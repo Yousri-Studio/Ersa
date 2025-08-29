@@ -1,0 +1,61 @@
+using System.ComponentModel.DataAnnotations;
+using ErsaTraining.API.Data.Entities;
+
+namespace ErsaTraining.API.DTOs;
+
+public class CreateOrderRequest
+{
+    [Required]
+    public Guid CartId { get; set; }
+}
+
+public class CreateOrderResponse
+{
+    public Guid OrderId { get; set; }
+    public decimal Amount { get; set; }
+    public string Currency { get; set; } = string.Empty;
+    public OrderStatus Status { get; set; }
+    public DateTime CreatedAt { get; set; }
+}
+
+public class CheckoutRequest
+{
+    [Required]
+    public Guid OrderId { get; set; }
+
+    [Required]
+    [Url]
+    public string ReturnUrl { get; set; } = string.Empty;
+}
+
+public class CheckoutResponse
+{
+    public string RedirectUrl { get; set; } = string.Empty;
+}
+
+public class PaymentWebhookRequest
+{
+    public Guid OrderId { get; set; }
+    public string Status { get; set; } = string.Empty;
+    public string? TransactionId { get; set; }
+    public string? RawPayload { get; set; }
+}
+
+public class OrderDto
+{
+    public Guid Id { get; set; }
+    public decimal Amount { get; set; }
+    public string Currency { get; set; } = string.Empty;
+    public OrderStatus Status { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public List<OrderItemDto> Items { get; set; } = new();
+}
+
+public class OrderItemDto
+{
+    public Guid CourseId { get; set; }
+    public LocalizedText CourseTitle { get; set; } = new();
+    public Guid? SessionId { get; set; }
+    public SessionDto? Session { get; set; }
+    public decimal Price { get; set; }
+}

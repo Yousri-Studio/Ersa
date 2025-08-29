@@ -1,0 +1,447 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View",
+    "search": "Search",
+    "filter": "Filter",
+    "next": "Next",
+    "previous": "Previous",
+    "home": "Home",
+    "about": "About",
+    "contact": "Contact",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "profile": "Profile",
+    "settings": "Settings",
+    "currency": "SAR",
+    "by": "by",
+    "off": "off",
+    "first-name": "First Name",
+    "last-name": "Last Name",
+    "email": "Email Address"
+  },
+  "navigation": {
+    "home": "Home",
+    "courses": "Training Courses",
+    "services": "Our Services",
+    "faq": "FAQ",
+    "contact": "Contact Us",
+    "consulting": "Administrative Consulting",
+    "ai": "AI Solutions",
+    "categories": "Platform Categories",
+    "cart": "Cart",
+    "wishlist": "Wishlist",
+    "my-learning": "My Learning",
+    "admin": "Admin"
+  },
+  "auth": {
+    "login": {
+      "title": "Welcome Back",
+      "subtitle": "Sign in to your account",
+      "email": "Email",
+      "password": "Password",
+      "remember": "Remember me",
+      "forgot": "Forgot password?",
+      "submit": "Sign In",
+      "no-account": "Don't have an account?",
+      "create-account": "Create one here"
+    },
+    "register": {
+      "title": "Create Account",
+      "subtitle": "Join Ersa Training today",
+      "full-name": "Full Name",
+      "email": "Email",
+      "phone": "Phone (Optional)",
+      "password": "Password",
+      "confirm-password": "Confirm Password",
+      "locale": "Preferred Language",
+      "submit": "Create Account",
+      "have-account": "Already have an account?",
+      "sign-in": "Sign in here"
+    },
+    "verify": {
+      "title": "Verify Your Email",
+      "subtitle": "Please enter the activation code sent to the email address you registered with",
+      "code-label": "Verification Code",
+      "verify-button": "Verify Account",
+      "verifying": "Verifying...",
+      "resend-question": "Didn't receive the code?",
+      "resend-button": "Resend Code",
+      "sending": "Sending...",
+      "back-to-register": "Back to Registration",
+      "success": "Email verified successfully!",
+      "invalid-code": "Invalid verification code. Please try again.",
+      "enter-complete-code": "Please enter the complete verification code",
+      "code-sent": "Verification code sent to your email",
+      "resend-failed": "Failed to resend verification code"
+    },
+    "errors": {
+      "invalid-credentials": "Invalid email or password",
+      "email-exists": "Email already exists",
+      "weak-password": "Password is too weak",
+      "required-field": "This field is required"
+    }
+  },
+  "home": {
+    "hero": {
+      "title": "Explore our training platform and elevate your skills to achieve your full potential",
+      "subtitle": "A comprehensive platform combining the latest training methods and advanced technologies to deliver an exceptional learning experience",
+      "cta": {
+        "explore": "Explore Courses",
+        "consult": "Request Consultation"
+      }
+    },
+    "search": {
+      "placeholder": "Search for a course?",
+      "categoryAll": "Choose Category",
+      "button": "Search"
+    },
+    "featured": {
+      "title": "Explore our training platform and unlock your potential",
+      "subtitle": "Achieve your full potential with top courses"
+    }
+  },
+  "hero": {
+    "title": "Transform Your Future with",
+    "company": "Ersa Training",
+    "subtitle": "Professional development courses designed to elevate your career and unlock your potential",
+    "cta": "Explore Courses",
+    "stats": {
+      "students": "Students Trained",
+      "courses": "Courses Available",
+      "satisfaction": "Satisfaction Rate"
+    }
+  },
+  "courses": {
+    "title": "Our Courses",
+    "subtitle": "Discover our comprehensive range of professional development courses",
+    "view-all": "View All Courses",
+    "featured": {
+      "title": "Featured Courses"
+    },
+    "live": "Live Session",
+    "pdf": "Self-Paced",
+    "price": "SAR",
+    "add-to-cart": "Add to Cart",
+    "add-to-wishlist": "Add to Wishlist",
+    "enrolled": "Enrolled",
+    "full": "Session Full",
+    "starts": "Starts",
+    "duration": "Duration",
+    "capacity": "Capacity",
+    "available": "Available Spots",
+    "bestseller": "Bestseller",
+    "new": "New",
+    "search": {
+      "results": "Search Results",
+      "results-for": "Search results for \"{query}\"",
+      "results-count": "{count} courses found",
+      "no-results": {
+        "title": "No search results found",
+        "description": "Try adjusting your search terms or using simpler phrases to find what you're looking for.",
+        "suggestions": {
+          "title": "Search suggestions:",
+          "items": {
+            "0": "Check your spelling",
+            "1": "Try different keywords",
+            "2": "Use more general terms",
+            "3": "Reduce the number of words"
+          }
+        },
+        "browse-all": "Browse Courses",
+        "try-again": "Try Search Again"
+      }
+    }
+  },
+  "card": {
+    "badge": {
+      "bestseller": "Bestseller",
+      "new": "New"
+    },
+    "mode": {
+      "onsite": "On-site",
+      "online": "Online"
+    },
+    "labels": {
+      "duration": "Duration"
+    },
+    "actions": {
+      "wishlist": "Add to wishlist",
+      "cart": "Add to cart"
+    }
+  },
+  "cart": {
+    "title": "Shopping Cart",
+    "empty": "Your cart is empty",
+    "continue-shopping": "Continue Shopping",
+    "remove": "Remove",
+    "total": "Total",
+    "checkout": "Proceed to Checkout",
+    "item-removed": "Item removed from cart",
+    "item-added": "Item added to cart",
+    "already-in-cart": "This item is already in your cart"
+  },
+  "checkout": {
+    "title": "Checkout",
+    "order-summary": "Order Summary",
+    "payment-method": "Payment Method",
+    "billing-info": "Billing Information",
+    "place-order": "Place Order",
+    "processing": "Processing...",
+    "success": {
+      "title": "Order Successful!",
+      "message": "Thank you for your purchase. You will receive an email with your course details shortly.",
+      "order-id": "Order ID",
+      "continue": "Continue Learning"
+    },
+    "failed": {
+      "title": "Payment Failed",
+      "message": "There was an issue processing your payment. Please try again.",
+      "retry": "Try Again"
+    }
+  },
+  "profile": {
+    "title": "My Profile",
+    "personal-info": "Personal Information",
+    "enrollments": "My Enrollments",
+    "orders": "Order History",
+    "settings": "Account Settings",
+    "update-success": "Profile updated successfully"
+  },
+  "cart": {
+    "title": "Shopping Cart",
+    "subtitle": "Review your selected items before purchase",
+    "items": "Items",
+    "items-count": "{count} items in cart",
+    "session": "Session",
+    "instructor": "Instructor",
+    "each": "each",
+    "remove": "Remove",
+    "move-to-wishlist": "Move to Wishlist",
+    "order-summary": "Order Summary",
+    "subtotal": "Subtotal",
+    "tax": "Tax",
+    "included": "Included",
+    "total": "Total",
+    "proceed-to-checkout": "Proceed to Checkout",
+    "continue-shopping": "Continue Shopping",
+    "promo-code": "Promo Code",
+    "promo-placeholder": "Enter promo code",
+    "apply": "Apply",
+    "clear-all": "Clear All",
+    "empty": {
+      "title": "Your cart is empty",
+      "description": "You haven't added any courses to your cart yet. Start browsing our featured courses.",
+      "browse-courses": "Browse Courses",
+      "go-to-home": "Go to Home Page"
+    }
+  },
+  "wishlist": {
+    "title": "Wishlist",
+    "subtitle": "Courses saved for later review",
+    "items-count": "{count} courses in wishlist",
+    "add-to-cart": "Add to Cart",
+    "continue-shopping": "Continue Shopping",
+    "empty": {
+      "title": "Your wishlist is empty now!",
+      "description": "Start saving your favorite products, click the button below",
+      "browse-courses": "Browse Courses",
+      "login-required": "Login",
+      "go-to-home": "Go to Home"
+    },
+    "item-added": "Item added to wishlist",
+    "item-removed": "Item removed from wishlist"
+  },
+  "course": {
+    "reviews": "reviews",
+    "students": "students",
+    "courses": "courses",
+    "lessons": "lessons",
+    "lesson": "Lesson",
+    "lesson-title": "Lesson Title",
+    "add-to-cart": "Add to Cart",
+    "view-in-cart": "View in Cart",
+    "add-to-wishlist": "Add to Wishlist",
+    "remove-from-wishlist": "Remove from Wishlist",
+    "includes": "This course includes",
+    "about": "About this course",
+    "requirements": "Requirements",
+    "curriculum": "Curriculum",
+    "instructor-info": "Instructor Information",
+    "student-reviews": "Student Reviews",
+    "reviews-coming-soon": "Reviews coming soon",
+    "details": "Course Details",
+    "level": "Level",
+    "duration": "Duration",
+    "language": "Language",
+    "last-updated": "Last Updated",
+    "preview": "Preview",
+    "tabs": {
+      "overview": "Overview",
+      "curriculum": "Curriculum",
+      "instructor": "Instructor",
+      "reviews": "Reviews"
+    }
+  },
+  "consultation": {
+    "badge": "Ersa with you for skill development",
+    "title": "Explore our training platform and elevate your abilities to achieve your maximum potential",
+    "description": "Build a promising future and lead your life with our interactive and comprehensive programs",
+    "request-consultation": "Request Consultation",
+    "explore-courses": "Explore Courses",
+    "image-alt": "Training Consultation",
+    "general-courses": "General Courses",
+    "courses": "courses",
+    "stats": {
+      "trainees": "trainees",
+      "courses": "courses"
+    }
+  },
+  "testimonials": {
+    "title": "Trainees' Opinions",
+    "subtitle": "Our Clients' Opinions",
+    "description": "Discover the experiences of learners who transformed their careers with us"
+  },
+  "admin": {
+    "dashboard": "Admin Dashboard",
+    "courses": "Manage Courses",
+    "orders": "Orders",
+    "users": "Users",
+    "enrollments": "Enrollments",
+    "email-logs": "Email Logs",
+    "create-course": "Create Course",
+    "edit-course": "Edit Course"
+  },
+  "join-us": {
+    "title": "Join Many Trainees",
+    "subtitle": "We make it easy for trainees to choose what suits their needs, helping these categories organize training content and present it clearly and distinctly for each category separately.",
+    "benefits": [
+      "Easy learning and achieving the best results with the best methods",
+      "Easy learning and achieving the best results with the best methods",
+      "Continuous support to meet needs"
+    ],
+    "cta": "Start with Us"
+  },
+  "achievements": {
+    "badge": "Our Numbers",
+    "title": "Our Achievements Since Establishment",
+    "subtitle": "We make it easy for trainees to choose what suits their needs, helping these categories organize training content and present it clearly and distinctly for each category separately.",
+    "stats": {
+      "trainees": "Trainees",
+      "government_courses": "Government Courses",
+      "clients": "Clients",
+      "satisfaction": "Client Satisfaction"
+    }
+  },
+  "training-categories": {
+    "badge": "Our Training Categories",
+    "title": "We offer at Ersa a diverse range of training categories covering multiple fields",
+    "subtitle": "We make it easy for trainees to choose what suits their needs, helping these categories organize training content and present it clearly and distinctly for each category separately.",
+    "categories": {
+      "general": {
+        "title": "General Courses",
+        "description": "We work to facilitate the process of trainees choosing what suits their needs."
+      },
+      "specialized": {
+        "title": "Specialized Programs",
+        "description": "We work to facilitate the process of trainees choosing what suits their needs."
+      },
+      "professional": {
+        "title": "Professional Certificates",
+        "description": "We work to facilitate the process of trainees choosing what suits their needs."
+      }
+    }
+  },
+  "services": {
+    "badge": "Your Best Choice",
+    "title": "Why Ersa Platform",
+    "subtitle": "We make it easy for trainees to choose what suits their needs, helping these categories organize training content and present it clearly and distinctly for each category separately.",
+    "cards": {
+      "quality": {
+        "title": "Quality and Commitment",
+        "description": "At Ersa, quality is not an additional option but the foundation of our work and the essence of what we provide to ensure the highest levels of excellence and distinction."
+      },
+      "partnership": {
+        "title": "Your Partner in Transformation Journey",
+        "description": "At Ersa, quality is not an additional option but the foundation of our work and the essence of what we provide to ensure the highest levels of excellence and distinction."
+      },
+      "innovation": {
+        "title": "Innovation and Creativity",
+        "description": "We constantly strive to renew our ideas and adopt new technologies, which enhances our ability to provide innovative solutions that meet our clients' needs."
+      },
+      "sustainability": {
+        "title": "Sustainability and Responsibility",
+        "description": "We recognize the importance of sustainability in our world today and therefore commit to implementing positive practices that preserve the environment and contribute to improving the communities in which we work."
+      }
+    }
+  },
+  "ai-consultation": {
+    "badge": "Your Best Choice",
+    "title": "Advanced Solutions Serving All Categories",
+    "subtitle": "We make it easy for trainees to choose what suits their needs, helping these categories organize training content and present it clearly and distinctly for each category separately.",
+    "cards": {
+      "ai-solutions": {
+        "title": "AI Solutions",
+        "description": "We make it easy for trainees to choose what suits their needs, helping these categories organize training content and present it clearly and distinctly for each category separately and organize training content clearly and distinctly for each category.",
+        "cta": "Request Consultation"
+      },
+      "admin-consultation": {
+        "title": "Administrative Consultation",
+        "description": "We make it easy for trainees to choose what suits their needs, helping these categories organize training content and present it clearly and distinctly for each category separately and organize training content clearly and distinctly for each category.",
+        "cta": "Request Consultation"
+      }
+    }
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "We make it easy for trainers to choose what suits their needs, to help us these categories organize training content and present it clearly and distinctly for each category separately.",
+    "view-all": "See Full FAQs",
+    "moreQuestions": "Have more questions?",
+    "contactUs": "Contact Us",
+    "questions": {
+      "0": {
+        "question": "What is the best way to learn programming?",
+        "answer": "The best way to learn programming is through consistent practice and working on real projects. Start with one programming language and master it well before moving to others."
+      },
+      "1": {
+        "question": "How long does it take for a beginner to learn development?",
+        "answer": "The time varies depending on the person and effort invested, but typically a beginner needs 6 to 12 months to build a strong foundation in programming with daily practice."
+      },
+      "2": {
+        "question": "Can I learn programming without a technical background?",
+        "answer": "Yes, absolutely! Programming is a skill that anyone can learn regardless of their background. What matters is patience, persistence, and continuous practice."
+      }
+    }
+  },
+  "contact": {
+    "subtitle": "Get in touch with our team. We're here to help you achieve your learning goals.",
+    "subject": "Subject",
+    "message": "Message",
+    "send-message": "Send Message",
+    "phone": "Phone",
+    "email": "Email",
+    "address": "Address"
+  },
+  "errors": {
+    "404": {
+      "title": "Page Not Found",
+      "description": "Sorry, the page you are looking for doesn't exist. Please check the URL or return to the homepage.",
+      "go-home": "Go to Homepage",
+      "browse-courses": "Browse Courses",
+      "contact-support": "Contact Support"
+    },
+    "server": {
+      "title": "Server Error",
+      "description": "An unexpected error occurred on our server. Please check your internet connection or try again later.",
+      "retry": "Try Again",
+      "go-home": "Go to Homepage"
+    }
+  }
+}
