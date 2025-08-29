@@ -89,6 +89,7 @@ public static class SeedData
             new Course
             {
                 Id = Guid.NewGuid(),
+                Slug = "advanced-project-management",
                 TitleEn = "Advanced Project Management",
                 TitleAr = "إدارة المشاريع المتقدمة",
                 DescriptionEn = "Master the art of project management with advanced techniques and methodologies. Learn to lead complex projects from initiation to closure.",
@@ -103,6 +104,7 @@ public static class SeedData
             new Course
             {
                 Id = Guid.NewGuid(),
+                Slug = "digital-marketing-fundamentals",
                 TitleEn = "Digital Marketing Fundamentals",
                 TitleAr = "أساسيات التسويق الرقمي",
                 DescriptionEn = "Learn the fundamentals of digital marketing including SEO, social media marketing, content marketing, and analytics.",
@@ -117,6 +119,7 @@ public static class SeedData
             new Course
             {
                 Id = Guid.NewGuid(),
+                Slug = "data-science-with-python",
                 TitleEn = "Data Science with Python",
                 TitleAr = "علم البيانات باستخدام بايثون",
                 DescriptionEn = "Comprehensive course covering data analysis, machine learning, and visualization using Python and popular libraries.",
@@ -131,6 +134,7 @@ public static class SeedData
             new Course
             {
                 Id = Guid.NewGuid(),
+                Slug = "leadership-and-team-management",
                 TitleEn = "Leadership and Team Management",
                 TitleAr = "القيادة وإدارة الفريق",
                 DescriptionEn = "Develop essential leadership skills and learn effective team management strategies for modern workplaces.",
@@ -145,6 +149,7 @@ public static class SeedData
             new Course
             {
                 Id = Guid.NewGuid(),
+                Slug = "financial-planning-and-analysis",
                 TitleEn = "Financial Planning and Analysis",
                 TitleAr = "التخطيط والتحليل المالي",
                 DescriptionEn = "Master financial planning, budgeting, forecasting, and analysis techniques for business success.",
@@ -159,6 +164,7 @@ public static class SeedData
             new Course
             {
                 Id = Guid.NewGuid(),
+                Slug = "web-development-bootcamp",
                 TitleEn = "Web Development Bootcamp",
                 TitleAr = "معسكر تطوير الويب",
                 DescriptionEn = "Full-stack web development course covering HTML, CSS, JavaScript, React, Node.js, and database management.",
@@ -172,6 +178,7 @@ public static class SeedData
             new Course
             {
                 Id = Guid.NewGuid(),
+                Slug = "cloud-computing-with-aws",
                 TitleEn = "Cloud Computing with AWS",
                 TitleAr = "الحوسبة السحابية مع أمازون ويب سيرفيسز",
                 DescriptionEn = "Learn cloud computing concepts and hands-on AWS services including EC2, S3, Lambda, and more.",
@@ -186,6 +193,7 @@ public static class SeedData
             new Course
             {
                 Id = Guid.NewGuid(),
+                Slug = "ux-ui-design-principles",
                 TitleEn = "UX/UI Design Principles",
                 TitleAr = "مبادئ تصميم تجربة وواجهة المستخدم",
                 DescriptionEn = "Master user experience and user interface design principles, tools, and best practices for digital products.",
@@ -200,6 +208,7 @@ public static class SeedData
             new Course
             {
                 Id = Guid.NewGuid(),
+                Slug = "cybersecurity-fundamentals2",
                 TitleEn = "Cybersecurity Fundamentals",
                 TitleAr = "أساسيات الأمن السيبراني",
                 DescriptionEn = "Comprehensive introduction to cybersecurity concepts, threats, and protection strategies for organizations.",
@@ -214,6 +223,7 @@ public static class SeedData
             new Course
             {
                 Id = Guid.NewGuid(),
+                Slug = "business-intelligence-and-analytics2",
                 TitleEn = "Business Intelligence and Analytics",
                 TitleAr = "ذكاء الأعمال والتحليلات",
                 DescriptionEn = "Learn to transform data into actionable business insights using modern BI tools and analytical techniques.",
@@ -228,6 +238,7 @@ public static class SeedData
             new Course
             {
                 Id = Guid.NewGuid(),
+                Slug = "Agileand-scrum-Methodology",
                 TitleEn = "Agile and Scrum Methodology",
                 TitleAr = "منهجية أجايل وسكرم",
                 DescriptionEn = "Master Agile principles and Scrum framework for effective project management and team collaboration.",
@@ -242,6 +253,7 @@ public static class SeedData
             new Course
             {
                 Id = Guid.NewGuid(),
+                Slug = "mobile-app-development2",
                 TitleEn = "Mobile App Development",
                 TitleAr = "تطوير تطبيقات الهاتف المحمول",
                 Level=CourseLevel.Advanced,

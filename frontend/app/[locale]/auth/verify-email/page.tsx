@@ -23,6 +23,11 @@ export default function VerifyEmailPage() {
   const { login } = useAuthStore();
 
   useEffect(() => {
+    if (!searchParams) {
+      router.push(`/${locale}/auth/register`);
+      return;
+    }
+    
     const emailParam = searchParams.get('email');
     if (emailParam) {
       setEmail(emailParam);

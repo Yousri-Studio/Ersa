@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ErsaTraining.API.Migrations
 {
     /// <inheritdoc />
-    public partial class CleanStart : Migration
+    public partial class RecreatedMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -89,6 +89,7 @@ namespace ErsaTraining.API.Migrations
                     Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Currency = table.Column<string>(type: "TEXT", maxLength: 3, nullable: false, defaultValue: "SAR"),
                     Type = table.Column<int>(type: "INTEGER", nullable: false),
+                    Level = table.Column<int>(type: "INTEGER", nullable: false),
                     IsActive = table.Column<bool>(type: "INTEGER", nullable: false, defaultValue: true),
                     IsFeatured = table.Column<bool>(type: "INTEGER", nullable: false, defaultValue: false),
                     TitleAr = table.Column<string>(type: "TEXT", maxLength: 500, nullable: false),
@@ -550,7 +551,7 @@ namespace ErsaTraining.API.Migrations
                     EnrollmentId = table.Column<Guid>(type: "TEXT", nullable: true),
                     TemplateKey = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     Locale = table.Column<string>(type: "TEXT", maxLength: 5, nullable: false),
-                    Status = table.Column<int>(type: "INTEGER", nullable: false, defaultValue: 1),
+                    Status = table.Column<int>(type: "INTEGER", nullable: true, defaultValue: 1),
                     ProviderMsgId = table.Column<string>(type: "TEXT", maxLength: 255, nullable: true),
                     SentAt = table.Column<DateTime>(type: "TEXT", nullable: true),
                     OpenedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
@@ -616,14 +617,14 @@ namespace ErsaTraining.API.Migrations
                 columns: new[] { "Id", "CreatedAt", "Description", "IsActive", "PageKey", "PageName", "UpdatedAt" },
                 values: new object[,]
                 {
-                    { new Guid("01d7b0f0-9133-44b4-ac9c-e6a99636c21a"), new DateTime(2025, 8, 29, 7, 25, 53, 680, DateTimeKind.Utc).AddTicks(9820), "Our services overview", true, "services", "Services", new DateTime(2025, 8, 29, 7, 25, 53, 680, DateTimeKind.Utc).AddTicks(9820) },
-                    { new Guid("2ed13c42-2486-4ff6-b085-45fb239fcdaa"), new DateTime(2025, 8, 29, 7, 25, 53, 680, DateTimeKind.Utc).AddTicks(9807), "Main landing page of the website", true, "home", "Home Page", new DateTime(2025, 8, 29, 7, 25, 53, 680, DateTimeKind.Utc).AddTicks(9807) },
-                    { new Guid("305220f6-6c44-49c5-957e-c6e6df4337d3"), new DateTime(2025, 8, 29, 7, 25, 53, 680, DateTimeKind.Utc).AddTicks(9814), "Contact information and form", true, "contact", "Contact Us", new DateTime(2025, 8, 29, 7, 25, 53, 680, DateTimeKind.Utc).AddTicks(9814) },
-                    { new Guid("4562f2d4-cde2-463e-a521-e6e50dd74ac3"), new DateTime(2025, 8, 29, 7, 25, 53, 680, DateTimeKind.Utc).AddTicks(9829), "Artificial Intelligence services", true, "ai-solutions", "AI Solutions", new DateTime(2025, 8, 29, 7, 25, 53, 680, DateTimeKind.Utc).AddTicks(9830) },
-                    { new Guid("955bb687-c935-4a53-a764-b3d869d868d6"), new DateTime(2025, 8, 29, 7, 25, 53, 680, DateTimeKind.Utc).AddTicks(9826), "Available training courses", true, "courses", "Courses", new DateTime(2025, 8, 29, 7, 25, 53, 680, DateTimeKind.Utc).AddTicks(9826) },
-                    { new Guid("a174bcca-bf8f-4936-b5ab-89dd9017fe10"), new DateTime(2025, 8, 29, 7, 25, 53, 680, DateTimeKind.Utc).AddTicks(9832), "Administrative consulting services", true, "admin-consulting", "Administrative Consulting", new DateTime(2025, 8, 29, 7, 25, 53, 680, DateTimeKind.Utc).AddTicks(9833) },
-                    { new Guid("df478517-4af6-4637-b045-63337db56f44"), new DateTime(2025, 8, 29, 7, 25, 53, 680, DateTimeKind.Utc).AddTicks(9817), "Frequently asked questions", true, "faq", "FAQ", new DateTime(2025, 8, 29, 7, 25, 53, 680, DateTimeKind.Utc).AddTicks(9817) },
-                    { new Guid("fbb7c634-4531-4aa2-a76d-14ac0798f820"), new DateTime(2025, 8, 29, 7, 25, 53, 680, DateTimeKind.Utc).AddTicks(9811), "Company information and mission", true, "about", "About Us", new DateTime(2025, 8, 29, 7, 25, 53, 680, DateTimeKind.Utc).AddTicks(9811) }
+                    { new Guid("03cff99c-ce27-4f2b-a75b-ee0791f7faf7"), new DateTime(2025, 8, 29, 19, 21, 39, 713, DateTimeKind.Utc).AddTicks(260), "Our services overview", true, "services", "Services", new DateTime(2025, 8, 29, 19, 21, 39, 713, DateTimeKind.Utc).AddTicks(261) },
+                    { new Guid("2486e34d-1aa7-4f1a-8d03-bc3b07984e1d"), new DateTime(2025, 8, 29, 19, 21, 39, 713, DateTimeKind.Utc).AddTicks(264), "Available training courses", true, "courses", "Courses", new DateTime(2025, 8, 29, 19, 21, 39, 713, DateTimeKind.Utc).AddTicks(264) },
+                    { new Guid("381472ab-60ed-48cf-8178-96ff1bc96494"), new DateTime(2025, 8, 29, 19, 21, 39, 713, DateTimeKind.Utc).AddTicks(258), "Frequently asked questions", true, "faq", "FAQ", new DateTime(2025, 8, 29, 19, 21, 39, 713, DateTimeKind.Utc).AddTicks(258) },
+                    { new Guid("41794009-4403-4626-bdba-18d679b0d8a4"), new DateTime(2025, 8, 29, 19, 21, 39, 713, DateTimeKind.Utc).AddTicks(266), "Artificial Intelligence services", true, "ai-solutions", "AI Solutions", new DateTime(2025, 8, 29, 19, 21, 39, 713, DateTimeKind.Utc).AddTicks(267) },
+                    { new Guid("4832a76a-fcb6-4838-a0a3-2132bbe4228e"), new DateTime(2025, 8, 29, 19, 21, 39, 712, DateTimeKind.Utc).AddTicks(9752), "Main landing page of the website", true, "home", "Home Page", new DateTime(2025, 8, 29, 19, 21, 39, 713, DateTimeKind.Utc) },
+                    { new Guid("9129fda5-9843-4b63-9a0d-853e8dabb0dc"), new DateTime(2025, 8, 29, 19, 21, 39, 713, DateTimeKind.Utc).AddTicks(242), "Company information and mission", true, "about", "About Us", new DateTime(2025, 8, 29, 19, 21, 39, 713, DateTimeKind.Utc).AddTicks(242) },
+                    { new Guid("b784e49b-1c28-4667-ac01-c01d09a5f243"), new DateTime(2025, 8, 29, 19, 21, 39, 713, DateTimeKind.Utc).AddTicks(269), "Administrative consulting services", true, "admin-consulting", "Administrative Consulting", new DateTime(2025, 8, 29, 19, 21, 39, 713, DateTimeKind.Utc).AddTicks(270) },
+                    { new Guid("cdf9af5e-0cf0-4497-a471-1e3399dae397"), new DateTime(2025, 8, 29, 19, 21, 39, 713, DateTimeKind.Utc).AddTicks(245), "Contact information and form", true, "contact", "Contact Us", new DateTime(2025, 8, 29, 19, 21, 39, 713, DateTimeKind.Utc).AddTicks(245) }
                 });
 
             migrationBuilder.InsertData(
@@ -631,9 +632,9 @@ namespace ErsaTraining.API.Migrations
                 columns: new[] { "Id", "BodyHtmlAr", "BodyHtmlEn", "CreatedAt", "Key", "SubjectAr", "SubjectEn", "UpdatedAt" },
                 values: new object[,]
                 {
-                    { new Guid("2bf1aa21-e832-4d6f-a3aa-f1ed647ebfca"), "<h1>مواد الدورة</h1><p>يمكنك تحميل مواد الدورة من الروابط التالية:</p>{{SecureLinks}}", "<h1>Course Materials</h1><p>You can download the course materials from the following links:</p>{{SecureLinks}}", new DateTime(2025, 8, 29, 7, 25, 53, 680, DateTimeKind.Utc).AddTicks(9648), "MaterialsDelivery", "مواد الدورة - {{CourseTitleAr}}", "Course Materials - {{CourseTitleEn}}", new DateTime(2025, 8, 29, 7, 25, 53, 680, DateTimeKind.Utc).AddTicks(9648) },
-                    { new Guid("5d3ad09e-d900-4399-8d09-a9ae24f92c1c"), "<h1>مرحباً بك في إرساء للتدريب</h1><p>شكراً لانضمامك إلينا!</p>", "<h1>Welcome to Ersa Training</h1><p>Thank you for joining us!</p>", new DateTime(2025, 8, 29, 7, 25, 53, 680, DateTimeKind.Utc).AddTicks(9639), "Welcome", "مرحباً بك في إرساء للتدريب", "Welcome to Ersa Training", new DateTime(2025, 8, 29, 7, 25, 53, 680, DateTimeKind.Utc).AddTicks(9640) },
-                    { new Guid("e228d662-0fb5-4ec7-a430-bf3cbdca7c42"), "<h1>تفاصيل الدورة المباشرة</h1><p>رابط الانضمام: {{TeamsLink}}</p><p>تاريخ البدء: {{StartDate}}</p>", "<h1>Live Course Details</h1><p>Join Link: {{TeamsLink}}</p><p>Start Date: {{StartDate}}</p>", new DateTime(2025, 8, 29, 7, 25, 53, 680, DateTimeKind.Utc).AddTicks(9645), "LiveDetails", "تفاصيل الدورة المباشرة - {{CourseTitleAr}}", "Live Course Details - {{CourseTitleEn}}", new DateTime(2025, 8, 29, 7, 25, 53, 680, DateTimeKind.Utc).AddTicks(9645) }
+                    { new Guid("14b21d21-962a-44ad-916a-6dc4793e060c"), "<h1>مرحباً بك في إرساء للتدريب</h1><p>شكراً لانضمامك إلينا!</p>", "<h1>Welcome to Ersa Training</h1><p>Thank you for joining us!</p>", new DateTime(2025, 8, 29, 19, 21, 39, 712, DateTimeKind.Utc).AddTicks(624), "Welcome", "مرحباً بك في إرساء للتدريب", "Welcome to Ersa Training", new DateTime(2025, 8, 29, 19, 21, 39, 712, DateTimeKind.Utc).AddTicks(880) },
+                    { new Guid("1b10b786-eee9-4ce6-b53d-d4bb89847610"), "<h1>مواد الدورة</h1><p>يمكنك تحميل مواد الدورة من الروابط التالية:</p>{{SecureLinks}}", "<h1>Course Materials</h1><p>You can download the course materials from the following links:</p>{{SecureLinks}}", new DateTime(2025, 8, 29, 19, 21, 39, 712, DateTimeKind.Utc).AddTicks(1133), "MaterialsDelivery", "مواد الدورة - {{CourseTitleAr}}", "Course Materials - {{CourseTitleEn}}", new DateTime(2025, 8, 29, 19, 21, 39, 712, DateTimeKind.Utc).AddTicks(1134) },
+                    { new Guid("71b11239-2933-41db-9b4c-8e5f00678492"), "<h1>تفاصيل الدورة المباشرة</h1><p>رابط الانضمام: {{TeamsLink}}</p><p>تاريخ البدء: {{StartDate}}</p>", "<h1>Live Course Details</h1><p>Join Link: {{TeamsLink}}</p><p>Start Date: {{StartDate}}</p>", new DateTime(2025, 8, 29, 19, 21, 39, 712, DateTimeKind.Utc).AddTicks(1129), "LiveDetails", "تفاصيل الدورة المباشرة - {{CourseTitleAr}}", "Live Course Details - {{CourseTitleEn}}", new DateTime(2025, 8, 29, 19, 21, 39, 712, DateTimeKind.Utc).AddTicks(1130) }
                 });
 
             migrationBuilder.CreateIndex(

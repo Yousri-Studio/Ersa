@@ -13,6 +13,11 @@ export default function AuthSuccessPage() {
   const { login } = useAuthStore();
 
   useEffect(() => {
+    if (!searchParams) {
+      router.push(`/${locale}/auth/login`);
+      return;
+    }
+    
     const token = searchParams.get('token');
     const error = searchParams.get('error');
 
