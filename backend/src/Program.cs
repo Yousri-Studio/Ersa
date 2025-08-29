@@ -190,8 +190,8 @@ using (var scope = app.Services.CreateScope())
         
         Log.Information("Database initialized successfully");
         
-        // Create super admin user
-        await ErsaTraining.API.CreateSuperAdmin.CreateSuperAdminUser(app.Services);
+        // Seed database with initial data
+        await ErsaTraining.API.SeedData.SeedAsync(app.Services);
     }
     catch (Exception ex)
     {

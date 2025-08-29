@@ -3,6 +3,7 @@ import { getMessages } from 'next-intl/server';
 import { Providers } from '@/components/providers';
 import { ConditionalLayout } from '@/components/layout/conditional-layout';
 import { ScrollAnimations } from '@/components/scroll-animations';
+import { cairo } from '../fonts';
 import '../globals.css';
 
 export function generateStaticParams() {
@@ -22,6 +23,7 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
       <head>
+        <link rel="stylesheet" href="/fontawesome/css/all.min.css" />
         {/* Apple ID Sign In - Only load if client ID is configured */}
         {process.env.NEXT_PUBLIC_APPLE_CLIENT_ID && (
           <>
@@ -37,7 +39,7 @@ export default async function LocaleLayout({
           </>
         )}
       </head>
-      <body className="font-cairo">
+      <body className={`${cairo.variable} font-cairo`}>
         <NextIntlClientProvider messages={messages}>
           <Providers>
             <ScrollAnimations />

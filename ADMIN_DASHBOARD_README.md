@@ -14,12 +14,15 @@ The Ersa Training Admin Dashboard is a comprehensive management system that allo
 - **JWT-based authentication**: Secure token-based authentication
 - **Protected routes**: All admin routes require proper authorization
 - **Session management**: Automatic token refresh and logout
+- **React Hooks Compliance**: All components follow React Rules of Hooks for consistent behavior
 
 ### 📊 Dashboard Overview
 - **Real-time statistics**: Total users, courses, orders, and revenue
 - **Recent activity**: Latest users and orders
 - **Performance metrics**: Active users, course completion rates
 - **Revenue tracking**: Total and average order values
+- **Geographic analytics**: Interactive Leaflet maps showing user distribution
+- **Fallback data**: Graceful handling of API failures with demo data
 
 ### 👥 User Management
 - **User listing**: View all users with pagination and search
@@ -27,13 +30,16 @@ The Ersa Training Admin Dashboard is a comprehensive management system that allo
 - **Role management**: Assign admin and super admin roles (Super Admin only)
 - **User details**: View user information, registration date, last login
 - **Admin notes**: Add internal notes about users
+- **User creation**: Add new users with role assignment
+- **Bulk operations**: Manage multiple users efficiently
 
 ### 📚 Course Management
 - **Course listing**: View all courses with pagination and search
 - **Course status**: Activate or deactivate courses
 - **Course details**: View course information, pricing, and status
-- **Course editing**: Edit course information (coming soon)
-- **Course creation**: Add new courses (coming soon)
+- **Course editing**: Full CRUD operations with bilingual support
+- **Course creation**: Add new courses with Arabic and English titles/descriptions
+- **Price management**: Set and update course pricing
 
 ### 🛒 Order Management
 - **Order listing**: View all orders with filtering and pagination
@@ -41,6 +47,14 @@ The Ersa Training Admin Dashboard is a comprehensive management system that allo
 - **Order details**: View order information, customer details, and amounts
 - **Date filtering**: Filter orders by date range
 - **Invoice generation**: Download order invoices (coming soon)
+- **Real-time updates**: Status changes reflect immediately
+
+### 🎨 Content Management
+- **Dynamic content editing**: Manage website content sections
+- **Bilingual support**: Edit content in both Arabic and English
+- **Section management**: Hero, FAQ, testimonials, and more
+- **Live preview**: See changes before publishing
+- **Content versioning**: Track content modification history
 
 ### 🔧 System Settings (Super Admin Only)
 - **Platform configuration**: System-wide settings
@@ -86,10 +100,10 @@ npm run dev
 
 ### 2. Access the Dashboard
 
-1. Navigate to `http://localhost:3000/en/admin` or `http://localhost:3000/ar/admin`
+1. Navigate to `http://localhost:8080/en/admin` or `http://localhost:8080/ar/admin`
 2. Login with admin credentials:
-   - **Email**: admin@ersatraining.com
-   - **Password**: Admin123!
+   - **Email**: superadmin@ersatraining.com
+   - **Password**: SuperAdmin123!
 
 ### 3. Create Additional Admin Users
 
@@ -279,7 +293,7 @@ The admin dashboard uses Tailwind CSS with a consistent design system:
    - Clear browser cache and cookies
 
 2. **API Connection Issues**
-   - Verify backend is running on `https://localhost:7001`
+   - Verify backend is running on `http://localhost:5002`
    - Check CORS configuration in `Program.cs`
    - Ensure firewall isn't blocking connections
    - Check network connectivity
@@ -303,7 +317,7 @@ The admin dashboard uses Tailwind CSS with a consistent design system:
 
 ### Development Tools
 - **Database**: Use SQL Server Management Studio or Azure Data Studio
-- **API Testing**: Swagger UI at `https://localhost:7001/swagger`
+- **API Testing**: Swagger UI at `http://localhost:5002/swagger`
 - **Frontend**: React Developer Tools browser extension
 - **Git**: Use GitHub Desktop or command line
 

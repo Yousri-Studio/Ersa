@@ -27,6 +27,12 @@ export default function AdminOrders() {
   });
   const { isHydrated } = useHydration();
 
+  useEffect(() => {
+    if (isHydrated) {
+      fetchOrders();
+    }
+  }, [isHydrated, pagination.page, filters]);
+
   if (!isHydrated) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -34,10 +40,6 @@ export default function AdminOrders() {
       </div>
     );
   }
-
-  useEffect(() => {
-    fetchOrders();
-  }, [pagination.page, filters]);
 
   const fetchOrders = async () => {
     try {

@@ -30,6 +30,13 @@ export default function ContentManagementPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('sections');
   const { isHydrated } = useHydration();
+  const locale = useLocale();
+
+  useEffect(() => {
+    if (isHydrated) {
+      loadContentSections();
+    }
+  }, [isHydrated]);
 
   if (!isHydrated) {
     return (
@@ -38,12 +45,6 @@ export default function ContentManagementPage() {
       </div>
     );
   }
-  
-  const locale = useLocale();
-
-  useEffect(() => {
-    loadContentSections();
-  }, []);
 
   const loadContentSections = async () => {
     try {

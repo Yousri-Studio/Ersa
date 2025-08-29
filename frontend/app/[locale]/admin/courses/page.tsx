@@ -33,6 +33,12 @@ export default function AdminCourses() {
   });
   const { isHydrated } = useHydration();
 
+  useEffect(() => {
+    if (isHydrated) {
+      fetchCourses();
+    }
+  }, [isHydrated, pagination.page, filters]);
+
   if (!isHydrated) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -40,10 +46,6 @@ export default function AdminCourses() {
       </div>
     );
   }
-
-  useEffect(() => {
-    fetchCourses();
-  }, [pagination.page, filters]);
 
   const fetchCourses = async () => {
     try {

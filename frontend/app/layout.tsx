@@ -12,14 +12,5 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <html>
-      <head>
-        <link rel="stylesheet" href="/fontawesome/css/all.min.css" />
-      </head>
-      <body className={`${cairo.variable} font-cairo`}>
-        {children}
-      </body>
-    </html>
-  );
+  return children;
 }

@@ -44,6 +44,12 @@ export default function AdminUsers() {
   const { user: currentUser } = useAuthStore();
   const { isHydrated } = useHydration();
 
+  useEffect(() => {
+    if (isHydrated) {
+      fetchUsers();
+    }
+  }, [isHydrated, pagination.page, filters]);
+
   if (!isHydrated) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -51,10 +57,6 @@ export default function AdminUsers() {
       </div>
     );
   }
-
-  useEffect(() => {
-    fetchUsers();
-  }, [pagination.page, filters]);
 
   const fetchUsers = async () => {
     try {

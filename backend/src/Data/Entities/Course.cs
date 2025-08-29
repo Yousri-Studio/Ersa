@@ -17,6 +17,8 @@ public class Course
     public string Currency { get; set; } = "SAR";
     
     public CourseType Type { get; set; }
+
+    public CourseLevel Level { get; set; }
     
     public bool IsActive { get; set; } = true;
     
@@ -57,4 +59,11 @@ public enum CourseType
 {
     Live = 1,
     PDF = 2
+}
+
+public enum CourseLevel
+{
+    Biginner = 1,
+    Intermediate = 2,
+    Advanced=3
 }

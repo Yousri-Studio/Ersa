@@ -12,18 +12,22 @@ A comprehensive bilingual (Arabic/English) e-learning platform built with Next.j
 - **Secure Content Delivery**: Protected PDF downloads with revocable links and download logging
 - **Shopping Cart**: Guest and authenticated user cart management with merge functionality
 - **Wishlist**: Authenticated user wishlist management
+- **Interactive Maps**: Leaflet-powered geographic visualization for user analytics
 
 ### User Experience
 - **Responsive Design**: Mobile-first approach with Tailwind CSS
 - **Modern UI**: Clean, professional interface with gradient text styling
 - **SEO Optimized**: Server-side rendering with Next.js App Router
 - **Real-time Updates**: React Query for efficient data fetching and caching
+- **React Hooks Compliance**: All components follow React Rules of Hooks for consistent behavior
 
 ### Admin Features
-- **Course Management**: Create and manage live sessions and PDF courses
-- **Order Tracking**: Complete order and payment history
+- **Comprehensive Dashboard**: Real-time statistics, user analytics, and geographic insights
+- **Course Management**: Create, edit, and manage live sessions and PDF courses with bilingual support
+- **User Management**: Complete user account management with role-based permissions
+- **Order Tracking**: Complete order and payment history with status management
+- **Content Management**: Dynamic website content editing with multilingual support
 - **Email Logs**: Track email delivery, opens, and clicks
-- **User Management**: User accounts and enrollment management
 - **Content Security**: Revokable download links with usage analytics
 
 ## 🏗️ Architecture
@@ -108,7 +112,7 @@ dotnet ef database update
 ```bash
 dotnet run
 ```
-The API will be available at `https://localhost:7001`
+The API will be available at `http://localhost:5002`
 
 ### 3. Frontend Setup
 
@@ -121,7 +125,7 @@ npm install
 #### Configure Environment
 Create `.env.local`:
 ```env
-NEXT_PUBLIC_API_BASE_URL=https://localhost:7001/api
+NEXT_PUBLIC_API_BASE_URL=http://localhost:5002/api
 FONTAWESOME_NPM_AUTH_TOKEN=your-fontawesome-pro-token
 ```
 
@@ -133,12 +137,14 @@ You need a Font Awesome Pro license:
 #### Start the Development Server
 ```bash
 npm run dev
+# or run on specific port
+npx next dev -p 8080
 ```
-The frontend will be available at `http://localhost:3000`
+The frontend will be available at `http://localhost:3000` (or `http://localhost:8080` if using custom port)
 
 ## 🌐 API Documentation
 
-The API includes Swagger documentation available at `https://localhost:7001/swagger` when running in development mode.
+The API includes Swagger documentation available at `http://localhost:5002/swagger` when running in development mode.
 
 ### Key Endpoints
 
@@ -224,8 +230,8 @@ Ersa/
 ### Environment Configuration
 
 #### Development
-- Backend runs on `https://localhost:7001`
-- Frontend runs on `http://localhost:3000`
+- Backend runs on `http://localhost:5002`
+- Frontend runs on `http://localhost:3000` or `http://localhost:8080`
 - Uses LocalDB for database
 - Test credentials for payment gateway
 

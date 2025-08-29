@@ -12,6 +12,7 @@ public class CourseListDto
     public decimal Price { get; set; }
     public string Currency { get; set; } = string.Empty;
     public CourseType Type { get; set; }
+    public CourseLevel Level { get; set; }
     public bool IsActive { get; set; }
     public bool IsFeatured { get; set; }
 }
