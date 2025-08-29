@@ -55,25 +55,26 @@ A comprehensive bilingual (Arabic/English) e-learning platform built with Next.j
 - **HyperPay Account** (for payments)
 - **Font Awesome 6 Pro License** (for icons)
 - **Azure Storage Account** (optional, for cloud storage)
+- **Git** (for version control)
 
 ## 🛠️ Setup Instructions
 
 ### 1. Clone the Repository
 ```bash
-git clone <repository-url>
-cd ersa-training-platform
+git clone https://github.com/your-username/Ersa.git
+cd Ersa
 ```
 
 ### 2. Backend Setup
 
 #### Install Dependencies
 ```bash
-cd backend
+cd backend/src
 dotnet restore
 ```
 
 #### Configure Settings
-Edit `backend/src/appsettings.json`:
+Create `backend/src/appsettings.Development.json` (this file is gitignored for security):
 ```json
 {
   "ConnectionStrings": {
@@ -180,27 +181,35 @@ The API includes Swagger documentation available at `https://localhost:7001/swag
 
 ## 🔧 Development
 
-### Code Structure
+### Project Structure
 
-#### Backend
 ```
-backend/src/
-├── Controllers/         # API controllers
-├── Data/               # EF Core context and entities
-├── DTOs/               # Data transfer objects
-├── Services/           # Business logic services
-├── Middleware/         # Custom middleware
-└── Configuration/      # App configuration
-```
-
-#### Frontend
-```
-frontend/
-├── app/[locale]/       # Next.js app router pages
-├── components/         # React components
-├── lib/                # Utilities and stores
-├── locales/           # Translation files
-└── styles/            # Global styles
+Ersa/
+├── backend/                    # .NET Core API
+│   ├── src/                   # Main API project
+│   │   ├── Controllers/       # API controllers
+│   │   ├── Data/             # EF Core context and entities
+│   │   ├── DTOs/             # Data transfer objects
+│   │   ├── Services/         # Business logic services
+│   │   ├── Middleware/       # Custom middleware
+│   │   └── Configuration/    # App configuration
+│   ├── Utilities/            # Utility applications
+│   └── VerifySuperAdminApp/  # Admin verification tool
+├── frontend/                  # Next.js application
+│   ├── app/[locale]/         # Next.js app router pages
+│   │   ├── admin/           # Admin dashboard
+│   │   ├── ar/              # Arabic locale
+│   │   └── en/              # English locale
+│   ├── components/           # React components
+│   │   ├── auth/            # Authentication components
+│   │   ├── forms/           # Form components
+│   │   └── examples/        # Example components
+│   ├── lib/                 # Utilities and stores
+│   ├── locales/            # Translation files
+│   └── styles/             # Global styles
+├── .gitignore                # Git ignore rules
+├── README.md                 # Main project documentation
+└── ADMIN_DASHBOARD_README.md # Admin dashboard documentation
 ```
 
 ### Best Practices
@@ -212,16 +221,47 @@ frontend/
 
 ## 🚀 Deployment
 
-### Backend Deployment
+### Environment Configuration
+
+#### Development
+- Backend runs on `https://localhost:7001`
+- Frontend runs on `http://localhost:3000`
+- Uses LocalDB for database
+- Test credentials for payment gateway
+
+#### Production
+
+**Backend Deployment:**
 1. Configure production settings in `appsettings.Production.json`
 2. Set up Azure SQL Database or SQL Server
 3. Configure SendGrid and HyperPay production credentials
 4. Deploy to Azure App Service or IIS
+5. Ensure SSL certificates are properly configured
 
-### Frontend Deployment
+**Frontend Deployment:**
 1. Build the application: `npm run build`
 2. Deploy to Vercel, Netlify, or any static hosting service
 3. Configure environment variables for production API URL
+4. Set up custom domain and SSL
+
+### Git Workflow
+
+```bash
+# Clone the repository
+git clone https://github.com/your-username/Ersa.git
+
+# Create a feature branch
+git checkout -b feature/your-feature-name
+
+# Make your changes and commit
+git add .
+git commit -m "Add your feature description"
+
+# Push to your branch
+git push origin feature/your-feature-name
+
+# Create a pull request on GitHub
+```
 
 ## 🔒 Security
 
@@ -272,6 +312,23 @@ The system includes bilingual email templates for:
 4. Add tests if applicable
 5. Submit a pull request
 
+## 🔄 Version Control
+
+### Git Ignore
+The project includes a comprehensive `.gitignore` file that excludes:
+- **Node.js**: `node_modules/`, build artifacts, cache files
+- **.NET**: `bin/`, `obj/`, user-specific files, build outputs
+- **Database**: `*.db`, `*.sqlite` files
+- **Environment**: `.env*` files with sensitive data
+- **IDE**: `.vs/`, `.vscode/`, `.idea/` directories
+- **OS**: `.DS_Store`, `Thumbs.db` system files
+
+### Repository Structure
+- **Main branch**: Production-ready code
+- **Develop branch**: Integration branch for features
+- **Feature branches**: Individual feature development
+- **Release branches**: Preparation for production releases
+
 ## 📄 License
 
 This project is proprietary software for Ersa Training.
@@ -279,9 +336,26 @@ This project is proprietary software for Ersa Training.
 ## 📞 Support
 
 For technical support or questions:
-- Email: support@ersatraining.com
-- Documentation: [Internal Wiki]
-- Issue Tracker: [Internal System]
+- **Email**: support@ersatraining.com
+- **GitHub Issues**: Use the repository's issue tracker
+- **Documentation**: See `ADMIN_DASHBOARD_README.md` for admin-specific docs
+- **Wiki**: [Project Wiki](https://github.com/your-username/Ersa/wiki)
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Make your changes
+4. Commit your changes (`git commit -m 'Add some amazing feature'`)
+5. Push to the branch (`git push origin feature/amazing-feature`)
+6. Open a Pull Request
+
+### Development Guidelines
+- Follow existing code style and conventions
+- Write meaningful commit messages
+- Add tests for new features
+- Update documentation as needed
+- Ensure all tests pass before submitting PR
 
 ---
 
