@@ -4,6 +4,10 @@ const withNextIntl = createNextIntlPlugin('./i18n.ts');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  outputFileTracingRoot: __dirname,
+  webpack: (config) => {
+    return config;
+  },
   images: {
     remotePatterns: [
       {

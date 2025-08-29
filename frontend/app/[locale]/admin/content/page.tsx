@@ -4,16 +4,9 @@ import { useState, useEffect } from 'react';
 import { useLocale } from 'next-intl';
 import { useHydration } from '@/hooks/useHydration';
 import toast from 'react-hot-toast';
+import { contentAdminApi } from '@/lib/admin-content-api';
+import type { ContentSection } from '@/lib/types/content';
 import { Icon } from '@/components/ui/icon';
-
-interface ContentSection {
-  id: string;
-  name: string;
-  type: 'hero' | 'consultation' | 'training' | 'services' | 'ai' | 'testimonials' | 'join' | 'achievements' | 'faq';
-  content: any;
-  isActive: boolean;
-  lastModified: string;
-}
 
 interface ContentBlock {
   id: string;
@@ -48,7 +41,13 @@ export default function ContentManagementPage() {
 
   const loadContentSections = async () => {
     try {
-      // Mock data - replace with actual API call
+      const response = await contentAdminApi.getContentSections();
+      setSections(response.data);
+      setIsLoading(false);
+    } catch (error) {
+      console.error('Error loading content sections:', error);
+      toast.error('Failed to load content sections');
+      // Fallback to mock data for development
       const mockSections: ContentSection[] = [
         {
           id: 'hero',
@@ -175,17 +174,16 @@ export default function ContentManagementPage() {
 
   const handleSave = async (sectionId: string, content: any) => {
     try {
-      // Mock API call - replace with actual API
-      console.log('Saving content for section:', sectionId, content);
+      const response = await contentAdminApi.updateContentSection(sectionId, content);
+      if (!response.success) {
+        throw new Error(response.message || 'Failed to update content');
+      }
+      
       toast.success('Content saved successfully');
       setIsEditing(false);
       
-      // Update local state
-      setSections(prev => prev.map(section => 
-        section.id === sectionId 
-          ? { ...section, content, lastModified: new Date().toISOString().split('T')[0] }
-          : section
-      ));
+      // Refresh the content sections
+      await loadContentSections();
     } catch (error) {
       toast.error('Failed to save content');
     }

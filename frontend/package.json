@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev -p",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
@@ -18,7 +18,7 @@
     "clsx": "^2.1.1",
     "js-cookie": "^3.0.5",
     "leaflet": "^1.9.4",
-    "next": "^15.1.6",
+    "next": "^15.5.2",
     "next-intl": "^3.26.5",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

@@ -26,8 +26,8 @@ export function SearchBar({ categories = [], compact = false }: SearchBarProps) 
 
   // Sync with URL parameters
   useEffect(() => {
-    const urlQuery = searchParams.get('query') || '';
-    const urlCategory = searchParams.get('category') || '';
+    const urlQuery = searchParams?.get('query') || '';
+    const urlCategory = searchParams?.get('category') || '';
     setQuery(urlQuery);
     setSelectedCategory(urlCategory);
   }, [searchParams]);

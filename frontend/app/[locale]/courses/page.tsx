@@ -11,15 +11,13 @@ import { SearchBar } from '@/components/home/search-bar';
 import { FilterDropdown } from '@/components/ui/filter-dropdown';
 import { NoSearchResults } from '@/components/ui/no-search-results';
 import { courseToCardProps } from '@/lib/course-adapter';
-import { Course } from '@/lib/api';
+import type { Course } from '@/lib/types/api';
 import { useCartStore } from '@/lib/cart-store';
 import { useAuthStore } from '@/lib/auth-store';
 import { toast } from 'react-hot-toast';
 import { usePageLoad, useStaggeredAnimation } from '@/lib/use-animations';
 import { ScrollAnimations } from '@/components/scroll-animations';
-
-
-// Mock courses data - in a real app this would come from API
+import { useCourses } from '@/lib/content-hooks';
 const mockCourses: Course[] = [
   {
     id: '1',
@@ -157,12 +155,12 @@ export default function CoursesPage() {
   const { addItem, hasItem } = useCartStore();
   const { user } = useAuthStore();
 
-  const query = searchParams.get('query') || '';
-  const category = searchParams.get('category') || '';
+  const query = searchParams?.get('query') || '';
+  const category = searchParams?.get('category') || '';
 
-  const [courses, setCourses] = useState(mockCourses);
-  const [filteredCourses, setFilteredCourses] = useState(mockCourses);
-  const [isLoading, setIsLoading] = useState(false);
+  const { courses: apiCourses, loading: coursesLoading, error: coursesError } = useCourses();
+  const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [sortBy, setSortBy] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [displayType, setDisplayType] = useState('grid');
@@ -170,58 +168,63 @@ export default function CoursesPage() {
   // Animation hooks
   const isLoaded = usePageLoad(100);
   const { visibleItems: featuredVisible, setRef: setFeaturedRef } = useStaggeredAnimation(
-    courses.filter(course => course.isFeatured).slice(0, 2), 
+    apiCourses?.filter((course: Course) => course.isFeatured)?.slice(0, 2) || [], 
     200
   );
   const { visibleItems: allCoursesVisible, setRef: setAllCoursesRef } = useStaggeredAnimation(
-    filteredCourses, 
+    filteredCourses || [], 
     100
   );
 
-  // Filter and sort courses based on search query and filters
+  // Update filtered courses when API courses change
   useEffect(() => {
-    let filtered = courses;
+    if (apiCourses) {
+      let filtered = [...apiCourses];
 
-    // Search filter
-    if (query) {
-      const searchTerm = query.toLowerCase();
-      filtered = filtered.filter(course => {
-        const title = locale === 'ar' ? course.title.ar : course.title.en;
-        const summary = locale === 'ar' ? course.summary.ar : course.summary.en;
-        return title.toLowerCase().includes(searchTerm) || 
-               summary.toLowerCase().includes(searchTerm);
-      });
+      // Search filter
+      if (query) {
+        const searchTerm = query.toLowerCase();
+        filtered = filtered.filter((course: Course) => {
+          const title = locale === 'ar' ? course.title.ar : course.title.en;
+          const summary = locale === 'ar' ? course.summary.ar : course.summary.en;
+          return title.toLowerCase().includes(searchTerm) || 
+                 summary.toLowerCase().includes(searchTerm);
+        });
+      }
+
+      // Category filter
+      if (category || categoryFilter) {
+        const filterCategory = category || categoryFilter;
+        filtered = filtered.filter((course: Course) => {
+          // Add your category filtering logic here
+          // For now, just return true to show all courses
+          return true;
+        });
+      }
+
+      // Sort courses
+      if (sortBy) {
+        filtered = [...filtered].sort((a: Course, b: Course) => {
+          switch (sortBy) {
+            case 'newest':
+              return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
+            case 'oldest':
+              return new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
+            case 'rating':
+              return (b.rating || 0) - (a.rating || 0);
+            case 'price-low':
+              return a.price - b.price;
+            case 'price-high':
+              return b.price - a.price;
+            default:
+              return 0;
+          }
+        });
+      }
+
+      setFilteredCourses(filtered);
     }
-
-    // Category filter
-    if (category || categoryFilter) {
-      const filterCategory = category || categoryFilter;
-      // In a real app, you would filter by course.category
-      // For now, we'll just keep all courses
-    }
-
-    // Sort courses
-    if (sortBy) {
-      filtered = [...filtered].sort((a, b) => {
-        switch (sortBy) {
-          case 'newest':
-            return new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime();
-          case 'oldest':
-            return new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime();
-          case 'rating':
-            return (b.rating || 0) - (a.rating || 0);
-          case 'price-low':
-            return a.price - b.price;
-          case 'price-high':
-            return b.price - a.price;
-          default:
-            return 0;
-        }
-      });
-    }
-
-    setFilteredCourses(filtered);
-  }, [query, category, categoryFilter, sortBy, courses, locale]);
+  }, [query, category, categoryFilter, sortBy, apiCourses, locale]);
 
   const handleToggleWishlist = (courseId: string) => {
     if (!user) {
@@ -234,7 +237,7 @@ export default function CoursesPage() {
   };
 
   const handleAddToCart = (courseId: string) => {
-    const course = courses.find(c => c.id === courseId);
+    const course = apiCourses?.find((c: Course) => c.id === courseId);
     if (!course) return;
 
     if (hasItem(courseId)) {
@@ -249,7 +252,7 @@ export default function CoursesPage() {
       price: course.price,
       currency: course.currency,
       imageUrl: course.thumbnailUrl,
-      instructor: 'مدرب محترف', // In real app, get from course data
+      instructor: course.instructor?.name || 'مدرب محترف',
       qty: 1
     });
 
@@ -262,6 +265,11 @@ export default function CoursesPage() {
 
   const hasSearchQuery = query.trim().length > 0;
   const hasResults = filteredCourses.length > 0;
+  
+  // Update loading state based on API status
+  useEffect(() => {
+    setIsLoading(coursesLoading);
+  }, [coursesLoading]);
 
   return (
     <>
@@ -299,35 +307,56 @@ export default function CoursesPage() {
           </div>
 
         {/* Featured Courses Section */}
-        <div className="mb-16 scroll-item">          
-          {/* Featured Courses Grid - 2 columns only */}
-          <div className="grid grid-cols-2 gap-6 mb-8">
-            {courses.filter(course => course.isFeatured).slice(0, 2).map((course, index) => {
-              const cardProps = courseToCardProps(course, locale as 'ar' | 'en', {
-                inWishlist: false,
-                inCart: hasItem(course.id),
-                onToggleWishlist: handleToggleWishlist,
-                onAddToCart: handleAddToCart,
-                onClick: handleCourseClick
-              });
-              
-              return (
-                <div
-                  key={course.id}
-                  ref={setFeaturedRef(index)}
-                  className={`scroll-item-scale hover-lift card-animate ${
-                    featuredVisible.has(index) ? 'visible' : ''
-                  }`}
-                >
-                  <CourseCard {...cardProps} />
-                </div>
-              );
-            })}
+        {!isLoading && !coursesError && apiCourses?.some((course: Course) => course.isFeatured) && (
+          <div className="mb-16 scroll-item">          
+            {/* Featured Courses Grid - 2 columns only */}
+            <div className="grid grid-cols-2 gap-6 mb-8">
+              {apiCourses?.filter((course: Course) => course.isFeatured)?.slice(0, 2)?.map((course: Course, index: number) => {
+                const cardProps = courseToCardProps(course, locale as 'ar' | 'en', {
+                  inWishlist: false,
+                  inCart: hasItem(course.id),
+                  onToggleWishlist: handleToggleWishlist,
+                  onAddToCart: handleAddToCart,
+                  onClick: handleCourseClick
+                });
+                
+                return (
+                  <div
+                    key={course.id}
+                    ref={setFeaturedRef(index)}
+                    className={`scroll-item-scale hover-lift card-animate ${
+                      featuredVisible.has(index) ? 'visible' : ''
+                    }`}
+                  >
+                    <CourseCard {...cardProps} />
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* Loading State */}
+        {isLoading && (
+          <div className="flex items-center justify-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+          </div>
+        )}
+
+        {/* Error State */}
+        {!isLoading && coursesError && (
+          <div className="text-center py-12">
+            <Icon name="alert-circle" className="h-12 w-12 text-red-500 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">
+              {t('errors.load-failed')}
+            </h3>
+            <p className="text-gray-500">{coursesError.message}</p>
+          </div>
+        )}
 
         {/* All Courses Section */}
-        <div className="mb-16">
+        {!isLoading && !coursesError && (
+          <div className="mb-16">
           {/* Section Title */}
           <h2 className={`font-cairo font-bold leading-tight mb-8 scroll-item ${
             locale === 'ar' ? 'text-center' : 'text-center'
@@ -407,38 +436,40 @@ export default function CoursesPage() {
           </div>
 
           {/* All Courses Grid or No Results */}
-          {filteredCourses.length === 0 && (query.trim() || sortBy || categoryFilter) ? (
-            <div className="scroll-item">
-              <NoSearchResults />
-            </div>
-          ) : (
-            <div className={`grid gap-6 ${
-              displayType === 'list' 
-                ? 'grid-cols-1' 
-                : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-            }`} style={{ position: 'relative', zIndex: 1 }}>
-              {filteredCourses.map((course, index) => {
-                const cardProps = courseToCardProps(course, locale as 'ar' | 'en', {
-                  inWishlist: false,
-                  inCart: hasItem(course.id),
-                  onToggleWishlist: handleToggleWishlist,
-                  onAddToCart: handleAddToCart,
-                  onClick: handleCourseClick
-                });
-                
-                return (
-                  <div
-                    key={course.id}
-                    ref={setAllCoursesRef(index)}
-                    className={`scroll-item hover-lift card-animate ${
-                      allCoursesVisible.has(index) ? 'visible' : ''
-                    }`}
-                  >
-                    <CourseCard {...cardProps} />
-                  </div>
-                );
-              })}
-            </div>
+          {!isLoading && !coursesError && (
+            filteredCourses.length === 0 && (query.trim() || sortBy || categoryFilter) ? (
+              <div className="scroll-item">
+                <NoSearchResults />
+              </div>
+            ) : (
+              <div className={`grid gap-6 ${
+                displayType === 'list' 
+                  ? 'grid-cols-1' 
+                  : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+              }`} style={{ position: 'relative', zIndex: 1 }}>
+                {filteredCourses.map((course: Course, index: number) => {
+                  const cardProps = courseToCardProps(course, locale as 'ar' | 'en', {
+                    inWishlist: false,
+                    inCart: hasItem(course.id),
+                    onToggleWishlist: handleToggleWishlist,
+                    onAddToCart: handleAddToCart,
+                    onClick: handleCourseClick
+                  });
+                  
+                  return (
+                    <div
+                      key={course.id}
+                      ref={setAllCoursesRef(index)}
+                      className={`scroll-item hover-lift card-animate ${
+                        allCoursesVisible.has(index) ? 'visible' : ''
+                      }`}
+                    >
+                      <CourseCard {...cardProps} />
+                    </div>
+                  );
+                })}
+              </div>
+            )
           )}
         </div>
       </div>

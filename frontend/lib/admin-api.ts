@@ -1,5 +1,143 @@
 import { api } from './api';
 
+export interface ContentPage {
+  id: string;
+  pageKey: string;
+  pageName: string;
+  description?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  sections: ContentSection[];
+}
+
+export interface ContentSection {
+  id: string;
+  contentPageId: string;
+  sectionKey: string;
+  sectionName: string;
+  description?: string;
+  sortOrder: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+  blocks: ContentBlock[];
+}
+
+export interface ContentBlock {
+  id: string;
+  contentSectionId: string;
+  blockKey: string;
+  blockName: string;
+  blockType: string;
+  contentEn?: string;
+  contentAr?: string;
+  imageUrl?: string;
+  linkUrl?: string;
+  linkText?: string;
+  sortOrder: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ContentVersion {
+  id: string;
+  contentPageId: string;
+  versionName: string;
+  contentData?: string;
+  isPublished: boolean;
+  createdAt: string;
+  createdBy: string;
+}
+
+export interface CreateContentPage {
+  pageKey: string;
+  pageName: string;
+  description?: string;
+}
+
+export interface UpdateContentPage {
+  pageName: string;
+  description?: string;
+  isActive: boolean;
+}
+
+export interface CreateContentSection {
+  sectionKey: string;
+  sectionName: string;
+  description?: string;
+  sortOrder: number;
+}
+
+export interface UpdateContentSection {
+  sectionName: string;
+  description?: string;
+  sortOrder: number;
+  isActive: boolean;
+}
+
+export interface CreateContentBlock {
+  blockKey: string;
+  blockName: string;
+  blockType: string;
+  contentEn?: string;
+  contentAr?: string;
+  imageUrl?: string;
+  linkUrl?: string;
+  linkText?: string;
+  sortOrder: number;
+}
+
+export interface UpdateContentBlock {
+  blockName: string;
+  contentEn?: string;
+  contentAr?: string;
+  imageUrl?: string;
+  linkUrl?: string;
+  linkText?: string;
+  sortOrder: number;
+  isActive: boolean;
+}
+
+export interface CreateContentVersion {
+  versionName: string;
+  contentData?: string;
+  isPublished: boolean;
+}
+
+export interface FileUploadResponse {
+  fileName: string;
+  fileUrl: string;
+  fileSize: number;
+  contentType: string;
+}
+
+export interface PageContent {
+  pageKey: string;
+  pageName: string;
+  sections: SectionContent[];
+}
+
+export interface SectionContent {
+  sectionKey: string;
+  sectionName: string;
+  sortOrder: number;
+  blocks: BlockContent[];
+}
+
+export interface BlockContent {
+  blockKey: string;
+  blockName: string;
+  blockType: string;
+  contentEn?: string;
+  contentAr?: string;
+  imageUrl?: string;
+  linkUrl?: string;
+  linkText?: string;
+  sortOrder: number;
+}
+
 export interface DashboardStats {
   totalUsers: number;
   activeUsers: number;
@@ -167,4 +305,59 @@ export const adminApi = {
 
   updateOrderStatus: (orderId: string, data: UpdateOrderStatusRequest) =>
     api.put(`/admin/orders/${orderId}/status`, data),
+    
+  // Content Management
+  getContentPages: () => api.get<ContentPage[]>('/api/content/pages'),
+
+  getContentPage: (id: string) =>
+    api.get<ContentPage>(`/api/content/pages/${id}`),
+
+  createContentPage: (data: CreateContentPage) =>
+    api.post<ContentPage>('/api/content/pages', data),
+
+  updateContentPage: (id: string, data: UpdateContentPage) =>
+    api.put<ContentPage>(`/api/content/pages/${id}`, data),
+
+  deleteContentPage: (id: string) =>
+    api.delete(`/api/content/pages/${id}`),
+
+  createContentSection: (pageId: string, data: CreateContentSection) =>
+    api.post<ContentSection>(`/api/content/pages/${pageId}/sections`, data),
+
+  updateContentSection: (pageId: string, sectionId: string, data: UpdateContentSection) =>
+    api.put<ContentSection>(`/api/content/pages/${pageId}/sections/${sectionId}`, data),
+
+  deleteContentSection: (pageId: string, sectionId: string) =>
+    api.delete(`/api/content/pages/${pageId}/sections/${sectionId}`),
+
+  createContentBlock: (pageId: string, sectionId: string, data: CreateContentBlock) =>
+    api.post<ContentBlock>(`/api/content/pages/${pageId}/sections/${sectionId}/blocks`, data),
+
+  updateContentBlock: (pageId: string, sectionId: string, blockId: string, data: UpdateContentBlock) =>
+    api.put<ContentBlock>(`/api/content/pages/${pageId}/sections/${sectionId}/blocks/${blockId}`, data),
+
+  deleteContentBlock: (pageId: string, sectionId: string, blockId: string) =>
+    api.delete(`/api/content/pages/${pageId}/sections/${sectionId}/blocks/${blockId}`),
+
+  uploadFile: (file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    return api.post<FileUploadResponse>('/api/content/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+  },
+
+  getPageContent: (pageKey: string) =>
+    api.get<PageContent>(`/api/content/pages/key/${pageKey}`),
+
+  getContentVersions: (pageId: string) =>
+    api.get<ContentVersion[]>(`/api/content/pages/${pageId}/versions`),
+
+  createContentVersion: (pageId: string, data: CreateContentVersion) =>
+    api.post<ContentVersion>(`/api/content/pages/${pageId}/versions`, data),
+
+  publishContentVersion: (pageId: string, versionId: string) =>
+    api.post(`/api/content/pages/${pageId}/versions/${versionId}/publish`),
 };

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using ErsaTraining.API.Models;
 
 namespace ErsaTraining.API.Data.Entities;
 
@@ -19,6 +20,15 @@ public class Course
     public CourseType Type { get; set; }
 
     public CourseLevel Level { get; set; }
+
+    public CourseCategory Category { get; set; }
+    
+    [MaxLength(1000)]
+    public string? ImageUrl { get; set; }
+    
+    [Required]
+    [MaxLength(255)]
+    public string InstructorName { get; set; } = string.Empty;
     
     public bool IsActive { get; set; } = true;
     

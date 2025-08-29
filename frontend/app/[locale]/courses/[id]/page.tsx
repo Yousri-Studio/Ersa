@@ -8,6 +8,9 @@ import { Icon } from '@/components/ui/icon';
 import { useCartStore } from '@/lib/cart-store';
 import { usePageLoad, useStaggeredAnimation } from '@/lib/use-animations';
 import { ScrollAnimations } from '@/components/scroll-animations';
+import { useCourse } from '@/lib/content-hooks';
+import type { Course, CurriculumSection } from '@/lib/types';
+import type { LocaleString } from '@/lib/common-types';
 
 // Mock course data - in real app this would come from API
 const mockCourseData = {
@@ -85,17 +88,58 @@ const mockCourseData = {
 
 export default function CourseDetailsPage() {
   const t = useTranslations();
-  const params = useParams();
+  const routeParams = useParams() as { id: string };
   const locale = useLocale();
   const { addItem, hasItem } = useCartStore();
   const [activeTab, setActiveTab] = useState('overview');
-  const [expandedSection, setExpandedSection] = useState<number | null>(null);
+  const [expandedSection, setExpandedSection] = useState<string | number | null>(null);
   const [isInWishlist, setIsInWishlist] = useState(false);
   const isLoaded = usePageLoad(100);
-  const { visibleItems: curriculumVisible, setRef: setCurriculumRef } = useStaggeredAnimation(mockCourseData.curriculum, 100);
-  
-  const course = mockCourseData; // In real app: fetch based on params.id
-  const isInCart = hasItem(course.id);
+  const { course, loading: courseLoading, error: courseError } = useCourse(routeParams.id);
+  const isInCart = course ? hasItem(course.id) : false;
+
+  // Show loading state
+  if (courseLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (courseError) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <Icon name="alert-circle" className="h-12 w-12 text-red-500 mb-4" />
+        <h1 className="text-xl font-medium text-gray-900 mb-2">
+          {t('errors.load-failed')}
+        </h1>
+        <p className="text-gray-500">{courseError.message}</p>
+      </div>
+    );
+  }
+
+  // Show not found state
+  if (!course) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <Icon name="alert-circle" className="h-12 w-12 text-gray-400 mb-4" />
+        <h1 className="text-xl font-medium text-gray-900 mb-2">
+          {t('errors.course-not-found')}
+        </h1>
+        <p className="text-gray-500">{t('errors.course-not-found-message')}</p>
+        <Link href={`/${locale}/courses`} className="mt-4 text-primary-600 hover:text-primary-700">
+          {t('common.back-to-courses')}
+        </Link>
+      </div>
+    );
+  }
+
+  const { visibleItems: curriculumVisible, setRef: setCurriculumRef } = useStaggeredAnimation(
+    course.curriculum || [], 
+    100
+  );
   
   // Handle localized content
   const title = typeof course.title === 'object' 
@@ -265,7 +309,7 @@ export default function CourseDetailsPage() {
                       {t('course.includes')}
                     </h3>
                     <ul className="space-y-2">
-                      {course.features.map((feature, index) => (
+                      {course.features.map((feature: string, index: number) => (
                         <li key={index} className="flex items-center space-x-2 rtl:space-x-reverse text-sm text-gray-600">
                                                      <Icon name="infinity" className="h-4 w-4 course-infinity-icon" />
                           <span className="font-cairo">{feature}</span>
@@ -328,7 +372,7 @@ export default function CourseDetailsPage() {
                         {t('course.requirements')}
                       </h3>
                       <ul className="space-y-2">
-                        {course.requirements.map((req, index) => (
+                        {course.requirements.map((req: string, index: number) => (
                           <li key={index} className="flex items-start space-x-2 rtl:space-x-reverse text-gray-600">
                             <span className="text-primary-500 mt-1">•</span>
                             <span className="font-cairo">{req}</span>
@@ -346,7 +390,7 @@ export default function CourseDetailsPage() {
                       {t('course.curriculum')}
                     </h2>
                     <div className="space-y-4">
-                      {course.curriculum.map((section, index) => (
+                      {course.curriculum.map((section: CurriculumSection, index: number) => (
                         <div 
                           key={section.id} 
                           ref={setCurriculumRef(index)}
