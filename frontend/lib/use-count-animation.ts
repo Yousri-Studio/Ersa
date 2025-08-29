@@ -26,10 +26,10 @@ export function useCountAnimation({
             
             // Start animation after delay
             setTimeout(() => {
-              const startTime = Date.now();
+              const startTime = performance.now();
               
               const animate = () => {
-                const elapsed = Date.now() - startTime;
+                const elapsed = performance.now() - startTime;
                 const progress = Math.min(elapsed / duration, 1);
                 
                 // Easing function for smooth animation

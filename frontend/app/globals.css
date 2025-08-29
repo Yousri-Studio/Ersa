@@ -49,16 +49,19 @@
 } */
 
 :root {
-  --foreground-rgb: 0, 0, 0;
+  --foreground-rgb: 26, 25, 40;
   --background-start-rgb: 255, 255, 255;
   --background-end-rgb: 255, 255, 255;
+  --primary-color: #292561;
+  --secondary-color: #00AC96;
+  --text-color: #1A1928;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    --background-start-rgb: 26, 25, 40;
+    --background-end-rgb: 26, 25, 40;
   }
 }
 
@@ -67,7 +70,7 @@
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
+  color: var(--text-color);
   background: linear-gradient(
       to bottom,
       transparent,

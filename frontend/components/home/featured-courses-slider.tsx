@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { Icon } from '@/components/ui/icon';
@@ -11,12 +11,14 @@ import { courseToCardProps } from '@/lib/course-adapter';
 import { useCartStore } from '@/lib/cart-store';
 import { useWishlistStore } from '@/lib/wishlist-store';
 import { useAuthStore } from '@/lib/auth-store';
+import { useHydration } from '@/hooks/useHydration';
 import toast from 'react-hot-toast';
 
 export function FeaturedCoursesSlider() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const sliderRef = useRef<HTMLDivElement>(null);
+  const { isHydrated } = useHydration();
   const locale = useLocale();
   const t = useTranslations();
   const router = useRouter();
@@ -27,18 +29,18 @@ export function FeaturedCoursesSlider() {
   const addWishlistItem = wishlistStore.addItem;
   const removeWishlistItem = wishlistStore.removeItem;
 
-  const { data: apiCourses, isLoading, error } = useQuery<Course[]>(
-    ['featured-courses', locale],
-    () => coursesApi.getCourses().then(res => res.data.filter(course => course.isFeatured).slice(0, 12)),
-    {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      retry: 0, // Don't retry to avoid hanging
-      retryDelay: 500, // Faster retry
-      onError: (error) => {
-        console.error('Failed to fetch courses:', error);
-      }
-    }
-  );
+  const { data: apiCourses, isLoading, error } = useQuery<Course[]>({
+    queryKey: ['featured-courses', locale],
+    queryFn: () => coursesApi.getCourses().then(res => res.data.filter(course => course.isFeatured).slice(0, 12)),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    retry: 0, // Don't retry to avoid hanging
+    retryDelay: 500, // Faster retry
+  });
+
+  // Handle query errors
+  if (error) {
+    // console.error('Failed to fetch courses:', error);
+  }
 
   // Mock data for development when API returns empty
   const mockCourses: Course[] = [
@@ -173,7 +175,7 @@ export function FeaturedCoursesSlider() {
   // Use mock data if API fails, returns empty, or is loading
   // For testing: limit mock courses to 3 to see grid layout, or use all 6 to see slider
   const testWith3Courses = mockCourses.slice(0, 3); // Change this to mockCourses to test with 6 courses
-  const courses = (apiCourses && apiCourses.length > 0 && !error) ? apiCourses : testWith3Courses;
+  const courses: Course[] = (apiCourses && Array.isArray(apiCourses) && apiCourses.length > 0 && !error) ? apiCourses : testWith3Courses;
 
   // Handler functions
   const handleToggleWishlist = (courseId: string) => {
@@ -183,7 +185,7 @@ export function FeaturedCoursesSlider() {
       return;
     }
     
-    const course = courses?.find(c => c.id === courseId);
+    const course = courses?.find((c: Course) => c.id === courseId);
     if (!course) return;
 
     if (hasWishlistItem(courseId)) {
@@ -205,7 +207,7 @@ export function FeaturedCoursesSlider() {
   };
 
   const handleAddToCart = (courseId: string) => {
-    const course = courses?.find(c => c.id === courseId);
+    const course = courses?.find((c: Course) => c.id === courseId);
     if (!course) return;
 
     if (hasItem(courseId)) {
@@ -214,7 +216,7 @@ export function FeaturedCoursesSlider() {
     }
 
     const cartItem = {
-      id: `${courseId}-${Date.now()}`,
+      id: `${courseId}-${crypto.randomUUID()}`,
       courseId: courseId,
       sessionId: undefined,
       title: course.title,
@@ -285,12 +287,25 @@ export function FeaturedCoursesSlider() {
   //   );
   // }
 
+  // Don't render until hydrated to prevent hydration mismatches
+  if (!isHydrated) {
+    return (
+      <div className="w-full">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <CourseCard.Skeleton />
+          <CourseCard.Skeleton />
+          <CourseCard.Skeleton />
+        </div>
+      </div>
+    );
+  }
+
   if (!courses || courses.length === 0) {
     return null;
   }
 
   // Apply grid/slider logic based on course count
-  console.log('Featured courses count:', courses.length, 'Showing:', courses.length <= 3 ? 'Grid' : 'Slider');
+  // console.log('Featured courses count:', courses.length, 'Showing:', courses.length <= 3 ? 'Grid' : 'Slider');
   
   if (courses.length <= 3) {
     // Static Grid for 3 or fewer courses

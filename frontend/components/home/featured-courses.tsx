@@ -1,6 +1,6 @@
 'use client';
 
-import { useQuery } from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
@@ -11,22 +11,22 @@ import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { courseToCardProps } from '@/lib/course-adapter';
 import { useCartStore } from '@/lib/cart-store';
 import { useAuthStore } from '@/lib/auth-store';
+import { useHydration } from '@/hooks/useHydration';
 import toast from 'react-hot-toast';
 
 export function FeaturedCourses() {
+  const { isHydrated } = useHydration();
   const locale = useLocale();
   const t = useTranslations();
   const router = useRouter();
   const { isAuthenticated } = useAuthStore();
   const { hasItem, addItem, items } = useCartStore();
 
-  const { data: courses, isLoading, error } = useQuery<Course[]>(
-    'featured-courses',
-    () => coursesApi.getCourses().then(res => res.data.slice(0, 6)),
-    {
-      staleTime: 5 * 60 * 1000, // 5 minutes
-    }
-  );
+  const { data: courses, isLoading, error } = useQuery<Course[]>({
+    queryKey: ['featured-courses'],
+    queryFn: () => coursesApi.getCourses().then(res => res.data.slice(0, 6)),
+    staleTime: 5 * 60 * 1000, // 5 minutes
+  });
 
   // Handle wishlist toggle
   const handleToggleWishlist = (courseId: string) => {
@@ -51,7 +51,7 @@ export function FeaturedCourses() {
     }
 
     const cartItem = {
-      id: `${courseId}-${Date.now()}`,
+      id: `${courseId}-${crypto.randomUUID()}`,
       courseId: courseId,
       sessionId: undefined,
       title: course.title,
@@ -95,7 +95,7 @@ export function FeaturedCourses() {
         </div>
 
         {/* Courses Grid */}
-        {isLoading ? (
+        {isLoading || !isHydrated ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             <CourseCard.Skeleton />
             <CourseCard.Skeleton />

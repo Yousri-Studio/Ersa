@@ -50,9 +50,9 @@ public class AdminController : ControllerBase
             var totalCourses = await _context.Courses.CountAsync();
             var activeCourses = await _context.Courses.CountAsync(c => c.IsActive);
             var totalOrders = await _context.Orders.CountAsync();
-            var totalRevenue = await _context.Orders
+            var totalRevenue = (decimal)await _context.Orders
                 .Where(o => o.Status == OrderStatus.Paid)
-                .SumAsync(o => o.Amount);
+                .SumAsync(o => (double)o.Amount);
 
             var recentUsers = await _context.Users
                 .OrderByDescending(u => u.CreatedAt)
