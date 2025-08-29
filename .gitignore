@@ -94,7 +94,7 @@ tmp/
 temp/
 
 # Logs
-logs
+logs/
 *.log
 
 # Runtime data
