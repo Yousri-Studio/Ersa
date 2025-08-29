@@ -168,7 +168,7 @@ if (app.Environment.IsDevelopment())
 // Custom middleware
 app.UseMiddleware<ExceptionMiddleware>();
 
-// Commenting out HTTPS redirection temporarily to resolve startup issues
+// HTTPS redirection disabled for development
 // app.UseHttpsRedirection();
 
 app.UseCors("AllowFrontend");
