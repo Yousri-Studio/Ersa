@@ -14,28 +14,16 @@ export function HydrationProvider({ children }: { children: React.ReactNode }) {
   const [isHydrated, setIsHydrated] = useState(false);
 
   useEffect(() => {
-    // Add a small delay to ensure DOM is fully ready
-    const timer = setTimeout(() => {
-      setIsHydrated(true);
-    }, 100);
-
-    return () => clearTimeout(timer);
+    // Mark as hydrated immediately when component mounts on client
+    setIsHydrated(true);
   }, []);
 
-  // Prevent hydration mismatches by not rendering interactive content until hydrated
-  if (!isHydrated) {
-    return (
-      <HydrationContext.Provider value={{ isHydrated: false }}>
-        <div suppressHydrationWarning={true}>
-          {children}
-        </div>
-      </HydrationContext.Provider>
-    );
-  }
-
+  // Always render children but provide hydration state
   return (
     <HydrationContext.Provider value={{ isHydrated }}>
-      {children}
+      <div suppressHydrationWarning={true}>
+        {children}
+      </div>
     </HydrationContext.Provider>
   );
 }

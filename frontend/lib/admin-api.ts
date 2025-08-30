@@ -267,6 +267,12 @@ export const adminApi = {
       })
       .catch(error => {
         console.error('API error:', error);
+        
+        // If it's a network error or 500 error, provide fallback
+        if (!error.response || error.response.status >= 500) {
+          console.log('Network/server error, API will use fallback data');
+        }
+        
         throw error;
       });
   },

@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Icon } from '@/components/ui/icon';
 import { adminApi, AdminOrder, PagedResult } from '@/lib/admin-api';
-import { useHydration } from '@/hooks/useHydration';
+import { useHydration } from '@/lib/use-hydration';
 import toast from 'react-hot-toast';
 
 export default function AdminOrders() {
