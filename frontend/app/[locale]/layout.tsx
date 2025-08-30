@@ -21,7 +21,7 @@ export default async function LocaleLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+    <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'} suppressHydrationWarning>
       <head>
         <link rel="stylesheet" href="/fontawesome/css/all.min.css" />
         {/* Apple ID Sign In - Only load if client ID is configured */}
@@ -39,15 +39,15 @@ export default async function LocaleLayout({
           </>
         )}
       </head>
-      <body className={`${cairo.variable} font-cairo`}>
-        <NextIntlClientProvider messages={messages}>
-          <Providers>
+      <body className={`${cairo.variable} font-cairo`} suppressHydrationWarning>
+        <Providers>
+          <NextIntlClientProvider messages={messages}>
             <ScrollAnimations />
             <ConditionalLayout>
               {children}
             </ConditionalLayout>
-          </Providers>
-        </NextIntlClientProvider>
+          </NextIntlClientProvider>
+        </Providers>
       </body>
     </html>
   );

@@ -14,8 +14,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html>
-      <body className={`${cairo.variable} font-cairo`}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${cairo.variable} font-cairo`} suppressHydrationWarning>
         {children}
       </body>
     </html>
