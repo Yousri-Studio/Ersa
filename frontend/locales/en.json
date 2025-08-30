@@ -313,8 +313,9 @@
     "title": "Admin Dashboard",
     "welcome": "Hello",
     "description": "from here you can manage all content, orders and everything",
-    "hello": "Hello",
+    "hello": "Hello 👋",
     "super-admin": "Super Admin",
+    "operations-dashboard": "Operations Dashboard",
     "dashboard-subtitle": "from here you can manage all content, orders and everything",
     "using-demo-data": "Using demo data",
     "online": "Online",
@@ -443,7 +444,7 @@
   "ai-consultation": {
     "badge": "Your Best Choice",
     "title": "Advanced Solutions Serving All Categories",
-    "subtitle": "We make it easy for trainees to choose what suits their needs, helping these categories organize training content and present it clearly and distinctly for each category separately.",
+    "subtitle": "We make it easy for trainees to choose what suits their needs, helping these categories organize training content and present it clearly and distinctly for each category separately and organize training content clearly and distinctly for each category.",
     "cards": {
       "ai-solutions": {
         "title": "AI Solutions",
