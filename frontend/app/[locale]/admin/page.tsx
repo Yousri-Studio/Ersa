@@ -1,13 +1,13 @@
-
 'use client';
 
 import { useEffect, useState } from 'react';
 import { adminApi, DashboardStats } from '@/lib/admin-api';
 import { useHydration } from '@/hooks/useHydration';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import { Icon } from '@/components/ui/icon';
 import WorldMap from '@/components/ui/world-map';
+import { useAuthStore } from '@/lib/auth-store';
 
 // Fallback stats for when API is not available
 const fallbackStats: DashboardStats = {
@@ -74,6 +74,8 @@ const fallbackStats: DashboardStats = {
 
 export default function AdminDashboard() {
   const t = useTranslations('admin');
+  const locale = useLocale();
+  const { user } = useAuthStore();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -123,14 +125,14 @@ export default function AdminDashboard() {
   const dashboardStats = stats || fallbackStats;
 
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
+    return new Intl.NumberFormat(locale === 'ar' ? 'ar-EG' : 'en-US', {
       style: 'currency',
       currency: 'USD',
     }).format(amount);
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
+    return new Date(dateString).toLocaleDateString(locale === 'ar' ? 'ar-EG' : 'en-US', {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
@@ -216,8 +218,10 @@ export default function AdminDashboard() {
     { country: 'United Kingdom', users: 20, coordinates: [-0.1278, 51.5074] }
   ];
 
+  const isRTL = locale === 'ar';
+
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Error message if API failed */}
       {error && (
         <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
@@ -231,20 +235,16 @@ export default function AdminDashboard() {
       )}
 
       {/* Welcome Header */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 sm:p-6">
-        <div className="flex items-center justify-between">
-          <div className="min-w-0 flex-1">
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">
-              {t('hello')}
-            </h1>
-            <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-green-600 mb-1 sm:mb-2">
-              {t('super-admin')}
-            </h2>
-            <p className="text-sm sm:text-base text-gray-600">
-              {t('dashboard-subtitle')}
-            </p>
-          </div>
-        </div>
+      <div className={`text-center ${isRTL ? 'lg:text-right' : 'lg:text-left'}`}>
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">
+          {t('hello')}
+        </h1>
+        <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-green-600 mb-1 sm:mb-2">
+          {t('super-admin')}
+        </h2>
+        <p className="text-sm sm:text-base text-gray-600">
+          {t('dashboard-subtitle')}
+        </p>
       </div>
 
       {/* Statistics Cards */}
@@ -255,7 +255,7 @@ export default function AdminDashboard() {
               <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1 truncate">{t('total-users')}</p>
               <p className="text-xl sm:text-2xl font-bold text-gray-900">{dashboardStats.totalUsers}</p>
             </div>
-            <div className="h-10 w-10 sm:h-12 sm:w-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 ml-3">
+            <div className={`h-10 w-10 sm:h-12 sm:w-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 ${isRTL ? 'ml-3' : 'mr-3'}`}>
               <Icon name="users" className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
             </div>
           </div>
@@ -267,7 +267,7 @@ export default function AdminDashboard() {
               <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1 truncate">{t('total-courses')}</p>
               <p className="text-xl sm:text-2xl font-bold text-gray-900">{dashboardStats.totalCourses}</p>
             </div>
-            <div className="h-10 w-10 sm:h-12 sm:w-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 ml-3">
+            <div className={`h-10 w-10 sm:h-12 sm:w-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 ${isRTL ? 'ml-3' : 'mr-3'}`}>
               <Icon name="graduation-cap" className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" />
             </div>
           </div>
@@ -279,7 +279,7 @@ export default function AdminDashboard() {
               <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1 truncate">{t('total-orders')}</p>
               <p className="text-xl sm:text-2xl font-bold text-gray-900">{dashboardStats.totalOrders}</p>
             </div>
-            <div className="h-10 w-10 sm:h-12 sm:w-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0 ml-3">
+            <div className={`h-10 w-10 sm:h-12 sm:w-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0 ${isRTL ? 'ml-3' : 'mr-3'}`}>
               <Icon name="shopping-cart" className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
             </div>
           </div>
@@ -291,7 +291,7 @@ export default function AdminDashboard() {
               <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1 truncate">{t('total-revenue')}</p>
               <p className="text-lg sm:text-2xl font-bold text-gray-900">{formatCurrency(dashboardStats.totalRevenue)}</p>
             </div>
-            <div className="h-10 w-10 sm:h-12 sm:w-12 bg-yellow-100 rounded-lg flex items-center justify-center flex-shrink-0 ml-3">
+            <div className={`h-10 w-10 sm:h-12 sm:w-12 bg-yellow-100 rounded-lg flex items-center justify-center flex-shrink-0 ${isRTL ? 'ml-3' : 'mr-3'}`}>
               <Icon name="chart-line" className="h-5 w-5 sm:h-6 sm:w-6 text-yellow-600" />
             </div>
           </div>
@@ -308,22 +308,22 @@ export default function AdminDashboard() {
           <table className="w-full min-w-[800px]">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className={`px-3 sm:px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('student-name')}
                 </th>
-                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
+                <th className={`px-3 sm:px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('course-name')}
                 </th>
-                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className={`px-3 sm:px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('order-date')}
                 </th>
-                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
+                <th className={`px-3 sm:px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('course-type')}
                 </th>
-                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className={`px-3 sm:px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('course-price')}
                 </th>
-                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className={`px-3 sm:px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
                   {t('actions')}
                 </th>
               </tr>
@@ -331,32 +331,32 @@ export default function AdminDashboard() {
             <tbody className="bg-white divide-y divide-gray-200">
               {recentOrders.map((order) => (
                 <tr key={order.id} className="hover:bg-gray-50">
-                  <td className="px-3 sm:px-6 py-4 text-xs sm:text-sm font-medium text-gray-900">
-                    <div className="truncate max-w-[120px] sm:max-w-none">
+                  <td className={`px-3 sm:px-6 py-4 text-xs sm:text-sm font-medium text-gray-900 ${isRTL ? 'text-right' : 'text-left'}`}>
+                    <div className={`truncate max-w-[120px] sm:max-w-none ${isRTL ? 'text-right' : 'text-left'}`}>
                       {order.studentName}
                     </div>
-                    <div className="sm:hidden text-xs text-gray-500 mt-1 truncate max-w-[120px]">
+                    <div className={`sm:hidden text-xs text-gray-500 mt-1 truncate max-w-[120px] ${isRTL ? 'text-right' : 'text-left'}`}>
                       {order.courseName}
                     </div>
                   </td>
-                  <td className="px-3 sm:px-6 py-4 text-xs sm:text-sm text-gray-500 hidden sm:table-cell">
-                    <div className="truncate max-w-[200px]">
+                  <td className={`px-3 sm:px-6 py-4 text-xs sm:text-sm text-gray-500 hidden sm:table-cell ${isRTL ? 'text-right' : 'text-left'}`}>
+                    <div className={`truncate max-w-[200px] ${isRTL ? 'text-right' : 'text-left'}`}>
                       {order.courseName}
                     </div>
                   </td>
-                  <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
+                  <td className={`px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 ${isRTL ? 'text-right' : 'text-left'}`}>
                     {order.orderDate}
                   </td>
-                  <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 hidden md:table-cell">
+                  <td className={`px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 hidden md:table-cell ${isRTL ? 'text-right' : 'text-left'}`}>
                     {order.courseType}
                   </td>
-                  <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900">
-                    <div className="md:hidden text-xs text-gray-500">
+                  <td className={`px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900 ${isRTL ? 'text-right' : 'text-left'}`}>
+                    <div className={`md:hidden text-xs text-gray-500 ${isRTL ? 'text-right' : 'text-left'}`}>
                       {order.courseType}
                     </div>
                     {order.coursePrice}
                   </td>
-                  <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
+                  <td className={`px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 ${isRTL ? 'text-right' : 'text-left'}`}>
                     <button className="text-gray-400 hover:text-gray-600 p-1">
                       <Icon name="ellipsis-v" className="h-3 w-3 sm:h-4 sm:w-4" />
                     </button>
@@ -380,7 +380,7 @@ export default function AdminDashboard() {
             <div className="space-y-3 sm:space-y-4">
               {recentUsers.map((user) => (
                 <div key={user.id} className="flex items-center justify-between">
-                  <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+                  <div className={`flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
                     <div className="h-8 w-8 sm:h-10 sm:w-10 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
                       <Icon name="user" className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600" />
                     </div>
@@ -389,8 +389,8 @@ export default function AdminDashboard() {
                       <p className="text-xs sm:text-sm text-gray-500 truncate">{user.email}</p>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
-                    <span className="text-xs sm:text-sm text-gray-500 hidden sm:inline">{user.date}</span>
+                  <div className={`flex items-center space-x-2 sm:space-x-3 flex-shrink-0 ${isRTL ? 'flex-row-reverse' : 'flex-row'}`}>
+                    <span className={`text-xs sm:text-sm text-gray-500 ${isRTL ? '' : 'hidden sm:inline'}`}>{user.date}</span>
                     <button className="text-gray-400 hover:text-gray-600 p-1">
                       <Icon name="ellipsis-v" className="h-3 w-3 sm:h-4 sm:w-4" />
                     </button>
@@ -408,14 +408,14 @@ export default function AdminDashboard() {
             <p className="text-xs sm:text-sm text-gray-600 mt-1">{t('geographics-subtitle')}</p>
           </div>
           <div className="p-4 sm:p-6">
-            <div className="flex flex-col lg:flex-row lg:items-start lg:space-x-6 space-y-4 lg:space-y-0">
+            <div className={`flex flex-col lg:flex-row lg:items-start lg:space-x-6 space-y-4 lg:space-y-0 ${isRTL ? 'lg:flex-row-reverse' : 'lg:flex-row'}`}>
               <div className="flex-1">
                 <h4 className="text-xs sm:text-sm font-medium text-gray-900 mb-2 sm:mb-3">{t('users-from-countries')}</h4>
                 <div className="space-y-1 sm:space-y-2">
                   {geographics.map((geo, index) => (
-                    <div key={index} className="flex justify-between items-center">
-                      <span className="text-xs sm:text-sm text-gray-600 truncate flex-1 mr-2">{geo.country}</span>
-                      <span className="text-xs sm:text-sm font-medium text-gray-900 flex-shrink-0">{geo.users} {t('user')}</span>
+                    <div key={index} className={`flex justify-between items-center ${isRTL ? 'text-right' : 'text-left'}`}>
+                      <span className={`text-xs sm:text-sm text-gray-600 truncate flex-1 mr-2 ${isRTL ? 'ml-2' : 'mr-2'}`}>{geo.country}</span>
+                      <span className={`text-xs sm:text-sm font-medium text-gray-900 flex-shrink-0 ${isRTL ? 'text-left' : 'text-right'}`}>{geo.users} {t('user')}</span>
                     </div>
                   ))}
                 </div>

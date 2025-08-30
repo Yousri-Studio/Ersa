@@ -249,7 +249,7 @@ export default function AdminLoginPage() {
         </div>
         
         {/* Login Form */}
-        <div className="bg-white rounded-xl shadow-lg p-8">
+        <div className="bg-white rounded-xl shadow-lg p-8" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
           <form className="space-y-6" onSubmit={handleLogin}>
             <div className="space-y-4">
               {/* Email */}
@@ -269,13 +269,13 @@ export default function AdminLoginPage() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo text-right"
+                    className={`w-full px-4 py-3 ${locale === 'ar' ? 'pr-10 text-right' : 'pl-10 text-left'} border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo`}
                     placeholder="superadmin@ersatraining.com"
-                    style={{ fontSize: '14px', direction: 'rtl' }}
+                    style={{ fontSize: '14px', direction: locale === 'ar' ? 'rtl' : 'ltr' }}
                   />
                   <Icon 
                     name="envelope" 
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4"
+                    className={`absolute ${locale === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 h-4 w-4`}
                     style={{ color: '#00AC96' }} 
                   />
                 </div>
@@ -298,18 +298,18 @@ export default function AdminLoginPage() {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo ${locale === 'ar' ? 'text-right' : 'text-left'} pl-10 pr-10`}
+                    className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo ${locale === 'ar' ? 'text-right pl-10 pr-10' : 'text-left pl-10 pr-10'}`}
                     placeholder="••••••••"
                     style={{ fontSize: '14px', direction: locale === 'ar' ? 'rtl' : 'ltr' }}
                   />
                   <Icon 
                     name="lock" 
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4"
+                    className={`absolute ${locale === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 h-4 w-4`}
                     style={{ color: '#00AC96' }} 
                   />
                   <button
                     type="button"
-                    className="absolute inset-y-0 left-0 pl-3 flex items-center"
+                    className={`absolute inset-y-0 ${locale === 'ar' ? 'left-0 pl-3' : 'right-0 pr-3'} flex items-center`}
                   >
                     <Icon name="eye" className="h-5 w-5" style={{ color: '#9797A8' }} />
                   </button>

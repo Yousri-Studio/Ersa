@@ -34,9 +34,9 @@ export default function AdminLayout({
     const checkAdminAccess = async () => {
       // Wait a bit for hydration to complete
       await new Promise(resolve => setTimeout(resolve, 500));
-      
+
       console.log('Admin layout check:', { isAuthenticated, user });
-      
+
       if (!isAuthenticated || !user) {
         console.log('Not authenticated, redirecting to admin login');
         router.push(`/${locale}/admin-login`);
@@ -100,10 +100,10 @@ export default function AdminLayout({
         } lg:block lg:w-64 lg:fixed lg:inset-y-0 lg:overflow-y-auto fixed inset-y-0 ${
           isRTL ? 'right-0' : 'left-0'
         } z-40 w-64 ${
-          isMenuOpen 
-            ? 'translate-x-0' 
-            : isRTL 
-              ? 'translate-x-full' 
+          isMenuOpen
+            ? 'translate-x-0'
+            : isRTL
+              ? 'translate-x-full'
               : '-translate-x-full'
         } lg:translate-x-0 transition-transform duration-300 ease-in-out`}>
           <div className={`h-full flex flex-col bg-white ${
@@ -111,19 +111,18 @@ export default function AdminLayout({
           } border-gray-200 shadow-lg lg:shadow-none`}>
             {/* Logo Section */}
             <div className="flex-shrink-0 px-4 sm:px-6 py-4 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <div className="flex-shrink-0">
-                  <Image
-                    src="/Header Logo.svg"
-                    alt="Ersa Training & Consultancy Services"
-                    width={120}
-                    height={46}
-                    className="h-8 sm:h-10 w-auto"
-                  />
-                </div>
+              <div className={`flex items-center ${isRTL ? 'justify-end' : 'justify-between'}`}>
+                <Image
+                  src="/Header Logo.svg"
+                  alt="Ersa Training"
+                  width={100}
+                  height={38}
+                  priority
+                  className={isRTL ? 'order-2' : 'order-1'}
+                />
                 <button
                   onClick={() => setIsMenuOpen(false)}
-                  className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+                  className={`lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 ${isRTL ? 'order-1' : 'order-2'}`}
                 >
                   <Icon name="times" className="h-5 w-5" />
                 </button>
@@ -146,16 +145,40 @@ export default function AdminLayout({
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }`}
                 >
-                  <Icon 
-                    name={item.icon} 
+                  <Icon
+                    name={item.icon}
                     className={`${isRTL ? 'ml-2 sm:ml-3' : 'mr-2 sm:mr-3'} h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 ${
                       activeTab === item.id ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-500'
-                    }`} 
+                    }`}
                   />
                   <span className="truncate">{item.label}</span>
                 </Link>
               ))}
             </nav>
+
+            {/* User Info */}
+            <div className="flex-shrink-0 px-4 sm:px-6 py-4 border-t border-gray-200" dir={isRTL ? 'rtl' : 'ltr'}>
+              <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-3' : 'space-x-3'}`}>
+                <div className="flex-shrink-0">
+                  <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-gradient-to-r from-blue-500 to-teal-600 flex items-center justify-center">
+                    <span className="text-white font-semibold text-xs sm:text-sm">
+                      {user?.fullName?.charAt(0)?.toUpperCase() || 'A'}
+                    </span>
+                  </div>
+                </div>
+                <div className={`flex-1 min-w-0 ${isRTL ? 'text-right' : 'text-left'}`}>
+                  <p className="text-xs sm:text-sm font-medium text-gray-900 truncate font-cairo">
+                    {user?.fullName || 'Admin User'}
+                  </p>
+                  <p className="text-xs text-gray-500 truncate font-cairo">
+                    {user?.isSuperAdmin ? t('super-admin') : 'Admin'}
+                  </p>
+                </div>
+                <div className="flex-shrink-0">
+                  <div className="h-2 w-2 bg-green-400 rounded-full"></div>
+                </div>
+              </div>
+            </div>
 
             {/* Logout Button */}
             <div className="flex-shrink-0 p-3 sm:p-4 border-t border-gray-200">
@@ -171,7 +194,7 @@ export default function AdminLayout({
         </div>
 
         {/* Main content */}
-        <div className={`${isRTL ? 'lg:pr-64' : 'lg:pl-64'} flex-1 min-w-0`}>
+        <div className={`${isRTL ? 'lg:pr-64' : 'lg:pl-64'} flex-1 min-w-0`} dir={isRTL ? 'rtl' : 'ltr'}>
           {/* Mobile menu button */}
           <div className={`lg:hidden fixed top-4 ${isRTL ? 'right-4' : 'left-4'} z-50`}>
             <button
@@ -181,18 +204,16 @@ export default function AdminLayout({
               <Icon name="bars" className="h-5 w-5 sm:h-6 sm:w-6" />
             </button>
           </div>
-          
-          <main className="py-4 sm:py-6 pt-16 lg:pt-6">
-            <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
-              {children}
-            </div>
+
+          <main className={`p-4 sm:p-6 lg:p-8 ${isRTL ? 'text-right' : 'text-left'}`}>
+            {children}
           </main>
         </div>
       </div>
 
       {/* Mobile menu overlay */}
       {isMenuOpen && (
-        <div 
+        <div
           className="lg:hidden fixed inset-0 z-40 bg-gray-600 bg-opacity-75"
           onClick={() => setIsMenuOpen(false)}
         />
