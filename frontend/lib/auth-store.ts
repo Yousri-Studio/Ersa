@@ -5,12 +5,15 @@ import Cookies from 'js-cookie';
 export interface User {
   id: string;
   fullName: string;
+  firstName?: string;
+  lastName?: string;
   email: string;
   phone?: string;
   locale: string;
   createdAt: string;
   isAdmin?: boolean;
   isSuperAdmin?: boolean;
+  role?: string;
   lastLoginAt?: string;
 }
 
@@ -109,3 +112,6 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 );
+
+// Export useAuth as an alias for useAuthStore for consistency
+export const useAuth = useAuthStore;

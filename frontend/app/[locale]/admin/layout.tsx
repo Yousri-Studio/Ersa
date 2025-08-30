@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { useAuth } from '@/lib/auth-store';
-import { useHydration } from '@/hooks/useHydration';
+import { useHydration } from '@/lib/use-hydration';
 import { Icon } from '@/components/ui/icon';
 import toast from 'react-hot-toast';
 
