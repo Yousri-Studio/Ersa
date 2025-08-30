@@ -14,6 +14,7 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState('SuperAdmin123!');
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const t = useTranslations('admin-login');
   
   // Account credentials for different roles
@@ -294,7 +295,7 @@ export default function AdminLoginPage() {
                   <input
                     id="password"
                     name="password"
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -309,9 +310,14 @@ export default function AdminLoginPage() {
                   />
                   <button
                     type="button"
+                    onClick={() => setShowPassword(!showPassword)}
                     className={`absolute inset-y-0 ${locale === 'ar' ? 'left-0 pl-3' : 'right-0 pr-3'} flex items-center`}
                   >
-                    <Icon name="eye" className="h-5 w-5" style={{ color: '#9797A8' }} />
+                    {showPassword ? (
+                      <Icon name="eye-slash" className="h-5 w-5" style={{ color: '#9797A8' }} />
+                    ) : (
+                      <Icon name="eye" className="h-5 w-5" style={{ color: '#9797A8' }} />
+                    )}
                   </button>
                 </div>
               </div>
