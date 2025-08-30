@@ -206,9 +206,8 @@ export default function AdminDashboard() {
 
   return (
     <div className="bg-white min-h-screen" dir={isRTL ? 'rtl' : 'ltr'}>
-      <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{maxWidth: '90rem'}}>
-        {/* Header */}
-        <div className="mb-8">
+      {/* Header */}
+      <div className="mb-8">
           <div className="flex items-center mb-2">
             <span className="text-2xl">👋</span>
             <span className="ml-2 text-lg text-gray-600">Hello</span>
@@ -397,6 +396,5 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
-    </div>
   );
 }
