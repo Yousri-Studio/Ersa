@@ -144,6 +144,7 @@ export default function AdminLayout({
                       ? `bg-opacity-10 bg-[#00AC96] text-[#00AC96] ${isRTL ? 'border-l-2' : 'border-r-2'} border-[#00AC96]`
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }`}
+                  style={{fontWeight: 700}}
                 >
                   <Icon
                     name={item.icon}
