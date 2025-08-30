@@ -1,18 +1,18 @@
 # Ersa Training - Bilingual E-Learning Platform
 
-A comprehensive bilingual (Arabic/English) e-learning platform built with Next.js and ASP.NET Core, featuring live sessions, PDF courses, secure payment processing, and automated email delivery.
+A comprehensive bilingual (Arabic/English) e-learning platform built with Next.js 15 and ASP.NET Core 8, featuring course management with search functionality, secure authentication, and modern responsive design.
 
 ## 🚀 Features
 
 ### Core Features
-- **Bilingual Support**: Full Arabic and English localization with RTL support
-- **Course Types**: Live sessions with Teams integration and self-paced PDF materials
-- **Secure Payments**: HyperPay integration with Apple Pay, Mada support (extensible for Tabby/Tamara)
-- **Email Automation**: SendGrid-powered bilingual email templates and notifications
-- **Secure Content Delivery**: Protected PDF downloads with revocable links and download logging
-- **Shopping Cart**: Guest and authenticated user cart management with merge functionality
-- **Wishlist**: Authenticated user wishlist management
-- **Interactive Maps**: Leaflet-powered geographic visualization for user analytics
+- **Bilingual Support**: Full Arabic and English localization with RTL support using next-intl
+- **Course Management**: Browse, search, and filter courses by category and keywords
+- **Featured Courses**: Highlight latest courses with dynamic sorting by creation date
+- **Responsive Design**: Mobile-first approach with Tailwind CSS and modern animations
+- **Search Functionality**: Real-time course search across titles and descriptions in both languages
+- **Category Filtering**: Filter courses by Programming, Business, and Design categories
+- **Authentication**: JWT-based secure user authentication and authorization
+- **Modern UI/UX**: Clean interface with gradient styling and smooth animations
 
 ### User Experience
 - **Responsive Design**: Mobile-first approach with Tailwind CSS
@@ -32,34 +32,31 @@ A comprehensive bilingual (Arabic/English) e-learning platform built with Next.j
 
 ## 🏗️ Architecture
 
-### Frontend (Next.js 14)
-- **Framework**: Next.js with App Router
-- **Internationalization**: next-intl for bilingual support
-- **Styling**: Tailwind CSS with custom gradient utilities
-- **State Management**: Zustand for auth and cart state
-- **Data Fetching**: React Query for server state management
-- **Forms**: React Hook Form with validation
-- **Notifications**: React Hot Toast
+### Frontend (Next.js 15)
+- **Framework**: Next.js 15 with App Router
+- **Internationalization**: next-intl for bilingual support (Arabic/English)
+- **Styling**: Tailwind CSS with custom gradient utilities and RTL support
+- **State Management**: React hooks and context for state management
+- **Data Fetching**: Custom hooks with fetch API for server communication
+- **UI Components**: Reusable components with TypeScript support
+- **Animations**: CSS animations with staggered loading effects
 
 ### Backend (ASP.NET Core 8)
-- **Framework**: ASP.NET Core Web API
-- **Database**: Entity Framework Core with SQL Server
-- **Authentication**: JWT with Identity framework
-- **Email**: SendGrid with webhook support
-- **Payments**: HyperPay integration (extensible architecture)
-- **Storage**: Azure Blob Storage or local file storage
-- **Logging**: Serilog with structured logging
+- **Framework**: ASP.NET Core 8 Web API
+- **Database**: Entity Framework Core with SQLite (development)
+- **Authentication**: JWT token-based authentication
+- **API Design**: RESTful endpoints with proper HTTP status codes
+- **CORS**: Configured for cross-origin requests from frontend
+- **Logging**: Built-in ASP.NET Core logging
+- **Data Transfer**: DTOs for clean API responses
 
 ## 📋 Prerequisites
 
 - **Node.js** 18+ and npm/yarn
 - **.NET 8 SDK**
-- **SQL Server** (LocalDB for development)
-- **SendGrid Account** (for emails)
-- **HyperPay Account** (for payments)
-- **Font Awesome 6 Pro License** (for icons)
-- **Azure Storage Account** (optional, for cloud storage)
+- **SQLite** (for development database)
 - **Git** (for version control)
+- **Code Editor** (VS Code recommended)
 
 ## 🛠️ Setup Instructions
 
@@ -82,22 +79,12 @@ Create `backend/src/appsettings.Development.json` (this file is gitignored for s
 ```json
 {
   "ConnectionStrings": {
-    "DefaultConnection": "Server=(localdb)\\mssqllocaldb;Database=ErsaTrainingDB;Trusted_Connection=true;MultipleActiveResultSets=true"
+    "DefaultConnection": "Data Source=ErsaTraining.db"
   },
   "Jwt": {
     "SecretKey": "your-super-secret-jwt-key-that-should-be-at-least-32-characters-long",
     "Issuer": "ErsaTraining.API",
     "Audience": "ErsaTraining.Web"
-  },
-  "SendGrid": {
-    "ApiKey": "your-sendgrid-api-key",
-    "FromEmail": "noreply@ersatraining.com",
-    "FromName": "Ersa Training"
-  },
-  "HyperPay": {
-    "ApiUrl": "https://test.oppwa.com",
-    "EntityId": "your-hyperpay-entity-id",
-    "AccessToken": "your-hyperpay-access-token"
   }
 }
 ```
@@ -126,13 +113,7 @@ npm install
 Create `.env.local`:
 ```env
 NEXT_PUBLIC_API_BASE_URL=http://localhost:5002/api
-FONTAWESOME_NPM_AUTH_TOKEN=your-fontawesome-pro-token
 ```
-
-#### Font Awesome Pro Setup
-You need a Font Awesome Pro license:
-1. Get your npm token from https://fontawesome.com/account
-2. Set the environment variable above
 
 #### Start the Development Server
 ```bash
@@ -148,24 +129,16 @@ The API includes Swagger documentation available at `http://localhost:5002/swagg
 
 ### Key Endpoints
 
-#### Authentication
+#### Courses
+- `GET /api/courses` - List courses with optional filters
+  - Query parameters: `type`, `activeOnly`, `query`, `category`
+- `GET /api/courses/{slug}` - Get course details by slug
+- `GET /api/courses/{id}` - Get course by ID
+
+#### Authentication (Future Implementation)
 - `POST /api/auth/register` - User registration
 - `POST /api/auth/login` - User login
 - `POST /api/auth/refresh-token` - Token refresh
-
-#### Courses
-- `GET /api/courses` - List courses
-- `GET /api/courses/{slug}` - Get course details
-- `GET /api/courses/{id}/sessions` - Get course sessions
-
-#### Cart & Orders
-- `POST /api/cart/init` - Initialize cart
-- `POST /api/cart/items` - Add item to cart
-- `POST /api/orders` - Create order
-- `POST /api/payments/checkout` - Create payment checkout
-
-#### Secure Content
-- `GET /api/secure/materials/{token}` - Download protected materials
 
 ## 🎨 UI/UX Guidelines
 

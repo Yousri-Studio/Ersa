@@ -22,23 +22,41 @@ public class CoursesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<List<CourseListDto>>> GetCourses(
         [FromQuery] CourseType? type = null,
-        [FromQuery] bool activeOnly = true)
+        [FromQuery] bool activeOnly = true,
+        [FromQuery] string? query = null,
+        [FromQuery] CourseCategory? category = null)
     {
         try
         {
-            var query = _context.Courses.AsQueryable();
+            var coursesQuery = _context.Courses.AsQueryable();
 
             if (activeOnly)
             {
-                query = query.Where(c => c.IsActive);
+                coursesQuery = coursesQuery.Where(c => c.IsActive);
             }
 
             if (type.HasValue)
             {
-                query = query.Where(c => c.Type == type.Value);
+                coursesQuery = coursesQuery.Where(c => c.Type == type.Value);
             }
 
-            var courses = await query
+            if (category.HasValue)
+            {
+                var searchCategory=(CourseCategory)category.Value;
+                coursesQuery = coursesQuery.Where(c => c.Category == searchCategory);
+            }
+
+            if (!string.IsNullOrEmpty(query))
+            {
+                var searchTerm = query.ToLower();
+                coursesQuery = coursesQuery.Where(c => 
+                    c.TitleAr.ToLower().Contains(searchTerm) ||
+                    c.TitleEn.ToLower().Contains(searchTerm) ||
+                    (c.DescriptionAr != null && c.DescriptionAr.ToLower().Contains(searchTerm)) ||
+                    (c.DescriptionEn != null && c.DescriptionEn.ToLower().Contains(searchTerm)));
+            }
+
+            var courses = await coursesQuery
                 .OrderBy(c => c.TitleEn)
                 .Select(c => new CourseListDto
                 {

@@ -24,7 +24,7 @@ export function FeaturedCourses() {
 
   const { data: courses, isLoading, error } = useQuery<Course[]>({
     queryKey: ['featured-courses'],
-    queryFn: () => coursesApi.getCourses().then(res => res.data.slice(0, 6)),
+    queryFn: () => coursesApi.getFeaturedCourses().then(res => res.data),
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 

@@ -2,6 +2,7 @@ import { useTranslations } from 'next-intl';
 import { HeroSection } from '@/components/home/hero-section';
 import { ConsultationSection } from '@/components/home/consultation-section';
 import { TrainingCategoriesSection } from '@/components/home/training-categories-section';
+import { FeaturedCourses } from '@/components/home/featured-courses';
 import { ServicesSection } from '@/components/home/services-section';
 import { AIConsultationSection } from '@/components/home/ai-consultation-section';
 import { TestimonialsSection } from '@/components/home/testimonials-section';
@@ -27,6 +28,11 @@ export default function HomePage() {
         {/* Training Categories Section - Slide from left */}
         <div className="scroll-item-left">
           <TrainingCategoriesSection />
+        </div>
+        
+        {/* Featured Courses Section - Fade up animation */}
+        <div className="scroll-item">
+          <FeaturedCourses />
         </div>
         
         {/* Services Section - Slide from right */}

@@ -7,11 +7,12 @@ import { useRouter } from 'next/navigation';
 import { Icon } from '@/components/ui/icon';
 import { CourseCard } from '@/components/ui/course-card-new';
 import { SearchEmptyState } from '@/components/ui/search-empty-state';
-import { SearchBar } from '@/components/ui/search-bar-new';
+import { SearchBar } from '@/components/home/search-bar';
 import { FilterDropdown } from '@/components/ui/filter-dropdown';
 import { NoSearchResults } from '@/components/ui/no-search-results';
 import { courseToCardProps } from '@/lib/course-adapter';
-import type { Course } from '@/lib/types/api';
+import type { Course as ApiCourse } from '@/lib/types/api';
+import type { Course } from '@/lib/types';
 import { useCartStore } from '@/lib/cart-store';
 import { useAuthStore } from '@/lib/auth-store';
 import { toast } from 'react-hot-toast';
@@ -30,7 +31,7 @@ const mockCourses: Course[] = [
       ar: 'تعلم أساسيات وتقنيات التصميم الجرافيكي الحديث باستخدام أدوات احترافية',
       en: 'Learn fundamentals and modern graphic design techniques using professional tools'
     },
-    thumbnailUrl: '/images/Course Place Holder Small.png',
+    imageUrl: '/images/Course Place Holder Small.png',
     type: 'Live' as const,
     price: 1200,
     currency: 'SAR',
@@ -38,7 +39,12 @@ const mockCourses: Course[] = [
 
     isActive: true,
     isFeatured: true,
-    badge: 'Bestseller' as const
+    badge: 'Bestseller' as const,
+    level: 'Biginner',
+    category: 'Programming',
+    instructorName: '',
+    createdAt: '',
+    updatedAt: ''
   },
   {
     id: '2',
@@ -51,7 +57,7 @@ const mockCourses: Course[] = [
       ar: 'دورة شاملة في أساسيات التسويق الرقمي ووسائل التواصل الاجتماعي',
       en: 'Comprehensive course in digital marketing fundamentals and social media'
     },
-    thumbnailUrl: '/images/Course Place Holder Small.png',
+    imageUrl: '/images/Course Place Holder Small.png',
     type: 'PDF' as const,
     price: 899,
     currency: 'SAR',
@@ -59,7 +65,12 @@ const mockCourses: Course[] = [
 
     isActive: true,
     isFeatured: true,
-    badge: 'Bestseller' as const
+    badge: 'Bestseller' as const,
+    level: 'Biginner',
+    category: 'Programming',
+    instructorName: '',
+    createdAt: '',
+    updatedAt: ''
   },
   {
     id: '3',
@@ -72,7 +83,7 @@ const mockCourses: Course[] = [
       ar: 'تعلم أحدث تقنيات وأساليب إدارة المشاريع الاحترافية',
       en: 'Learn the latest techniques and professional project management methods'
     },
-    thumbnailUrl: '/images/Course Place Holder Small.png',
+    imageUrl: '/images/Course Place Holder Small.png',
     type: 'Live' as const,
     price: 1599,
     currency: 'SAR',
@@ -80,7 +91,12 @@ const mockCourses: Course[] = [
 
     isActive: true,
     isFeatured: false,
-    badge: 'Bestseller' as const
+    badge: 'Bestseller' as const,
+    level: 'Biginner',
+    category: 'Programming',
+    instructorName: '',
+    createdAt: '',
+    updatedAt: ''
   },
   {
     id: '4',
@@ -93,7 +109,7 @@ const mockCourses: Course[] = [
       ar: 'دورة متخصصة في تحليل البيانات والإحصاء باستخدام Microsoft Excel',
       en: 'Specialized course in data analysis and statistics using Microsoft Excel'
     },
-    thumbnailUrl: '/images/Course Place Holder Small.png',
+    imageUrl: '/images/Course Place Holder Small.png',
     type: 'PDF' as const,
     price: 699,
     currency: 'SAR',
@@ -101,7 +117,12 @@ const mockCourses: Course[] = [
 
     isActive: true,
     isFeatured: false,
-    badge: 'Bestseller' as const
+    badge: 'Bestseller' as const,
+    level: 'Biginner',
+    category: 'Programming',
+    instructorName: '',
+    createdAt: '',
+    updatedAt: ''
   },
   {
     id: '5',
@@ -114,7 +135,7 @@ const mockCourses: Course[] = [
       ar: 'تطوير مهارات القيادة الفعالة وإدارة الفرق في بيئة العمل',
       en: 'Develop effective leadership skills and team management in workplace'
     },
-    thumbnailUrl: '/images/Course Place Holder Small.png',
+    imageUrl: '/images/Course Place Holder Small.png',
     type: 'Live' as const,
     price: 1399,
     currency: 'SAR',
@@ -122,7 +143,12 @@ const mockCourses: Course[] = [
 
     isActive: true,
     isFeatured: true,
-    badge: 'Bestseller' as const
+    badge: 'Bestseller' as const,
+    level: 'Biginner',
+    category: 'Programming',
+    instructorName: '',
+    createdAt: '',
+    updatedAt: ''
   },
   {
     id: '6',
@@ -135,7 +161,7 @@ const mockCourses: Course[] = [
       ar: 'تعلم أساسيات تطوير المواقع الإلكترونية باستخدام HTML وCSS وJavaScript',
       en: 'Learn web development basics using HTML, CSS, and JavaScript'
     },
-    thumbnailUrl: '/images/Course Place Holder Small.png',
+    imageUrl: '/images/Course Place Holder Small.png',
     type: 'PDF' as const,
     price: 999,
     currency: 'SAR',
@@ -143,7 +169,12 @@ const mockCourses: Course[] = [
 
     isActive: true,
     isFeatured: false,
-    badge: 'Bestseller' as const
+    badge: 'Bestseller' as const,
+    level: 'Biginner',
+    category: 'Programming',
+    instructorName: '',
+    createdAt: '',
+    updatedAt: ''
   }
 ];
 
@@ -158,7 +189,10 @@ export default function CoursesPage() {
   const query = searchParams?.get('query') || '';
   const category = searchParams?.get('category') || '';
 
-  const { courses: apiCourses, loading: coursesLoading, error: coursesError } = useCourses();
+  const { courses: apiCourses, loading: coursesLoading, error: coursesError } = useCourses({ 
+    query: query || undefined,
+    category: category || undefined 
+  });
   const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [sortBy, setSortBy] = useState('');
@@ -176,33 +210,12 @@ export default function CoursesPage() {
     100
   );
 
-  // Update filtered courses when API courses change
+  // Update filtered courses when API courses change (backend now handles search/category filtering)
   useEffect(() => {
     if (apiCourses) {
       let filtered = [...apiCourses];
 
-      // Search filter
-      if (query) {
-        const searchTerm = query.toLowerCase();
-        filtered = filtered.filter((course: Course) => {
-          const title = locale === 'ar' ? course.title.ar : course.title.en;
-          const summary = locale === 'ar' ? course.summary.ar : course.summary.en;
-          return title.toLowerCase().includes(searchTerm) || 
-                 summary.toLowerCase().includes(searchTerm);
-        });
-      }
-
-      // Category filter
-      if (category || categoryFilter) {
-        const filterCategory = category || categoryFilter;
-        filtered = filtered.filter((course: Course) => {
-          // Add your category filtering logic here
-          // For now, just return true to show all courses
-          return true;
-        });
-      }
-
-      // Sort courses
+      // Only apply frontend sorting since backend handles search and category filtering
       if (sortBy) {
         filtered = [...filtered].sort((a: Course, b: Course) => {
           switch (sortBy) {
@@ -224,7 +237,7 @@ export default function CoursesPage() {
 
       setFilteredCourses(filtered);
     }
-  }, [query, category, categoryFilter, sortBy, apiCourses, locale]);
+  }, [sortBy, apiCourses]);
 
   const handleToggleWishlist = (courseId: string) => {
     if (!user) {
@@ -307,11 +320,19 @@ export default function CoursesPage() {
           </div>
 
         {/* Featured Courses Section */}
-        {!isLoading && !coursesError && apiCourses?.some((course: Course) => course.isFeatured) && (
-          <div className="mb-16 scroll-item">          
+        {!isLoading && !coursesError && apiCourses && apiCourses.length > 0 && (
+          <div className="mb-16 scroll-item">
+            {/* Section Title */}
+            <h2 className={`text-2xl font-bold mb-6 ${locale === 'ar' ? 'text-right' : 'text-left'}`} style={{
+              color: 'var(--Primary, #292561)',
+              fontFamily: 'Cairo'
+            }}>
+              {locale === 'ar' ? 'الدورات المميزة' : 'Featured Courses'}
+            </h2>
+            
             {/* Featured Courses Grid - 2 columns only */}
             <div className="grid grid-cols-2 gap-6 mb-8">
-              {apiCourses?.filter((course: Course) => course.isFeatured)?.slice(0, 2)?.map((course: Course, index: number) => {
+              {apiCourses?.slice(0, 2)?.map((course: Course, index: number) => {
                 const cardProps = courseToCardProps(course, locale as 'ar' | 'en', {
                   inWishlist: false,
                   inCart: hasItem(course.id),
@@ -375,7 +396,25 @@ export default function CoursesPage() {
           <div className="mb-8">
             {/* Search Bar */}
             <div className={`mb-6 scroll-item max-w-5xl mx-auto ${isLoaded ? 'animate-slide-in-right stagger-3' : 'opacity-0'}`}>
-              <SearchBar className="shadow-lg rounded-lg bg-white p-4" />
+              <div className="shadow-lg rounded-lg bg-white p-4">
+                <SearchBar categories={[
+                  {
+                    id: 'Programming',
+                    name: { ar: 'البرمجة', en: 'Programming' },
+                    slug: 'Programming'
+                  },
+                  {
+                    id: 'Business',
+                    name: { ar: 'الأعمال', en: 'Business' },
+                    slug: 'Business'
+                  },
+                  {
+                    id: 'Design',
+                    name: { ar: 'التصميم', en: 'Design' },
+                    slug: 'Design'
+                  }
+                ]} compact={true} />
+              </div>
             </div>
 
             {/* Filter Options - Match search width */}
@@ -404,11 +443,9 @@ export default function CoursesPage() {
                   <FilterDropdown
                     label={locale === 'ar' ? "التصنيف" : "Category"}
                     options={[
-                      { value: 'tech', label: locale === 'ar' ? 'تقنية' : 'Technology' },
-                      { value: 'management', label: locale === 'ar' ? 'إدارة' : 'Management' },
-                      { value: 'marketing', label: locale === 'ar' ? 'تسويق' : 'Marketing' },
-                      { value: 'design', label: locale === 'ar' ? 'تصميم' : 'Design' },
-                      { value: 'finance', label: locale === 'ar' ? 'مالية' : 'Finance' }
+                      { value: 'Programming', label: locale === 'ar' ? 'البرمجة' : 'Programming' },
+                      { value: 'Business', label: locale === 'ar' ? 'الأعمال' : 'Business' },
+                      { value: 'Design', label: locale === 'ar' ? 'التصميم' : 'Design' }
                     ]}
                     value={categoryFilter}
                     onChange={setCategoryFilter}

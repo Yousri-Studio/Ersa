@@ -20,7 +20,7 @@ export const contentApi = {
     }),
 
   // Courses
-  getCourses: (params?: { type?: 'Live' | 'PDF', featured?: boolean }) =>
+  getCourses: (params?: { type?: 'Live' | 'PDF', featured?: boolean, query?: string, category?: string }) =>
     api.get<Course[]>('/courses', { params }),
 
   getCourse: (slug: string, locale: string) =>

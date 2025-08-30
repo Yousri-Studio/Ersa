@@ -2,27 +2,24 @@
 
 ## Overview
 
-The Ersa Training Admin Dashboard is a comprehensive management system that allows administrators and super administrators to manage all aspects of the e-learning platform. The dashboard is integrated into the main Next.js application but requires proper authentication and authorization to access.
+The Ersa Training Admin Dashboard is a comprehensive management system for the e-learning platform. Currently in development phase, it will provide administrators with tools to manage courses, users, and system settings. The dashboard will be integrated into the main Next.js 15 application with proper authentication and authorization.
 
 **Repository**: [GitHub - Ersa Training Platform](https://github.com/your-username/Ersa)
 **Live Demo**: [Admin Dashboard](https://your-domain.com/admin)
 
-## Features
+## Planned Features
 
-### 🔐 Security & Authentication
+### 🔐 Security & Authentication (Future)
 - **Role-based access control**: Admin and Super Admin roles
 - **JWT-based authentication**: Secure token-based authentication
 - **Protected routes**: All admin routes require proper authorization
 - **Session management**: Automatic token refresh and logout
-- **React Hooks Compliance**: All components follow React Rules of Hooks for consistent behavior
 
-### 📊 Dashboard Overview
+### 📊 Dashboard Overview (Future)
 - **Real-time statistics**: Total users, courses, orders, and revenue
 - **Recent activity**: Latest users and orders
 - **Performance metrics**: Active users, course completion rates
-- **Revenue tracking**: Total and average order values
-- **Geographic analytics**: Interactive Leaflet maps showing user distribution
-- **Fallback data**: Graceful handling of API failures with demo data
+- **Course analytics**: View and manage course statistics
 
 ### 👥 User Management
 - **User listing**: View all users with pagination and search

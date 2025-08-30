@@ -11,6 +11,25 @@ export function HeroSection() {
   const t = useTranslations();
   const isLoaded = usePageLoad(100);
 
+  // Define localized course categories matching backend enum
+  const categories = [
+    {
+      id: 'Programming',
+      name: { ar: 'البرمجة', en: 'Programming' },
+      slug: 'Programming'
+    },
+    {
+      id: 'Business',
+      name: { ar: 'الأعمال', en: 'Business' },
+      slug: 'Business'
+    },
+    {
+      id: 'Design',
+      name: { ar: 'التصميم', en: 'Design' },
+      slug: 'Design'
+    }
+  ];
+
   return (
     <section className="relative pt-20 pb-20">
       {/* Background that extends to top */}
@@ -40,7 +59,7 @@ export function HeroSection() {
 
         {/* Search Bar */}
         <div className={`mb-16 ${isLoaded ? 'animate-slide-in-right stagger-2' : 'opacity-0'}`}>
-          <SearchBar />
+          <SearchBar categories={categories} />
         </div>
 
         {/* Featured Courses Slider */}

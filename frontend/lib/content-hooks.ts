@@ -105,7 +105,7 @@ function transformApiCourse(apiCourse: ApiCourse, locale: string = 'ar'): Course
   };
 }
 
-export function useCourses(params?: { type?: 'Live' | 'PDF'; featured?: boolean }) {
+export function useCourses(params?: { type?: 'Live' | 'PDF'; featured?: boolean; query?: string; category?: string }) {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -127,7 +127,7 @@ export function useCourses(params?: { type?: 'Live' | 'PDF'; featured?: boolean 
     };
 
     fetchCourses();
-  }, [params?.type, params?.featured]);
+  }, [params?.type, params?.featured, params?.query, params?.category]);
 
   return { courses, loading, error };
 }
