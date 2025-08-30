@@ -44,7 +44,7 @@ export default function AdminLoginPage() {
       console.log('Starting login process...');
       console.log('Email:', email);
       console.log('Password:', password);
-      console.log('API URL:', process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5002/api');
+      console.log('API URL:', process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000/api');
       
       // Try real API first
       try {
