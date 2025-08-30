@@ -154,52 +154,26 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+var logger = app.Services.GetRequiredService<ILogger<Program>>();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Ersa Training API V1");
-        c.RoutePrefix = "swagger";
-    });
+    app.UseSwaggerUI();
 }
 
-// Custom middleware
-app.UseMiddleware<ExceptionMiddleware>();
-
-// HTTPS redirection disabled for development
+// Don't use HTTPS redirection in development for Replit
 // app.UseHttpsRedirection();
-
-app.UseCors("AllowFrontend");
-
+app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
-// Database migration and seeding
-using (var scope = app.Services.CreateScope())
-{
-    try
-    {
-        var context = scope.ServiceProvider.GetRequiredService<ErsaTrainingDbContext>();
+// Add health check endpoint
+app.MapGet("/", () => "Ersa Training API is running!");
+app.MapGet("/api/health", () => new { status = "OK", timestamp = DateTime.UtcNow });
 
-        // For development, always use EnsureCreatedAsync to avoid migration issues
-        await context.Database.EnsureCreatedAsync();
-
-        Log.Information("Database initialized successfully");
-
-        // Seed database with initial data
-        await ErsaTraining.API.SeedData.SeedAsync(app.Services);
-    }
-    catch (Exception ex)
-    {
-        Log.Fatal(ex, "An error occurred while initializing the database");
-        throw;
-    }
-}
-
-Log.Information("Starting Ersa Training API");
+logger.LogInformation("Starting Ersa Training API on http://0.0.0.0:5000");
 
 app.Run("http://0.0.0.0:5000");
