@@ -368,7 +368,7 @@ body {
 }
 
 /* Admin Dashboard Styles */
-@media (min-width: 1024px) {
+@media (min-width: 640px) {
   .lg\:p-8 {
     padding: 0rem;
   }
