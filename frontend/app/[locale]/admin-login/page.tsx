@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { useAuthStore } from '@/lib/auth-store';
 import { api } from '@/lib/api';
 import toast from 'react-hot-toast';
@@ -14,19 +14,21 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState('SuperAdmin123!');
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
+  const t = useTranslations('admin-login');
+  
   // Account credentials for different roles
   const accountCredentials = {
     'system-manager': {
       email: 'superadmin@ersatraining.com',
       password: 'SuperAdmin123!',
-      title: 'مدير النظام',
-      description: 'صلاحيات كاملة لإدارة النظام'
+      title: t('roles.system-manager'),
+      description: t('roles.system-manager-desc')
     },
     'operations-manager': {
       email: 'operations@ersatraining.com',
       password: 'Operations123!',
-      title: 'مسؤول التشغيل',
-      description: 'صلاحيات محدودة لإدارة العمليات'
+      title: t('roles.operations-manager'),
+      description: t('roles.operations-manager-desc')
     }
   } as const;
   
@@ -169,7 +171,7 @@ export default function AdminLoginPage() {
           {/* Welcome Badge */}
           <div className="mb-6">
             <span className="font-cairo" style={{ color: '#1A1928', fontSize: '16px', fontWeight: 700 }}>
-              مرحباً بك عزيزي 👋
+              {t('welcome')} 👋
             </span>
           </div>
           
@@ -195,7 +197,7 @@ export default function AdminLoginPage() {
                   height: '46px'
                 }}
               >
-                مسؤول التشغيل
+                {t('roles.operations-manager')}
               </button>
               <button
                 type="button"
@@ -216,7 +218,7 @@ export default function AdminLoginPage() {
                   height: '46px'
                 }}
               >
-                مدير النظام
+                {t('roles.system-manager')}
               </button>
             </div>
           </div>
@@ -230,7 +232,7 @@ export default function AdminLoginPage() {
               fontWeight: 700
             }}
           >
-            تسجيل الدخول
+            {t('title')}
           </h1>
           
           {/* Subtitle */}
@@ -242,7 +244,7 @@ export default function AdminLoginPage() {
               fontWeight: 400
             }}
           >
-            سجل الدخول للوصول إلى إدارة النظام بشكل كامل
+            {t('subtitle')}
           </p>
         </div>
         
@@ -254,10 +256,10 @@ export default function AdminLoginPage() {
               <div>
                 <label 
                   htmlFor="email" 
-                  className="block font-cairo mb-2 text-right"
+                  className={`block font-cairo mb-2 ${locale === 'ar' ? 'text-right' : 'text-left'}`}
                   style={{ color: '#292561', fontWeight: 700, fontSize: '12px' }}
                 >
-                  البريد الإلكتروني
+                  {t('email')}
                 </label>
                 <div className="relative">
                   <input
@@ -283,10 +285,10 @@ export default function AdminLoginPage() {
               <div>
                 <label 
                   htmlFor="password" 
-                  className="block font-cairo mb-2 text-right"
+                  className={`block font-cairo mb-2 ${locale === 'ar' ? 'text-right' : 'text-left'}`}
                   style={{ color: '#292561', fontWeight: 700, fontSize: '12px' }}
                 >
-                  كلمة المرور
+                  {t('password')}
                 </label>
                 <div className="relative">
                   <input
@@ -296,9 +298,9 @@ export default function AdminLoginPage() {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo text-right pl-10 pr-10"
+                    className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo ${locale === 'ar' ? 'text-right' : 'text-left'} pl-10 pr-10`}
                     placeholder="••••••••"
-                    style={{ fontSize: '14px', direction: 'rtl' }}
+                    style={{ fontSize: '14px', direction: locale === 'ar' ? 'rtl' : 'ltr' }}
                   />
                   <Icon 
                     name="lock" 
@@ -316,9 +318,9 @@ export default function AdminLoginPage() {
             </div>
 
             {/* Remember me */}
-            <div className="flex items-center justify-end">
-              <label htmlFor="remember-me" className="block text-sm text-gray-900 font-cairo ml-5">
-                تذكرني
+            <div className={`flex items-center ${locale === 'ar' ? 'justify-end' : 'justify-start'}`}>
+              <label htmlFor="remember-me" className={`block text-sm text-gray-900 font-cairo ${locale === 'ar' ? 'ml-5' : 'mr-5'}`}>
+                {t('remember-me')}
               </label>
               <input
                 id="remember-me"
@@ -345,10 +347,10 @@ export default function AdminLoginPage() {
                 {isLoading ? (
                   <div className="flex items-center">
                     <div className="spinner mr-2" />
-                    جارٍ تسجيل الدخول...
+                    {t('logging-in')}
                   </div>
                 ) : (
-                  'تسجيل الدخول'
+                  t('login-button')
                 )}
               </button>
             </div>
@@ -380,10 +382,10 @@ export default function AdminLoginPage() {
         {/* Footer */}
         <div className="text-center space-y-2">
           <p className="text-sm text-gray-500">
-            جميع الحقوق محفوظة لمنصة إرساء © 2025
+            {t('footer.copyright')}
           </p>
-          <div className="flex items-center justify-center space-x-2">
-            <span className="text-sm text-gray-400">تصميم وتطوير</span>
+          <div className={`flex items-center justify-center ${locale === 'ar' ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
+            <span className="text-sm text-gray-400">{t('footer.designed-by')}</span>
             <a 
               href="https://kijoo.agency" 
               target="_blank" 

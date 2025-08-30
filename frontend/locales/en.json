@@ -357,6 +357,26 @@
       }
     }
   },
+  "admin-login": {
+    "welcome": "Welcome dear",
+    "title": "Login",
+    "subtitle": "Sign in to access the full system management",
+    "email": "Email Address",
+    "password": "Password",
+    "remember-me": "Remember me",
+    "logging-in": "Logging in...",
+    "login-button": "Login",
+    "roles": {
+      "system-manager": "System Manager",
+      "system-manager-desc": "Full system management permissions",
+      "operations-manager": "Operations Manager",
+      "operations-manager-desc": "Limited permissions for operations management"
+    },
+    "footer": {
+      "copyright": "All rights reserved to Ersa Platform © 2025",
+      "designed-by": "Designed and developed by"
+    }
+  },
   "join-us": {
     "title": "Join Many Trainees",
     "subtitle": "We make it easy for trainees to choose what suits their needs, helping these categories organize training content and present it clearly and distinctly for each category separately.",
