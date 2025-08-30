@@ -336,11 +336,13 @@ body {
 
 /* Form styles */
 .form-input {
-  @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500;
+  @apply block w-full rounded-md border-gray-300 shadow-sm;
 }
 
 .form-input:focus {
-  @apply ring-2 ring-primary-500 border-primary-500;
+  border-color: #00AC96;
+  ring-color: #00AC96;
+  @apply ring-2;
 }
 
 .form-error {
@@ -373,7 +375,16 @@ body {
 }
 
 .btn-primary {
-  @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-2 focus:ring-primary-500;
+  @apply text-white hover:bg-opacity-90 focus:ring-2 focus:ring-opacity-50;
+  background-color: #00AC96;
+}
+
+.btn-primary:hover {
+  background-color: #009688;
+}
+
+.btn-primary:focus {
+  ring-color: #00AC96;
 }
 
 .btn-secondary {
@@ -381,7 +392,17 @@ body {
 }
 
 .btn-outline {
-  @apply border border-primary-600 text-primary-600 hover:bg-primary-600 hover:text-white focus:ring-2 focus:ring-primary-500;
+  @apply border text-white hover:text-white focus:ring-2 focus:ring-opacity-50;
+  border-color: #00AC96;
+  color: #00AC96;
+}
+
+.btn-outline:hover {
+  background-color: #00AC96;
+}
+
+.btn-outline:focus {
+  ring-color: #00AC96;
 }
 
 /* Card styles */
@@ -745,6 +766,32 @@ body {
   transition: outline 0.2s ease;
 }
 
+/* Dashboard specific focus and active states */
+.dashboard-btn-primary {
+  background-color: #00AC96;
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.dashboard-btn-primary:hover {
+  background-color: #009688;
+}
+
+.dashboard-btn-primary:focus {
+  ring-color: #00AC96;
+  ring-opacity: 0.5;
+}
+
+.dashboard-link-active {
+  color: #00AC96;
+  border-color: #00AC96;
+}
+
+.dashboard-tab-active {
+  border-bottom-color: #00AC96;
+  color: #00AC96;
+}
+
 /* Global Button Enhancement */
 button {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -840,5 +887,18 @@ a {
 }
 
 .filter-dropdown-selected:focus {
+  border-color: #00AC96;
+}
+
+/* Dashboard specific styles */
+.dashboard-primary-bg {
+  background-color: #00AC96;
+}
+
+.dashboard-primary-text {
+  color: #00AC96;
+}
+
+.dashboard-primary-border {
   border-color: #00AC96;
 }
