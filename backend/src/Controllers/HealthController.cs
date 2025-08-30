@@ -1,4 +1,3 @@
-
 using Microsoft.AspNetCore.Mvc;
 
 namespace ErsaTraining.API.Controllers
@@ -10,12 +9,25 @@ namespace ErsaTraining.API.Controllers
         [HttpGet]
         public IActionResult Get()
         {
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+            Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
             return Ok(new { 
-                status = "healthy", 
-                message = "API is running successfully",
+                status = "OK", 
                 timestamp = DateTime.UtcNow,
-                environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Unknown"
+                message = "API is running successfully"
             });
+        }
+
+        [HttpOptions]
+        public IActionResult Options()
+        {
+            Response.Headers.Add("Access-Control-Allow-Origin", "*");
+            Response.Headers.Add("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+            Response.Headers.Add("Access-Control-Allow-Headers", "Content-Type, Authorization");
+
+            return Ok();
         }
 
         [HttpGet("demo")]
