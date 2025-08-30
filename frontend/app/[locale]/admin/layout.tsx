@@ -141,14 +141,14 @@ export default function AdminLayout({
                   }}
                   className={`group flex items-center px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm font-medium rounded-lg transition-colors ${
                     activeTab === item.id
-                      ? `bg-blue-50 text-blue-700 ${isRTL ? 'border-l-2' : 'border-r-2'} border-blue-500`
+                      ? `bg-opacity-10 bg-[#00AC96] text-[#00AC96] ${isRTL ? 'border-l-2' : 'border-r-2'} border-[#00AC96]`
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }`}
                 >
                   <Icon
                     name={item.icon}
                     className={`${isRTL ? 'ml-2 sm:ml-3' : 'mr-2 sm:mr-3'} h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 ${
-                      activeTab === item.id ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-500'
+                      activeTab === item.id ? 'text-[#00AC96]' : 'text-gray-400 group-hover:text-gray-500'
                     }`}
                   />
                   <span className="truncate">{item.label}</span>
