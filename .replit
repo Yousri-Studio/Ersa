@@ -24,7 +24,7 @@ localPort = 8080
 externalPort = 80
 
 [workflows]
-runButton = "Run Full Stack Clean"
+runButton = "Run Full Stack Fixed"
 
 [[workflows.workflow]]
 name = "Run Full Stack"
@@ -47,6 +47,37 @@ mode = "parallel"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd backend/src && dotnet run"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd frontend && npm run dev"
+
+[[workflows.workflow]]
+name = "Run Backend Only"
+author = 46831471
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd backend/src && dotnet run --urls=\"http://0.0.0.0:5002\""
+
+[[workflows.workflow]]
+name = "Run Frontend Only"
+author = 46831471
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd frontend && npm run dev"
+
+[[workflows.workflow]]
+name = "Run Full Stack Fixed"
+author = 46831471
+mode = "parallel"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd backend/src && dotnet run --urls=\"http://0.0.0.0:5002\""
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
