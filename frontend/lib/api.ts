@@ -1,6 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
 import Cookies from 'js-cookie';
 import { useAuthStore } from './auth-store';
+import toast from 'react-hot-toast';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://0.0.0.0:5000/api';
 
@@ -56,13 +57,32 @@ api.interceptors.response.use(
     return response;
   },
   async (error) => {
-    console.error('API Error Details:', {
-      status: error.response?.status,
-      url: error.config?.url,
-      data: error.response?.data,
-      message: error.message,
-      code: error.code
-    });
+    // Check if error exists and has meaningful data
+    if (!error) {
+      console.error('API Error: Unknown error occurred');
+      return Promise.reject(new Error('Unknown API error'));
+    }
+
+    // Log detailed error information
+    const errorDetails = {
+      status: error.response?.status || 'No status',
+      url: error.config?.url || 'No URL',
+      data: error.response?.data || 'No response data',
+      message: error.message || 'No error message',
+      code: error.code || 'No error code',
+      isNetworkError: !error.response,
+      baseURL: error.config?.baseURL || 'No base URL'
+    };
+    
+    console.error('API Error Details:', errorDetails);
+    
+    // Handle network errors specifically
+    if (!error.response) {
+      console.error('Network Error: Could not connect to API server');
+      toast.error('Unable to connect to server. Please check your connection.');
+      return Promise.reject(new Error('Network connection failed'));
+    }
+    
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {
