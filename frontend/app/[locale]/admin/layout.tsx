@@ -205,7 +205,7 @@ export default function AdminLayout({
             </button>
           </div>
 
-          <main className={`${isRTL ? 'text-right' : 'text-left'}`}>
+          <main className={`${isRTL ? 'text-right pr-12' : 'text-left pl-12'}`} style={{paddingLeft: isRTL ? undefined : '50px', paddingRight: isRTL ? '50px' : undefined}}>
             {children}
           </main>
         </div>
