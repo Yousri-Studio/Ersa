@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { api } from '@/lib/api';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://5000-ca5306b5-004d-4516-8130-6e9fc8da81bb-00-sjhyk0bgy5dy.sisko.replit.dev/api';
 
 export default function TestConnectionPage() {
   const [testResult, setTestResult] = useState<string>('');
@@ -16,7 +16,17 @@ export default function TestConnectionPage() {
     try {
       console.log('Testing connection to:', API_BASE_URL);
       
-      // Test 1: Simple GET request
+      // Test 1: Health check
+      console.log('Making GET request to /health...');
+      const healthResponse = await api.get('/health');
+      console.log('Health response:', healthResponse.data);
+      
+      // Test 2: Demo data
+      console.log('Making GET request to /health/demo...');
+      const demoResponse = await api.get('/health/demo');
+      console.log('Demo response:', demoResponse.data);
+      
+      // Test 3: Courses
       console.log('Making GET request to /courses...');
       const coursesResponse = await api.get('/courses');
       console.log('Courses response:', coursesResponse.data);
@@ -49,10 +59,10 @@ export default function TestConnectionPage() {
     setTestResult('Testing fetch connection...');
     
     try {
-      console.log('Testing fetch connection to:', `${API_BASE_URL}/courses`);
+      console.log('Testing fetch connection to:', `${API_BASE_URL}/health`);
       
       // Test with native fetch
-      const response = await fetch(`${API_BASE_URL}/courses`, {
+      const response = await fetch(`${API_BASE_URL}/health`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
