@@ -1,0 +1,8 @@
+modules = ["nodejs-22", "dotnet-9.0", "web"]
+run = "cd backend/src & dotnet run"
+
+[nix]
+channel = "stable-25_05"
+
+[deployment]
+run = ["sh", "-c", "dotnet run"]
