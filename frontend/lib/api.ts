@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from "axios";
 import Cookies from "js-cookie";
 import { useAuthStore } from "./auth-store";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "https://5000-ca5306b5-004d-4516-8130-6e9fc8da81bb-00-sjhyk0bgy5dy.sisko.replit.dev/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
 
 // Create axios instance
 export const api = axios.create({

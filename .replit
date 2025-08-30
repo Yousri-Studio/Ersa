@@ -24,7 +24,7 @@ localPort = 8080
 externalPort = 80
 
 [workflows]
-runButton = "Start Services"
+runButton = "Start Full Stack"
 
 [[workflows.workflow]]
 name = "Run Full Stack"
@@ -127,3 +127,16 @@ args = "echo \"Starting frontend...\""
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd frontend && npm run dev"
+
+[[workflows.workflow]]
+name = "Start Full Stack"
+author = 46831471
+mode = "parallel"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd backend/src && dotnet run --urls=\"http://0.0.0.0:5000\""
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd frontend && NEXT_PUBLIC_API_BASE_URL=\"http://localhost:5000/api\" npm run dev"
