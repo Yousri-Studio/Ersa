@@ -155,31 +155,30 @@ export default function AdminDashboard() {
   };
 
   // Mock data for demonstration - replace with real data from API
-  // This mock data should ideally also use translations or be structured to accept them.
   const recentOrders = [
     {
       id: '1',
       studentName: 'Eslam Elsayed',
-      courseName: 'Advanced Graphic Design Course',
-      orderDate: '01 / 01 / 2025',
-      courseType: t('online'),
-      coursePrice: '1200 SAR'
+      courseName: locale === 'ar' ? 'دورة التصميم الجرافيكي المتقدمة' : 'Advanced Graphic Design Course',
+      orderDate: '2025/01/01',
+      courseType: locale === 'ar' ? 'أونلاين' : 'Online',
+      coursePrice: locale === 'ar' ? '1200 ر.س' : '1200 SAR'
     },
     {
       id: '2',
       studentName: 'Eslam Elsayed',
-      courseName: 'Advanced Graphic Design Course',
-      orderDate: '01 / 01 / 2025',
-      courseType: t('online'),
-      coursePrice: '1200 SAR'
+      courseName: locale === 'ar' ? 'دورة التصميم الجرافيكي المتقدمة' : 'Advanced Graphic Design Course',
+      orderDate: '2025/01/01',
+      courseType: locale === 'ar' ? 'أونلاين' : 'Online',
+      coursePrice: locale === 'ar' ? '1200 ر.س' : '1200 SAR'
     },
     {
       id: '3',
       studentName: 'Eslam Elsayed',
-      courseName: 'Advanced Graphic Design Course',
-      orderDate: '01 / 01 / 2025',
-      courseType: t('online'),
-      coursePrice: '1200 SAR'
+      courseName: locale === 'ar' ? 'دورة التصميم الجرافيكي المتقدمة' : 'Advanced Graphic Design Course',
+      orderDate: '2025/01/01',
+      courseType: locale === 'ar' ? 'أونلاين' : 'Online',
+      coursePrice: locale === 'ar' ? '1200 ر.س' : '1200 SAR'
     }
   ];
 
@@ -188,38 +187,54 @@ export default function AdminDashboard() {
       id: '1',
       name: 'Eslam Elsayed',
       email: 'gfxislam@gmail.com',
-      date: '01/01/2025',
+      date: '2025/01/01',
       avatar: '/images/Avatar.svg'
     },
     {
       id: '2',
       name: 'Eslam Elsayed',
       email: 'gfxislam@gmail.com',
-      date: '01/01/2025',
+      date: '2025/01/01',
       avatar: '/images/Avatar.svg'
     },
     {
       id: '3',
       name: 'Eslam Elsayed',
       email: 'gfxislam@gmail.com',
-      date: '01/01/2025',
+      date: '2025/01/01',
       avatar: '/images/Avatar.svg'
     },
     {
       id: '4',
       name: 'Eslam Elsayed',
       email: 'gfxislam@gmail.com',
-      date: '01/01/2025',
+      date: '2025/01/01',
       avatar: '/images/Avatar.svg'
     }
   ];
 
   // Use real geographic data from API or fallback to mock data
   const geographics = [
-    { country: 'Saudi Arabia', users: 20, coordinates: [45.0792, 23.8859] },
-    { country: 'Egypt', users: 20, coordinates: [30.8025, 26.8206] },
-    { country: 'United States', users: 20, coordinates: [-95.7129, 37.0902] },
-    { country: 'United Kingdom', users: 20, coordinates: [-0.1278, 51.5074] }
+    { 
+      country: locale === 'ar' ? 'المملكة العربية السعودية' : 'Saudi Arabia', 
+      users: 20, 
+      coordinates: [45.0792, 23.8859] 
+    },
+    { 
+      country: locale === 'ar' ? 'مصر' : 'Egypt', 
+      users: 20, 
+      coordinates: [30.8025, 26.8206] 
+    },
+    { 
+      country: locale === 'ar' ? 'الولايات المتحدة' : 'United States', 
+      users: 20, 
+      coordinates: [-95.7129, 37.0902] 
+    },
+    { 
+      country: locale === 'ar' ? 'المملكة المتحدة' : 'United Kingdom', 
+      users: 20, 
+      coordinates: [-0.1278, 51.5074] 
+    }
   ];
 
   const isRTL = locale === 'ar';
@@ -359,7 +374,9 @@ export default function AdminDashboard() {
                         {order.coursePrice}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {order.status}
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          {locale === 'ar' ? 'مدفوع' : 'Paid'}
+                        </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         <button className="text-gray-400 hover:text-gray-600 p-1">

@@ -362,6 +362,7 @@
     },
     "dashboard": {
       "title": "لوحة القيادة",
+      "overview-platform": "نظرة عامة على المنصة",
       "stats": {
         "totalUsers": "إجمالي المستخدمين",
         "activeUsers": "المستخدمون النشطون",
