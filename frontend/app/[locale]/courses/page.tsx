@@ -7,7 +7,7 @@ import { useRouter } from 'next/navigation';
 import { Icon } from '@/components/ui/icon';
 import { CourseCard } from '@/components/ui/course-card-new';
 import { SearchEmptyState } from '@/components/ui/search-empty-state';
-import { SearchBar } from '@/components/home/search-bar';
+import { SearchBar } from '@/components/ui/search-bar-new';
 import { FilterDropdown } from '@/components/ui/filter-dropdown';
 import { NoSearchResults } from '@/components/ui/no-search-results';
 import { courseToCardProps } from '@/lib/course-adapter';
@@ -374,8 +374,8 @@ export default function CoursesPage() {
           {/* Search and Filters */}
           <div className="mb-8">
             {/* Search Bar */}
-            <div className={`mb-6 scroll-item ${isLoaded ? 'animate-slide-in-right stagger-3' : 'opacity-0'}`}>
-              <SearchBar />
+            <div className={`mb-6 scroll-item max-w-5xl mx-auto ${isLoaded ? 'animate-slide-in-right stagger-3' : 'opacity-0'}`}>
+              <SearchBar className="shadow-lg rounded-lg bg-white p-4" />
             </div>
 
             {/* Filter Options - Match search width */}
@@ -437,39 +437,38 @@ export default function CoursesPage() {
 
           {/* All Courses Grid or No Results */}
           {!isLoading && !coursesError && (
-            filteredCourses.length === 0 && (query.trim() || sortBy || categoryFilter) ? (
-              <div className="scroll-item">
-                <NoSearchResults />
-              </div>
-            ) : (
-              <div className={`grid gap-6 ${
-                displayType === 'list' 
-                  ? 'grid-cols-1' 
-                  : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-              }`} style={{ position: 'relative', zIndex: 1 }}>
-                {filteredCourses.map((course: Course, index: number) => {
-                  const cardProps = courseToCardProps(course, locale as 'ar' | 'en', {
-                    inWishlist: false,
-                    inCart: hasItem(course.id),
-                    onToggleWishlist: handleToggleWishlist,
-                    onAddToCart: handleAddToCart,
-                    onClick: handleCourseClick
-                  });
-                  
-                  return (
-                    <div
-                      key={course.id}
-                      ref={setAllCoursesRef(index)}
-                      className={`scroll-item hover-lift card-animate ${
-                        allCoursesVisible.has(index) ? 'visible' : ''
-                      }`}
-                    >
-                      <CourseCard {...cardProps} />
-                    </div>
-                  );
-                })}
-              </div>
-            )
+            <div>
+              {filteredCourses.length === 0 && (query.trim() || sortBy || categoryFilter) ? (
+                <div className="scroll-item">
+                  <NoSearchResults />
+                </div>
+              ) : (
+                <div 
+                  className={`grid gap-6 ${displayType === 'list' ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'}`}
+                  style={{ position: 'relative', zIndex: 1 }}
+                >
+                  {filteredCourses.map((course: Course, index: number) => {
+                    const cardProps = courseToCardProps(course, locale as 'ar' | 'en', {
+                      inWishlist: false,
+                      inCart: hasItem(course.id),
+                      onToggleWishlist: handleToggleWishlist,
+                      onAddToCart: handleAddToCart,
+                      onClick: handleCourseClick
+                    });
+                    
+                    return (
+                      <div
+                        key={course.id}
+                        ref={setAllCoursesRef(index)}
+                        className={`scroll-item hover-lift card-animate ${allCoursesVisible.has(index) ? 'visible' : ''}`}
+                      >
+                        <CourseCard {...cardProps} />
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
           )}
         </div>
       </div>

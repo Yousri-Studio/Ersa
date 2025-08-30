@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using ErsaTraining.API.Models;
 
 namespace ErsaTraining.API.Data.Entities;
 
@@ -65,15 +64,22 @@ public class Course
     public virtual ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
 }
 
-public enum CourseType
+public enum CourseType:int
 {
     Live = 1,
     PDF = 2
 }
 
-public enum CourseLevel
+public enum CourseLevel:int
 {
     Biginner = 1,
     Intermediate = 2,
     Advanced=3
+}
+
+public enum CourseCategory:int
+{
+    Programming = 1,
+    Business = 2,
+    Design = 3
 }

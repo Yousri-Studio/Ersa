@@ -15,8 +15,8 @@ public class ErsaTrainingDbContext : IdentityDbContext<User, IdentityRole<Guid>,
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         // Remove the warning configuration as PendingModelChangesWarning doesn't exist in EF Core 8.x
-        // optionsBuilder.ConfigureWarnings(warnings => 
-        //     warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+        optionsBuilder.ConfigureWarnings(warnings =>
+            warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
     }
 
     // DbSets

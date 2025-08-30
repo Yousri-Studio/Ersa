@@ -3,6 +3,7 @@ using System;
 using ErsaTraining.API.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ErsaTraining.API.Migrations
 {
     [DbContext(typeof(ErsaTrainingDbContext))]
-    partial class ErsaTrainingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250829215022_missing")]
+    partial class missing
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "9.0.0");
@@ -232,83 +235,83 @@ namespace ErsaTraining.API.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("e48b6230-3b72-4cc8-b56a-4389847de6a8"),
-                            CreatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(1988),
+                            Id = new Guid("f998e9db-3f1a-424a-86ab-fa82eaeae5f7"),
+                            CreatedAt = new DateTime(2025, 8, 29, 21, 50, 20, 945, DateTimeKind.Utc).AddTicks(2011),
                             Description = "Main landing page of the website",
                             IsActive = true,
                             PageKey = "home",
                             PageName = "Home Page",
-                            UpdatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(2397)
+                            UpdatedAt = new DateTime(2025, 8, 29, 21, 50, 20, 945, DateTimeKind.Utc).AddTicks(2242)
                         },
                         new
                         {
-                            Id = new Guid("3a4feb4a-c720-4928-b010-7df4bc141d92"),
-                            CreatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(2812),
+                            Id = new Guid("d0483703-c630-4369-9432-e12aa7f12e60"),
+                            CreatedAt = new DateTime(2025, 8, 29, 21, 50, 20, 945, DateTimeKind.Utc).AddTicks(2467),
                             Description = "Company information and mission",
                             IsActive = true,
                             PageKey = "about",
                             PageName = "About Us",
-                            UpdatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(2812)
+                            UpdatedAt = new DateTime(2025, 8, 29, 21, 50, 20, 945, DateTimeKind.Utc).AddTicks(2468)
                         },
                         new
                         {
-                            Id = new Guid("3dafea9c-991d-4450-9983-bd1152574b90"),
-                            CreatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(2816),
+                            Id = new Guid("4620ba0f-597d-4e51-8787-685bf46ab31b"),
+                            CreatedAt = new DateTime(2025, 8, 29, 21, 50, 20, 945, DateTimeKind.Utc).AddTicks(2471),
                             Description = "Contact information and form",
                             IsActive = true,
                             PageKey = "contact",
                             PageName = "Contact Us",
-                            UpdatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(2817)
+                            UpdatedAt = new DateTime(2025, 8, 29, 21, 50, 20, 945, DateTimeKind.Utc).AddTicks(2471)
                         },
                         new
                         {
-                            Id = new Guid("7048c3fe-a0d3-4428-8870-76c172ba82eb"),
-                            CreatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(2821),
+                            Id = new Guid("dcfad677-1e68-4908-8e39-4726970ebc86"),
+                            CreatedAt = new DateTime(2025, 8, 29, 21, 50, 20, 945, DateTimeKind.Utc).AddTicks(2474),
                             Description = "Frequently asked questions",
                             IsActive = true,
                             PageKey = "faq",
                             PageName = "FAQ",
-                            UpdatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(2821)
+                            UpdatedAt = new DateTime(2025, 8, 29, 21, 50, 20, 945, DateTimeKind.Utc).AddTicks(2474)
                         },
                         new
                         {
-                            Id = new Guid("07a7a667-0f39-4447-8f5a-bceaedd29c90"),
-                            CreatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(2833),
+                            Id = new Guid("9f37dfbb-60fc-4aaf-a666-0833b83c4abc"),
+                            CreatedAt = new DateTime(2025, 8, 29, 21, 50, 20, 945, DateTimeKind.Utc).AddTicks(2485),
                             Description = "Our services overview",
                             IsActive = true,
                             PageKey = "services",
                             PageName = "Services",
-                            UpdatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(2833)
+                            UpdatedAt = new DateTime(2025, 8, 29, 21, 50, 20, 945, DateTimeKind.Utc).AddTicks(2485)
                         },
                         new
                         {
-                            Id = new Guid("1bd09288-2fbc-462f-b17c-aa7115b87333"),
-                            CreatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(2838),
+                            Id = new Guid("cbfcf3a4-172d-4c16-bd6f-a23d9ddde5c6"),
+                            CreatedAt = new DateTime(2025, 8, 29, 21, 50, 20, 945, DateTimeKind.Utc).AddTicks(2488),
                             Description = "Available training courses",
                             IsActive = true,
                             PageKey = "courses",
                             PageName = "Courses",
-                            UpdatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(2838)
+                            UpdatedAt = new DateTime(2025, 8, 29, 21, 50, 20, 945, DateTimeKind.Utc).AddTicks(2488)
                         },
                         new
                         {
-                            Id = new Guid("01506179-ea6c-4dce-8ab1-58a5e857800a"),
-                            CreatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(2841),
+                            Id = new Guid("fbccea55-edbf-4ce3-a412-2cc4c0829698"),
+                            CreatedAt = new DateTime(2025, 8, 29, 21, 50, 20, 945, DateTimeKind.Utc).AddTicks(2491),
                             Description = "Artificial Intelligence services",
                             IsActive = true,
                             PageKey = "ai-solutions",
                             PageName = "AI Solutions",
-                            UpdatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(2841)
+                            UpdatedAt = new DateTime(2025, 8, 29, 21, 50, 20, 945, DateTimeKind.Utc).AddTicks(2491)
                         },
                         new
                         {
-                            Id = new Guid("0f9b56de-77f2-4142-9f85-1d239780a24c"),
-                            CreatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(2879),
+                            Id = new Guid("f07327ee-3396-438f-9f15-5a8c9147f30c"),
+                            CreatedAt = new DateTime(2025, 8, 29, 21, 50, 20, 945, DateTimeKind.Utc).AddTicks(2494),
                             Description = "Administrative consulting services",
                             IsActive = true,
                             PageKey = "admin-consulting",
                             PageName = "Administrative Consulting",
-                            UpdatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(2879)
+                            UpdatedAt = new DateTime(2025, 8, 29, 21, 50, 20, 945, DateTimeKind.Utc).AddTicks(2494)
                         });
                 });
 
@@ -403,9 +406,7 @@ namespace ErsaTraining.API.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Category")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasDefaultValue(2);
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -420,26 +421,21 @@ namespace ErsaTraining.API.Migrations
                         .HasDefaultValue("SAR");
 
                     b.Property<string>("DescriptionAr")
-                        .HasMaxLength(5000)
+                        .HasMaxLength(2000)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("DescriptionEn")
-                        .HasMaxLength(5000)
+                        .HasMaxLength(2000)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
                         .HasMaxLength(1000)
-                        .HasColumnType("TEXT")
-                        .HasDefaultValue("");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("InstructorName")
                         .IsRequired()
-                        .ValueGeneratedOnAdd()
                         .HasMaxLength(255)
-                        .HasColumnType("TEXT")
-                        .HasDefaultValue("");
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -452,9 +448,7 @@ namespace ErsaTraining.API.Migrations
                         .HasDefaultValue(false);
 
                     b.Property<int>("Level")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasDefaultValue(1);
+                        .HasColumnType("INTEGER");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
@@ -475,9 +469,7 @@ namespace ErsaTraining.API.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<int>("Type")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER")
-                        .HasDefaultValue(2);
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
@@ -600,36 +592,36 @@ namespace ErsaTraining.API.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("fd0830b9-35a2-496d-b024-b896031c5db1"),
+                            Id = new Guid("ee20f2a5-3aa1-414b-baa7-d7bdd796c90a"),
                             BodyHtmlAr = "<h1>مرحباً بك في إرساء للتدريب</h1><p>شكراً لانضمامك إلينا!</p>",
                             BodyHtmlEn = "<h1>Welcome to Ersa Training</h1><p>Thank you for joining us!</p>",
-                            CreatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 594, DateTimeKind.Utc).AddTicks(7342),
+                            CreatedAt = new DateTime(2025, 8, 29, 21, 50, 20, 944, DateTimeKind.Utc).AddTicks(3483),
                             Key = "Welcome",
                             SubjectAr = "مرحباً بك في إرساء للتدريب",
                             SubjectEn = "Welcome to Ersa Training",
-                            UpdatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 594, DateTimeKind.Utc).AddTicks(7669)
+                            UpdatedAt = new DateTime(2025, 8, 29, 21, 50, 20, 944, DateTimeKind.Utc).AddTicks(3720)
                         },
                         new
                         {
-                            Id = new Guid("4f80b621-5df1-4764-bf48-e787be3a12cc"),
+                            Id = new Guid("00e15e64-5a4b-4c3c-95dc-ceeea809ec4e"),
                             BodyHtmlAr = "<h1>تفاصيل الدورة المباشرة</h1><p>رابط الانضمام: {{TeamsLink}}</p><p>تاريخ البدء: {{StartDate}}</p>",
                             BodyHtmlEn = "<h1>Live Course Details</h1><p>Join Link: {{TeamsLink}}</p><p>Start Date: {{StartDate}}</p>",
-                            CreatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 594, DateTimeKind.Utc).AddTicks(8014),
+                            CreatedAt = new DateTime(2025, 8, 29, 21, 50, 20, 944, DateTimeKind.Utc).AddTicks(3944),
                             Key = "LiveDetails",
                             SubjectAr = "تفاصيل الدورة المباشرة - {{CourseTitleAr}}",
                             SubjectEn = "Live Course Details - {{CourseTitleEn}}",
-                            UpdatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 594, DateTimeKind.Utc).AddTicks(8015)
+                            UpdatedAt = new DateTime(2025, 8, 29, 21, 50, 20, 944, DateTimeKind.Utc).AddTicks(3945)
                         },
                         new
                         {
-                            Id = new Guid("0c79d088-1792-4cb9-9217-32b94e80d2ca"),
+                            Id = new Guid("cd6096ae-c09e-477c-a3b7-545dab9e60ff"),
                             BodyHtmlAr = "<h1>مواد الدورة</h1><p>يمكنك تحميل مواد الدورة من الروابط التالية:</p>{{SecureLinks}}",
                             BodyHtmlEn = "<h1>Course Materials</h1><p>You can download the course materials from the following links:</p>{{SecureLinks}}",
-                            CreatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 594, DateTimeKind.Utc).AddTicks(8019),
+                            CreatedAt = new DateTime(2025, 8, 29, 21, 50, 20, 944, DateTimeKind.Utc).AddTicks(3948),
                             Key = "MaterialsDelivery",
                             SubjectAr = "مواد الدورة - {{CourseTitleAr}}",
                             SubjectEn = "Course Materials - {{CourseTitleEn}}",
-                            UpdatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 594, DateTimeKind.Utc).AddTicks(8019)
+                            UpdatedAt = new DateTime(2025, 8, 29, 21, 50, 20, 944, DateTimeKind.Utc).AddTicks(3948)
                         });
                 });
 

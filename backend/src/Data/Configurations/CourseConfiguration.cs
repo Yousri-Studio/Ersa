@@ -34,10 +34,10 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
             .HasMaxLength(500);
 
         builder.Property(c => c.DescriptionAr)
-            .HasMaxLength(2000);
+            .HasMaxLength(5000);
 
         builder.Property(c => c.DescriptionEn)
-            .HasMaxLength(2000);
+            .HasMaxLength(5000);
 
         builder.Property(c => c.IsActive)
             .HasDefaultValue(true);
@@ -48,8 +48,33 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
         builder.Property(c => c.CreatedAt)
             .HasDefaultValueSql("GETUTCDATE()");
 
+        builder.Property(c => c.Type)
+            .IsRequired()
+            .HasDefaultValue(CourseType.PDF);
+
+        builder.Property(c => c.Level)
+            .IsRequired()
+            .HasDefaultValue(CourseLevel.Biginner);
+
+        builder.Property(c => c.Category)
+            .IsRequired()
+            .HasDefaultValue(CourseCategory.Business);
+
+        builder.Property(c => c.CreatedAt)
+            .HasDefaultValueSql("GETUTCDATE()");
+
         builder.Property(c => c.UpdatedAt)
             .HasDefaultValueSql("GETUTCDATE()");
+
+        builder.Property(c => c.ImageUrl)
+            .IsRequired()
+            .HasDefaultValue("")
+            .HasMaxLength(1000);
+
+        builder.Property(c => c.InstructorName)
+            .IsRequired()
+            .HasMaxLength(255)
+            .HasDefaultValue("");
     }
 }
 

@@ -89,6 +89,8 @@ export interface RegisterResponse {
   message: string;
 }
 
+export type CourseCategory = 'Programming' | 'Business' | 'Design';
+
 export interface Course {
   id: string;
   slug: string;
@@ -107,6 +109,9 @@ export interface Course {
   isFeatured?: boolean;
   rating?: number;
   createdAt?: string;
+  category: CourseCategory;
+  imageUrl?: string;
+  instructorName?: string;
 
   badge?: 'Bestseller' | 'New' | null;
   thumbnailUrl?: string;

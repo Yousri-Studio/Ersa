@@ -154,7 +154,7 @@ export default function CourseDetailsPage() {
       price: course.price,
       currency: course.currency,
       imageUrl: course.imageUrl,
-      instructor: course.instructor.name,
+      instructor: course.instructorName,
       qty: 1
     });
   };

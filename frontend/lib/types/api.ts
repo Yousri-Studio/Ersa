@@ -1,6 +1,8 @@
 import { LocaleString } from '../common-types';
 
 // Course-related types
+export type CourseCategory = 'Programming' | 'Business' | 'Design';
+
 export interface Course {
   id: string;
   slug: string;
@@ -9,12 +11,14 @@ export interface Course {
   price: number;
   currency: string;
   type: 'Live' | 'PDF';
+  category: CourseCategory;
+  imageUrl: string;
+  instructorName: string;
   isActive: boolean;
   isFeatured?: boolean;
   rating?: number;
   createdAt?: string;
   badge?: 'Bestseller' | 'New' | null;
-  thumbnailUrl?: string;
   instructor?: {
     name: string;
     title?: string;

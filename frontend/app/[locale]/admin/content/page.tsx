@@ -44,132 +44,131 @@ export default function ContentManagementPage() {
       const response = await contentAdminApi.getContentSections();
       setSections(response.data);
       setIsLoading(false);
+      return;
     } catch (error) {
       console.error('Error loading content sections:', error);
-      toast.error('Failed to load content sections');
-      // Fallback to mock data for development
-      const mockSections: ContentSection[] = [
-        {
-          id: 'hero',
-          name: 'Hero Section',
-          type: 'hero',
-          content: {
-            title: 'Welcome to Ersa Training',
-            subtitle: 'Professional Training & Consultancy Services',
-            description: 'Empowering individuals and organizations with world-class training solutions'
-          },
-          isActive: true,
-          lastModified: '2024-01-15'
-        },
-        {
-          id: 'consultation',
-          name: 'Consultation Section',
-          type: 'consultation',
-          content: {
-            title: 'Get Professional Consultation',
-            description: 'Our experts are here to help you achieve your goals'
-          },
-          isActive: true,
-          lastModified: '2024-01-14'
-        },
-        {
-          id: 'training',
-          name: 'Training Categories',
-          type: 'training',
-          content: {
-            categories: [
-              { name: 'Graphic Design', description: 'Professional design courses' },
-              { name: 'Web Development', description: 'Modern web development skills' },
-              { name: 'Digital Marketing', description: 'Marketing strategies and tools' }
-            ]
-          },
-          isActive: true,
-          lastModified: '2024-01-13'
-        },
-        {
-          id: 'services',
-          name: 'Services Section',
-          type: 'services',
-          content: {
-            services: [
-              { title: 'Online Training', description: 'Flexible online learning' },
-              { title: 'Corporate Training', description: 'Customized corporate solutions' },
-              { title: 'Consultation', description: 'Expert advice and guidance' }
-            ]
-          },
-          isActive: true,
-          lastModified: '2024-01-12'
-        },
-        {
-          id: 'ai',
-          name: 'AI Consultation',
-          type: 'ai',
-          content: {
-            title: 'AI-Powered Consultation',
-            description: 'Get instant answers to your questions'
-          },
-          isActive: true,
-          lastModified: '2024-01-11'
-        },
-        {
-          id: 'testimonials',
-          name: 'Testimonials',
-          type: 'testimonials',
-          content: {
-            testimonials: [
-              { name: 'Ahmed Ali', role: 'Student', text: 'Excellent training experience' },
-              { name: 'Sarah Johnson', role: 'Manager', text: 'Professional and effective' }
-            ]
-          },
-          isActive: true,
-          lastModified: '2024-01-10'
-        },
-        {
-          id: 'join',
-          name: 'Join Us Section',
-          type: 'join',
-          content: {
-            title: 'Join Our Community',
-            description: 'Be part of our growing network of professionals'
-          },
-          isActive: true,
-          lastModified: '2024-01-09'
-        },
-        {
-          id: 'achievements',
-          name: 'Achievements',
-          type: 'achievements',
-          content: {
-            stats: [
-              { number: '1000+', label: 'Students Trained' },
-              { number: '50+', label: 'Courses Available' },
-              { number: '95%', label: 'Success Rate' }
-            ]
-          },
-          isActive: true,
-          lastModified: '2024-01-08'
-        },
-        {
-          id: 'faq',
-          name: 'FAQ Section',
-          type: 'faq',
-          content: {
-            faqs: [
-              { question: 'How do I enroll in a course?', answer: 'You can enroll through our website or contact us directly.' },
-              { question: 'What payment methods do you accept?', answer: 'We accept credit cards, bank transfers, and online payments.' }
-            ]
-          },
-          isActive: true,
-          lastModified: '2024-01-07'
-        }
-      ];
-
-      setSections(mockSections);
-      setIsLoading(false);
-    } catch (error) {
-      toast.error('Failed to load content sections');
-      setIsLoading(false);
     }
+
+    // Fallback to mock data for development
+    const mockSections: ContentSection[] = [
+      {
+        id: 'hero',
+        name: 'Hero Section',
+        type: 'hero',
+        content: {
+          title: 'Welcome to Ersa Training',
+          subtitle: 'Professional Training & Consultancy Services',
+          description: 'Empowering individuals and organizations with world-class training solutions'
+        },
+        isActive: true,
+        lastModified: '2024-01-15'
+      },
+      {
+        id: 'consultation',
+        name: 'Consultation Section',
+        type: 'consultation',
+        content: {
+          title: 'Get Professional Consultation',
+          description: 'Our experts are here to help you achieve your goals'
+        },
+        isActive: true,
+        lastModified: '2024-01-14'
+      },
+      {
+        id: 'training',
+        name: 'Training Categories',
+        type: 'training',
+        content: {
+          categories: [
+            { name: 'Graphic Design', description: 'Professional design courses' },
+            { name: 'Web Development', description: 'Modern web development skills' },
+            { name: 'Digital Marketing', description: 'Marketing strategies and tools' }
+          ]
+        },
+        isActive: true,
+        lastModified: '2024-01-13'
+      },
+      {
+        id: 'services',
+        name: 'Services Section',
+        type: 'services',
+        content: {
+          services: [
+            { title: 'Online Training', description: 'Flexible online learning' },
+            { title: 'Corporate Training', description: 'Customized corporate solutions' },
+            { title: 'Consultation', description: 'Expert advice and guidance' }
+          ]
+        },
+        isActive: true,
+        lastModified: '2024-01-12'
+      },
+      {
+        id: 'ai',
+        name: 'AI Consultation',
+        type: 'ai',
+        content: {
+          title: 'AI-Powered Consultation',
+          description: 'Get instant answers to your questions'
+        },
+        isActive: true,
+        lastModified: '2024-01-11'
+      },
+      {
+        id: 'testimonials',
+        name: 'Testimonials',
+        type: 'testimonials',
+        content: {
+          testimonials: [
+            { name: 'Ahmed Ali', role: 'Student', text: 'Excellent training experience' },
+            { name: 'Sarah Johnson', role: 'Manager', text: 'Professional and effective' }
+          ]
+        },
+        isActive: true,
+        lastModified: '2024-01-10'
+      },
+      {
+        id: 'join',
+        name: 'Join Us Section',
+        type: 'join',
+        content: {
+          title: 'Join Our Community',
+          description: 'Be part of our growing network of professionals'
+        },
+        isActive: true,
+        lastModified: '2024-01-09'
+      },
+      {
+        id: 'achievements',
+        name: 'Achievements',
+        type: 'achievements',
+        content: {
+          stats: [
+            { number: '1000+', label: 'Students Trained' },
+            { number: '50+', label: 'Courses Available' },
+            { number: '95%', label: 'Success Rate' }
+          ]
+        },
+        isActive: true,
+        lastModified: '2024-01-08'
+      },
+      {
+        id: 'faq',
+        name: 'FAQ Section',
+        type: 'faq',
+        content: {
+          faqs: [
+            { question: 'How do I enroll in a course?', answer: 'You can enroll through our website or contact us directly.' },
+            { question: 'What payment methods do you accept?', answer: 'We accept credit cards, bank transfers, and online payments.' }
+          ]
+        },
+        isActive: true,
+        lastModified: '2024-01-07'
+      }
+    ];
+
+    toast.error('Failed to load content sections, using mock data');
+    setSections(mockSections);
+    setIsLoading(false);
   };
 
   const handleSave = async (sectionId: string, content: any) => {

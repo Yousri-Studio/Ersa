@@ -20,6 +20,8 @@ export type CourseCardProps = {
   badge?: 'bestseller' | 'new' | null;
   durationLabel: Localized;
   rating?: number;
+  category: 'Programming' | 'Business' | 'Design';
+  instructorName?: string;
 
   price: number;
   currency: 'SAR' | 'USD';
@@ -143,6 +145,8 @@ export const CourseCard: React.FC<CourseCardProps> & {
   badge,
   durationLabel,
   rating,
+  category,
+  instructorName,
 
   price,
   currency,
@@ -228,24 +232,45 @@ export const CourseCard: React.FC<CourseCardProps> & {
         className="p-6 space-y-3 cursor-pointer flex-grow flex flex-col" 
         onClick={handleCardClick}
       >
-        {/* Bestseller badge */}
-        {badge === 'bestseller' && (
-          <div className="text-sm flex items-center gap-1.5 font-medium" style={{ color: '#00AC96' }}>
-            <span>🔥</span>
-            <span>{getBestsellerLabel()}</span>
+        {/* Top row with bestseller badge and category */}
+        <div className="flex items-center justify-between">
+          {/* Bestseller badge */}
+          {badge === 'bestseller' && (
+            <div className="text-sm flex items-center gap-1.5 font-medium" style={{ color: '#00AC96' }}>
+              <span>🔥</span>
+              <span>{getBestsellerLabel()}</span>
+            </div>
+          )}
+
+          {/* Category tag */}
+          <div className="px-3 py-1 rounded-full text-xs font-medium" style={{ 
+            backgroundColor: category === 'Programming' ? '#E1F3FF' : 
+                           category === 'Business' ? '#FFE1E1' : 
+                           '#E1FFE9',
+            color: category === 'Programming' ? '#0078D4' : 
+                  category === 'Business' ? '#D40000' : 
+                  '#00D439'
+          }}>
+            {category}
           </div>
-        )}
+        </div>
 
         {/* Title */}
         <h3 className="text-slate-900 line-clamp-1 font-cairo" style={{ fontWeight: 700, fontSize: '1.2rem' }}>
           {isHydrated ? title[locale as keyof Localized] : (title[currentLocale as keyof Localized] || title.ar || title.en)}
         </h3>
 
-        {/* Summary - flex-grow to take remaining space */}
-        <div className="flex-grow">
+        {/* Summary and instructor */}
+        <div className="flex-grow space-y-3">
           <p className="text-slate-500 line-clamp-2 leading-relaxed">
             {isHydrated ? summary[locale as keyof Localized] : (summary[currentLocale as keyof Localized] || summary.ar || summary.en)}
           </p>
+          {instructorName && (
+            <div className="flex items-center text-sm text-slate-600">
+              <Icon icon="user" className="w-4 h-4 mr-2" />
+              <span>{instructorName}</span>
+            </div>
+          )}
         </div>
       </div>
 

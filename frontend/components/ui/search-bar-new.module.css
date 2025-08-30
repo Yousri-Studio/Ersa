@@ -1,0 +1,78 @@
+.searchContainer {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+}
+
+.searchInput {
+  flex: 1;
+  height: 48px;
+  padding: 0 1rem 0 3rem;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  background-color: white;
+  font-size: 1rem;
+  transition: all 0.2s;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: transparent;
+  box-shadow: 0 0 0 2px #6366F1;
+}
+
+.categorySelect {
+  width: 200px;
+  height: 48px;
+  padding: 0 2.5rem 0 1rem;
+  border: 1px solid #E5E7EB;
+  border-radius: 8px;
+  background-color: white;
+  font-size: 1rem;
+  appearance: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236B7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1.25rem;
+}
+
+.categorySelect:focus {
+  outline: none;
+  border-color: transparent;
+  box-shadow: 0 0 0 2px #6366F1;
+}
+
+.searchButton {
+  padding: 0 2rem;
+  height: 48px;
+  background-color: #292561;
+  color: white;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.searchButton:hover {
+  background-color: #1e1b4b;
+}
+
+.searchButton:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px white, 0 0 0 4px #292561;
+}
+
+@media (max-width: 768px) {
+  .searchContainer {
+    flex-direction: column;
+  }
+
+  .searchButton {
+    width: 100%;
+  }
+
+  .categorySelect {
+    width: 100%;
+  }
+}

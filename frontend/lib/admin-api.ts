@@ -307,42 +307,42 @@ export const adminApi = {
     api.put(`/admin/orders/${orderId}/status`, data),
     
   // Content Management
-  getContentPages: () => api.get<ContentPage[]>('/api/content/pages'),
+  getContentPages: () => api.get<ContentPage[]>('/content/pages'),
 
   getContentPage: (id: string) =>
-    api.get<ContentPage>(`/api/content/pages/${id}`),
+    api.get<ContentPage>(`/content/pages/${id}`),
 
   createContentPage: (data: CreateContentPage) =>
-    api.post<ContentPage>('/api/content/pages', data),
+    api.post<ContentPage>('/content/pages', data),
 
   updateContentPage: (id: string, data: UpdateContentPage) =>
-    api.put<ContentPage>(`/api/content/pages/${id}`, data),
+    api.put<ContentPage>(`/content/pages/${id}`, data),
 
   deleteContentPage: (id: string) =>
-    api.delete(`/api/content/pages/${id}`),
+    api.delete(`/content/pages/${id}`),
 
   createContentSection: (pageId: string, data: CreateContentSection) =>
-    api.post<ContentSection>(`/api/content/pages/${pageId}/sections`, data),
+    api.post<ContentSection>(`/content/pages/${pageId}/sections`, data),
 
   updateContentSection: (pageId: string, sectionId: string, data: UpdateContentSection) =>
-    api.put<ContentSection>(`/api/content/pages/${pageId}/sections/${sectionId}`, data),
+    api.put<ContentSection>(`/content/pages/${pageId}/sections/${sectionId}`, data),
 
   deleteContentSection: (pageId: string, sectionId: string) =>
-    api.delete(`/api/content/pages/${pageId}/sections/${sectionId}`),
+    api.delete(`/content/pages/${pageId}/sections/${sectionId}`),
 
   createContentBlock: (pageId: string, sectionId: string, data: CreateContentBlock) =>
-    api.post<ContentBlock>(`/api/content/pages/${pageId}/sections/${sectionId}/blocks`, data),
+    api.post<ContentBlock>(`/content/pages/${pageId}/sections/${sectionId}/blocks`, data),
 
   updateContentBlock: (pageId: string, sectionId: string, blockId: string, data: UpdateContentBlock) =>
-    api.put<ContentBlock>(`/api/content/pages/${pageId}/sections/${sectionId}/blocks/${blockId}`, data),
+    api.put<ContentBlock>(`/content/pages/${pageId}/sections/${sectionId}/blocks/${blockId}`, data),
 
   deleteContentBlock: (pageId: string, sectionId: string, blockId: string) =>
-    api.delete(`/api/content/pages/${pageId}/sections/${sectionId}/blocks/${blockId}`),
+    api.delete(`/content/pages/${pageId}/sections/${sectionId}/blocks/${blockId}`),
 
   uploadFile: (file: File) => {
     const formData = new FormData();
     formData.append('file', file);
-    return api.post<FileUploadResponse>('/api/content/upload', formData, {
+    return api.post<FileUploadResponse>('/content/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -350,14 +350,14 @@ export const adminApi = {
   },
 
   getPageContent: (pageKey: string) =>
-    api.get<PageContent>(`/api/content/pages/key/${pageKey}`),
+    api.get<PageContent>(`/content/pages/key/${pageKey}`),
 
   getContentVersions: (pageId: string) =>
-    api.get<ContentVersion[]>(`/api/content/pages/${pageId}/versions`),
+    api.get<ContentVersion[]>(`/content/pages/${pageId}/versions`),
 
   createContentVersion: (pageId: string, data: CreateContentVersion) =>
-    api.post<ContentVersion>(`/api/content/pages/${pageId}/versions`, data),
+    api.post<ContentVersion>(`/content/pages/${pageId}/versions`, data),
 
   publishContentVersion: (pageId: string, versionId: string) =>
-    api.post(`/api/content/pages/${pageId}/versions/${versionId}/publish`),
+    api.post(`/content/pages/${pageId}/versions/${versionId}/publish`),
 };
