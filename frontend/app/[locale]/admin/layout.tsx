@@ -18,14 +18,18 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const router = useRouter();
   const locale = useLocale();
   const t = useTranslations('admin');
-  const { isHydrated } = useHydration();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    if (isHydrated && (!isAuthenticated || !user?.role || !['Admin', 'SuperAdmin'].includes(user.role))) {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (mounted && (!isAuthenticated || !user?.role || !['Admin', 'SuperAdmin'].includes(user.role))) {
       router.push(`/${locale}/admin-login`);
     }
-  }, [isAuthenticated, user, router, locale, isHydrated]);
+  }, [isAuthenticated, user, router, locale, mounted]);
 
   const handleLogout = async () => {
     try {
@@ -37,7 +41,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     }
   };
 
-  if (!isHydrated) {
+  if (!mounted) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
