@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useState } from 'react';
@@ -9,6 +8,8 @@ import toast from 'react-hot-toast';
 import { Icon } from '@/components/ui/icon';
 import WorldMap from '@/components/ui/world-map';
 import { useAuthStore } from '@/lib/auth-store';
+import { Users } from 'lucide-react'; // Assuming Users icon is imported from lucide-react
+import { motion } from 'framer-motion'; // Assuming motion is used for animations
 
 // Fallback stats for when API is not available
 const fallbackStats: DashboardStats = {
@@ -88,6 +89,22 @@ export default function AdminDashboard() {
   const [error, setError] = useState<string | null>(null);
   const { isHydrated } = useHydration();
 
+  // Animation variants for cards
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 },
+  };
+
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -132,10 +149,13 @@ export default function AdminDashboard() {
   const dashboardStats = stats || fallbackStats;
 
   const formatDate = (dateString: string) => {
+    // This function seems to be unused, but kept for potential future use.
+    // If it's intended to format dates from the API, it should be implemented.
     return '01/01/2025';
   };
 
   // Mock data for demonstration - replace with real data from API
+  // This mock data should ideally also use translations or be structured to accept them.
   const recentOrders = [
     {
       id: '1',
@@ -210,97 +230,110 @@ export default function AdminDashboard() {
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center mb-2">
-            <span className="text-2xl">👋</span>
-            <span className="ml-2 text-lg text-gray-600">Hello</span>
+            <span className="text-2xl mr-2">👋</span>
+            <h1 className="text-2xl font-bold text-gray-900">
+              {t('admin.hello')} {user?.fullName || t('admin.admin-user')}
+            </h1>
           </div>
-          <h1 className="text-3xl font-bold text-teal-600 mb-2">
-            {t('operations-dashboard')}
-          </h1>
-          <p className="text-gray-600">
-            {t('dashboard-subtitle')}
+          <p className="text-gray-600 text-base">
+            {user?.isSuperAdmin ? t('admin.super-admin') : t('admin.admin')} • {t('admin.operations-dashboard')}
           </p>
+          <p className="text-gray-500 text-sm mt-1">
+            {t('admin.dashboard-subtitle')}
+          </p>
+          <div className="mt-3">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
+              <span className="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>
+              {t('admin.using-demo-data')}
+            </span>
+          </div>
         </div>
 
         {/* Dashboard Content */}
         <div style={{backgroundColor: '#FAFCFF'}} className="rounded-2xl p-6">
           {/* Dashboard Header */}
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-1">Dashboard</h2>
-            <p className="text-gray-600 text-sm">Overview of your platform's performance and recent activity</p>
+            <h2 className="text-xl font-bold text-gray-800 mb-1">{t('admin.dashboard')}</h2>
+            <p className="text-gray-600 text-sm">{t('admin.overview-platform')}</p>
           </div>
 
           {/* Statistics Cards */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            <div className="bg-white rounded-xl p-6 shadow-sm">
+          <motion.div 
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+          >
+            <motion.div variants={itemVariants} className="bg-white rounded-xl p-6 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="flex items-center mb-2">
                     <div className="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center mr-3">
                       <Icon name="users" className="w-4 h-4 text-teal-600" />
                     </div>
-                    <span className="text-gray-600 text-sm font-medium">Total Users</span>
+                    <span className="text-gray-600 text-sm font-medium">{t('admin.total-users')}</span>
                   </div>
                   <div className="text-3xl font-bold text-gray-800">{dashboardStats.totalUsers}</div>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="bg-white rounded-xl p-6 shadow-sm">
+            <motion.div variants={itemVariants} className="bg-white rounded-xl p-6 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="flex items-center mb-2">
                     <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
                       <Icon name="graduation-cap" className="w-4 h-4 text-blue-600" />
                     </div>
-                    <span className="text-gray-600 text-sm font-medium">Total Courses</span>
+                    <span className="text-gray-600 text-sm font-medium">{t('admin.total-courses')}</span>
                   </div>
                   <div className="text-3xl font-bold text-gray-800">{dashboardStats.totalCourses}</div>
                 </div>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="bg-white rounded-xl p-6 shadow-sm">
+            <motion.div variants={itemVariants} className="bg-white rounded-xl p-6 shadow-sm">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="flex items-center mb-2">
                     <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
                       <Icon name="shopping-cart" className="w-4 h-4 text-green-600" />
                     </div>
-                    <span className="text-gray-600 text-sm font-medium">Total Orders</span>
+                    <span className="text-gray-600 text-sm font-medium">{t('admin.total-orders')}</span>
                   </div>
                   <div className="text-3xl font-bold text-gray-800">{dashboardStats.totalOrders}</div>
                 </div>
               </div>
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           {/* Recent Orders */}
           <div className="bg-white rounded-xl shadow-sm mb-8">
             <div className="px-6 py-4 border-b border-gray-100">
-              <h3 className="text-lg font-bold text-gray-800 mb-1">Recent Orders</h3>
-              <p className="text-gray-600 text-sm">Overview of orders and recent activity</p>
+              <h3 className="text-lg font-bold text-gray-800 mb-1">{t('admin.recent-orders')}</h3>
+              <p className="text-gray-600 text-sm">{t('admin.overview-orders')}</p>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Student Name
+                      {t('admin.student-name')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Course Name
+                      {t('admin.course-name')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Order Date
+                      {t('admin.order-date')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Course Type
+                      {t('admin.course-type')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Course Price
+                      {t('admin.course-price')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
+                      {t('admin.actions')}
                     </th>
                   </tr>
                 </thead>
@@ -339,8 +372,8 @@ export default function AdminDashboard() {
             {/* Recent Users */}
             <div className="bg-white rounded-xl shadow-sm">
               <div className="px-6 py-4 border-b border-gray-100">
-                <h3 className="text-lg font-bold text-gray-800 mb-1">Recent Users</h3>
-                <p className="text-gray-600 text-sm">Overview of Users and Recently Joined</p>
+                <h3 className="text-lg font-bold text-gray-800 mb-1">{t('admin.recent-users')}</h3>
+                <p className="text-gray-600 text-sm">{t('admin.overview-users')}</p>
               </div>
               <div className="p-6">
                 <div className="space-y-4">
@@ -374,12 +407,12 @@ export default function AdminDashboard() {
             {/* Geographics */}
             <div className="bg-white rounded-xl shadow-sm">
               <div className="px-6 py-4 border-b border-gray-100">
-                <h3 className="text-lg font-bold text-gray-800 mb-1">Geographics</h3>
-                <p className="text-gray-600 text-sm">Overview of Countries and Areas</p>
+                <h3 className="text-lg font-bold text-gray-800 mb-1">{t('admin.geographics')}</h3>
+                <p className="text-gray-600 text-sm">{t('admin.overview-countries')}</p>
               </div>
               <div className="p-6">
                 <div className="mb-4">
-                  <h4 className="text-sm font-medium text-gray-900 mb-3">Users From Countries</h4>
+                  <h4 className="text-sm font-medium text-gray-900 mb-3">{t('admin.users-from-countries')}</h4>
                   <div className="space-y-2">
                     {geographics.map((geo, index) => (
                       <div key={index} className="flex justify-between items-center">

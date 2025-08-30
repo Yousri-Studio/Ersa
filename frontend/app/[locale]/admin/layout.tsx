@@ -73,7 +73,7 @@ export default function AdminLayout({
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading admin dashboard...</p>
+          <p className="mt-4 text-gray-600">{t('common.loading')}</p>
         </div>
       </div>
     );
@@ -169,10 +169,10 @@ export default function AdminLayout({
                 </div>
                 <div className={`flex-1 min-w-0 ${isRTL ? 'text-right' : 'text-left'}`}>
                   <p className="text-xs sm:text-sm font-medium text-gray-900 truncate font-cairo">
-                    {user?.fullName || 'Admin User'}
+                    {user?.fullName || t('admin.admin-user')}
                   </p>
                   <p className="text-xs text-gray-500 truncate font-cairo">
-                    {user?.isSuperAdmin ? t('super-admin') : 'Admin'}
+                    {user?.isSuperAdmin ? t('admin.super-admin') : t('admin.admin')}
                   </p>
                 </div>
                 <div className="flex-shrink-0">
