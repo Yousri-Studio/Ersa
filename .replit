@@ -24,10 +24,23 @@ localPort = 8080
 externalPort = 80
 
 [workflows]
-runButton = "Run Full Stack"
+runButton = "Run Full Stack Clean"
 
 [[workflows.workflow]]
 name = "Run Full Stack"
+author = 46831471
+mode = "parallel"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd backend/src && dotnet run"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd frontend && npm run dev"
+
+[[workflows.workflow]]
+name = "Run Full Stack Clean"
 author = 46831471
 mode = "parallel"
 
