@@ -87,12 +87,7 @@ export default function AdminLayout({
     { id: 'orders', label: t('sidebar.orders'), icon: 'shopping-cart', href: `/${locale}/admin/orders` },
   ];
 
-  // Add super admin only items
-  if (user?.isSuperAdmin) {
-    menuItems.push(
-      { id: 'settings', label: t('sidebar.settings'), icon: 'cog', href: `/${locale}/admin/settings` }
-    );
-  }
+  // Super admin items can be added here if needed in the future
 
   return (
     <div className="min-h-screen bg-gray-50">
