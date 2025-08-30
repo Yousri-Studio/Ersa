@@ -89,16 +89,26 @@ export default function AdminLayout({
 
   // Super admin items can be added here if needed in the future
 
+  const isRTL = locale === 'ar';
+
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className={`min-h-screen bg-gray-50 ${isRTL ? 'rtl' : 'ltr'}`}>
       <div className="flex">
         {/* Sidebar */}
         <div className={`${
           isMenuOpen ? 'block' : 'hidden'
-        } lg:block lg:w-64 lg:fixed lg:inset-y-0 lg:overflow-y-auto fixed inset-y-0 left-0 z-40 w-64 ${
-          isMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        } lg:block lg:w-64 lg:fixed lg:inset-y-0 lg:overflow-y-auto fixed inset-y-0 ${
+          isRTL ? 'right-0' : 'left-0'
+        } z-40 w-64 ${
+          isMenuOpen 
+            ? 'translate-x-0' 
+            : isRTL 
+              ? 'translate-x-full' 
+              : '-translate-x-full'
         } lg:translate-x-0 transition-transform duration-300 ease-in-out`}>
-          <div className="h-full flex flex-col bg-white border-r border-gray-200 shadow-lg lg:shadow-none">
+          <div className={`h-full flex flex-col bg-white ${
+            isRTL ? 'border-l' : 'border-r'
+          } border-gray-200 shadow-lg lg:shadow-none`}>
             {/* Logo Section */}
             <div className="flex-shrink-0 px-4 sm:px-6 py-4 border-b border-gray-200">
               <div className="flex items-center justify-between">
@@ -132,13 +142,13 @@ export default function AdminLayout({
                   }}
                   className={`group flex items-center px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm font-medium rounded-lg transition-colors ${
                     activeTab === item.id
-                      ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-500'
+                      ? `bg-blue-50 text-blue-700 ${isRTL ? 'border-l-2' : 'border-r-2'} border-blue-500`
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }`}
                 >
                   <Icon 
                     name={item.icon} 
-                    className={`mr-2 sm:mr-3 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 ${
+                    className={`${isRTL ? 'ml-2 sm:ml-3' : 'mr-2 sm:mr-3'} h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 ${
                       activeTab === item.id ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-500'
                     }`} 
                   />
@@ -153,7 +163,7 @@ export default function AdminLayout({
                 onClick={handleLogout}
                 className="w-full flex items-center px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors"
               >
-                <Icon name="power-off" className="mr-2 sm:mr-3 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                <Icon name="power-off" className={`${isRTL ? 'ml-2 sm:ml-3' : 'mr-2 sm:mr-3'} h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0`} />
                 <span className="truncate">{t('sidebar.logout')}</span>
               </button>
             </div>
@@ -161,9 +171,9 @@ export default function AdminLayout({
         </div>
 
         {/* Main content */}
-        <div className="lg:pl-64 flex-1 min-w-0">
+        <div className={`${isRTL ? 'lg:pr-64' : 'lg:pl-64'} flex-1 min-w-0`}>
           {/* Mobile menu button */}
-          <div className="lg:hidden fixed top-4 left-4 z-50">
+          <div className={`lg:hidden fixed top-4 ${isRTL ? 'right-4' : 'left-4'} z-50`}>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 bg-white shadow-md"
