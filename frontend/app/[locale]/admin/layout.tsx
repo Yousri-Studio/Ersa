@@ -205,7 +205,7 @@ export default function AdminLayout({
             </button>
           </div>
 
-          <main className={`p-4 sm:p-6 lg:p-8 ${isRTL ? 'text-right' : 'text-left'}`}>
+          <main className={`${isRTL ? 'text-right' : 'text-left'}`}>
             {children}
           </main>
         </div>
