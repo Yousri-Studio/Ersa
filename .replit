@@ -10,3 +10,15 @@ run = ["sh", "-c", "dotnet run"]
 [[ports]]
 localPort = 8080
 externalPort = 80
+
+[workflows]
+runButton = "Start Backend"
+
+[[workflows.workflow]]
+name = "Start Backend"
+author = 46831471
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd backend/src && dotnet run --urls \"http://0.0.0.0:5000\""

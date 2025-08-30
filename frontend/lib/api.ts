@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from 'axios';
 import Cookies from 'js-cookie';
 import { useAuthStore } from './auth-store';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5002/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://0.0.0.0:5000/api';
 
 // Create axios instance
 export const api = axios.create({
@@ -30,7 +30,7 @@ api.interceptors.response.use(
       // Token expired or invalid
       const { logout } = useAuthStore.getState();
       logout();
-      
+
       // Check if we're in admin area and redirect accordingly
       const currentPath = window.location.pathname;
       if (currentPath.includes('/admin')) {
