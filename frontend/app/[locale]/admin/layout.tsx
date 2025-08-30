@@ -93,25 +93,35 @@ export default function AdminLayout({
     <div className="min-h-screen bg-gray-50">
       <div className="flex">
         {/* Sidebar */}
-        <div className={`${isMenuOpen ? 'block' : 'hidden'} lg:block lg:w-64 lg:fixed lg:inset-y-0 lg:overflow-y-auto`}>
-          <div className="h-full flex flex-col bg-white border-r border-gray-200">
+        <div className={`${
+          isMenuOpen ? 'block' : 'hidden'
+        } lg:block lg:w-64 lg:fixed lg:inset-y-0 lg:overflow-y-auto fixed inset-y-0 left-0 z-40 w-64 ${
+          isMenuOpen ? 'translate-x-0' : '-translate-x-full'
+        } lg:translate-x-0 transition-transform duration-300 ease-in-out`}>
+          <div className="h-full flex flex-col bg-white border-r border-gray-200 shadow-lg lg:shadow-none">
             {/* Logo Section */}
-            <div className="flex-shrink-0 px-6 py-4 border-b border-gray-200">
-              <div className="flex items-center">
+            <div className="flex-shrink-0 px-4 sm:px-6 py-4 border-b border-gray-200">
+              <div className="flex items-center justify-between">
                 <div className="flex-shrink-0">
                   <Image
                     src="/Header Logo.svg"
                     alt="Ersa Training & Consultancy Services"
                     width={120}
                     height={46}
-                    className="h-10 w-auto"
+                    className="h-8 sm:h-10 w-auto"
                   />
                 </div>
+                <button
+                  onClick={() => setIsMenuOpen(false)}
+                  className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100"
+                >
+                  <Icon name="times" className="h-5 w-5" />
+                </button>
               </div>
             </div>
 
             {/* Navigation */}
-            <nav className="flex-1 px-4 py-6 space-y-2">
+            <nav className="flex-1 px-3 sm:px-4 py-4 sm:py-6 space-y-1 sm:space-y-2 overflow-y-auto">
               {menuItems.map((item) => (
                 <Link
                   key={item.id}
@@ -120,7 +130,7 @@ export default function AdminLayout({
                     setActiveTab(item.id);
                     setIsMenuOpen(false);
                   }}
-                  className={`group flex items-center px-3 py-3 text-sm font-medium rounded-lg transition-colors ${
+                  className={`group flex items-center px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm font-medium rounded-lg transition-colors ${
                     activeTab === item.id
                       ? 'bg-blue-50 text-blue-700 border-r-2 border-blue-500'
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
@@ -128,42 +138,42 @@ export default function AdminLayout({
                 >
                   <Icon 
                     name={item.icon} 
-                    className={`mr-3 h-5 w-5 ${
+                    className={`mr-2 sm:mr-3 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 ${
                       activeTab === item.id ? 'text-blue-600' : 'text-gray-400 group-hover:text-gray-500'
                     }`} 
                   />
-                  {item.label}
+                  <span className="truncate">{item.label}</span>
                 </Link>
               ))}
             </nav>
 
             {/* Logout Button */}
-            <div className="flex-shrink-0 p-4 border-t border-gray-200">
+            <div className="flex-shrink-0 p-3 sm:p-4 border-t border-gray-200">
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors"
+                className="w-full flex items-center px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors"
               >
-                <Icon name="power-off" className="mr-3 h-5 w-5" />
-                {t('sidebar.logout')}
+                <Icon name="power-off" className="mr-2 sm:mr-3 h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+                <span className="truncate">{t('sidebar.logout')}</span>
               </button>
             </div>
           </div>
         </div>
 
         {/* Main content */}
-        <div className="lg:pl-64 flex-1">
+        <div className="lg:pl-64 flex-1 min-w-0">
           {/* Mobile menu button */}
           <div className="lg:hidden fixed top-4 left-4 z-50">
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+              className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 bg-white shadow-md"
             >
-              <Icon name="bars" className="h-6 w-6" />
+              <Icon name="bars" className="h-5 w-5 sm:h-6 sm:w-6" />
             </button>
           </div>
           
-          <main className="py-6">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <main className="py-4 sm:py-6 pt-16 lg:pt-6">
+            <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
               {children}
             </div>
           </main>

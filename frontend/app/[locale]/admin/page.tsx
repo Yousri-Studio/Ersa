@@ -231,16 +231,16 @@ export default function AdminDashboard() {
       )}
 
       {/* Welcome Header */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6">
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-4 sm:p-6">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">
               {t('hello')}
             </h1>
-            <h2 className="text-2xl font-bold text-green-600 mb-2">
+            <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-green-600 mb-1 sm:mb-2">
               {t('super-admin')}
             </h2>
-            <p className="text-gray-600">
+            <p className="text-sm sm:text-base text-gray-600">
               {t('dashboard-subtitle')}
             </p>
           </div>
@@ -248,51 +248,51 @@ export default function AdminDashboard() {
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 mb-1">{t('total-users')}</p>
-              <p className="text-2xl font-bold text-gray-900">{dashboardStats.totalUsers}</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1 truncate">{t('total-users')}</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">{dashboardStats.totalUsers}</p>
             </div>
-            <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center">
-              <Icon name="users" className="h-6 w-6 text-blue-600" />
+            <div className="h-10 w-10 sm:h-12 sm:w-12 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 ml-3">
+              <Icon name="users" className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 mb-1">{t('total-courses')}</p>
-              <p className="text-2xl font-bold text-gray-900">{dashboardStats.totalCourses}</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1 truncate">{t('total-courses')}</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">{dashboardStats.totalCourses}</p>
             </div>
-            <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
-              <Icon name="graduation-cap" className="h-6 w-6 text-green-600" />
+            <div className="h-10 w-10 sm:h-12 sm:w-12 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 ml-3">
+              <Icon name="graduation-cap" className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 mb-1">{t('total-orders')}</p>
-              <p className="text-2xl font-bold text-gray-900">{dashboardStats.totalOrders}</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1 truncate">{t('total-orders')}</p>
+              <p className="text-xl sm:text-2xl font-bold text-gray-900">{dashboardStats.totalOrders}</p>
             </div>
-            <div className="h-12 w-12 bg-purple-100 rounded-lg flex items-center justify-center">
-              <Icon name="shopping-cart" className="h-6 w-6 text-purple-600" />
+            <div className="h-10 w-10 sm:h-12 sm:w-12 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0 ml-3">
+              <Icon name="shopping-cart" className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-gray-600 mb-1">{t('total-revenue')}</p>
-              <p className="text-2xl font-bold text-gray-900">{formatCurrency(dashboardStats.totalRevenue)}</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-xs sm:text-sm font-medium text-gray-600 mb-1 truncate">{t('total-revenue')}</p>
+              <p className="text-lg sm:text-2xl font-bold text-gray-900">{formatCurrency(dashboardStats.totalRevenue)}</p>
             </div>
-            <div className="h-12 w-12 bg-yellow-100 rounded-lg flex items-center justify-center">
-              <Icon name="chart-line" className="h-6 w-6 text-yellow-600" />
+            <div className="h-10 w-10 sm:h-12 sm:w-12 bg-yellow-100 rounded-lg flex items-center justify-center flex-shrink-0 ml-3">
+              <Icon name="chart-line" className="h-5 w-5 sm:h-6 sm:w-6 text-yellow-600" />
             </div>
           </div>
         </div>
@@ -300,30 +300,30 @@ export default function AdminDashboard() {
 
       {/* Recent Orders Section */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-        <div className="px-6 py-4 border-b border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-900">{t('recent-orders')}</h3>
-          <p className="text-sm text-gray-600">{t('recent-orders-subtitle')}</p>
+        <div className="px-4 sm:px-6 py-4 border-b border-gray-100">
+          <h3 className="text-base sm:text-lg font-semibold text-gray-900">{t('recent-orders')}</h3>
+          <p className="text-xs sm:text-sm text-gray-600 mt-1">{t('recent-orders-subtitle')}</p>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[800px]">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   {t('student-name')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">
                   {t('course-name')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   {t('order-date')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">
                   {t('course-type')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   {t('course-price')}
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-3 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   {t('actions')}
                 </th>
               </tr>
@@ -331,24 +331,34 @@ export default function AdminDashboard() {
             <tbody className="bg-white divide-y divide-gray-200">
               {recentOrders.map((order) => (
                 <tr key={order.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {order.studentName}
+                  <td className="px-3 sm:px-6 py-4 text-xs sm:text-sm font-medium text-gray-900">
+                    <div className="truncate max-w-[120px] sm:max-w-none">
+                      {order.studentName}
+                    </div>
+                    <div className="sm:hidden text-xs text-gray-500 mt-1 truncate max-w-[120px]">
+                      {order.courseName}
+                    </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {order.courseName}
+                  <td className="px-3 sm:px-6 py-4 text-xs sm:text-sm text-gray-500 hidden sm:table-cell">
+                    <div className="truncate max-w-[200px]">
+                      {order.courseName}
+                    </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
                     {order.orderDate}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500 hidden md:table-cell">
                     {order.courseType}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm font-medium text-gray-900">
+                    <div className="md:hidden text-xs text-gray-500">
+                      {order.courseType}
+                    </div>
                     {order.coursePrice}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <button className="text-gray-400 hover:text-gray-600">
-                      <Icon name="ellipsis-v" className="h-4 w-4" />
+                  <td className="px-3 sm:px-6 py-4 whitespace-nowrap text-xs sm:text-sm text-gray-500">
+                    <button className="text-gray-400 hover:text-gray-600 p-1">
+                      <Icon name="ellipsis-v" className="h-3 w-3 sm:h-4 sm:w-4" />
                     </button>
                   </td>
                 </tr>
@@ -359,30 +369,30 @@ export default function AdminDashboard() {
       </div>
 
       {/* Bottom Grid - Recent Users and Geographics */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
         {/* Recent Users */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-          <div className="px-6 py-4 border-b border-gray-100">
-            <h3 className="text-lg font-semibold text-gray-900">{t('recent-users')}</h3>
-            <p className="text-sm text-gray-600">{t('recent-users-subtitle')}</p>
+          <div className="px-4 sm:px-6 py-4 border-b border-gray-100">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900">{t('recent-users')}</h3>
+            <p className="text-xs sm:text-sm text-gray-600 mt-1">{t('recent-users-subtitle')}</p>
           </div>
-          <div className="p-6">
-            <div className="space-y-4">
+          <div className="p-4 sm:p-6">
+            <div className="space-y-3 sm:space-y-4">
               {recentUsers.map((user) => (
                 <div key={user.id} className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="h-10 w-10 bg-orange-100 rounded-full flex items-center justify-center">
-                      <Icon name="user" className="h-5 w-5 text-orange-600" />
+                  <div className="flex items-center space-x-2 sm:space-x-3 min-w-0 flex-1">
+                    <div className="h-8 w-8 sm:h-10 sm:w-10 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
+                      <Icon name="user" className="h-4 w-4 sm:h-5 sm:w-5 text-orange-600" />
                     </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-900">{user.name}</p>
-                      <p className="text-sm text-gray-500">{user.email}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs sm:text-sm font-medium text-gray-900 truncate">{user.name}</p>
+                      <p className="text-xs sm:text-sm text-gray-500 truncate">{user.email}</p>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <span className="text-sm text-gray-500">{user.date}</span>
-                    <button className="text-gray-400 hover:text-gray-600">
-                      <Icon name="ellipsis-v" className="h-4 w-4" />
+                  <div className="flex items-center space-x-2 sm:space-x-3 flex-shrink-0">
+                    <span className="text-xs sm:text-sm text-gray-500 hidden sm:inline">{user.date}</span>
+                    <button className="text-gray-400 hover:text-gray-600 p-1">
+                      <Icon name="ellipsis-v" className="h-3 w-3 sm:h-4 sm:w-4" />
                     </button>
                   </div>
                 </div>
@@ -393,25 +403,25 @@ export default function AdminDashboard() {
 
         {/* Geographics */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-          <div className="px-6 py-4 border-b border-gray-100">
-            <h3 className="text-lg font-semibold text-gray-900">{t('geographics')}</h3>
-            <p className="text-sm text-gray-600">{t('geographics-subtitle')}</p>
+          <div className="px-4 sm:px-6 py-4 border-b border-gray-100">
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900">{t('geographics')}</h3>
+            <p className="text-xs sm:text-sm text-gray-600 mt-1">{t('geographics-subtitle')}</p>
           </div>
-          <div className="p-6">
-            <div className="flex items-start space-x-6">
+          <div className="p-4 sm:p-6">
+            <div className="flex flex-col lg:flex-row lg:items-start lg:space-x-6 space-y-4 lg:space-y-0">
               <div className="flex-1">
-                <h4 className="text-sm font-medium text-gray-900 mb-3">{t('users-from-countries')}</h4>
-                <div className="space-y-2">
+                <h4 className="text-xs sm:text-sm font-medium text-gray-900 mb-2 sm:mb-3">{t('users-from-countries')}</h4>
+                <div className="space-y-1 sm:space-y-2">
                   {geographics.map((geo, index) => (
                     <div key={index} className="flex justify-between items-center">
-                      <span className="text-sm text-gray-600">{geo.country}</span>
-                      <span className="text-sm font-medium text-gray-900">{geo.users} {t('user')}</span>
+                      <span className="text-xs sm:text-sm text-gray-600 truncate flex-1 mr-2">{geo.country}</span>
+                      <span className="text-xs sm:text-sm font-medium text-gray-900 flex-shrink-0">{geo.users} {t('user')}</span>
                     </div>
                   ))}
                 </div>
               </div>
-              <div className="flex-1">
-                <div className="h-48">
+              <div className="flex-1 lg:max-w-xs">
+                <div className="h-32 sm:h-40 lg:h-48">
                   <WorldMap data={geographics} />
                 </div>
               </div>
