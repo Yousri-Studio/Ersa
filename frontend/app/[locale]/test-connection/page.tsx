@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { api } from '@/lib/api';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://ca5306b5-004d-4516-8130-6e9fc8da81bb-00-sjhyk0bgy5dy.sisko.replit.dev:5000/api;
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000/api';
 
 export default function TestConnectionPage() {
   const [testResult, setTestResult] = useState<string>('');
