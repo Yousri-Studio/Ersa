@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from 'axios';
 import Cookies from 'js-cookie';
 import { useAuthStore } from './auth-store';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000/api';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://0.0.0.0:5000/api';
 
 // Helper functions for auth token management (assuming these exist elsewhere)
 const getStoredAuth = () => {
@@ -35,7 +35,8 @@ export const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: false, // Disable credentials for CORS
+  withCredentials: false,
+  timeout: 10000, // 10 second timeout
 });
 
 // Add request interceptor to include auth token
@@ -55,7 +56,13 @@ api.interceptors.response.use(
     return response;
   },
   async (error) => {
-    console.error('API Error:', error.response?.status, error.config?.url, error.response?.data);
+    console.error('API Error Details:', {
+      status: error.response?.status,
+      url: error.config?.url,
+      data: error.response?.data,
+      message: error.message,
+      code: error.code
+    });
     const originalRequest = error.config;
 
     if (error.response?.status === 401 && !originalRequest._retry) {
