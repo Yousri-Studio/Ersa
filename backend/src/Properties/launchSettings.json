@@ -2,19 +2,10 @@
   "profiles": {
     "ErsaTraining.API": {
       "commandName": "Project",
-      "launchBrowser": false,
-      "applicationUrl": "http://0.0.0.0:5000",
-      "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development",
-        "ASPNETCORE_URLS": "http://0.0.0.0:5000"
-      }
-    },
-    "http": {
-      "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "applicationUrl": "http://0.0.0.0:5000",
+      "applicationUrl": "http://localhost:5002",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }

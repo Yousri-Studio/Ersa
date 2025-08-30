@@ -37,7 +37,6 @@ public class LoginRequest
 public class LoginResponse
 {
     public string Token { get; set; } = string.Empty;
-    public string TokenType { get; set; } = "Bearer";
     public UserDto User { get; set; } = null!;
 }
 

@@ -16,17 +16,7 @@ export default function TestConnectionPage() {
     try {
       console.log('Testing connection to:', API_BASE_URL);
       
-      // Test 1: Health check
-      console.log('Making GET request to /health...');
-      const healthResponse = await api.get('/health');
-      console.log('Health response:', healthResponse.data);
-      
-      // Test 2: Demo data
-      console.log('Making GET request to /health/demo...');
-      const demoResponse = await api.get('/health/demo');
-      console.log('Demo response:', demoResponse.data);
-      
-      // Test 3: Courses
+      // Test 1: Simple GET request
       console.log('Making GET request to /courses...');
       const coursesResponse = await api.get('/courses');
       console.log('Courses response:', coursesResponse.data);
@@ -59,10 +49,10 @@ export default function TestConnectionPage() {
     setTestResult('Testing fetch connection...');
     
     try {
-      console.log('Testing fetch connection to:', `${API_BASE_URL}/health`);
+      console.log('Testing fetch connection to:', `${API_BASE_URL}/courses`);
       
       // Test with native fetch
-      const response = await fetch(`${API_BASE_URL}/health`, {
+      const response = await fetch(`${API_BASE_URL}/courses`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
