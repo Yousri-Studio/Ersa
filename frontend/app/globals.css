@@ -57,6 +57,11 @@
   --text-color: #1A1928;
 }
 
+/* Custom CSS overrides */
+.lg\:p-8 {
+  padding: 0rem;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --foreground-rgb: 255, 255, 255;
