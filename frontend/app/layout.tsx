@@ -1,4 +1,3 @@
-
 import type { Metadata } from 'next';
 import './globals.css';
 import { cairo } from './fonts';
@@ -14,8 +13,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={`${cairo.variable} font-cairo`} suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning={true}>
+      <body className={`${cairo.variable} font-cairo`} suppressHydrationWarning={true}>
         {children}
       </body>
     </html>
