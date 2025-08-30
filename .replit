@@ -106,11 +106,11 @@ args = "sleep 2"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "echo \"Starting backend on port 5002...\""
+args = "echo \"Starting backend on port 5000...\""
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd backend/src && dotnet run --urls=\"http://0.0.0.0:5002\" &"
+args = "cd backend/src && dotnet run --urls=\"http://0.0.0.0:5000\" &"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
