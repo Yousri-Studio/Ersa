@@ -81,9 +81,11 @@ builder.Services.AddCors(options =>
         Console.WriteLine($"CORS Allowed Origins: {string.Join(", ", allowedOrigins)}");
 
         policy.WithOrigins(allowedOrigins)
+              .SetIsOriginAllowedToAllowWildcardSubdomains()
               .AllowAnyHeader()
               .AllowAnyMethod()
-              .AllowCredentials();
+              .AllowCredentials()
+              .WithExposedHeaders("*");
     });
 });
 
@@ -154,26 +156,57 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-var logger = app.Services.GetRequiredService<ILogger<Program>>();
+// Database migration and seeding
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        var context = scope.ServiceProvider.GetRequiredService<ErsaTrainingDbContext>();
+
+        // For development, always use EnsureCreatedAsync to avoid migration issues
+        await context.Database.EnsureCreatedAsync();
+
+        Log.Information("Database initialized successfully");
+
+        // Seed database with initial data
+        await ErsaTraining.API.SeedData.SeedAsync(app.Services);
+    }
+    catch (Exception ex)
+    {
+        Log.Fatal(ex, "An error occurred while initializing the database");
+        throw;
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Ersa Training API V1");
+        c.RoutePrefix = "swagger";
+    });
 }
+
+// Custom middleware
+app.UseMiddleware<ExceptionMiddleware>();
+
+// CORS must come before authentication
+app.UseCors("AllowFrontend");
 
 // Don't use HTTPS redirection in development for Replit
 // app.UseHttpsRedirection();
-app.UseCors();
+
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapControllers();
 
-// Add health check endpoint
+// Add health check endpoints before MapControllers
 app.MapGet("/", () => "Ersa Training API is running!");
 app.MapGet("/api/health", () => new { status = "OK", timestamp = DateTime.UtcNow });
 
-logger.LogInformation("Starting Ersa Training API on http://0.0.0.0:5000");
+app.MapControllers();
+
+Log.Information("Starting Ersa Training API on http://0.0.0.0:5000");
 
 app.Run("http://0.0.0.0:5000");
