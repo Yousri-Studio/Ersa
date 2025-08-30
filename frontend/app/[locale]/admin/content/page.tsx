@@ -396,7 +396,7 @@ export default function ContentManagementPage() {
   }
 
   return (
-    <div className="space-y-6" style={{maxWidth: '90rem'}}>
+    <div className="space-y-6" style={{maxWidth: '90rem', paddingTop: '50px'}}>
       {/* Page Header */}
       <div>
         <div className="flex items-center justify-between">

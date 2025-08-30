@@ -141,7 +141,7 @@ export default function AdminOrders() {
   };
 
   return (
-    <div className="space-y-6" style={{maxWidth: '90rem'}}>
+    <div className="space-y-6" style={{maxWidth: '90rem', paddingTop: '50px'}}>
       {/* Page Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Orders Management</h1>
