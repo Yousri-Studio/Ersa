@@ -1,0 +1,23 @@
+{
+  "name": "workspace",
+  "version": "1.0.0",
+  "description": "A comprehensive bilingual (Arabic/English) e-learning platform built with Next.js 15 and ASP.NET Core 8, featuring course management with search functionality, secure authentication, and modern responsive design.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alyhassan/Ersa.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/alyhassan/Ersa/issues"
+  },
+  "homepage": "https://github.com/alyhassan/Ersa#readme",
+  "dependencies": {
+    "framer-motion": "^12.23.12"
+  }
+}
