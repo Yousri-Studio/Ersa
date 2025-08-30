@@ -1,3 +1,4 @@
+
 import type { Metadata } from 'next';
 import './globals.css';
 import { cairo } from './fonts';
@@ -12,5 +13,11 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return (
+    <html>
+      <body className={`${cairo.variable} font-cairo`}>
+        {children}
+      </body>
+    </html>
+  );
 }
