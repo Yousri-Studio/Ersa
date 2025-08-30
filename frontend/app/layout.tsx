@@ -1,4 +1,3 @@
-
 import type { Metadata } from 'next';
 import './globals.css';
 import { cairo } from './fonts';
@@ -14,7 +13,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html suppressHydrationWarning={true}>
+    <html lang="en" suppressHydrationWarning={true}>
       <head>
         <link rel="stylesheet" href="/fontawesome/css/all.min.css" />
         {/* Apple ID Sign In - Only load if client ID is configured */}
