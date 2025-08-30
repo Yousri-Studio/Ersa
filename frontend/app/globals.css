@@ -375,6 +375,11 @@ body {
   }
 }
 
+/* Override blue colors in admin dashboard */
+[data-admin-page] .text-blue-700 {
+  color: #00AC96;
+}
+
 /* Button styles */
 .btn {
   @apply px-4 py-2 rounded-md font-medium transition-colors duration-200;
