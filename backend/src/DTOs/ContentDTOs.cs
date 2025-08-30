@@ -20,11 +20,11 @@ public class CreateContentPageRequest
     [Required]
     [MaxLength(100)]
     public string PageKey { get; set; } = string.Empty;
-    
+
     [Required]
     [MaxLength(255)]
     public string PageName { get; set; } = string.Empty;
-    
+
     [MaxLength(500)]
     public string? Description { get; set; }
 }
@@ -34,10 +34,10 @@ public class UpdateContentPageRequest
     [Required]
     [MaxLength(255)]
     public string PageName { get; set; } = string.Empty;
-    
+
     [MaxLength(500)]
     public string? Description { get; set; }
-    
+
     public bool IsActive { get; set; }
 }
 
@@ -61,14 +61,14 @@ public class CreateContentSectionRequest
     [Required]
     [MaxLength(100)]
     public string SectionKey { get; set; } = string.Empty;
-    
+
     [Required]
     [MaxLength(255)]
     public string SectionName { get; set; } = string.Empty;
-    
+
     [MaxLength(500)]
     public string? Description { get; set; }
-    
+
     public int SortOrder { get; set; } = 0;
 }
 
@@ -77,12 +77,12 @@ public class UpdateContentSectionRequest
     [Required]
     [MaxLength(255)]
     public string SectionName { get; set; } = string.Empty;
-    
+
     [MaxLength(500)]
     public string? Description { get; set; }
-    
+
     public int SortOrder { get; set; }
-    
+
     public bool IsActive { get; set; }
 }
 
@@ -110,15 +110,15 @@ public class CreateContentBlockRequest
     [Required]
     [MaxLength(100)]
     public string BlockKey { get; set; } = string.Empty;
-    
+
     [Required]
     [MaxLength(255)]
     public string BlockName { get; set; } = string.Empty;
-    
+
     [Required]
     [MaxLength(50)]
     public string BlockType { get; set; } = string.Empty;
-    
+
     public string? ContentEn { get; set; }
     public string? ContentAr { get; set; }
     public string? ImageUrl { get; set; }
@@ -132,7 +132,7 @@ public class UpdateContentBlockRequest
     [Required]
     [MaxLength(255)]
     public string BlockName { get; set; } = string.Empty;
-    
+
     public string? ContentEn { get; set; }
     public string? ContentAr { get; set; }
     public string? ImageUrl { get; set; }
@@ -159,7 +159,7 @@ public class CreateContentVersionRequest
     [Required]
     [MaxLength(100)]
     public string VersionName { get; set; } = string.Empty;
-    
+
     public string? ContentData { get; set; }
     public bool IsPublished { get; set; } = false;
 }

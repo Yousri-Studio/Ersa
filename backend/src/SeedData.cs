@@ -355,126 +355,225 @@ public static class SeedData
 
     private static async Task SeedContentPagesAsync(ErsaTrainingDbContext context, ILogger logger)
     {
-        if (await context.ContentPages.AnyAsync())
+        // Seed content pages if they don't exist
+        var contentPagesCount = await context.ContentPages.CountAsync();
+        if (contentPagesCount == 0)
+        {
+            await SeedContentPages(context, logger);
+        }
+        else
         {
             logger.LogInformation("Content pages already exist, skipping seed");
-            return;
         }
+    }
 
-        // Home Page
-        var homePage = new ContentPage
+    private static async Task SeedContentPages(ErsaTrainingDbContext context, ILogger logger)
+    {
+        try
         {
-            Id = Guid.NewGuid(),
-            PageKey = "home",
-            PageName = "Home Page",
-            Description = "Main landing page content",
-            IsActive = true,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
+            var contentPages = new List<ContentPage>();
+            var contentSections = new List<ContentSection>();
+            var contentBlocks = new List<ContentBlock>();
 
-        var heroSection = new ContentSection
+            // Home Page
+            var homePage = new ContentPage
+            {
+                Id = Guid.NewGuid(),
+                PageKey = "home",
+                PageName = "Home Page",
+                Description = "Main landing page",
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+            contentPages.Add(homePage);
+
+            // Hero Section
+            var heroSection = new ContentSection
+            {
+                Id = Guid.NewGuid(),
+                ContentPageId = homePage.Id,
+                SectionKey = "hero",
+                SectionName = "Hero Section",
+                Description = "Main banner section",
+                SortOrder = 1,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+            contentSections.Add(heroSection);
+
+            contentBlocks.AddRange(new[]
+            {
+                new ContentBlock
+                {
+                    Id = Guid.NewGuid(),
+                    ContentSectionId = heroSection.Id,
+                    BlockKey = "title",
+                    BlockName = "Title",
+                    BlockType = "text",
+                    ContentEn = "Welcome to Ersa Training",
+                    ContentAr = "مرحباً بكم في إرسا للتدريب",
+                    SortOrder = 1,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new ContentBlock
+                {
+                    Id = Guid.NewGuid(),
+                    ContentSectionId = heroSection.Id,
+                    BlockKey = "subtitle",
+                    BlockName = "Subtitle",
+                    BlockType = "text",
+                    ContentEn = "Professional Training & Consultancy Services",
+                    ContentAr = "خدمات التدريب والاستشارات المهنية",
+                    SortOrder = 2,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new ContentBlock
+                {
+                    Id = Guid.NewGuid(),
+                    ContentSectionId = heroSection.Id,
+                    BlockKey = "description",
+                    BlockName = "Description",
+                    BlockType = "text",
+                    ContentEn = "Empowering individuals and organizations with world-class training solutions",
+                    ContentAr = "تمكين الأفراد والمؤسسات بحلول تدريبية عالمية المستوى",
+                    SortOrder = 3,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                }
+            });
+
+            // Other pages
+            var otherPages = new[]
+            {
+                new { Key = "courses", Name = "Courses", Description = "Courses listing page" },
+                new { Key = "about", Name = "About Us", Description = "About us page" },
+                new { Key = "contact", Name = "Contact", Description = "Contact page" },
+                new { Key = "consultation", Name = "Consultation", Description = "Consultation services page" }
+            };
+
+            foreach (var pageInfo in otherPages)
+            {
+                var page = new ContentPage
+                {
+                    Id = Guid.NewGuid(),
+                    PageKey = pageInfo.Key,
+                    PageName = pageInfo.Name,
+                    Description = pageInfo.Description,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                contentPages.Add(page);
+
+                var section = new ContentSection
+                {
+                    Id = Guid.NewGuid(),
+                    ContentPageId = page.Id,
+                    SectionKey = "header",
+                    SectionName = "Page Header",
+                    Description = $"{pageInfo.Name} page header",
+                    SortOrder = 1,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+                contentSections.Add(section);
+
+                contentBlocks.Add(new ContentBlock
+                {
+                    Id = Guid.NewGuid(),
+                    ContentSectionId = section.Id,
+                    BlockKey = "title",
+                    BlockName = "Title",
+                    BlockType = "text",
+                    ContentEn = pageInfo.Name,
+                    ContentAr = pageInfo.Name,
+                    SortOrder = 1,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+            }
+
+            // FAQ Page with specific content
+            var faqPage = new ContentPage
+            {
+                Id = Guid.NewGuid(),
+                PageKey = "faq",
+                PageName = "FAQ",
+                Description = "Frequently asked questions",
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+            contentPages.Add(faqPage);
+
+            var faqSection = new ContentSection
+            {
+                Id = Guid.NewGuid(),
+                ContentPageId = faqPage.Id,
+                SectionKey = "faq",
+                SectionName = "FAQ Section",
+                Description = "Frequently asked questions",
+                SortOrder = 1,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+            contentSections.Add(faqSection);
+
+            contentBlocks.AddRange(new[]
+            {
+                new ContentBlock
+                {
+                    Id = Guid.NewGuid(),
+                    ContentSectionId = faqSection.Id,
+                    BlockKey = "faq_0",
+                    BlockName = "How do I enroll in a course?",
+                    BlockType = "faq",
+                    ContentEn = "You can enroll through our website or contact us directly.",
+                    ContentAr = "يمكنك التسجيل من خلال موقعنا أو التواصل معنا مباشرة.",
+                    SortOrder = 1,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                },
+                new ContentBlock
+                {
+                    Id = Guid.NewGuid(),
+                    ContentSectionId = faqSection.Id,
+                    BlockKey = "faq_1",
+                    BlockName = "What payment methods do you accept?",
+                    BlockType = "faq",
+                    ContentEn = "We accept credit cards, bank transfers, and online payments.",
+                    ContentAr = "نقبل البطاقات الائتمانية والتحويلات البنكية والمدفوعات الإلكترونية.",
+                    SortOrder = 2,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                }
+            });
+
+            context.ContentPages.AddRange(contentPages);
+            context.ContentSections.AddRange(contentSections);
+            context.ContentBlocks.AddRange(contentBlocks);
+
+            await context.SaveChangesAsync();
+
+            logger.LogInformation("Content pages seeded successfully with {PageCount} pages, {SectionCount} sections, and {BlockCount} blocks", 
+                contentPages.Count, contentSections.Count, contentBlocks.Count);
+        }
+        catch (Exception ex)
         {
-            Id = Guid.NewGuid(),
-            ContentPageId = homePage.Id,
-            SectionKey = "hero",
-            SectionName = "Hero Section",
-            Description = "Main hero banner",
-            SortOrder = 1,
-            IsActive = true,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
-
-        var heroTitle = new ContentBlock
-        {
-            Id = Guid.NewGuid(),
-            ContentSectionId = heroSection.Id,
-            BlockKey = "hero-title",
-            BlockName = "Hero Title",
-            BlockType = "text",
-            ContentEn = "Elevate Your Career with Professional Training",
-            ContentAr = "ارتق بمسيرتك المهنية مع التدريب المهني",
-            SortOrder = 1,
-            IsActive = true,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
-
-        var heroSubtitle = new ContentBlock
-        {
-            Id = Guid.NewGuid(),
-            ContentSectionId = heroSection.Id,
-            BlockKey = "hero-subtitle",
-            BlockName = "Hero Subtitle",
-            BlockType = "text",
-            ContentEn = "Discover world-class courses designed to unlock your potential and accelerate your professional growth.",
-            ContentAr = "اكتشف دورات عالمية المستوى مصممة لإطلاق إمكاناتك وتسريع نموك المهني.",
-            SortOrder = 2,
-            IsActive = true,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
-
-        // About Page
-        var aboutPage = new ContentPage
-        {
-            Id = Guid.NewGuid(),
-            PageKey = "about",
-            PageName = "About Page",
-            Description = "About us page content",
-            IsActive = true,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
-
-        var aboutSection = new ContentSection
-        {
-            Id = Guid.NewGuid(),
-            ContentPageId = aboutPage.Id,
-            SectionKey = "about-intro",
-            SectionName = "About Introduction",
-            Description = "Introduction section for about page",
-            SortOrder = 1,
-            IsActive = true,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
-
-        var aboutTitle = new ContentBlock
-        {
-            Id = Guid.NewGuid(),
-            ContentSectionId = aboutSection.Id,
-            BlockKey = "about-title",
-            BlockName = "About Title",
-            BlockType = "text",
-            ContentEn = "About Ersa Training",
-            ContentAr = "حول إرسا للتدريب",
-            SortOrder = 1,
-            IsActive = true,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
-
-        var aboutDescription = new ContentBlock
-        {
-            Id = Guid.NewGuid(),
-            ContentSectionId = aboutSection.Id,
-            BlockKey = "about-description",
-            BlockName = "About Description",
-            BlockType = "text",
-            ContentEn = "Ersa Training is a leading provider of professional development courses designed to elevate careers and unlock potential. We offer comprehensive training programs across various industries and skill levels.",
-            ContentAr = "إرسا للتدريب هي مزود رائد لدورات التطوير المهني المصممة لرفع مستوى المهن وإطلاق الإمكانات. نحن نقدم برامج تدريبية شاملة عبر مختلف الصناعات ومستويات المهارات.",
-            SortOrder = 2,
-            IsActive = true,
-            CreatedAt = DateTime.UtcNow,
-            UpdatedAt = DateTime.UtcNow
-        };
-
-        context.ContentPages.AddRange(homePage, aboutPage);
-        context.ContentSections.AddRange(heroSection, aboutSection);
-        context.ContentBlocks.AddRange(heroTitle, heroSubtitle, aboutTitle, aboutDescription);
-
-        logger.LogInformation("Added content pages with sections and blocks");
+            logger.LogError(ex, "Error seeding content pages");
+            throw;
+        }
     }
 }
