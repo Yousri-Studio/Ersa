@@ -4,6 +4,8 @@ export interface Course extends ApiCourse {
   curriculum: CurriculumSection[];
   features: string[];
   requirements: string[];
+  description: string;
+  lessons: number;
   instructor: {
     name: string;
     title: string;
@@ -17,7 +19,7 @@ export interface Course extends ApiCourse {
   duration: string;
   level: string;
   language: string;
-  originalPrice?: number;
+  originalPrice: number;
   lastUpdated: string;
   videoPreviewUrl?: string;
   subtitle?: string;

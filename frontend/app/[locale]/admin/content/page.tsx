@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useLocale } from 'next-intl';
 import { useHydration } from '@/hooks/useHydration';
 import toast from 'react-hot-toast';
-import { contentAdminApi } from '@/lib/admin-content-api';
+import { contentAdminApi, type AdminContentSection } from '@/lib/admin-content-api';
 import type { ContentSection } from '@/lib/types/content';
 import { Icon } from '@/components/ui/icon';
 
@@ -17,8 +17,9 @@ interface ContentBlock {
 }
 
 export default function ContentManagementPage() {
-  const [sections, setSections] = useState<ContentSection[]>([]);
-  const [selectedSection, setSelectedSection] = useState<ContentSection | null>(null);
+  const [sections, setSections] = useState<AdminContentSection[]>([]);
+  const [selectedSection, setSelectedSection] = useState<AdminContentSection | null>(null);
+  const [selectedPageKey, setSelectedPageKey] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('sections');
@@ -39,22 +40,54 @@ export default function ContentManagementPage() {
     );
   }
 
+  const initializeSampleData = async () => {
+    try {
+      setIsLoading(true);
+      const response = await contentAdminApi.initializeSampleData();
+      toast.success('Sample data initialized successfully');
+      // Reload content sections
+      await loadContentSections();
+    } catch (error) {
+      console.error('Error initializing sample data:', error);
+      toast.error('Failed to initialize sample data');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const loadContentSections = async () => {
     try {
       const response = await contentAdminApi.getContentSections();
-      setSections(response.data);
+      // Map ContentSection to AdminContentSection
+      const adminSections: AdminContentSection[] = response.data.map((section: any) => ({
+        id: section.id,
+        name: section.name,
+        type: section.type,
+        pageKey: section.pageKey || 'unknown',
+        pageName: section.pageName || 'Unknown Page',
+        content: section.content,
+        isActive: section.isActive,
+        lastModified: section.lastModified
+      }));
+      setSections(adminSections);
       setIsLoading(false);
       return;
     } catch (error) {
       console.error('Error loading content sections:', error);
+      // Show initialization option if no data exists
+      if (sections.length === 0) {
+        toast.error('No content sections found. Initialize sample data to get started.');
+      }
     }
 
     // Fallback to mock data for development
-    const mockSections: ContentSection[] = [
+    const mockSections: AdminContentSection[] = [
       {
         id: 'hero',
         name: 'Hero Section',
         type: 'hero',
+        pageKey: 'home',
+        pageName: 'Home Page',
         content: {
           title: 'Welcome to Ersa Training',
           subtitle: 'Professional Training & Consultancy Services',
@@ -67,6 +100,8 @@ export default function ContentManagementPage() {
         id: 'consultation',
         name: 'Consultation Section',
         type: 'consultation',
+        pageKey: 'consultation',
+        pageName: 'Consultation',
         content: {
           title: 'Get Professional Consultation',
           description: 'Our experts are here to help you achieve your goals'
@@ -78,6 +113,8 @@ export default function ContentManagementPage() {
         id: 'training',
         name: 'Training Categories',
         type: 'training',
+        pageKey: 'courses',
+        pageName: 'Courses',
         content: {
           categories: [
             { name: 'Graphic Design', description: 'Professional design courses' },
@@ -92,6 +129,8 @@ export default function ContentManagementPage() {
         id: 'services',
         name: 'Services Section',
         type: 'services',
+        pageKey: 'home',
+        pageName: 'Home Page',
         content: {
           services: [
             { title: 'Online Training', description: 'Flexible online learning' },
@@ -106,6 +145,8 @@ export default function ContentManagementPage() {
         id: 'ai',
         name: 'AI Consultation',
         type: 'ai',
+        pageKey: 'consultation',
+        pageName: 'Consultation',
         content: {
           title: 'AI-Powered Consultation',
           description: 'Get instant answers to your questions'
@@ -117,6 +158,8 @@ export default function ContentManagementPage() {
         id: 'testimonials',
         name: 'Testimonials',
         type: 'testimonials',
+        pageKey: 'home',
+        pageName: 'Home Page',
         content: {
           testimonials: [
             { name: 'Ahmed Ali', role: 'Student', text: 'Excellent training experience' },
@@ -130,6 +173,8 @@ export default function ContentManagementPage() {
         id: 'join',
         name: 'Join Us Section',
         type: 'join',
+        pageKey: 'about',
+        pageName: 'About Us',
         content: {
           title: 'Join Our Community',
           description: 'Be part of our growing network of professionals'
@@ -141,6 +186,8 @@ export default function ContentManagementPage() {
         id: 'achievements',
         name: 'Achievements',
         type: 'achievements',
+        pageKey: 'about',
+        pageName: 'About Us',
         content: {
           stats: [
             { number: '1000+', label: 'Students Trained' },
@@ -155,6 +202,8 @@ export default function ContentManagementPage() {
         id: 'faq',
         name: 'FAQ Section',
         type: 'faq',
+        pageKey: 'faq',
+        pageName: 'FAQ',
         content: {
           faqs: [
             { question: 'How do I enroll in a course?', answer: 'You can enroll through our website or contact us directly.' },
@@ -174,21 +223,57 @@ export default function ContentManagementPage() {
   const handleSave = async (sectionId: string, content: any) => {
     try {
       const response = await contentAdminApi.updateContentSection(sectionId, content);
-      if (!response.success) {
-        throw new Error(response.message || 'Failed to update content');
-      }
-      
       toast.success('Content saved successfully');
       setIsEditing(false);
       
       // Refresh the content sections
       await loadContentSections();
     } catch (error) {
+      console.error('Error saving content:', error);
       toast.error('Failed to save content');
     }
   };
 
-  const renderContentEditor = (section: ContentSection) => {
+  const handleManagePageContent = async (pageKey: string) => {
+    try {
+      setIsLoading(true);
+      // Try to get existing page content
+      const response = await contentAdminApi.getPageContent(pageKey);
+      const responseData = response.data as any;
+      if (responseData && responseData.data && responseData.data.sections) {
+        const pageData = responseData.data;
+        const pageSections: AdminContentSection[] = pageData.sections.map((section: any) => ({
+          id: section.id,
+          name: section.name,
+          type: section.type,
+          pageKey: pageKey,
+          pageName: pageData.pageName,
+          content: section.content,
+          isActive: section.isActive,
+          lastModified: section.lastModified
+        }));
+        setSections(pageSections);
+        setSelectedPageKey(pageKey);
+        setActiveTab('sections');
+      }
+    } catch (error) {
+      // If page doesn't exist, initialize it
+      try {
+        await contentAdminApi.initializePageContent(pageKey);
+        toast.success(`Initialized content for ${pageKey} page`);
+        // Reload the page content
+        await handleManagePageContent(pageKey);
+        return;
+      } catch (initError) {
+        console.error('Error initializing page content:', initError);
+        toast.error('Failed to initialize page content');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const renderContentEditor = (section: AdminContentSection) => {
     switch (section.type) {
       case 'hero':
         return (
@@ -314,10 +399,25 @@ export default function ContentManagementPage() {
     <div className="space-y-6">
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Content Management</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          Manage all content sections of your website
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Content Management</h1>
+            <p className="mt-1 text-sm text-gray-500">
+              {selectedPageKey ? `Managing content for ${selectedPageKey} page` : 'Manage all content sections of your website'}
+            </p>
+          </div>
+          {selectedPageKey && (
+            <button
+              onClick={() => {
+                setSelectedPageKey(null);
+                loadContentSections();
+              }}
+              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm"
+            >
+              ← Back to All Sections
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Tabs */}
@@ -356,18 +456,32 @@ export default function ContentManagementPage() {
                 <p className="text-sm text-gray-600">Select a section to edit</p>
               </div>
               <div className="p-4">
-                <div className="space-y-2">
-                  {sections.map((section) => (
+                {sections.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Icon name="edit" className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <h3 className="text-lg font-medium text-gray-900 mb-2">No Content Sections</h3>
+                    <p className="text-gray-500 mb-4">Initialize sample data to get started with content management</p>
                     <button
-                      key={section.id}
-                      onClick={() => setSelectedSection(section)}
-                      className={`w-full text-left p-3 rounded-lg border transition-colors ${
-                        selectedSection?.id === section.id
-                          ? 'border-blue-500 bg-blue-50 text-blue-700'
-                          : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                      }`}
+                      onClick={initializeSampleData}
+                      disabled={isLoading}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
                     >
-                      <div className="flex items-center justify-between">
+                      {isLoading ? 'Initializing...' : 'Initialize Sample Data'}
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {sections.map((section) => (
+                      <button
+                        key={section.id}
+                        onClick={() => setSelectedSection(section)}
+                        className={`w-full text-left p-3 rounded-lg border transition-colors ${
+                          selectedSection?.id === section.id
+                            ? 'border-blue-500 bg-blue-50 text-blue-700'
+                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
                         <div>
                           <h4 className="font-medium">{section.name}</h4>
                           <p className="text-sm text-gray-500">Last modified: {section.lastModified}</p>
@@ -380,8 +494,9 @@ export default function ContentManagementPage() {
                         </div>
                       </div>
                     </button>
-                  ))}
-                </div>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -468,7 +583,10 @@ export default function ContentManagementPage() {
                 <div key={page.path} className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors">
                   <h4 className="font-medium text-gray-900 mb-2">{page.name}</h4>
                   <p className="text-sm text-gray-500 mb-3">{page.sections} content sections</p>
-                  <button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                  <button 
+                    onClick={() => handleManagePageContent(page.path.substring(1) || 'home')}
+                    className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                  >
                     Manage Content →
                   </button>
                 </div>

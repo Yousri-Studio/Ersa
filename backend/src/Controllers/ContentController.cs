@@ -637,4 +637,427 @@ public class ContentController : ControllerBase
             return StatusCode(500, new { error = "Internal server error" });
         }
     }
+
+    // Admin Content Management Endpoints
+    [HttpGet("admin/sections")]
+    public async Task<ActionResult> GetAllContentSections()
+    {
+        try
+        {
+            var sections = await _context.ContentSections
+                .Include(s => s.ContentPage)
+                .Include(s => s.Blocks)
+                .Where(s => s.IsActive)
+                .OrderBy(s => s.ContentPage.PageName)
+                .ThenBy(s => s.SortOrder)
+                .ToListAsync();
+
+            var sectionDtos = sections.Select(s => new AdminContentSectionDto
+            {
+                Id = s.Id.ToString(),
+                Name = s.SectionName,
+                Type = s.SectionKey,
+                PageKey = s.ContentPage.PageKey,
+                PageName = s.ContentPage.PageName,
+                Content = GetSectionContentObject(s),
+                IsActive = s.IsActive,
+                LastModified = s.UpdatedAt.ToString("yyyy-MM-dd")
+            }).ToList();
+
+            // If no sections exist, return empty array but still success
+            return Ok(new { data = sectionDtos, success = true, message = sectionDtos.Count == 0 ? "No content sections found" : null });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting all content sections");
+            return StatusCode(500, new { error = "Internal server error" });
+        }
+    }
+
+    [HttpPut("admin/sections/{sectionId}")]
+    public async Task<ActionResult> UpdateContentSectionContent(string sectionId, [FromBody] UpdateSectionContentRequest request)
+    {
+        try
+        {
+            if (!Guid.TryParse(sectionId, out var sectionGuid))
+            {
+                return BadRequest(new { error = "Invalid section ID" });
+            }
+
+            var section = await _context.ContentSections
+                .Include(s => s.Blocks)
+                .FirstOrDefaultAsync(s => s.Id == sectionGuid);
+
+            if (section == null)
+            {
+                return NotFound(new { error = "Section not found" });
+            }
+
+            // Update section blocks based on content
+            await UpdateSectionBlocks(section, request.Content);
+            
+            section.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Content updated successfully" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating section content {SectionId}", sectionId);
+            return StatusCode(500, new { error = "Internal server error" });
+        }
+    }
+
+    [HttpGet("admin/pages/{pageKey}/content")]
+    public async Task<ActionResult> GetPageContentForAdmin(string pageKey)
+    {
+        try
+        {
+            var page = await _context.ContentPages
+                .Include(p => p.Sections.Where(s => s.IsActive))
+                .ThenInclude(s => s.Blocks.Where(b => b.IsActive))
+                .FirstOrDefaultAsync(p => p.PageKey == pageKey && p.IsActive);
+
+            if (page == null)
+            {
+                return NotFound(new { error = "Page not found" });
+            }
+
+            var pageContent = new AdminPageContentDto
+            {
+                PageKey = page.PageKey,
+                PageName = page.PageName,
+                Sections = page.Sections
+                    .OrderBy(s => s.SortOrder)
+                    .Select(s => new AdminContentSectionDto
+                    {
+                        Id = s.Id.ToString(),
+                        Name = s.SectionName,
+                        Type = s.SectionKey,
+                        PageKey = page.PageKey,
+                        PageName = page.PageName,
+                        Content = GetSectionContentObject(s),
+                        IsActive = s.IsActive,
+                        LastModified = s.UpdatedAt.ToString("yyyy-MM-dd")
+                    }).ToList()
+            };
+
+            return Ok(new { data = pageContent, success = true });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error initializing sample data");
+            return StatusCode(500, new { error = "Internal server error" });
+        }
+    }
+
+    [HttpPost("admin/initialize-sample-data")]
+    public async Task<ActionResult> InitializeSampleData()
+    {
+        try
+        {
+            // Check if data already exists
+            var existingPages = await _context.ContentPages.AnyAsync();
+            if (existingPages)
+            {
+                return Ok(new { success = true, message = "Sample data already exists" });
+            }
+
+            // Initialize sample pages
+            var pageKeys = new[] { "home", "courses", "contact", "faq", "consultation", "about" };
+            
+            foreach (var pageKey in pageKeys)
+            {
+                await InitializePageContentInternal(pageKey);
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new { success = true, message = "Sample data initialized successfully" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error initializing sample data");
+            return StatusCode(500, new { error = "Internal server error" });
+        }
+    }
+
+    [HttpPost("admin/pages/{pageKey}/initialize")]
+    public async Task<ActionResult> InitializePageContent(string pageKey)
+    {
+        try
+        {
+            await InitializePageContentInternal(pageKey);
+            return Ok(new { success = true, message = "Page initialized successfully" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error initializing page content {PageKey}", pageKey);
+            return StatusCode(500, new { error = "Internal server error" });
+        }
+    }
+
+    private async Task InitializePageContentInternal(string pageKey)
+    {
+        try
+        {
+            var existingPage = await _context.ContentPages
+                .FirstOrDefaultAsync(p => p.PageKey == pageKey);
+
+            if (existingPage != null)
+            {
+                return; // Page already exists, skip initialization
+            }
+
+            var page = new ContentPage
+            {
+                Id = Guid.NewGuid(),
+                PageKey = pageKey,
+                PageName = GetPageDisplayName(pageKey),
+                Description = $"Content for {GetPageDisplayName(pageKey)} page",
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            _context.ContentPages.Add(page);
+
+            // Initialize default sections for the page
+            var defaultSections = GetDefaultSectionsForPage(pageKey);
+            foreach (var sectionData in defaultSections)
+            {
+                var section = new ContentSection
+                {
+                    Id = Guid.NewGuid(),
+                    ContentPageId = page.Id,
+                    SectionKey = sectionData.Key,
+                    SectionName = sectionData.Name,
+                    Description = sectionData.Description,
+                    SortOrder = sectionData.SortOrder,
+                    IsActive = true,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                };
+
+                _context.ContentSections.Add(section);
+
+                // Add default blocks
+                foreach (var blockData in sectionData.DefaultBlocks)
+                {
+                    var block = new ContentBlock
+                    {
+                        Id = Guid.NewGuid(),
+                        ContentSectionId = section.Id,
+                        BlockKey = blockData.Key,
+                        BlockName = blockData.Name,
+                        BlockType = blockData.Type,
+                        ContentEn = blockData.ContentEn,
+                        ContentAr = blockData.ContentAr,
+                        SortOrder = blockData.SortOrder,
+                        IsActive = true,
+                        CreatedAt = DateTime.UtcNow,
+                        UpdatedAt = DateTime.UtcNow
+                    };
+
+                    _context.ContentBlocks.Add(block);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error initializing page content {PageKey}", pageKey);
+            throw;
+        }
+    }
+
+    // Helper methods
+    private object GetSectionContentObject(ContentSection section)
+    {
+        var blocks = section.Blocks.Where(b => b.IsActive).OrderBy(b => b.SortOrder).ToList();
+        
+        switch (section.SectionKey.ToLower())
+        {
+            case "hero":
+                return new
+                {
+                    title = blocks.FirstOrDefault(b => b.BlockKey == "title")?.ContentEn ?? "Welcome to Ersa Training",
+                    subtitle = blocks.FirstOrDefault(b => b.BlockKey == "subtitle")?.ContentEn ?? "Professional Training & Consultancy Services",
+                    description = blocks.FirstOrDefault(b => b.BlockKey == "description")?.ContentEn ?? "Empowering individuals and organizations with world-class training solutions"
+                };
+            
+            case "faq":
+                var faqBlocks = blocks.Where(b => b.BlockType == "faq").ToList();
+                return new
+                {
+                    faqs = faqBlocks.Select(b => new
+                    {
+                        question = b.BlockName,
+                        answer = b.ContentEn ?? ""
+                    }).ToList()
+                };
+            
+            case "services":
+                var serviceBlocks = blocks.Where(b => b.BlockType == "service").ToList();
+                return new
+                {
+                    services = serviceBlocks.Select(b => new
+                    {
+                        title = b.BlockName,
+                        description = b.ContentEn ?? ""
+                    }).ToList()
+                };
+            
+            default:
+                return new
+                {
+                    title = blocks.FirstOrDefault(b => b.BlockKey == "title")?.ContentEn ?? section.SectionName,
+                    description = blocks.FirstOrDefault(b => b.BlockKey == "description")?.ContentEn ?? ""
+                };
+        }
+    }
+
+    private async Task UpdateSectionBlocks(ContentSection section, dynamic content)
+    {
+        var contentDict = content as IDictionary<string, object> ?? new Dictionary<string, object>();
+        
+        switch (section.SectionKey.ToLower())
+        {
+            case "hero":
+                await UpdateOrCreateBlock(section.Id, "title", "Title", "text", contentDict.ContainsKey("title") ? contentDict["title"]?.ToString() : null);
+                await UpdateOrCreateBlock(section.Id, "subtitle", "Subtitle", "text", contentDict.ContainsKey("subtitle") ? contentDict["subtitle"]?.ToString() : null);
+                await UpdateOrCreateBlock(section.Id, "description", "Description", "text", contentDict.ContainsKey("description") ? contentDict["description"]?.ToString() : null);
+                break;
+            
+            case "faq":
+                if (contentDict.ContainsKey("faqs") && contentDict["faqs"] is IEnumerable<object> faqs)
+                {
+                    var faqList = faqs.ToList();
+                    for (int i = 0; i < faqList.Count; i++)
+                    {
+                        var faq = faqList[i] as IDictionary<string, object>;
+                        if (faq != null)
+                        {
+                            var question = faq.ContainsKey("question") ? faq["question"]?.ToString() : null;
+                            var answer = faq.ContainsKey("answer") ? faq["answer"]?.ToString() : null;
+                            await UpdateOrCreateBlock(section.Id, $"faq_{i}", question ?? $"FAQ {i + 1}", "faq", answer);
+                        }
+                    }
+                }
+                break;
+            
+            default:
+                await UpdateOrCreateBlock(section.Id, "title", "Title", "text", contentDict.ContainsKey("title") ? contentDict["title"]?.ToString() : null);
+                await UpdateOrCreateBlock(section.Id, "description", "Description", "text", contentDict.ContainsKey("description") ? contentDict["description"]?.ToString() : null);
+                break;
+        }
+    }
+
+    private async Task UpdateOrCreateBlock(Guid sectionId, string blockKey, string blockName, string blockType, string? content)
+    {
+        var existingBlock = await _context.ContentBlocks
+            .FirstOrDefaultAsync(b => b.ContentSectionId == sectionId && b.BlockKey == blockKey);
+
+        if (existingBlock != null)
+        {
+            existingBlock.ContentEn = content;
+            existingBlock.UpdatedAt = DateTime.UtcNow;
+        }
+        else
+        {
+            var newBlock = new ContentBlock
+            {
+                Id = Guid.NewGuid(),
+                ContentSectionId = sectionId,
+                BlockKey = blockKey,
+                BlockName = blockName,
+                BlockType = blockType,
+                ContentEn = content,
+                SortOrder = 0,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+            _context.ContentBlocks.Add(newBlock);
+        }
+    }
+
+    private string GetPageDisplayName(string pageKey)
+    {
+        return pageKey.ToLower() switch
+        {
+            "home" => "Home Page",
+            "courses" => "Courses",
+            "contact" => "Contact",
+            "faq" => "FAQ",
+            "consultation" => "Consultation",
+            "about" => "About Us",
+            _ => pageKey
+        };
+    }
+
+    private List<DefaultSectionData> GetDefaultSectionsForPage(string pageKey)
+    {
+        return pageKey.ToLower() switch
+        {
+            "home" => new List<DefaultSectionData>
+            {
+                new() { Key = "hero", Name = "Hero Section", Description = "Main banner section", SortOrder = 1, DefaultBlocks = GetDefaultBlocks("hero") },
+                new() { Key = "services", Name = "Services", Description = "Services overview", SortOrder = 2, DefaultBlocks = GetDefaultBlocks("services") },
+                new() { Key = "testimonials", Name = "Testimonials", Description = "Client testimonials", SortOrder = 3, DefaultBlocks = GetDefaultBlocks("testimonials") }
+            },
+            "courses" => new List<DefaultSectionData>
+            {
+                new() { Key = "header", Name = "Page Header", Description = "Courses page header", SortOrder = 1, DefaultBlocks = GetDefaultBlocks("header") },
+                new() { Key = "categories", Name = "Course Categories", Description = "Available course categories", SortOrder = 2, DefaultBlocks = GetDefaultBlocks("categories") },
+                new() { Key = "featured", Name = "Featured Courses", Description = "Featured course listings", SortOrder = 3, DefaultBlocks = GetDefaultBlocks("featured") }
+            },
+            "contact" => new List<DefaultSectionData>
+            {
+                new() { Key = "header", Name = "Contact Header", Description = "Contact page header", SortOrder = 1, DefaultBlocks = GetDefaultBlocks("header") },
+                new() { Key = "info", Name = "Contact Information", Description = "Contact details and location", SortOrder = 2, DefaultBlocks = GetDefaultBlocks("contact_info") }
+            },
+            "faq" => new List<DefaultSectionData>
+            {
+                new() { Key = "faq", Name = "FAQ Section", Description = "Frequently asked questions", SortOrder = 1, DefaultBlocks = GetDefaultBlocks("faq") }
+            },
+            "consultation" => new List<DefaultSectionData>
+            {
+                new() { Key = "header", Name = "Consultation Header", Description = "Consultation page header", SortOrder = 1, DefaultBlocks = GetDefaultBlocks("header") },
+                new() { Key = "services", Name = "Consultation Services", Description = "Available consultation services", SortOrder = 2, DefaultBlocks = GetDefaultBlocks("consultation_services") }
+            },
+            "about" => new List<DefaultSectionData>
+            {
+                new() { Key = "header", Name = "About Header", Description = "About page header", SortOrder = 1, DefaultBlocks = GetDefaultBlocks("header") },
+                new() { Key = "story", Name = "Our Story", Description = "Company story and mission", SortOrder = 2, DefaultBlocks = GetDefaultBlocks("story") },
+                new() { Key = "team", Name = "Our Team", Description = "Team members", SortOrder = 3, DefaultBlocks = GetDefaultBlocks("team") },
+                new() { Key = "achievements", Name = "Achievements", Description = "Company achievements and statistics", SortOrder = 4, DefaultBlocks = GetDefaultBlocks("achievements") }
+            },
+            _ => new List<DefaultSectionData>()
+        };
+    }
+
+    private List<DefaultBlockData> GetDefaultBlocks(string sectionType)
+    {
+        return sectionType.ToLower() switch
+        {
+            "hero" => new List<DefaultBlockData>
+            {
+                new() { Key = "title", Name = "Title", Type = "text", ContentEn = "Welcome to Ersa Training", SortOrder = 1 },
+                new() { Key = "subtitle", Name = "Subtitle", Type = "text", ContentEn = "Professional Training & Consultancy Services", SortOrder = 2 },
+                new() { Key = "description", Name = "Description", Type = "text", ContentEn = "Empowering individuals and organizations with world-class training solutions", SortOrder = 3 }
+            },
+            "faq" => new List<DefaultBlockData>
+            {
+                new() { Key = "faq_0", Name = "How do I enroll in a course?", Type = "faq", ContentEn = "You can enroll through our website or contact us directly.", SortOrder = 1 },
+                new() { Key = "faq_1", Name = "What payment methods do you accept?", Type = "faq", ContentEn = "We accept credit cards, bank transfers, and online payments.", SortOrder = 2 }
+            },
+            _ => new List<DefaultBlockData>
+            {
+                new() { Key = "title", Name = "Title", Type = "text", ContentEn = "Section Title", SortOrder = 1 },
+                new() { Key = "description", Name = "Description", Type = "text", ContentEn = "Section description", SortOrder = 2 }
+            }
+        };
+    }
 }

@@ -1,7 +1,9 @@
 import { LocaleString } from '../common-types';
 
-// Course-related types
+// Course-related types matching backend DTOs
 export type CourseCategory = 'Programming' | 'Business' | 'Design';
+export type CourseType = 'Live' | 'PDF';
+export type CourseLevel = 'Biginner' | 'Intermediate' | 'Advanced';
 
 export interface Course {
   id: string;
@@ -10,14 +12,16 @@ export interface Course {
   summary: LocaleString;
   price: number;
   currency: string;
-  type: 'Live' | 'PDF';
+  type: CourseType;
+  level: CourseLevel;
   category: CourseCategory;
-  imageUrl: string;
+  imageUrl?: string;
   instructorName: string;
   isActive: boolean;
-  isFeatured?: boolean;
+  isFeatured: boolean;
+  createdAt: string;
+  updatedAt: string;
   rating?: number;
-  createdAt?: string;
   badge?: 'Bestseller' | 'New' | null;
   instructor?: {
     name: string;

@@ -206,3 +206,48 @@ public class FileUploadResponse
     public long FileSize { get; set; }
     public string ContentType { get; set; } = string.Empty;
 }
+
+// Admin Content Management DTOs
+public class AdminContentSectionDto
+{
+    public string Id { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string Type { get; set; } = string.Empty;
+    public string PageKey { get; set; } = string.Empty;
+    public string PageName { get; set; } = string.Empty;
+    public object Content { get; set; } = new();
+    public bool IsActive { get; set; }
+    public string LastModified { get; set; } = string.Empty;
+}
+
+public class AdminPageContentDto
+{
+    public string PageKey { get; set; } = string.Empty;
+    public string PageName { get; set; } = string.Empty;
+    public List<AdminContentSectionDto> Sections { get; set; } = new();
+}
+
+public class UpdateSectionContentRequest
+{
+    public object Content { get; set; } = new();
+}
+
+// Helper classes for page initialization
+public class DefaultSectionData
+{
+    public string Key { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string Description { get; set; } = string.Empty;
+    public int SortOrder { get; set; }
+    public List<DefaultBlockData> DefaultBlocks { get; set; } = new();
+}
+
+public class DefaultBlockData
+{
+    public string Key { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+    public string Type { get; set; } = string.Empty;
+    public string? ContentEn { get; set; }
+    public string? ContentAr { get; set; }
+    public int SortOrder { get; set; }
+}

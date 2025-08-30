@@ -2,13 +2,14 @@ import { useState, useEffect } from 'react';
 import { useLocale } from 'next-intl';
 import { contentApi } from './content-api';
 import type { 
-  Course, 
+  Course as ApiCourse, 
   Category, 
   HomeContent, 
   SiteStats,
   AboutContent,
   PageContent
 } from './types/api';
+import type { Course } from './types';
 
 export function usePageContent<T>(
   pageKey: string,
@@ -40,6 +41,70 @@ export function usePageContent<T>(
   return { data, loading, error };
 }
 
+// Transform API Course to extended Course type
+function transformApiCourse(apiCourse: ApiCourse, locale: string = 'ar'): Course {
+  const levelMap = { 'Biginner': 'مبتدئ', 'Intermediate': 'متوسط', 'Advanced': 'متقدم' };
+  const categoryMap = { 'Programming': 'البرمجة', 'Business': 'الأعمال', 'Design': 'التصميم' };
+  
+  return {
+    ...apiCourse,
+    // Keep the original localized title and summary objects from backend
+    title: apiCourse.title,
+    summary: apiCourse.summary,
+    curriculum: apiCourse.sessions?.map((session, index) => ({
+      id: index + 1,
+      title: `الجلسة ${index + 1}`,
+      lessons: 4,
+      duration: '2 ساعة',
+      isPreview: index === 0
+    })) || apiCourse.attachments?.map((attachment, index) => ({
+      id: index + 1,
+      title: `${attachment.fileName}`,
+      lessons: 1,
+      duration: 'ملف PDF',
+      isPreview: index === 0
+    })) || [
+      {
+        id: 1,
+        title: 'مقدمة في الدورة',
+        lessons: 4,
+        duration: '2 ساعة',
+        isPreview: true
+      }
+    ],
+    features: apiCourse.type === 'Live' 
+      ? ['جلسات مباشرة', 'شهادة إتمام', 'دعم المدرب', 'تسجيلات الجلسات', 'مواد تدريبية']
+      : ['وصول مدى الحياة', 'ملفات PDF', 'شهادة إتمام', 'دعم المدرب', 'ملفات قابلة للتحميل'],
+    requirements: ['معرفة أساسية بالحاسوب', 'الرغبة في التعلم والإبداع'],
+    description: typeof apiCourse.summary === 'object' 
+      ? (locale === 'ar' ? apiCourse.summary.ar : apiCourse.summary.en) || (locale === 'ar' ? apiCourse.summary.en : apiCourse.summary.ar)
+      : apiCourse.summary,
+    lessons: apiCourse.sessions?.length || apiCourse.attachments?.length || 1,
+    instructor: {
+      name: apiCourse.instructorName,
+      title: apiCourse.instructor?.title || 'مدرب معتمد',
+      avatar: apiCourse.instructor?.avatar || '/api/placeholder/60/60',
+      rating: 4.8,
+      studentsCount: Math.floor(Math.random() * 5000) + 1000,
+      coursesCount: Math.floor(Math.random() * 20) + 5
+    },
+    reviewsCount: Math.floor(Math.random() * 2000) + 500,
+    studentsCount: Math.floor(Math.random() * 5000) + 1000,
+    duration: apiCourse.type === 'Live' 
+      ? `${(apiCourse.sessions?.length || 1) * 2} ساعة` 
+      : 'وصول مدى الحياة',
+    level: levelMap[apiCourse.level] || apiCourse.level || 'متوسط',
+    language: 'العربية',
+    originalPrice: Math.round(apiCourse.price * 1.3),
+    lastUpdated: apiCourse.updatedAt?.split('T')[0] || apiCourse.createdAt?.split('T')[0] || new Date().toISOString().split('T')[0],
+    videoPreviewUrl: '/api/placeholder/video',
+    subtitle: typeof apiCourse.summary === 'object' 
+      ? (locale === 'ar' ? apiCourse.summary.ar : apiCourse.summary.en) || (locale === 'ar' ? apiCourse.summary.en : apiCourse.summary.ar)
+      : apiCourse.summary,
+    // Map additional backend fields - these are already in the spread operator above
+  };
+}
+
 export function useCourses(params?: { type?: 'Live' | 'PDF'; featured?: boolean }) {
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
@@ -50,7 +115,8 @@ export function useCourses(params?: { type?: 'Live' | 'PDF'; featured?: boolean 
       try {
         setLoading(true);
         const response = await contentApi.getCourses(params);
-        setCourses(response.data);
+        const transformedCourses = response.data.map(course => transformApiCourse(course));
+        setCourses(transformedCourses);
         setError(null);
       } catch (err) {
         console.error('Error fetching courses:', err);
@@ -77,7 +143,8 @@ export function useCourse(slug: string) {
       try {
         setLoading(true);
         const response = await contentApi.getCourse(slug, locale);
-        setCourse(response.data);
+        const transformedCourse = transformApiCourse(response.data, locale);
+        setCourse(transformedCourse);
         setError(null);
       } catch (err) {
         console.error(`Error fetching course ${slug}:`, err);

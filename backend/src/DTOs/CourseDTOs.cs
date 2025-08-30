@@ -13,8 +13,13 @@ public class CourseListDto
     public string Currency { get; set; } = string.Empty;
     public CourseType Type { get; set; }
     public CourseLevel Level { get; set; }
+    public CourseCategory Category { get; set; }
+    public string? ImageUrl { get; set; }
+    public string InstructorName { get; set; } = string.Empty;
     public bool IsActive { get; set; }
     public bool IsFeatured { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
 }
 
 public class CourseDetailDto : CourseListDto

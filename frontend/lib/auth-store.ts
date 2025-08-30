@@ -69,8 +69,8 @@ export const useAuthStore = create<AuthState>()(
         const token = Cookies.get('auth-token');
         if (token && !get().user) {
           try {
-            const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5002';
-            const response = await fetch(`${API_BASE_URL}/api/auth/refresh-token`, {
+            const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5002/api';
+            const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
               headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',

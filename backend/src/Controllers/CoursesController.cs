@@ -49,8 +49,14 @@ public class CoursesController : ControllerBase
                     Price = c.Price,
                     Currency = c.Currency,
                     Type = c.Type,
+                    Level = c.Level,
+                    Category = c.Category,
+                    ImageUrl = c.ImageUrl,
+                    InstructorName = c.InstructorName,
                     IsActive = c.IsActive,
-                    IsFeatured = c.IsFeatured
+                    IsFeatured = c.IsFeatured,
+                    CreatedAt = c.CreatedAt,
+                    UpdatedAt = c.UpdatedAt
                 })
                 .ToListAsync();
 
@@ -87,8 +93,14 @@ public class CoursesController : ControllerBase
                 Price = course.Price,
                 Currency = course.Currency,
                 Type = course.Type,
+                Level = course.Level,
+                Category = course.Category,
+                ImageUrl = course.ImageUrl,
+                InstructorName = course.InstructorName,
                 IsActive = course.IsActive,
                 IsFeatured = course.IsFeatured,
+                CreatedAt = course.CreatedAt,
+                UpdatedAt = course.UpdatedAt,
                 Sessions = course.Sessions
                     .OrderBy(s => s.StartAt)
                     .Select(s => new SessionDto
@@ -136,8 +148,14 @@ public class CoursesController : ControllerBase
                     Price = c.Price,
                     Currency = c.Currency,
                     Type = c.Type,
+                    Level = c.Level,
+                    Category = c.Category,
+                    ImageUrl = c.ImageUrl,
+                    InstructorName = c.InstructorName,
                     IsActive = c.IsActive,
-                    IsFeatured = c.IsFeatured
+                    IsFeatured = c.IsFeatured,
+                    CreatedAt = c.CreatedAt,
+                    UpdatedAt = c.UpdatedAt
                 })
                 .ToListAsync();
 

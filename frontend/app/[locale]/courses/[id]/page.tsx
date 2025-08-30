@@ -12,79 +12,6 @@ import { useCourse } from '@/lib/content-hooks';
 import type { Course, CurriculumSection } from '@/lib/types';
 import type { LocaleString } from '@/lib/common-types';
 
-// Mock course data - in real app this would come from API
-const mockCourseData = {
-  id: '1',
-  title: {
-    ar: 'دورة التصميم الجرافيكي المتقدمة',
-    en: 'Advanced Graphic Design Course'
-  },
-  subtitle: 'تعلم أساسيات وتقنيات التصميم الجرافيكي الحديث باستخدام أدوات احترافية',
-  instructor: {
-    name: 'أحمد محمد',
-    title: 'مصمم جرافيك محترف',
-    avatar: '/api/placeholder/60/60',
-    rating: 4.9,
-    studentsCount: 15000,
-    coursesCount: 12
-  },
-  price: 299,
-  originalPrice: 399,
-  currency: 'SAR',
-  rating: 4.8,
-  reviewsCount: 1250,
-  studentsCount: 5430,
-  duration: '12 ساعة',
-  lessons: 24,
-  level: 'متقدم',
-  language: 'العربية',
-  imageUrl: '/api/placeholder/800/450',
-  videoPreviewUrl: '/api/placeholder/video',
-  lastUpdated: '2024-01-15',
-  features: [
-    'وصول مدى الحياة',
-    'شهادة إتمام',
-    'دعم المدرب',
-    'مشاريع عملية',
-    'ملفات قابلة للتحميل'
-  ],
-  description: 'هذه الدورة مصممة لتعليمك أساسيات وتقنيات التصميم الجرافيكي الحديث. ستتعلم كيفية استخدام الأدوات الاحترافية لإنشاء تصاميم مبتكرة وجذابة. تشمل الدورة مشاريع عملية ستساعدك على تطبيق ما تعلمته.',
-  requirements: [
-    'معرفة أساسية بالحاسوب',
-    'برنامج Adobe Photoshop أو Illustrator',
-    'الرغبة في التعلم والإبداع'
-  ],
-  curriculum: [
-    {
-      id: 1,
-      title: 'مقدمة في التصميم الجرافيكي',
-      lessons: 4,
-      duration: '45 دقيقة',
-      isPreview: true
-    },
-    {
-      id: 2,
-      title: 'أساسيات الألوان والطباعة',
-      lessons: 6,
-      duration: '1.5 ساعة',
-      isPreview: false
-    },
-    {
-      id: 3,
-      title: 'تقنيات التصميم المتقدمة',
-      lessons: 8,
-      duration: '2 ساعة',
-      isPreview: false
-    },
-    {
-      id: 4,
-      title: 'مشاريع عملية وتطبيقية',
-      lessons: 6,
-      duration: '1.5 ساعة',
-      isPreview: false
-    }
-  ]
-};
 
 export default function CourseDetailsPage() {
   const t = useTranslations();
@@ -96,6 +23,13 @@ export default function CourseDetailsPage() {
   const [isInWishlist, setIsInWishlist] = useState(false);
   const isLoaded = usePageLoad(100);
   const { course, loading: courseLoading, error: courseError } = useCourse(routeParams.id);
+  
+  // Always call hooks in the same order - use empty array as fallback
+  const { visibleItems: curriculumVisible, setRef: setCurriculumRef } = useStaggeredAnimation(
+    course?.curriculum || [], 
+    100
+  );
+  
   const isInCart = course ? hasItem(course.id) : false;
 
   // Show loading state
@@ -135,16 +69,15 @@ export default function CourseDetailsPage() {
       </div>
     );
   }
-
-  const { visibleItems: curriculumVisible, setRef: setCurriculumRef } = useStaggeredAnimation(
-    course.curriculum || [], 
-    100
-  );
   
   // Handle localized content
   const title = typeof course.title === 'object' 
     ? (locale === 'ar' ? course.title.ar : course.title.en)
     : course.title;
+  
+  const summary = typeof course.summary === 'object'
+    ? (locale === 'ar' ? course.summary.ar : course.summary.en)
+    : course.summary;
 
   const addToCart = () => {
     addItem({
@@ -187,7 +120,7 @@ export default function CourseDetailsPage() {
                 </h1>
                 
                 <p className={`text-lg text-gray-600 mb-6 font-cairo ${isLoaded ? 'animate-fade-in-up stagger-2' : 'opacity-0'}`}>
-                  {course.subtitle}
+                  {summary}
                 </p>
                 
                 {/* Course Stats */}

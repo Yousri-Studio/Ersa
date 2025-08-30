@@ -15,50 +15,50 @@ import type { ContentApiResponse } from './types/api-common';
 export const contentApi = {
   // Page Content
   getPageContent: (pageKey: string, locale: string) =>
-    api.get<PageContent>(`/api/content/pages/key/${pageKey}`, {
+    api.get<PageContent>(`/content/pages/key/${pageKey}`, {
       headers: { 'Accept-Language': locale }
     }),
 
   // Courses
   getCourses: (params?: { type?: 'Live' | 'PDF', featured?: boolean }) =>
-    api.get<Course[]>('/api/courses', { params }),
+    api.get<Course[]>('/courses', { params }),
 
   getCourse: (slug: string, locale: string) =>
-    api.get<Course>(`/api/courses/${slug}`, {
+    api.get<Course>(`/courses/${slug}`, {
       headers: { 'Accept-Language': locale }
     }),
 
   getCourseSessions: (courseId: string) =>
-    api.get<Session[]>(`/api/courses/${courseId}/sessions`),
+    api.get<Session[]>(`/courses/${courseId}/sessions`),
 
   getFeaturedCourses: () =>
-    api.get<Course[]>('/api/courses/featured'),
+    api.get<Course[]>('/courses/featured'),
 
   // Categories
   getCategories: (locale: string) =>
-    api.get<Category[]>('/api/categories', {
+    api.get<Category[]>('/categories', {
       headers: { 'Accept-Language': locale }
     }),
 
   // Site Content (Home Page, About, etc.)
   getHomeContent: (locale: string) =>
-    api.get<HomeContent>('/api/content/home', {
+    api.get<HomeContent>('/content/home', {
       headers: { 'Accept-Language': locale }
     }),
 
   getAboutContent: (locale: string) =>
-    api.get<AboutContent>('/api/content/about', {
+    api.get<AboutContent>('/content/about', {
       headers: { 'Accept-Language': locale }
     }),
 
   getFaqContent: (locale: string) =>
-    api.get<FaqContent>('/api/content/faq', {
+    api.get<FaqContent>('/content/faq', {
       headers: { 'Accept-Language': locale }
     }),
 
   // Stats
   getSiteStats: () =>
-    api.get<SiteStats>('/api/stats'),
+    api.get<SiteStats>('/stats'),
 };
 
 
