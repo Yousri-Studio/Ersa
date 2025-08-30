@@ -8,8 +8,8 @@ import toast from 'react-hot-toast';
 import { Icon } from '@/components/ui/icon';
 import WorldMap from '@/components/ui/world-map';
 import { useAuthStore } from '@/lib/auth-store';
-import { Users } from 'lucide-react'; // Assuming Users icon is imported from lucide-react
-import { motion } from 'framer-motion'; // Assuming motion is used for animations
+import { Users } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 // Fallback stats for when API is not available
 const fallbackStats: DashboardStats = {
@@ -81,9 +81,9 @@ const fallbackStats: DashboardStats = {
 };
 
 export default function AdminDashboard() {
+  const { user } = useAuthStore();
   const t = useTranslations('admin');
   const locale = useLocale();
-  const { user } = useAuthStore();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -232,19 +232,19 @@ export default function AdminDashboard() {
           <div className="flex items-center mb-2">
             <span className="text-2xl mr-2">👋</span>
             <h1 className="text-2xl font-bold text-gray-900">
-              {t('admin.hello')} {user?.fullName || t('admin.admin-user')}
+              {t('hello')} {user?.fullName || t('admin')} 👋
             </h1>
           </div>
           <p className="text-gray-600 text-base">
-            {user?.isSuperAdmin ? t('admin.super-admin') : t('admin.admin')} • {t('admin.operations-dashboard')}
+            {user?.isSuperAdmin ? t('super-admin') : t('admin')} • {t('operations-dashboard')}
           </p>
           <p className="text-gray-500 text-sm mt-1">
-            {t('admin.dashboard-subtitle')}
+            {t('dashboard-subtitle')}
           </p>
           <div className="mt-3">
             <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
               <span className="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>
-              {t('admin.using-demo-data')}
+              {t('using-demo-data')}
             </span>
           </div>
         </div>
@@ -253,8 +253,8 @@ export default function AdminDashboard() {
         <div style={{backgroundColor: '#FAFCFF'}} className="rounded-2xl p-6">
           {/* Dashboard Header */}
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-1">{t('admin.dashboard')}</h2>
-            <p className="text-gray-600 text-sm">{t('admin.overview-platform')}</p>
+            <h2 className="text-xl font-bold text-gray-800 mb-1">{t('dashboard')}</h2>
+            <p className="text-gray-600 text-sm">{t('overview-platform')}</p>
           </div>
 
           {/* Statistics Cards */}
@@ -271,7 +271,7 @@ export default function AdminDashboard() {
                     <div className="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center mr-3">
                       <Icon name="users" className="w-4 h-4 text-teal-600" />
                     </div>
-                    <span className="text-gray-600 text-sm font-medium">{t('admin.total-users')}</span>
+                    <span className="text-gray-600 text-sm font-medium">{t('total-users')}</span>
                   </div>
                   <div className="text-3xl font-bold text-gray-800">{dashboardStats.totalUsers}</div>
                 </div>
@@ -285,7 +285,7 @@ export default function AdminDashboard() {
                     <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
                       <Icon name="graduation-cap" className="w-4 h-4 text-blue-600" />
                     </div>
-                    <span className="text-gray-600 text-sm font-medium">{t('admin.total-courses')}</span>
+                    <span className="text-gray-600 text-sm font-medium">{t('total-courses')}</span>
                   </div>
                   <div className="text-3xl font-bold text-gray-800">{dashboardStats.totalCourses}</div>
                 </div>
@@ -299,7 +299,7 @@ export default function AdminDashboard() {
                     <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
                       <Icon name="shopping-cart" className="w-4 h-4 text-green-600" />
                     </div>
-                    <span className="text-gray-600 text-sm font-medium">{t('admin.total-orders')}</span>
+                    <span className="text-gray-600 text-sm font-medium">{t('total-orders')}</span>
                   </div>
                   <div className="text-3xl font-bold text-gray-800">{dashboardStats.totalOrders}</div>
                 </div>
@@ -310,30 +310,33 @@ export default function AdminDashboard() {
           {/* Recent Orders */}
           <div className="bg-white rounded-xl shadow-sm mb-8">
             <div className="px-6 py-4 border-b border-gray-100">
-              <h3 className="text-lg font-bold text-gray-800 mb-1">{t('admin.recent-orders')}</h3>
-              <p className="text-gray-600 text-sm">{t('admin.overview-orders')}</p>
+              <h3 className="text-lg font-bold text-gray-800 mb-1">{t('recent-orders')}</h3>
+              <p className="text-gray-600 text-sm">{t('recent-orders-subtitle')}</p>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {t('admin.student-name')}
+                      {t('student-name')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {t('admin.course-name')}
+                      {t('course-name')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {t('admin.order-date')}
+                      {t('order-date')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {t('admin.course-type')}
+                      {t('course-type')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {t('admin.course-price')}
+                      {t('course-price')}
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      {t('admin.actions')}
+                      {t('status')}
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      {t('actions')}
                     </th>
                   </tr>
                 </thead>
@@ -356,6 +359,9 @@ export default function AdminDashboard() {
                         {order.coursePrice}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        {order.status}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         <button className="text-gray-400 hover:text-gray-600 p-1">
                           <Icon name="ellipsis-v" className="h-4 w-4" />
                         </button>
@@ -372,8 +378,8 @@ export default function AdminDashboard() {
             {/* Recent Users */}
             <div className="bg-white rounded-xl shadow-sm">
               <div className="px-6 py-4 border-b border-gray-100">
-                <h3 className="text-lg font-bold text-gray-800 mb-1">{t('admin.recent-users')}</h3>
-                <p className="text-gray-600 text-sm">{t('admin.overview-users')}</p>
+                <h3 className="text-lg font-bold text-gray-800 mb-1">{t('recent-users')}</h3>
+                <p className="text-gray-600 text-sm">{t('recent-users-subtitle')}</p>
               </div>
               <div className="p-6">
                 <div className="space-y-4">
@@ -407,17 +413,17 @@ export default function AdminDashboard() {
             {/* Geographics */}
             <div className="bg-white rounded-xl shadow-sm">
               <div className="px-6 py-4 border-b border-gray-100">
-                <h3 className="text-lg font-bold text-gray-800 mb-1">{t('admin.geographics')}</h3>
-                <p className="text-gray-600 text-sm">{t('admin.overview-countries')}</p>
+                <h3 className="text-lg font-bold text-gray-800 mb-1">{t('geographics')}</h3>
+                <p className="text-gray-600 text-sm">{t('geographics-subtitle')}</p>
               </div>
               <div className="p-6">
                 <div className="mb-4">
-                  <h4 className="text-sm font-medium text-gray-900 mb-3">{t('admin.users-from-countries')}</h4>
+                  <h4 className="text-md font-semibold text-gray-900 mb-4">{t('users-from-countries')}</h4>
                   <div className="space-y-2">
                     {geographics.map((geo, index) => (
                       <div key={index} className="flex justify-between items-center">
                         <span className="text-sm text-gray-600">{geo.country}</span>
-                        <span className="text-sm font-medium text-teal-600">{geo.users} User</span>
+                        <span className="text-sm font-medium text-teal-600">{geo.users} {t('user')}</span>
                       </div>
                     ))}
                   </div>
