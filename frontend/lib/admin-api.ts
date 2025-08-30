@@ -258,7 +258,18 @@ export interface AdminUpdateCourseRequest {
 
 export const adminApi = {
   // Dashboard
-  getDashboardStats: () => api.get<DashboardStats>('/admin/dashboard-stats'),
+  getDashboardStats: () => {
+    console.log('Making API call to /admin/dashboard-stats');
+    return api.get<DashboardStats>('/admin/dashboard-stats')
+      .then(response => {
+        console.log('API response received:', response);
+        return response;
+      })
+      .catch(error => {
+        console.error('API error:', error);
+        throw error;
+      });
+  },
 
   // Users
   getUsers: (params: {

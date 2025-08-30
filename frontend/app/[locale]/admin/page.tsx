@@ -87,9 +87,15 @@ export default function AdminDashboard() {
       } catch (error: any) {
         console.error('Error fetching dashboard stats:', error);
         setError(error.message || 'Failed to load dashboard statistics');
-        // Use fallback data instead of showing error
-        setStats(fallbackStats);
-        toast.error('Using demo data - API connection failed');
+        
+        // Only use fallback data if there's a network error, otherwise show the error
+        if (error.code === 'NETWORK_ERROR' || error.code === 'ERR_NETWORK') {
+          setStats(fallbackStats);
+          toast.error('Network error - Using demo data');
+        } else {
+          // For authentication or other API errors, don't use fallback data
+          toast.error('Failed to load dashboard data: ' + (error.response?.data?.error || error.message));
+        }
       } finally {
         setIsLoading(false);
       }
@@ -150,60 +156,22 @@ export default function AdminDashboard() {
     }
   };
 
-  // Mock data for demonstration - replace with real data from API
-  const recentOrders = [
-    {
-      id: '1',
-      studentName: 'Eslam Elsayed',
-      courseName: 'Advanced Graphic Design Course',
-      orderDate: '01 / 01 / 2025',
-      courseType: 'Online',
-      coursePrice: '1200 SAR'
-    },
-    {
-      id: '2',
-      studentName: 'Eslam Elsayed',
-      courseName: 'Advanced Graphic Design Course',
-      orderDate: '01 / 01 / 2025',
-      courseType: 'Online',
-      coursePrice: '1200 SAR'
-    },
-    {
-      id: '3',
-      studentName: 'Eslam Elsayed',
-      courseName: 'Advanced Graphic Design Course',
-      orderDate: '01 / 01 / 2025',
-      courseType: 'Online',
-      coursePrice: '1200 SAR'
-    }
-  ];
+  // Use real data from API
+  const recentOrders = dashboardStats?.recentOrders?.map(order => ({
+    id: order.id,
+    studentName: order.userName,
+    courseName: `Order #${order.id.substring(0, 8)}`, // Using order ID as placeholder since course name isn't in the API
+    orderDate: formatDate(order.createdAt),
+    courseType: 'Online', // Default type
+    coursePrice: formatCurrency(order.totalAmount)
+  })) || [];
 
-  const recentUsers = [
-    {
-      id: '1',
-      name: 'Eslam Elsayed',
-      email: 'gfxislam@gmail.com',
-      date: '01/01/2025'
-    },
-    {
-      id: '2',
-      name: 'Eslam Elsayed',
-      email: 'gfxislam@gmail.com',
-      date: '01/01/2025'
-    },
-    {
-      id: '3',
-      name: 'Eslam Elsayed',
-      email: 'gfxislam@gmail.com',
-      date: '01/01/2025'
-    },
-    {
-      id: '4',
-      name: 'Eslam Elsayed',
-      email: 'gfxislam@gmail.com',
-      date: '01/01/2025'
-    }
-  ];
+  const recentUsers = dashboardStats?.recentUsers?.map(user => ({
+    id: user.id,
+    name: user.fullName,
+    email: user.email,
+    date: formatDate(user.createdAt)
+  })) || [];
 
   // Use real geographic data from API or fallback to mock data
   const geographics = dashboardStats.userGeographics || [

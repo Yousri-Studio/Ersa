@@ -4,6 +4,31 @@ import { useAuthStore } from './auth-store';
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://0.0.0.0:5000/api';
 
+// Helper functions for auth token management (assuming these exist elsewhere)
+const getStoredAuth = () => {
+  // Replace with actual implementation to get auth tokens from cookies or local storage
+  const token = Cookies.get('auth-token');
+  if (token) {
+    // Assuming token structure includes accessToken and refreshToken
+    // This is a placeholder, actual implementation may vary
+    return { accessToken: token, refreshToken: 'dummy_refresh_token' };
+  }
+  return null;
+};
+
+const setStoredAuth = ({ accessToken, refreshToken }: { accessToken: string; refreshToken: string }) => {
+  // Replace with actual implementation to store auth tokens
+  Cookies.set('auth-token', accessToken, { expires: 1, secure: true, sameSite: 'Lax' });
+  // Store refresh token securely if needed, e.g., in HttpOnly cookie or secure storage
+  console.log('Tokens updated:', { accessToken, refreshToken });
+};
+
+const clearStoredAuth = () => {
+  // Replace with actual implementation to clear auth tokens
+  Cookies.remove('auth-token');
+  console.log('Auth tokens cleared');
+};
+
 // Create axios instance
 export const api = axios.create({
   baseURL: API_BASE_URL,
@@ -13,36 +38,67 @@ export const api = axios.create({
   withCredentials: false, // Disable credentials for CORS
 });
 
-// Request interceptor to add auth token
+// Add request interceptor to include auth token
 api.interceptors.request.use((config) => {
-  const token = Cookies.get('auth-token');
+  const token = getStoredAuth()?.accessToken;
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+  console.log('API Request:', config.method?.toUpperCase(), config.url, config.headers);
   return config;
 });
 
-// Response interceptor to handle auth errors
+// Add response interceptor to handle errors
 api.interceptors.response.use(
-  (response) => response,
-  (error) => {
+  (response) => {
+    console.log('API Response:', response.status, response.config.url);
+    return response;
+  },
+  async (error) => {
+    console.error('API Error:', error.response?.status, error.config?.url, error.response?.data);
+    const originalRequest = error.config;
+
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+
+      try {
+        const refreshToken = getStoredAuth()?.refreshToken;
+        if (refreshToken) {
+          console.log('Attempting token refresh...');
+          const response = await api.post('/auth/refresh-token', { refreshToken });
+          const { accessToken, refreshToken: newRefreshToken } = response.data;
+
+          setStoredAuth({ accessToken, refreshToken: newRefreshToken });
+          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+
+          return api(originalRequest);
+        }
+      } catch (refreshError) {
+        console.error('Token refresh failed:', refreshError);
+        clearStoredAuth();
+        // Only redirect to login for admin routes
+        if (originalRequest.url?.includes('/admin/')) {
+          window.location.href = '/auth/login';
+        }
+        return Promise.reject(refreshError);
+      }
+    }
+
+    // Handle other 401 scenarios or general errors
     if (error.response?.status === 401) {
-      // Token expired or invalid
       const { logout } = useAuthStore.getState();
       logout();
 
-      // Check if we're in admin area and redirect accordingly
       const currentPath = window.location.pathname;
       if (currentPath.includes('/admin')) {
-        // If in admin area, redirect to admin login
-        const locale = currentPath.split('/')[1]; // Get locale from URL
+        const locale = currentPath.split('/')[1];
         window.location.href = `/${locale}/admin-login`;
       } else {
-        // If in public area, redirect to public login
-        const locale = currentPath.split('/')[1] || 'en'; // Get locale from URL or default to 'en'
+        const locale = currentPath.split('/')[1] || 'en';
         window.location.href = `/${locale}/auth/login`;
       }
     }
+
     return Promise.reject(error);
   }
 );
