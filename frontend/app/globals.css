@@ -367,9 +367,10 @@ body {
   100% { transform: rotate(360deg); }
 }
 
-/* Admin Dashboard Styles */
+/* Admin Dashboard Styles - Apply only to admin pages */
 @media (min-width: 640px) {
-  .lg\:p-8 {
+  [data-admin-page] .lg\:p-8,
+  .admin-dashboard .lg\:p-8 {
     padding: 0rem;
   }
 }

@@ -92,7 +92,7 @@ export default function AdminLayout({
   const isRTL = locale === 'ar';
 
   return (
-    <div className={`min-h-screen bg-gray-50 ${isRTL ? 'rtl' : 'ltr'}`}>
+    <div className={`min-h-screen bg-gray-50 ${isRTL ? 'rtl' : 'ltr'}`} data-admin-page>
       <div className="flex">
         {/* Sidebar */}
         <div className={`${
