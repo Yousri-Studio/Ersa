@@ -222,7 +222,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Dashboard Content */}
-        <div className="bg-gray-100 rounded-2xl p-6">
+        <div style={{backgroundColor: '#FAFCFF'}} className="rounded-2xl p-6">
           {/* Dashboard Header */}
           <div className="mb-6">
             <h2 className="text-xl font-bold text-gray-800 mb-1">Dashboard</h2>
