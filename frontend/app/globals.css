@@ -367,6 +367,13 @@ body {
   100% { transform: rotate(360deg); }
 }
 
+/* Admin Dashboard Styles */
+@media (min-width: 1024px) {
+  .lg\:p-8 {
+    padding: 0rem;
+  }
+}
+
 /* Button styles */
 .btn {
   @apply px-4 py-2 rounded-md font-medium transition-colors duration-200;
