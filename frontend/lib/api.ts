@@ -1,21 +1,23 @@
-import axios, { AxiosResponse } from 'axios';
-import Cookies from 'js-cookie';
-import { useAuthStore } from './auth-store';
+import axios, { AxiosResponse } from "axios";
+import Cookies from "js-cookie";
+import { useAuthStore } from "./auth-store";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'https://5000-ca5306b5-004d-4516-8130-6e9fc8da81bb-00-sjhyk0bgy5dy.sisko.replit.dev/api';
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL ||
+  "https://ca5306b5-004d-4516-8130-6e9fc8da81bb-00-sjhyk0bgy5dy.sisko.replit.dev:5000/api";
 
 // Create axios instance
 export const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
   withCredentials: false, // Disable credentials for CORS
 });
 
 // Request interceptor to add auth token
 api.interceptors.request.use((config) => {
-  const token = Cookies.get('auth-token');
+  const token = Cookies.get("auth-token");
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -30,21 +32,21 @@ api.interceptors.response.use(
       // Token expired or invalid
       const { logout } = useAuthStore.getState();
       logout();
-      
+
       // Check if we're in admin area and redirect accordingly
       const currentPath = window.location.pathname;
-      if (currentPath.includes('/admin')) {
+      if (currentPath.includes("/admin")) {
         // If in admin area, redirect to admin login
-        const locale = currentPath.split('/')[1]; // Get locale from URL
+        const locale = currentPath.split("/")[1]; // Get locale from URL
         window.location.href = `/${locale}/admin-login`;
       } else {
         // If in public area, redirect to public login
-        const locale = currentPath.split('/')[1] || 'en'; // Get locale from URL or default to 'en'
+        const locale = currentPath.split("/")[1] || "en"; // Get locale from URL or default to 'en'
         window.location.href = `/${locale}/auth/login`;
       }
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 // Types
@@ -89,7 +91,7 @@ export interface RegisterResponse {
   message: string;
 }
 
-export type CourseCategory = 'Programming' | 'Business' | 'Design';
+export type CourseCategory = "Programming" | "Business" | "Design";
 
 export interface Course {
   id: string;
@@ -104,7 +106,7 @@ export interface Course {
   };
   price: number;
   currency: string;
-  type: 'Live' | 'PDF';
+  type: "Live" | "PDF";
   isActive: boolean;
   isFeatured?: boolean;
   rating?: number;
@@ -113,7 +115,7 @@ export interface Course {
   imageUrl?: string;
   instructorName?: string;
 
-  badge?: 'Bestseller' | 'New' | null;
+  badge?: "Bestseller" | "New" | null;
   thumbnailUrl?: string;
   instructor?: {
     name: string;
@@ -166,7 +168,7 @@ export interface Order {
   id: string;
   amount: number;
   currency: string;
-  status: 'Pending' | 'Paid' | 'Failed' | 'Refunded';
+  status: "Pending" | "Paid" | "Failed" | "Refunded";
   createdAt: string;
   items: OrderItem[];
 }
@@ -185,28 +187,32 @@ export interface OrderItem {
 // Auth API
 export const authApi = {
   login: (data: LoginRequest): Promise<AxiosResponse<LoginResponse>> =>
-    api.post('/auth/login', data),
+    api.post("/auth/login", data),
 
   register: (data: RegisterRequest): Promise<AxiosResponse<RegisterResponse>> =>
-    api.post('/auth/register', data),
+    api.post("/auth/register", data),
 
-  verifyEmail: (data: VerifyEmailRequest): Promise<AxiosResponse<LoginResponse>> =>
-    api.post('/auth/verify-email', data),
+  verifyEmail: (
+    data: VerifyEmailRequest,
+  ): Promise<AxiosResponse<LoginResponse>> =>
+    api.post("/auth/verify-email", data),
 
-  resendVerificationCode: (data: ResendVerificationRequest): Promise<AxiosResponse<{ message: string }>> =>
-    api.post('/auth/resend-verification', data),
+  resendVerificationCode: (
+    data: ResendVerificationRequest,
+  ): Promise<AxiosResponse<{ message: string }>> =>
+    api.post("/auth/resend-verification", data),
 
   refreshToken: (): Promise<AxiosResponse<LoginResponse>> =>
-    api.post('/auth/refresh-token'),
+    api.post("/auth/refresh-token"),
 };
 
 // Courses API
 export const coursesApi = {
-  getCourses: (type?: 'Live' | 'PDF'): Promise<AxiosResponse<Course[]>> =>
-    api.get('/courses', { params: { type } }),
+  getCourses: (type?: "Live" | "PDF"): Promise<AxiosResponse<Course[]>> =>
+    api.get("/courses", { params: { type } }),
 
   getFeaturedCourses: (): Promise<AxiosResponse<Course[]>> =>
-    api.get('/courses/featured'),
+    api.get("/courses/featured"),
 
   getCourse: (slug: string): Promise<AxiosResponse<Course>> =>
     api.get(`/courses/${slug}`),
@@ -217,39 +223,42 @@ export const coursesApi = {
 
 // Cart API
 export const cartApi = {
-  initCart: (anonymousId?: string): Promise<AxiosResponse<{ cartId: string; anonymousId?: string }>> =>
-    api.post('/cart/init', { anonymousId }),
+  initCart: (
+    anonymousId?: string,
+  ): Promise<AxiosResponse<{ cartId: string; anonymousId?: string }>> =>
+    api.post("/cart/init", { anonymousId }),
 
   addToCart: (data: {
     cartId: string;
     courseId: string;
     sessionId?: string;
-  }): Promise<AxiosResponse<Cart>> =>
-    api.post('/cart/items', data),
+  }): Promise<AxiosResponse<Cart>> => api.post("/cart/items", data),
 
   getCart: (cartId: string): Promise<AxiosResponse<Cart>> =>
-    api.get('/cart', { params: { cartId } }),
+    api.get("/cart", { params: { cartId } }),
 
   removeFromCart: (cartItemId: string): Promise<AxiosResponse<Cart>> =>
     api.delete(`/cart/items/${cartItemId}`),
 
   mergeCart: (anonymousId: string): Promise<AxiosResponse<Cart>> =>
-    api.post('/cart/merge', { anonymousId }),
+    api.post("/cart/merge", { anonymousId }),
 };
 
 // Orders API
 export const ordersApi = {
-  createOrder: (cartId: string): Promise<AxiosResponse<{
-    orderId: string;
-    amount: number;
-    currency: string;
-    status: string;
-    createdAt: string;
-  }>> =>
-    api.post('/orders', { cartId }),
+  createOrder: (
+    cartId: string,
+  ): Promise<
+    AxiosResponse<{
+      orderId: string;
+      amount: number;
+      currency: string;
+      status: string;
+      createdAt: string;
+    }>
+  > => api.post("/orders", { cartId }),
 
-  getOrders: (): Promise<AxiosResponse<Order[]>> =>
-    api.get('/orders'),
+  getOrders: (): Promise<AxiosResponse<Order[]>> => api.get("/orders"),
 
   getOrder: (orderId: string): Promise<AxiosResponse<Order>> =>
     api.get(`/orders/${orderId}`),
@@ -261,22 +270,21 @@ export const paymentsApi = {
     orderId: string;
     returnUrl: string;
   }): Promise<AxiosResponse<{ redirectUrl: string }>> =>
-    api.post('/payments/checkout', data),
+    api.post("/payments/checkout", data),
 };
 
 // Enrollments API
 export const enrollmentsApi = {
   getMyEnrollments: (): Promise<AxiosResponse<any[]>> =>
-    api.get('/my/enrollments'),
+    api.get("/my/enrollments"),
 };
 
 // Wishlist API
 export const wishlistApi = {
-  getWishlist: (): Promise<AxiosResponse<any[]>> =>
-    api.get('/wishlist/items'),
+  getWishlist: (): Promise<AxiosResponse<any[]>> => api.get("/wishlist/items"),
 
   addToWishlist: (courseId: string): Promise<AxiosResponse<any>> =>
-    api.post('/wishlist/items', { courseId }),
+    api.post("/wishlist/items", { courseId }),
 
   removeFromWishlist: (courseId: string): Promise<AxiosResponse<any>> =>
     api.delete(`/wishlist/items/${courseId}`),
