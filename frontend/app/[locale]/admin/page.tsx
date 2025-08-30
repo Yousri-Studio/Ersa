@@ -1,8 +1,10 @@
+
 'use client';
 
 import { useEffect, useState } from 'react';
 import { adminApi, DashboardStats } from '@/lib/admin-api';
 import { useHydration } from '@/hooks/useHydration';
+import { useTranslations } from 'next-intl';
 import toast from 'react-hot-toast';
 import { Icon } from '@/components/ui/icon';
 import WorldMap from '@/components/ui/world-map';
@@ -71,6 +73,7 @@ const fallbackStats: DashboardStats = {
 };
 
 export default function AdminDashboard() {
+  const t = useTranslations('admin');
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -89,7 +92,7 @@ export default function AdminDashboard() {
         setError(error.message || 'Failed to load dashboard statistics');
         // Use fallback data instead of showing error
         setStats(fallbackStats);
-        toast.error('Using demo data - API connection failed');
+        toast.error(t('using-demo-data'));
       } finally {
         setIsLoading(false);
       }
@@ -98,7 +101,7 @@ export default function AdminDashboard() {
     if (isHydrated) {
       fetchStats();
     }
-  }, [isHydrated]);
+  }, [isHydrated, t]);
 
   if (!isHydrated) {
     return (
@@ -157,7 +160,7 @@ export default function AdminDashboard() {
       studentName: 'Eslam Elsayed',
       courseName: 'Advanced Graphic Design Course',
       orderDate: '01 / 01 / 2025',
-      courseType: 'Online',
+      courseType: t('online'),
       coursePrice: '1200 SAR'
     },
     {
@@ -165,7 +168,7 @@ export default function AdminDashboard() {
       studentName: 'Eslam Elsayed',
       courseName: 'Advanced Graphic Design Course',
       orderDate: '01 / 01 / 2025',
-      courseType: 'Online',
+      courseType: t('online'),
       coursePrice: '1200 SAR'
     },
     {
@@ -173,7 +176,7 @@ export default function AdminDashboard() {
       studentName: 'Eslam Elsayed',
       courseName: 'Advanced Graphic Design Course',
       orderDate: '01 / 01 / 2025',
-      courseType: 'Online',
+      courseType: t('online'),
       coursePrice: '1200 SAR'
     }
   ];
@@ -221,7 +224,7 @@ export default function AdminDashboard() {
           <div className="flex">
             <Icon name="exclamation-triangle" className="h-5 w-5 text-yellow-400 mr-2" />
             <p className="text-sm text-yellow-700">
-              {error} - Using demo data for display
+              {error} - {t('using-demo-data')}
             </p>
           </div>
         </div>
@@ -232,13 +235,13 @@ export default function AdminDashboard() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Hello 👋
+              {t('hello')}
             </h1>
             <h2 className="text-2xl font-bold text-green-600 mb-2">
-              Super Admin
+              {t('super-admin')}
             </h2>
             <p className="text-gray-600">
-              from here you can manage all content, orders and everything
+              {t('dashboard-subtitle')}
             </p>
           </div>
         </div>
@@ -249,7 +252,7 @@ export default function AdminDashboard() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 mb-1">Total Users</p>
+              <p className="text-sm font-medium text-gray-600 mb-1">{t('total-users')}</p>
               <p className="text-2xl font-bold text-gray-900">{dashboardStats.totalUsers}</p>
             </div>
             <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -261,7 +264,7 @@ export default function AdminDashboard() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 mb-1">Total Courses</p>
+              <p className="text-sm font-medium text-gray-600 mb-1">{t('total-courses')}</p>
               <p className="text-2xl font-bold text-gray-900">{dashboardStats.totalCourses}</p>
             </div>
             <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
@@ -273,7 +276,7 @@ export default function AdminDashboard() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 mb-1">Total Orders</p>
+              <p className="text-sm font-medium text-gray-600 mb-1">{t('total-orders')}</p>
               <p className="text-2xl font-bold text-gray-900">{dashboardStats.totalOrders}</p>
             </div>
             <div className="h-12 w-12 bg-purple-100 rounded-lg flex items-center justify-center">
@@ -285,7 +288,7 @@ export default function AdminDashboard() {
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-gray-600 mb-1">Total Revenue</p>
+              <p className="text-sm font-medium text-gray-600 mb-1">{t('total-revenue')}</p>
               <p className="text-2xl font-bold text-gray-900">{formatCurrency(dashboardStats.totalRevenue)}</p>
             </div>
             <div className="h-12 w-12 bg-yellow-100 rounded-lg flex items-center justify-center">
@@ -298,30 +301,30 @@ export default function AdminDashboard() {
       {/* Recent Orders Section */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100">
         <div className="px-6 py-4 border-b border-gray-100">
-          <h3 className="text-lg font-semibold text-gray-900">Recent Orders</h3>
-          <p className="text-sm text-gray-600">Overview of orders and recent activity</p>
+          <h3 className="text-lg font-semibold text-gray-900">{t('recent-orders')}</h3>
+          <p className="text-sm text-gray-600">{t('recent-orders-subtitle')}</p>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Student Name
+                  {t('student-name')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Course Name
+                  {t('course-name')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Order Date
+                  {t('order-date')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Course Type
+                  {t('course-type')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Course Price
+                  {t('course-price')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Actions
+                  {t('actions')}
                 </th>
               </tr>
             </thead>
@@ -360,8 +363,8 @@ export default function AdminDashboard() {
         {/* Recent Users */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
           <div className="px-6 py-4 border-b border-gray-100">
-            <h3 className="text-lg font-semibold text-gray-900">Recent Users</h3>
-            <p className="text-sm text-gray-600">Overview of Users and Recently Joined</p>
+            <h3 className="text-lg font-semibold text-gray-900">{t('recent-users')}</h3>
+            <p className="text-sm text-gray-600">{t('recent-users-subtitle')}</p>
           </div>
           <div className="p-6">
             <div className="space-y-4">
@@ -391,18 +394,18 @@ export default function AdminDashboard() {
         {/* Geographics */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
           <div className="px-6 py-4 border-b border-gray-100">
-            <h3 className="text-lg font-semibold text-gray-900">Geographics</h3>
-            <p className="text-sm text-gray-600">Overview of Countries and Areas</p>
+            <h3 className="text-lg font-semibold text-gray-900">{t('geographics')}</h3>
+            <p className="text-sm text-gray-600">{t('geographics-subtitle')}</p>
           </div>
           <div className="p-6">
             <div className="flex items-start space-x-6">
               <div className="flex-1">
-                <h4 className="text-sm font-medium text-gray-900 mb-3">Users From Countries</h4>
+                <h4 className="text-sm font-medium text-gray-900 mb-3">{t('users-from-countries')}</h4>
                 <div className="space-y-2">
                   {geographics.map((geo, index) => (
                     <div key={index} className="flex justify-between items-center">
                       <span className="text-sm text-gray-600">{geo.country}</span>
-                      <span className="text-sm font-medium text-gray-900">{geo.users} User</span>
+                      <span className="text-sm font-medium text-gray-900">{geo.users} {t('user')}</span>
                     </div>
                   ))}
                 </div>
