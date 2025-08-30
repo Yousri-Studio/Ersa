@@ -75,11 +75,11 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() 
-            ?? new[] { "http://localhost:3000", "http://localhost:3001", "http://localhost:3002", "http://localhost:3003", "http://localhost:3004", "http://localhost:3005", "http://localhost:3006", "http://localhost:3007", "https://localhost:3000" };
-            
+        var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+            ?? new[] { "http://localhost:3000", "http://localhost:3001", "http://localhost:3002", "http://localhost:3003", "http://localhost:3004", "http://localhost:3005", "http://localhost:3006", "http://localhost:8080", "https://localhost:3000", "https://localhost:8080", "https://ersatraining.com", "https://www.ersatraining.com", "https://ca5306b5-004d-4516-8130-6e9fc8da81bb-00-sjhyk0bgy5dy.sisko.replit.dev:3000", "https://ca5306b5-004d-4516-8130-6e9fc8da81bb-00-sjhyk0bgy5dy.sisko.replit.dev:3001", "https://ca5306b5-004d-4516-8130-6e9fc8da81bb-00-sjhyk0bgy5dy.sisko.replit.dev" };
+
         Console.WriteLine($"CORS Allowed Origins: {string.Join(", ", allowedOrigins)}");
-            
+
         policy.WithOrigins(allowedOrigins)
               .AllowAnyHeader()
               .AllowAnyMethod()
@@ -120,13 +120,13 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo 
-    { 
-        Title = "Ersa Training API", 
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "Ersa Training API",
         Version = "v1",
         Description = "Bilingual e-learning platform API for Ersa Training"
     });
-    
+
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Description = "JWT Authorization header using the Bearer scheme",
@@ -135,7 +135,7 @@ builder.Services.AddSwaggerGen(c =>
         Type = SecuritySchemeType.ApiKey,
         Scheme = "Bearer"
     });
-    
+
     c.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
@@ -184,12 +184,12 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = scope.ServiceProvider.GetRequiredService<ErsaTrainingDbContext>();
-        
+
         // For development, always use EnsureCreatedAsync to avoid migration issues
         await context.Database.EnsureCreatedAsync();
-        
+
         Log.Information("Database initialized successfully");
-        
+
         // Seed database with initial data
         await ErsaTraining.API.SeedData.SeedAsync(app.Services);
     }
