@@ -746,7 +746,7 @@ public class ContentController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting page content for admin {PageKey}", pageKey);
+            _logger.LogError(ex, "Error initializing sample data");
             return StatusCode(500, new { error = "Internal server error" });
         }
     }

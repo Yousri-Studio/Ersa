@@ -1,34 +1,8 @@
 import axios, { AxiosResponse } from 'axios';
 import Cookies from 'js-cookie';
 import { useAuthStore } from './auth-store';
-import toast from 'react-hot-toast';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://0.0.0.0:5000/api';
-
-// Helper functions for auth token management (assuming these exist elsewhere)
-const getStoredAuth = () => {
-  // Replace with actual implementation to get auth tokens from cookies or local storage
-  const token = Cookies.get('auth-token');
-  if (token) {
-    // Assuming token structure includes accessToken and refreshToken
-    // This is a placeholder, actual implementation may vary
-    return { accessToken: token, refreshToken: 'dummy_refresh_token' };
-  }
-  return null;
-};
-
-const setStoredAuth = ({ accessToken, refreshToken }: { accessToken: string; refreshToken: string }) => {
-  // Replace with actual implementation to store auth tokens
-  Cookies.set('auth-token', accessToken, { expires: 1, secure: true, sameSite: 'Lax' });
-  // Store refresh token securely if needed, e.g., in HttpOnly cookie or secure storage
-  console.log('Tokens updated:', { accessToken, refreshToken });
-};
-
-const clearStoredAuth = () => {
-  // Replace with actual implementation to clear auth tokens
-  Cookies.remove('auth-token');
-  console.log('Auth tokens cleared');
-};
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5002/api';
 
 // Create axios instance
 export const api = axios.create({
@@ -36,96 +10,39 @@ export const api = axios.create({
   headers: {
     'Content-Type': 'application/json',
   },
-  withCredentials: false,
-  timeout: 10000, // 10 second timeout
+  withCredentials: false, // Disable credentials for CORS
 });
 
-// Add request interceptor to include auth token
+// Request interceptor to add auth token
 api.interceptors.request.use((config) => {
-  const token = getStoredAuth()?.accessToken;
+  const token = Cookies.get('auth-token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
-  console.log('API Request:', config.method?.toUpperCase(), config.url, config.headers);
   return config;
 });
 
-// Add response interceptor to handle errors
+// Response interceptor to handle auth errors
 api.interceptors.response.use(
-  (response) => {
-    console.log('API Response:', response.status, response.config.url);
-    return response;
-  },
-  async (error) => {
-    // Check if error exists and has meaningful data
-    if (!error) {
-      console.error('API Error: Unknown error occurred');
-      return Promise.reject(new Error('Unknown API error'));
-    }
-
-    // Log detailed error information
-    const errorDetails = {
-      status: error.response?.status || 'No status',
-      url: error.config?.url || 'No URL',
-      data: error.response?.data || 'No response data',
-      message: error.message || 'No error message',
-      code: error.code || 'No error code',
-      isNetworkError: !error.response,
-      baseURL: error.config?.baseURL || 'No base URL'
-    };
-    
-    console.error('API Error Details:', errorDetails);
-    
-    // Handle network errors specifically
-    if (!error.response) {
-      console.error('Network Error: Could not connect to API server');
-      toast.error('Unable to connect to server. Please check your connection.');
-      return Promise.reject(new Error('Network connection failed'));
-    }
-    
-    const originalRequest = error.config;
-
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      originalRequest._retry = true;
-
-      try {
-        const refreshToken = getStoredAuth()?.refreshToken;
-        if (refreshToken) {
-          console.log('Attempting token refresh...');
-          const response = await api.post('/auth/refresh-token', { refreshToken });
-          const { accessToken, refreshToken: newRefreshToken } = response.data;
-
-          setStoredAuth({ accessToken, refreshToken: newRefreshToken });
-          originalRequest.headers.Authorization = `Bearer ${accessToken}`;
-
-          return api(originalRequest);
-        }
-      } catch (refreshError) {
-        console.error('Token refresh failed:', refreshError);
-        clearStoredAuth();
-        // Only redirect to login for admin routes
-        if (originalRequest.url?.includes('/admin/')) {
-          window.location.href = '/auth/login';
-        }
-        return Promise.reject(refreshError);
-      }
-    }
-
-    // Handle other 401 scenarios or general errors
+  (response) => response,
+  (error) => {
     if (error.response?.status === 401) {
+      // Token expired or invalid
       const { logout } = useAuthStore.getState();
       logout();
-
+      
+      // Check if we're in admin area and redirect accordingly
       const currentPath = window.location.pathname;
       if (currentPath.includes('/admin')) {
-        const locale = currentPath.split('/')[1];
+        // If in admin area, redirect to admin login
+        const locale = currentPath.split('/')[1]; // Get locale from URL
         window.location.href = `/${locale}/admin-login`;
       } else {
-        const locale = currentPath.split('/')[1] || 'en';
+        // If in public area, redirect to public login
+        const locale = currentPath.split('/')[1] || 'en'; // Get locale from URL or default to 'en'
         window.location.href = `/${locale}/auth/login`;
       }
     }
-
     return Promise.reject(error);
   }
 );

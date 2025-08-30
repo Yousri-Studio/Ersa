@@ -442,10 +442,6 @@
       "description": "An unexpected error occurred on our server. Please check your internet connection or try again later.",
       "retry": "Try Again",
       "go-home": "Go to Homepage"
-    },
-    "load-failed": "Failed to load content",
-    "course-not-found": "Course not found",
-    "course-not-found-message": "The course you're looking for doesn't exist or has been removed.",
-    "back-to-courses": "Back to Courses"
+    }
   }
 }

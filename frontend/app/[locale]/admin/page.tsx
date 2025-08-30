@@ -1,36 +1,72 @@
-
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
-import { useHydration } from '@/lib/use-hydration';
 import { adminApi, DashboardStats } from '@/lib/admin-api';
-import { Icon } from '@/components/ui/icon';
+import { useHydration } from '@/hooks/useHydration';
 import toast from 'react-hot-toast';
+import { Icon } from '@/components/ui/icon';
+import WorldMap from '@/components/ui/world-map';
 
-// Fallback stats for demo purposes
+// Fallback stats for when API is not available
 const fallbackStats: DashboardStats = {
-  totalUsers: 247,
-  activeUsers: 189,
-  totalCourses: 24,
-  activeCourses: 18,
-  totalOrders: 156,
-  totalRevenue: 45230,
+  totalUsers: 1250,
+  activeUsers: 890,
+  totalCourses: 45,
+  activeCourses: 38,
+  totalOrders: 567,
+  totalRevenue: 125000,
   recentUsers: [
-    { id: '1', firstName: 'Ahmed', lastName: 'Ali', email: 'ahmed@example.com', joinedDate: '2024-01-15' },
-    { id: '2', firstName: 'Sarah', lastName: 'Johnson', email: 'sarah@example.com', joinedDate: '2024-01-14' },
-    { id: '3', firstName: 'Mohammed', lastName: 'Hassan', email: 'mohammed@example.com', joinedDate: '2024-01-13' },
+    {
+      id: '1',
+      fullName: 'Eslam Elsayed',
+      email: 'gfxislam@gmail.com',
+      createdAt: '2025-01-15T10:30:00Z',
+      status: 'Active'
+    },
+    {
+      id: '2',
+      fullName: 'Ahmed Mohamed',
+      email: 'ahmed@example.com',
+      createdAt: '2025-01-14T15:45:00Z',
+      status: 'Active'
+    },
+    {
+      id: '3',
+      fullName: 'Sarah Johnson',
+      email: 'sarah@example.com',
+      createdAt: '2025-01-13T09:20:00Z',
+      status: 'Active'
+    }
   ],
   recentOrders: [
-    { id: '1', courseName: 'React Development', customerName: 'Ahmed Ali', amount: 299, status: 'Completed', createdAt: '2024-01-15' },
-    { id: '2', courseName: 'UI/UX Design', customerName: 'Sarah Johnson', amount: 199, status: 'Processing', createdAt: '2024-01-14' },
-    { id: '3', courseName: 'Digital Marketing', customerName: 'Mohammed Hassan', amount: 149, status: 'Completed', createdAt: '2024-01-13' },
+    {
+      id: '1',
+      userName: 'Eslam Elsayed',
+      totalAmount: 1200,
+      status: 'Paid',
+      createdAt: '2025-01-15T12:00:00Z'
+    },
+    {
+      id: '2',
+      userName: 'Ahmed Mohamed',
+      totalAmount: 800,
+      status: 'Paid',
+      createdAt: '2025-01-14T16:30:00Z'
+    },
+    {
+      id: '3',
+      userName: 'Sarah Johnson',
+      totalAmount: 1500,
+      status: 'Pending',
+      createdAt: '2025-01-13T11:15:00Z'
+    }
   ],
   userGeographics: [
-    { country: 'Saudi Arabia', count: 120 },
-    { country: 'UAE', count: 68 },
-    { country: 'Egypt', count: 45 },
-    { country: 'Jordan', count: 14 },
+    { country: 'Saudi Arabia', users: 450, coordinates: [45.0792, 23.8859] },
+    { country: 'Egypt', users: 320, coordinates: [30.8025, 26.8206] },
+    { country: 'United States', users: 180, coordinates: [-95.7129, 37.0902] },
+    { country: 'United Kingdom', users: 95, coordinates: [-0.1278, 51.5074] },
+    { country: 'Canada', users: 75, coordinates: [-106.3468, 56.1304] }
   ]
 };
 
@@ -38,13 +74,7 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [mounted, setMounted] = useState(false);
-  const locale = useLocale();
-  const t = useTranslations('admin');
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
+  const { isHydrated } = useHydration();
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -56,25 +86,21 @@ export default function AdminDashboard() {
         setError(null);
       } catch (error: any) {
         console.error('Error fetching dashboard stats:', error);
-        
-        // Use fallback data for now to prevent server errors
-        console.log('Using fallback data due to API error');
+        setError(error.message || 'Failed to load dashboard statistics');
+        // Use fallback data instead of showing error
         setStats(fallbackStats);
-        setError(null);
-        
-        // Log the error but don't show it to user for now
-        console.warn('Dashboard API error (using fallback):', error.message);
+        toast.error('Using demo data - API connection failed');
       } finally {
         setIsLoading(false);
       }
     };
 
-    if (mounted) {
+    if (isHydrated) {
       fetchStats();
     }
-  }, [mounted]);
+  }, [isHydrated]);
 
-  if (!mounted) {
+  if (!isHydrated) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -84,276 +110,306 @@ export default function AdminDashboard() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded w-1/4 mb-6"></div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {[...Array(4)].map((_, i) => (
-              <div key={i} className="bg-white rounded-xl p-6 shadow-sm">
-                <div className="h-4 bg-gray-200 rounded w-3/4 mb-4"></div>
-                <div className="h-8 bg-gray-200 rounded w-1/2"></div>
-              </div>
-            ))}
-          </div>
-        </div>
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
-  const statsCards = [
+  // Use fallback data if stats is null
+  const dashboardStats = stats || fallbackStats;
+
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+    }).format(amount);
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    }).replace(/\//g, ' / ');
+  };
+
+  const getStatusColor = (status: any) => {
+    const statusStr = String(status || '').toLowerCase();
+    switch (statusStr) {
+      case 'active':
+      case 'completed':
+        return 'bg-green-100 text-green-800';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      case 'inactive':
+      case 'cancelled':
+        return 'bg-red-100 text-red-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  // Mock data for demonstration - replace with real data from API
+  const recentOrders = [
     {
-      title: 'Total Users',
-      value: stats?.totalUsers?.toLocaleString() || '0',
-      change: '+12%',
-      changeType: 'positive' as const,
-      icon: 'users',
-      color: 'blue',
+      id: '1',
+      studentName: 'Eslam Elsayed',
+      courseName: 'Advanced Graphic Design Course',
+      orderDate: '01 / 01 / 2025',
+      courseType: 'Online',
+      coursePrice: '1200 SAR'
     },
     {
-      title: 'Active Courses',
-      value: stats?.activeCourses?.toString() || '0',
-      change: '+8%',
-      changeType: 'positive' as const,
-      icon: 'book-open',
-      color: 'green',
+      id: '2',
+      studentName: 'Eslam Elsayed',
+      courseName: 'Advanced Graphic Design Course',
+      orderDate: '01 / 01 / 2025',
+      courseType: 'Online',
+      coursePrice: '1200 SAR'
     },
     {
-      title: 'Total Orders',
-      value: stats?.totalOrders?.toLocaleString() || '0',
-      change: '+23%',
-      changeType: 'positive' as const,
-      icon: 'shopping-cart',
-      color: 'purple',
+      id: '3',
+      studentName: 'Eslam Elsayed',
+      courseName: 'Advanced Graphic Design Course',
+      orderDate: '01 / 01 / 2025',
+      courseType: 'Online',
+      coursePrice: '1200 SAR'
+    }
+  ];
+
+  const recentUsers = [
+    {
+      id: '1',
+      name: 'Eslam Elsayed',
+      email: 'gfxislam@gmail.com',
+      date: '01/01/2025'
     },
     {
-      title: 'Revenue',
-      value: `${stats?.totalRevenue?.toLocaleString() || '0'} SAR`,
-      change: '+15%',
-      changeType: 'positive' as const,
-      icon: 'dollar-sign',
-      color: 'orange',
+      id: '2',
+      name: 'Eslam Elsayed',
+      email: 'gfxislam@gmail.com',
+      date: '01/01/2025'
     },
+    {
+      id: '3',
+      name: 'Eslam Elsayed',
+      email: 'gfxislam@gmail.com',
+      date: '01/01/2025'
+    },
+    {
+      id: '4',
+      name: 'Eslam Elsayed',
+      email: 'gfxislam@gmail.com',
+      date: '01/01/2025'
+    }
+  ];
+
+  // Use real geographic data from API or fallback to mock data
+  const geographics = dashboardStats.userGeographics || [
+    { country: 'Saudi Arabia', users: 20, coordinates: [45.0792, 23.8859] },
+    { country: 'Egypt', users: 20, coordinates: [30.8025, 26.8206] },
+    { country: 'United States', users: 20, coordinates: [-95.7129, 37.0902] },
+    { country: 'United Kingdom', users: 20, coordinates: [-0.1278, 51.5074] }
   ];
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard Overview</h1>
-          <p className="text-gray-600 mt-1">Welcome back! Here's what's happening with your platform.</p>
+    <div className="space-y-6">
+      {/* Error message if API failed */}
+      {error && (
+        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
+          <div className="flex">
+            <Icon name="exclamation-triangle" className="h-5 w-5 text-yellow-400 mr-2" />
+            <p className="text-sm text-yellow-700">
+              {error} - Using demo data for display
+            </p>
+          </div>
         </div>
-        <div className="flex items-center space-x-3">
-          <button className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <Icon name="download" className="h-4 w-4 mr-2" />
-            Export Data
-          </button>
-          <button className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
-            <Icon name="plus" className="h-4 w-4 mr-2" />
-            Add New
-          </button>
+      )}
+
+      {/* Welcome Header */}
+      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Hello 👋
+            </h1>
+            <h2 className="text-2xl font-bold text-green-600 mb-2">
+              Super Admin
+            </h2>
+            <p className="text-gray-600">
+              from here you can manage all content, orders and everything
+            </p>
+          </div>
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {statsCards.map((card, index) => (
-          <div key={index} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow duration-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600 mb-1">{card.title}</p>
-                <p className="text-2xl font-bold text-gray-900">{card.value}</p>
-                <div className="flex items-center mt-2">
-                  <span className={`text-sm font-medium ${
-                    card.changeType === 'positive' ? 'text-green-600' : 'text-red-600'
-                  }`}>
-                    {card.change}
-                  </span>
-                  <span className="text-sm text-gray-500 ml-1">vs last month</span>
-                </div>
-              </div>
-              <div className={`p-3 rounded-lg ${
-                card.color === 'blue' ? 'bg-blue-100' :
-                card.color === 'green' ? 'bg-green-100' :
-                card.color === 'purple' ? 'bg-purple-100' : 'bg-orange-100'
-              }`}>
-                <Icon name={card.icon} className={`h-6 w-6 ${
-                  card.color === 'blue' ? 'text-blue-600' :
-                  card.color === 'green' ? 'text-green-600' :
-                  card.color === 'purple' ? 'text-purple-600' : 'text-orange-600'
-                }`} />
-              </div>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600 mb-1">Total Users</p>
+              <p className="text-2xl font-bold text-gray-900">{dashboardStats.totalUsers}</p>
             </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Recent Activity */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Recent Orders */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-            <div className="px-6 py-4 border-b border-gray-100">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900">Recent Orders</h3>
-                <a href={`/${locale}/admin/orders`} className="text-sm text-blue-600 hover:text-blue-700 font-medium">
-                  View All
-                </a>
-              </div>
-            </div>
-            <div className="p-6">
-              <div className="space-y-4">
-                {stats?.recentOrders?.slice(0, 5).map((order) => (
-                  <div key={order.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                    <div className="flex items-center space-x-4">
-                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <Icon name="shopping-cart" className="h-5 w-5 text-blue-600" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-900">{order.courseName}</p>
-                        <p className="text-sm text-gray-600">{order.customerName}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-semibold text-gray-900">{order.amount} SAR</p>
-                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        order.status === 'Completed' ? 'bg-green-100 text-green-800' :
-                        order.status === 'Processing' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-gray-100 text-gray-800'
-                      }`}>
-                        {order.status}
-                      </span>
-                    </div>
-                  </div>
-                )) || []}
-              </div>
-            </div>
-          </div>
-
-          {/* Performance Chart Placeholder */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-            <div className="px-6 py-4 border-b border-gray-100">
-              <h3 className="text-lg font-semibold text-gray-900">Revenue Overview</h3>
-            </div>
-            <div className="p-6">
-              <div className="h-64 bg-gray-50 rounded-lg flex items-center justify-center">
-                <div className="text-center">
-                  <Icon name="chart-bar" className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-500">Chart will be displayed here</p>
-                </div>
-              </div>
+            <div className="h-12 w-12 bg-blue-100 rounded-lg flex items-center justify-center">
+              <Icon name="users" className="h-6 w-6 text-blue-600" />
             </div>
           </div>
         </div>
 
-        {/* Sidebar Content */}
-        <div className="space-y-6">
-          {/* Recent Users */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-            <div className="px-6 py-4 border-b border-gray-100">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900">Recent Users</h3>
-                <a href={`/${locale}/admin/users`} className="text-sm text-blue-600 hover:text-blue-700 font-medium">
-                  View All
-                </a>
-              </div>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600 mb-1">Total Courses</p>
+              <p className="text-2xl font-bold text-gray-900">{dashboardStats.totalCourses}</p>
             </div>
-            <div className="p-6">
-              <div className="space-y-4">
-                {stats?.recentUsers?.slice(0, 5).map((user) => (
-                  <div key={user.id} className="flex items-center space-x-3">
-                    <div className="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center">
-                      <Icon name="user" className="h-5 w-5 text-gray-600" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-gray-900 text-sm truncate">
-                        {user.firstName} {user.lastName}
-                      </p>
-                      <p className="text-xs text-gray-500 truncate">{user.email}</p>
-                    </div>
-                    <div className="text-xs text-gray-400">
-                      {new Date(user.joinedDate).toLocaleDateString()}
-                    </div>
-                  </div>
-                )) || []}
-              </div>
+            <div className="h-12 w-12 bg-green-100 rounded-lg flex items-center justify-center">
+              <Icon name="graduation-cap" className="h-6 w-6 text-green-600" />
             </div>
           </div>
+        </div>
 
-          {/* Quick Actions */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-            <div className="px-6 py-4 border-b border-gray-100">
-              <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600 mb-1">Total Orders</p>
+              <p className="text-2xl font-bold text-gray-900">{dashboardStats.totalOrders}</p>
             </div>
-            <div className="p-6">
-              <div className="space-y-3">
-                <a
-                  href={`/${locale}/admin/courses`}
-                  className="flex items-center p-3 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200"
-                >
-                  <Icon name="plus" className="h-4 w-4 mr-3 text-blue-600" />
-                  Add New Course
-                </a>
-                <a
-                  href={`/${locale}/admin/users`}
-                  className="flex items-center p-3 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200"
-                >
-                  <Icon name="user-plus" className="h-4 w-4 mr-3 text-green-600" />
-                  Manage Users
-                </a>
-                <a
-                  href={`/${locale}/admin/content`}
-                  className="flex items-center p-3 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200"
-                >
-                  <Icon name="edit" className="h-4 w-4 mr-3 text-purple-600" />
-                  Edit Content
-                </a>
-                <a
-                  href={`/${locale}/admin/orders`}
-                  className="flex items-center p-3 text-sm font-medium text-gray-700 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200"
-                >
-                  <Icon name="chart-line" className="h-4 w-4 mr-3 text-orange-600" />
-                  View Reports
-                </a>
-              </div>
+            <div className="h-12 w-12 bg-purple-100 rounded-lg flex items-center justify-center">
+              <Icon name="shopping-cart" className="h-6 w-6 text-purple-600" />
             </div>
           </div>
+        </div>
 
-          {/* System Status */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-            <div className="px-6 py-4 border-b border-gray-100">
-              <h3 className="text-lg font-semibold text-gray-900">System Status</h3>
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-shadow">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-medium text-gray-600 mb-1">Total Revenue</p>
+              <p className="text-2xl font-bold text-gray-900">{formatCurrency(dashboardStats.totalRevenue)}</p>
             </div>
-            <div className="p-6">
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
+            <div className="h-12 w-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+              <Icon name="chart-line" className="h-6 w-6 text-yellow-600" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Recent Orders Section */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+        <div className="px-6 py-4 border-b border-gray-100">
+          <h3 className="text-lg font-semibold text-gray-900">Recent Orders</h3>
+          <p className="text-sm text-gray-600">Overview of orders and recent activity</p>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Student Name
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Course Name
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Order Date
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Course Type
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Course Price
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-white divide-y divide-gray-200">
+              {recentOrders.map((order) => (
+                <tr key={order.id} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {order.studentName}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {order.courseName}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {order.orderDate}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    {order.courseType}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    {order.coursePrice}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <button className="text-gray-400 hover:text-gray-600">
+                      <Icon name="ellipsis-v" className="h-4 w-4" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Bottom Grid - Recent Users and Geographics */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Recent Users */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+          <div className="px-6 py-4 border-b border-gray-100">
+            <h3 className="text-lg font-semibold text-gray-900">Recent Users</h3>
+            <p className="text-sm text-gray-600">Overview of Users and Recently Joined</p>
+          </div>
+          <div className="p-6">
+            <div className="space-y-4">
+              {recentUsers.map((user) => (
+                <div key={user.id} className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm font-medium text-gray-900">API Server</span>
+                    <div className="h-10 w-10 bg-orange-100 rounded-full flex items-center justify-center">
+                      <Icon name="user" className="h-5 w-5 text-orange-600" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                      <p className="text-sm text-gray-500">{user.email}</p>
+                    </div>
                   </div>
-                  <span className="text-sm text-green-600">Online</span>
+                  <div className="flex items-center space-x-3">
+                    <span className="text-sm text-gray-500">{user.date}</span>
+                    <button className="text-gray-400 hover:text-gray-600">
+                      <Icon name="ellipsis-v" className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm font-medium text-gray-900">Database</span>
-                  </div>
-                  <span className="text-sm text-green-600">Connected</span>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Geographics */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
+          <div className="px-6 py-4 border-b border-gray-100">
+            <h3 className="text-lg font-semibold text-gray-900">Geographics</h3>
+            <p className="text-sm text-gray-600">Overview of Countries and Areas</p>
+          </div>
+          <div className="p-6">
+            <div className="flex items-start space-x-6">
+              <div className="flex-1">
+                <h4 className="text-sm font-medium text-gray-900 mb-3">Users From Countries</h4>
+                <div className="space-y-2">
+                  {geographics.map((geo, index) => (
+                    <div key={index} className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">{geo.country}</span>
+                      <span className="text-sm font-medium text-gray-900">{geo.users} User</span>
+                    </div>
+                  ))}
                 </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                    <span className="text-sm font-medium text-gray-900">Email Service</span>
-                  </div>
-                  <span className="text-sm text-yellow-600">Warning</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span className="text-sm font-medium text-gray-900">File Storage</span>
-                  </div>
-                  <span className="text-sm text-green-600">Online</span>
+              </div>
+              <div className="flex-1">
+                <div className="h-48">
+                  <WorldMap data={geographics} />
                 </div>
               </div>
             </div>

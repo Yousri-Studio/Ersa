@@ -12,28 +12,5 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <html lang="en" suppressHydrationWarning={true}>
-      <head>
-        <link rel="stylesheet" href="/fontawesome/css/all.min.css" />
-        {/* Apple ID Sign In - Only load if client ID is configured */}
-        {process.env.NEXT_PUBLIC_APPLE_CLIENT_ID && (
-          <>
-            <script 
-              type="text/javascript" 
-              src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"
-              async
-            />
-            <meta name="appleid-signin-client-id" content={process.env.NEXT_PUBLIC_APPLE_CLIENT_ID} />
-            <meta name="appleid-signin-scope" content="name email" />
-            <meta name="appleid-signin-redirect-uri" content={`${process.env.NEXT_PUBLIC_FRONTEND_URL}/auth/success`} />
-            <meta name="appleid-signin-state" content="origin:web" />
-          </>
-        )}
-      </head>
-      <body className={`${cairo.variable} font-cairo`} suppressHydrationWarning={true}>
-        {children}
-      </body>
-    </html>
-  );
+  return children;
 }

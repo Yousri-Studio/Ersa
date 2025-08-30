@@ -8,30 +8,17 @@ channel = "stable-25_05"
 run = ["sh", "-c", "dotnet run"]
 
 [[ports]]
+localPort = 3000
+externalPort = 3000
+
+[[ports]]
+localPort = 3001
+externalPort = 3001
+
+[[ports]]
 localPort = 5000
 externalPort = 5000
 
 [[ports]]
 localPort = 8080
 externalPort = 80
-
-[workflows]
-runButton = "Start Backend"
-
-[[workflows.workflow]]
-name = "Start Backend"
-author = 46831471
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd backend/src && dotnet run --urls \"http://0.0.0.0:5000\""
-
-[[workflows.workflow]]
-name = "Start Frontend"
-author = 46831471
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd frontend && npm run dev -- -p 8080"

@@ -258,24 +258,7 @@ export interface AdminUpdateCourseRequest {
 
 export const adminApi = {
   // Dashboard
-  getDashboardStats: () => {
-    console.log('Making API call to /admin/dashboard-stats');
-    return api.get<DashboardStats>('/admin/dashboard-stats')
-      .then(response => {
-        console.log('API response received:', response);
-        return response;
-      })
-      .catch(error => {
-        console.error('API error:', error);
-        
-        // If it's a network error or 500 error, provide fallback
-        if (!error.response || error.response.status >= 500) {
-          console.log('Network/server error, API will use fallback data');
-        }
-        
-        throw error;
-      });
-  },
+  getDashboardStats: () => api.get<DashboardStats>('/admin/dashboard-stats'),
 
   // Users
   getUsers: (params: {
