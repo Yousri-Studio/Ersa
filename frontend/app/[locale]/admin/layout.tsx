@@ -80,17 +80,17 @@ export default function AdminLayout({
   }
 
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: 'chart-line', href: `/${locale}/admin` },
-    { id: 'content', label: 'Content Management', icon: 'edit', href: `/${locale}/admin/content` },
-    { id: 'users', label: 'Manage Users', icon: 'users', href: `/${locale}/admin/users` },
-    { id: 'courses', label: 'Manage Courses', icon: 'graduation-cap', href: `/${locale}/admin/courses` },
-    { id: 'orders', label: 'Orders', icon: 'shopping-cart', href: `/${locale}/admin/orders` },
+    { id: 'dashboard', label: t('sidebar.dashboard'), icon: 'chart-line', href: `/${locale}/admin` },
+    { id: 'content', label: t('sidebar.contentManagement'), icon: 'edit', href: `/${locale}/admin/content` },
+    { id: 'users', label: t('sidebar.manageUsers'), icon: 'users', href: `/${locale}/admin/users` },
+    { id: 'courses', label: t('sidebar.manageCourses'), icon: 'graduation-cap', href: `/${locale}/admin/courses` },
+    { id: 'orders', label: t('sidebar.orders'), icon: 'shopping-cart', href: `/${locale}/admin/orders` },
   ];
 
   // Add super admin only items
   if (user?.isSuperAdmin) {
     menuItems.push(
-      { id: 'settings', label: 'Settings', icon: 'cog', href: `/${locale}/admin/settings` }
+      { id: 'settings', label: t('sidebar.settings'), icon: 'cog', href: `/${locale}/admin/settings` }
     );
   }
 
@@ -149,7 +149,7 @@ export default function AdminLayout({
                 className="w-full flex items-center px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 hover:text-red-700 rounded-lg transition-colors"
               >
                 <Icon name="power-off" className="mr-3 h-5 w-5" />
-                Logout
+                {t('sidebar.logout')}
               </button>
             </div>
           </div>

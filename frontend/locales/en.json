@@ -310,37 +310,29 @@
     "description": "Discover the experiences of learners who transformed their careers with us"
   },
   "admin": {
-    "dashboard": "Admin Dashboard",
-    "courses": "Manage Courses",
-    "orders": "Orders",
-    "users": "Users",
-    "enrollments": "Enrollments",
-    "email-logs": "Email Logs",
-    "create-course": "Create Course",
-    "edit-course": "Edit Course",
-    "hello": "Hello 👋",
-    "super-admin": "Super Admin",
-    "dashboard-subtitle": "from here you can manage all content, orders and everything",
-    "total-users": "Total Users",
-    "total-courses": "Total Courses",
-    "total-orders": "Total Orders",
-    "total-revenue": "Total Revenue",
-    "recent-orders": "Recent Orders",
-    "recent-orders-subtitle": "Overview of orders and recent activity",
-    "student-name": "Student Name",
-    "course-name": "Course Name",
-    "order-date": "Order Date",
-    "course-type": "Course Type",
-    "course-price": "Course Price",
-    "actions": "Actions",
-    "recent-users": "Recent Users",
-    "recent-users-subtitle": "Overview of Users and Recently Joined",
-    "geographics": "Geographics",
-    "geographics-subtitle": "Overview of Countries and Areas",
-    "users-from-countries": "Users From Countries",
-    "user": "User",
-    "online": "Online",
-    "using-demo-data": "Using demo data - API connection failed"
+    "title": "Admin Dashboard",
+    "welcome": "Hello",
+    "description": "from here you can manage all content, orders and everything",
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "contentManagement": "Content Management",
+      "manageUsers": "Manage Users",
+      "manageCourses": "Manage Courses",
+      "orders": "Orders",
+      "settings": "Settings",
+      "logout": "Logout"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "stats": {
+        "totalUsers": "Total Users",
+        "activeUsers": "Active Users",
+        "totalCourses": "Total Courses",
+        "activeCourses": "Active Courses",
+        "totalOrders": "Total Orders",
+        "totalRevenue": "Total Revenue"
+      }
+    }
   },
   "join-us": {
     "title": "Join Many Trainees",
