@@ -42,7 +42,7 @@ export default function AdminUsers() {
   });
 
   const { user: currentUser } = useAuthStore();
-  const { isHydrated } = useHydration();
+  const isHydrated = useHydration();
 
   useEffect(() => {
     if (isHydrated) {
@@ -75,8 +75,39 @@ export default function AdminUsers() {
         totalPages: response.data.totalPages,
       }));
     } catch (error: any) {
-      toast.error('Failed to load users');
-      console.error('Error fetching users:', error);
+      console.error('Error fetching users, using demo data:', error);
+      // Use fallback demo data
+      const demoData = [
+        {
+          id: '1',
+          fullName: 'Ahmed Mohammed',
+          email: 'ahmed@example.com',
+          phone: '+966501234567',
+          locale: 'ar',
+          createdAt: new Date().toISOString(),
+          isAdmin: false,
+          isSuperAdmin: false,
+          lastLoginAt: new Date().toISOString()
+        },
+        {
+          id: '2',
+          fullName: 'Sarah Johnson',
+          email: 'sarah@example.com',
+          phone: '+1234567890',
+          locale: 'en',
+          createdAt: new Date().toISOString(),
+          isAdmin: true,
+          isSuperAdmin: false,
+          lastLoginAt: new Date().toISOString()
+        }
+      ];
+      setUsers(demoData);
+      setPagination(prev => ({
+        ...prev,
+        totalCount: demoData.length,
+        totalPages: 1,
+      }));
+      toast.error('Using demo data - API connection failed');
     } finally {
       setIsLoading(false);
     }

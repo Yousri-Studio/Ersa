@@ -39,7 +39,7 @@ export default async function LocaleLayout({
           </>
         )}
       </head>
-      <body className={`${cairo.variable} font-cairo`}>
+      <body className={`${cairo.variable} font-cairo`} suppressHydrationWarning={true}>
         <NextIntlClientProvider messages={messages}>
           <Providers>
             <ScrollAnimations />

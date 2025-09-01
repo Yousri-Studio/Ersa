@@ -232,83 +232,83 @@ namespace ErsaTraining.API.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("e48b6230-3b72-4cc8-b56a-4389847de6a8"),
-                            CreatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(1988),
+                            Id = new Guid("8e3df411-cb47-4c8f-91bc-f175e1322651"),
+                            CreatedAt = new DateTime(2025, 9, 1, 20, 17, 52, 689, DateTimeKind.Utc).AddTicks(3623),
                             Description = "Main landing page of the website",
                             IsActive = true,
                             PageKey = "home",
                             PageName = "Home Page",
-                            UpdatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(2397)
+                            UpdatedAt = new DateTime(2025, 9, 1, 20, 17, 52, 689, DateTimeKind.Utc).AddTicks(4317)
                         },
                         new
                         {
-                            Id = new Guid("3a4feb4a-c720-4928-b010-7df4bc141d92"),
-                            CreatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(2812),
+                            Id = new Guid("bbeed7e5-197f-499d-bc48-b671958c2c15"),
+                            CreatedAt = new DateTime(2025, 9, 1, 20, 17, 52, 689, DateTimeKind.Utc).AddTicks(4627),
                             Description = "Company information and mission",
                             IsActive = true,
                             PageKey = "about",
                             PageName = "About Us",
-                            UpdatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(2812)
+                            UpdatedAt = new DateTime(2025, 9, 1, 20, 17, 52, 689, DateTimeKind.Utc).AddTicks(4628)
                         },
                         new
                         {
-                            Id = new Guid("3dafea9c-991d-4450-9983-bd1152574b90"),
-                            CreatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(2816),
+                            Id = new Guid("e5ad598d-9926-4ca0-a0bf-7eed5e154063"),
+                            CreatedAt = new DateTime(2025, 9, 1, 20, 17, 52, 689, DateTimeKind.Utc).AddTicks(4632),
                             Description = "Contact information and form",
                             IsActive = true,
                             PageKey = "contact",
                             PageName = "Contact Us",
-                            UpdatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(2817)
+                            UpdatedAt = new DateTime(2025, 9, 1, 20, 17, 52, 689, DateTimeKind.Utc).AddTicks(4632)
                         },
                         new
                         {
-                            Id = new Guid("7048c3fe-a0d3-4428-8870-76c172ba82eb"),
-                            CreatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(2821),
+                            Id = new Guid("56d4462e-79bf-41ba-91d2-f6536b9cc9d1"),
+                            CreatedAt = new DateTime(2025, 9, 1, 20, 17, 52, 689, DateTimeKind.Utc).AddTicks(4635),
                             Description = "Frequently asked questions",
                             IsActive = true,
                             PageKey = "faq",
                             PageName = "FAQ",
-                            UpdatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(2821)
+                            UpdatedAt = new DateTime(2025, 9, 1, 20, 17, 52, 689, DateTimeKind.Utc).AddTicks(4635)
                         },
                         new
                         {
-                            Id = new Guid("07a7a667-0f39-4447-8f5a-bceaedd29c90"),
-                            CreatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(2833),
+                            Id = new Guid("c25127c8-cd8a-4354-93fd-d37e1bc6f795"),
+                            CreatedAt = new DateTime(2025, 9, 1, 20, 17, 52, 689, DateTimeKind.Utc).AddTicks(4638),
                             Description = "Our services overview",
                             IsActive = true,
                             PageKey = "services",
                             PageName = "Services",
-                            UpdatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(2833)
+                            UpdatedAt = new DateTime(2025, 9, 1, 20, 17, 52, 689, DateTimeKind.Utc).AddTicks(4639)
                         },
                         new
                         {
-                            Id = new Guid("1bd09288-2fbc-462f-b17c-aa7115b87333"),
-                            CreatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(2838),
+                            Id = new Guid("7ebdc044-e37b-4f62-b8a4-e94e0d5d0dc7"),
+                            CreatedAt = new DateTime(2025, 9, 1, 20, 17, 52, 689, DateTimeKind.Utc).AddTicks(4642),
                             Description = "Available training courses",
                             IsActive = true,
                             PageKey = "courses",
                             PageName = "Courses",
-                            UpdatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(2838)
+                            UpdatedAt = new DateTime(2025, 9, 1, 20, 17, 52, 689, DateTimeKind.Utc).AddTicks(4642)
                         },
                         new
                         {
-                            Id = new Guid("01506179-ea6c-4dce-8ab1-58a5e857800a"),
-                            CreatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(2841),
+                            Id = new Guid("5f76de35-b1af-46a3-95dc-fc46d6fabe85"),
+                            CreatedAt = new DateTime(2025, 9, 1, 20, 17, 52, 689, DateTimeKind.Utc).AddTicks(4645),
                             Description = "Artificial Intelligence services",
                             IsActive = true,
                             PageKey = "ai-solutions",
                             PageName = "AI Solutions",
-                            UpdatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(2841)
+                            UpdatedAt = new DateTime(2025, 9, 1, 20, 17, 52, 689, DateTimeKind.Utc).AddTicks(4645)
                         },
                         new
                         {
-                            Id = new Guid("0f9b56de-77f2-4142-9f85-1d239780a24c"),
-                            CreatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(2879),
+                            Id = new Guid("3afd857e-4eae-4f30-9eb1-53b17f075338"),
+                            CreatedAt = new DateTime(2025, 9, 1, 20, 17, 52, 689, DateTimeKind.Utc).AddTicks(4648),
                             Description = "Administrative consulting services",
                             IsActive = true,
                             PageKey = "admin-consulting",
                             PageName = "Administrative Consulting",
-                            UpdatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 596, DateTimeKind.Utc).AddTicks(2879)
+                            UpdatedAt = new DateTime(2025, 9, 1, 20, 17, 52, 689, DateTimeKind.Utc).AddTicks(4649)
                         });
                 });
 
@@ -427,12 +427,9 @@ namespace ErsaTraining.API.Migrations
                         .HasMaxLength(5000)
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasMaxLength(1000)
-                        .HasColumnType("TEXT")
-                        .HasDefaultValue("");
+                    b.Property<string>("Duration")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("InstructorName")
                         .IsRequired()
@@ -440,6 +437,14 @@ namespace ErsaTraining.API.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("TEXT")
                         .HasDefaultValue("");
+
+                    b.Property<string>("InstructorsBioAr")
+                        .HasMaxLength(2500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("InstructorsBioEn")
+                        .HasMaxLength(2500)
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -456,12 +461,28 @@ namespace ErsaTraining.API.Migrations
                         .HasColumnType("INTEGER")
                         .HasDefaultValue(1);
 
+                    b.Property<byte[]>("Photo")
+                        .HasMaxLength(1000)
+                        .HasColumnType("BLOB");
+
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Slug")
                         .IsRequired()
                         .HasMaxLength(255)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SummaryAr")
+                        .HasMaxLength(5000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("SummaryEn")
+                        .HasMaxLength(5000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Tags")
+                        .HasMaxLength(2000)
                         .HasColumnType("TEXT");
 
                     b.Property<string>("TitleAr")
@@ -483,6 +504,13 @@ namespace ErsaTraining.API.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT")
                         .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<string>("VideoUrl")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(1000)
+                        .HasColumnType("TEXT")
+                        .HasDefaultValue("");
 
                     b.HasKey("Id");
 
@@ -600,36 +628,36 @@ namespace ErsaTraining.API.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("fd0830b9-35a2-496d-b024-b896031c5db1"),
+                            Id = new Guid("0bb596f5-b645-46e9-8048-13623910fa57"),
                             BodyHtmlAr = "<h1>مرحباً بك في إرساء للتدريب</h1><p>شكراً لانضمامك إلينا!</p>",
                             BodyHtmlEn = "<h1>Welcome to Ersa Training</h1><p>Thank you for joining us!</p>",
-                            CreatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 594, DateTimeKind.Utc).AddTicks(7342),
+                            CreatedAt = new DateTime(2025, 9, 1, 20, 17, 52, 688, DateTimeKind.Utc).AddTicks(1302),
                             Key = "Welcome",
                             SubjectAr = "مرحباً بك في إرساء للتدريب",
                             SubjectEn = "Welcome to Ersa Training",
-                            UpdatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 594, DateTimeKind.Utc).AddTicks(7669)
+                            UpdatedAt = new DateTime(2025, 9, 1, 20, 17, 52, 688, DateTimeKind.Utc).AddTicks(1577)
                         },
                         new
                         {
-                            Id = new Guid("4f80b621-5df1-4764-bf48-e787be3a12cc"),
+                            Id = new Guid("9cf603b5-2f66-43f7-8071-881a2615d43d"),
                             BodyHtmlAr = "<h1>تفاصيل الدورة المباشرة</h1><p>رابط الانضمام: {{TeamsLink}}</p><p>تاريخ البدء: {{StartDate}}</p>",
                             BodyHtmlEn = "<h1>Live Course Details</h1><p>Join Link: {{TeamsLink}}</p><p>Start Date: {{StartDate}}</p>",
-                            CreatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 594, DateTimeKind.Utc).AddTicks(8014),
+                            CreatedAt = new DateTime(2025, 9, 1, 20, 17, 52, 688, DateTimeKind.Utc).AddTicks(1840),
                             Key = "LiveDetails",
                             SubjectAr = "تفاصيل الدورة المباشرة - {{CourseTitleAr}}",
                             SubjectEn = "Live Course Details - {{CourseTitleEn}}",
-                            UpdatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 594, DateTimeKind.Utc).AddTicks(8015)
+                            UpdatedAt = new DateTime(2025, 9, 1, 20, 17, 52, 688, DateTimeKind.Utc).AddTicks(1840)
                         },
                         new
                         {
-                            Id = new Guid("0c79d088-1792-4cb9-9217-32b94e80d2ca"),
+                            Id = new Guid("e7bf5dc6-04c6-4f01-8853-30c195188d3e"),
                             BodyHtmlAr = "<h1>مواد الدورة</h1><p>يمكنك تحميل مواد الدورة من الروابط التالية:</p>{{SecureLinks}}",
                             BodyHtmlEn = "<h1>Course Materials</h1><p>You can download the course materials from the following links:</p>{{SecureLinks}}",
-                            CreatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 594, DateTimeKind.Utc).AddTicks(8019),
+                            CreatedAt = new DateTime(2025, 9, 1, 20, 17, 52, 688, DateTimeKind.Utc).AddTicks(1844),
                             Key = "MaterialsDelivery",
                             SubjectAr = "مواد الدورة - {{CourseTitleAr}}",
                             SubjectEn = "Course Materials - {{CourseTitleEn}}",
-                            UpdatedAt = new DateTime(2025, 8, 30, 3, 41, 53, 594, DateTimeKind.Utc).AddTicks(8019)
+                            UpdatedAt = new DateTime(2025, 9, 1, 20, 17, 52, 688, DateTimeKind.Utc).AddTicks(1844)
                         });
                 });
 
@@ -827,6 +855,14 @@ namespace ErsaTraining.API.Migrations
                         .HasColumnType("TEXT")
                         .HasDefaultValueSql("GETUTCDATE()");
 
+                    b.Property<string>("DescriptionAr")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("DescriptionEn")
+                        .HasMaxLength(2000)
+                        .HasColumnType("TEXT");
+
                     b.Property<DateTime>("EndAt")
                         .HasColumnType("TEXT");
 
@@ -835,6 +871,16 @@ namespace ErsaTraining.API.Migrations
 
                     b.Property<string>("TeamsLink")
                         .HasMaxLength(500)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TitleAr")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("TitleEn")
+                        .IsRequired()
+                        .HasMaxLength(200)
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");

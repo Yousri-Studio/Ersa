@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using ErsaTraining.API.Data.Entities;
 
@@ -9,13 +11,18 @@ public class CourseListDto
     public string Slug { get; set; } = string.Empty;
     public LocalizedText Title { get; set; } = new();
     public LocalizedText Summary { get; set; } = new();
+    public LocalizedText Description { get; set; } = new();
     public decimal Price { get; set; }
     public string Currency { get; set; } = string.Empty;
     public CourseType Type { get; set; }
     public CourseLevel Level { get; set; }
     public CourseCategory Category { get; set; }
-    public string? ImageUrl { get; set; }
+    public string? VideoUrl { get; set; }
+    public string Duration { get; set; } = string.Empty;
     public string InstructorName { get; set; } = string.Empty;
+    public byte[]? Photo { get; set; }
+    public string? Tags { get; set; }
+    public LocalizedText InstructorsBio { get; set; } = new();
     public bool IsActive { get; set; }
     public bool IsFeatured { get; set; }
     public DateTime CreatedAt { get; set; }
@@ -61,6 +68,20 @@ public class CreateCourseRequest
     [Required]
     public CourseType Type { get; set; }
 
+    public CourseLevel Level { get; set; } = CourseLevel.Biginner;
+
+    public CourseCategory Category { get; set; } = CourseCategory.Programming;
+
+    [MaxLength(1000)]
+    public string? VideoUrl { get; set; }
+
+    [MaxLength(50)]
+    public string? Duration { get; set; }
+
+    [Required]
+    [MaxLength(255)]
+    public string InstructorName { get; set; } = string.Empty;
+
     [Required]
     [MaxLength(500)]
     public string TitleAr { get; set; } = string.Empty;
@@ -74,6 +95,23 @@ public class CreateCourseRequest
 
     [MaxLength(2000)]
     public string? SummaryEn { get; set; }
+
+    [MaxLength(5000)]
+    public string? DescriptionAr { get; set; }
+
+    [MaxLength(5000)]
+    public string? DescriptionEn { get; set; }
+
+    public byte[]? Photo { get; set; }
+
+    [MaxLength(2000)]
+    public string? Tags { get; set; }
+
+    [MaxLength(2500)]
+    public string? InstructorsBioAr { get; set; }
+
+    [MaxLength(2500)]
+    public string? InstructorsBioEn { get; set; }
 }
 
 public class UpdateCourseRequest : CreateCourseRequest

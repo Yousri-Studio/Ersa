@@ -1,4 +1,24 @@
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { 
+  faBars, faXmark, faUser, faHeart, faShoppingCart, faGraduationCap, faLanguage, faSearch, faFilter,
+  faArrowRight, faArrowLeft, faChevronDown, faChevronUp, faChevronRight, faChevronLeft, faSort, faTag,
+  faThLarge, faList, faSliders, faArrowsUpDown, faEllipsisV, faVideo, faBook, faClock, faUsers,
+  faCalendar, faStar, faPlay, faDownload, faCertificate, faEye, faEyeSlash, faEnvelope, faPhone,
+  faMobileScreen, faLock, faUserPlus, faSignInAlt, faSignOutAlt, faShieldAlt, faInfoCircle, faPowerOff,
+  faPlus, faMinus, faTrash, faEdit, faCheck, faTimes, faSpinner, faExclamationTriangle, faCheckCircle,
+  faTimesCircle, faChartLine, faTable, faFileText, faCog, faDatabase, faUpload, faFolder, faFile,
+  faHome, faDesktop, faTshirt, faDollarSign, faUserShield, faLayerGroup, faCube, faExternalLinkAlt,
+  faSave, faQuestionCircle, faCogs, faBriefcase, faRobot, faFileAlt, faPen, faMessage, faGlobe,
+  faMagnifyingGlass
+} from '@fortawesome/free-solid-svg-icons';
+import { 
+  faHeart as faHeartRegular, faStar as faStarRegular, faBookmark as faBookmarkRegular,
+  faUser as faUserRegular, faEnvelope as faEnvelopeRegular
+} from '@fortawesome/free-regular-svg-icons';
+import {
+  faFacebook, faTwitter, faLinkedin, faInstagram, faYoutube, faWhatsapp, faGoogle
+} from '@fortawesome/free-brands-svg-icons';
 
 interface IconProps {
   name?: string;
@@ -11,169 +31,136 @@ interface IconProps {
 }
 
 // FontAwesome icon mapping
-const iconMap: Record<string, string> = {
+const iconMap: Record<string, any> = {
   // Navigation & UI
-  'bars': 'fa-bars',
-  'xmark': 'fa-xmark',
-  'user': 'fa-user',
-  'heart': 'fa-heart',
-  'shopping-cart': 'fa-shopping-cart',
-  'graduation-cap': 'fa-graduation-cap',
-  'language': 'fa-language',
-  'search': 'fa-search',
-  'filter': 'fa-filter',
-  'arrow-right': 'fa-arrow-right',
-  'arrow-left': 'fa-arrow-left',
-  'chevron-down': 'fa-chevron-down',
-  'chevron-up': 'fa-chevron-up',
-  'chevron-right': 'fa-chevron-right',
-  'chevron-left': 'fa-chevron-left',
-  'sort': 'fa-sort',
-  'tag': 'fa-tag',
-  'th-large': 'fa-th-large',
-  'list': 'fa-list',
-  'sliders': 'fa-sliders',
-  'up-down': 'fa-arrows-up-down',
-  'ellipsis-v': 'fa-ellipsis-v',
+  'bars': faBars,
+  'xmark': faXmark,
+  'user': faUser,
+  'heart': faHeart,
+  'shopping-cart': faShoppingCart,
+  'graduation-cap': faGraduationCap,
+  'language': faLanguage,
+  'search': faSearch,
+  'filter': faFilter,
+  'arrow-right': faArrowRight,
+  'arrow-left': faArrowLeft,
+  'chevron-down': faChevronDown,
+  'chevron-up': faChevronUp,
+  'chevron-right': faChevronRight,
+  'chevron-left': faChevronLeft,
+  'sort': faSort,
+  'tag': faTag,
+  'th-large': faThLarge,
+  'list': faList,
+  'sliders': faSliders,
+  'up-down': faArrowsUpDown,
+  'ellipsis-v': faEllipsisV,
   
   // Course & Learning
-  'video': 'fa-video',
-  'book': 'fa-book',
-  'clock': 'fa-clock',
-  'users': 'fa-users',
-  'calendar': 'fa-calendar',
-  'star': 'fa-star',
-  'play': 'fa-play',
-  'download': 'fa-download',
-  'certificate': 'fa-certificate',
+  'video': faVideo,
+  'book': faBook,
+  'clock': faClock,
+  'users': faUsers,
+  'calendar': faCalendar,
+  'star': faStar,
+  'play': faPlay,
+  'download': faDownload,
+  'certificate': faCertificate,
   
   // Auth & Profile
-  'eye': 'fa-eye',
-  'eye-slash': 'fa-eye-slash',
-  'envelope': 'fa-envelope',
-  'phone': 'fa-phone',
-  'mobile-screen': 'fa-mobile-screen',
-  'lock': 'fa-lock',
-  'user-plus': 'fa-user-plus',
-  'sign-in': 'fa-sign-in-alt',
-  'sign-out': 'fa-sign-out-alt',
-  'shield-alt': 'fa-shield-alt',
-  'info-circle': 'fa-info-circle',
-  'power-off': 'fa-power-off',
+  'eye': faEye,
+  'eye-slash': faEyeSlash,
+  'envelope': faEnvelope,
+  'phone': faPhone,
+  'mobile-screen': faMobileScreen,
+  'lock': faLock,
+  'user-plus': faUserPlus,
+  'sign-in': faSignInAlt,
+  'sign-out': faSignOutAlt,
+  'shield-alt': faShieldAlt,
+  'info-circle': faInfoCircle,
+  'power-off': faPowerOff,
   
   // E-commerce
-  'plus': 'fa-plus',
-  'minus': 'fa-minus',
-  'trash': 'fa-trash',
-  'edit': 'fa-edit',
-  'check': 'fa-check',
-  'times': 'fa-times',
-  'spinner': 'fa-spinner',
-  'exclamation-triangle': 'fa-exclamation-triangle',
-  'check-circle': 'fa-check-circle',
-  'times-circle': 'fa-times-circle',
+  'plus': faPlus,
+  'minus': faMinus,
+  'trash': faTrash,
+  'edit': faEdit,
+  'check': faCheck,
+  'times': faTimes,
+  'spinner': faSpinner,
+  'exclamation-triangle': faExclamationTriangle,
+  'check-circle': faCheckCircle,
+  'times-circle': faTimesCircle,
   
   // Admin & Management
-  'chart-line': 'fa-chart-line',
-  'table': 'fa-table',
-  'file-text': 'fa-file-text',
-  'cog': 'fa-cog',
-  'database': 'fa-database',
-  'upload': 'fa-upload',
-  'folder': 'fa-folder',
-  'file': 'fa-file',
-  'home': 'fa-home',
-  'desktop': 'fa-desktop',
-  'shirt': 'fa-tshirt',
-  'dollar-sign': 'fa-dollar-sign',
-  'user-shield': 'fa-user-shield',
+  'chart-line': faChartLine,
+  'table': faTable,
+  'file-text': faFileText,
+  'cog': faCog,
+  'database': faDatabase,
+  'upload': faUpload,
+  'folder': faFolder,
+  'file': faFile,
+  'home': faHome,
+  'desktop': faDesktop,
+  'shirt': faTshirt,
+  'dollar-sign': faDollarSign,
+  'user-shield': faUserShield,
   
   // Content Management
-  'layer-group': 'fa-layer-group',
-  'cube': 'fa-cube',
-  'external-link-alt': 'fa-external-link-alt',
-  'save': 'fa-save',
-  'question-circle': 'fa-question-circle',
-  'cogs': 'fa-cogs',
-  'briefcase': 'fa-briefcase',
-  'robot': 'fa-robot',
-  'file-alt': 'fa-file-alt',
+  'layer-group': faLayerGroup,
+  'cube': faCube,
+  'external-link-alt': faExternalLinkAlt,
+  'save': faSave,
+  'question-circle': faQuestionCircle,
+  'cogs': faCogs,
+  'briefcase': faBriefcase,
+  'robot': faRobot,
+  'file-alt': faFileAlt,
   
   // Regular icons (for outline style)
-  'heart-regular': 'fa-heart',
-  'star-regular': 'fa-star',
-  'bookmark-regular': 'fa-bookmark',
-  'user-regular': 'fa-user',
-  'envelope-regular': 'fa-envelope',
+  'heart-regular': faHeartRegular,
+  'star-regular': faStarRegular,
+  'bookmark-regular': faBookmarkRegular,
+  'user-regular': faUserRegular,
+  'envelope-regular': faEnvelopeRegular,
   
   // Brand icons
-  'facebook': 'fa-facebook',
-  'twitter': 'fa-twitter',
-  'linkedin': 'fa-linkedin',
-  'instagram': 'fa-instagram',
-  'youtube': 'fa-youtube',
-  'whatsapp': 'fa-whatsapp',
-  'google': 'fa-google',
+  'facebook': faFacebook,
+  'twitter': faTwitter,
+  'linkedin': faLinkedin,
+  'instagram': faInstagram,
+  'youtube': faYoutube,
+  'whatsapp': faWhatsapp,
+  'google': faGoogle,
   
   // Additional icons that were being used
-  'pen': 'fa-pen',
-  'message': 'fa-message',
-  'globe': 'fa-globe',
-  'magnifying-glass': 'fa-magnifying-glass',
+  'pen': faPen,
+  'message': faMessage,
+  'globe': faGlobe,
+  'magnifying-glass': faMagnifyingGlass,
 };
 
 export function Icon({ name, icon, className = '', variant = 'solid', style, color, width }: IconProps) {
-  let iconClass = '';
-  let faStyle = variant;
+  let iconDefinition = null;
   
   // Handle both old API (icon prop) and new API (name prop)
-  if (icon) {
-    if (Array.isArray(icon)) {
-      // Handle array format: ['fas', 'fa-heart'] or ['far', 'heart']
-      if (icon.length >= 2) {
-        faStyle = icon[0] as any;
-        iconClass = icon[1].startsWith('fa-') ? icon[1] : `fa-${icon[1]}`;
-      }
-    } else {
-      // Handle string format: 'fa-heart' or 'heart'
-      iconClass = icon.startsWith('fa-') ? icon : `fa-${icon}`;
-    }
-  } else if (name) {
-    // New API with name prop
-    iconClass = iconMap[name];
+  if (name && iconMap[name]) {
+    iconDefinition = iconMap[name];
+  } else if (icon) {
+    // Legacy support for icon prop
+    const iconName = Array.isArray(icon) ? icon[1] : icon;
+    const cleanIconName = iconName.replace('fa-', '');
+    iconDefinition = iconMap[cleanIconName];
   }
   
-  if (!iconClass) {
+  if (!iconDefinition) {
     console.warn(`Icon not found: name="${name}", icon="${icon}"`);
     return <span className={className}>?</span>;
   }
   
-  // Determine the appropriate FontAwesome class prefix
-  let faClass = '';
-  switch (faStyle) {
-    case 'solid':
-      faClass = `fas ${iconClass}`;
-      break;
-    case 'regular':
-      faClass = `far ${iconClass}`;
-      break;
-    case 'light':
-      faClass = `fal ${iconClass}`;
-      break;
-    case 'thin':
-      faClass = `fa-thin ${iconClass}`;
-      break;
-    case 'duotone':
-      faClass = `fad ${iconClass}`;
-      break;
-    case 'brands':
-      faClass = `fab ${iconClass}`;
-      break;
-    default:
-      faClass = `fas ${iconClass}`;
-  }
-  
-  // Build inline styles - handle both CSS style object and FontAwesome style string
+  // Build inline styles
   const inlineStyles: React.CSSProperties = {};
   
   // If style is a CSS object, use it
@@ -190,17 +177,14 @@ export function Icon({ name, icon, className = '', variant = 'solid', style, col
   }
   
   return (
-    <i 
-      className={`${faClass} ${className}`} 
-      aria-hidden="true"
+    <FontAwesomeIcon 
+      icon={iconDefinition}
+      className={className}
       style={{
         height: '1.5rem',
         width: '1.5rem',
-        display: 'inline-flex',
-        alignItems: 'center',
-        justifyContent: 'center',
         ...inlineStyles
       }}
-    ></i>
+    />
   );
 }

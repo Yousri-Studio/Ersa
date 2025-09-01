@@ -7,5 +7,5 @@ export function useHydration() {
     setIsHydrated(true);
   }, []);
 
-  return { isHydrated };
+  return isHydrated;
 }

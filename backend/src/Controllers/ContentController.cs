@@ -674,7 +674,7 @@ public class ContentController : ControllerBase
         }
     }
 
-    [HttpPut("admin/sections/{sectionId}")]
+    [HttpPut("admin/sections/{sectionId}/content")]
     public async Task<ActionResult> UpdateContentSectionContent(string sectionId, [FromBody] UpdateSectionContentRequest request)
     {
         try
@@ -746,7 +746,145 @@ public class ContentController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error initializing sample data");
+            _logger.LogError(ex, "Error getting page content for admin");
+            return StatusCode(500, new { error = "Internal server error" });
+        }
+    }
+
+    // Content Templates endpoint for frontend
+    [HttpGet("templates")]
+    public async Task<ActionResult<Dictionary<string, object>>> GetContentTemplates()
+    {
+        try
+        {
+            var templates = new Dictionary<string, object>();
+            
+            // Get all active pages with their sections
+            var pages = await _context.ContentPages
+                .Include(p => p.Sections.Where(s => s.IsActive))
+                .ThenInclude(s => s.Blocks.Where(b => b.IsActive))
+                .Where(p => p.IsActive)
+                .ToListAsync();
+
+            foreach (var page in pages)
+            {
+                foreach (var section in page.Sections.OrderBy(s => s.SortOrder))
+                {
+                    var template = new
+                    {
+                        id = section.Id.ToString(), // Use actual GUID as ID
+                        sectionKey = section.SectionKey, // Keep section key for reference
+                        title = section.SectionName,
+                        description = section.Description ?? $"Content for {section.SectionName}",
+                        status = "published", // Default status
+                        lastModified = section.UpdatedAt.ToString("yyyy-MM-ddTHH:mm:ssZ"),
+                        pageKey = page.PageKey,
+                        fields = GetTemplateFields(section)
+                    };
+                    
+                    templates[section.SectionKey] = template;
+                }
+            }
+
+            return Ok(templates);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting content templates");
+            return StatusCode(500, new { error = "Internal server error" });
+        }
+    }
+
+    // Update section content endpoint for frontend
+    [HttpPut("sections/{sectionId}/content")]
+    public async Task<ActionResult<object>> UpdateSectionContent(string sectionId, [FromBody] UpdateSectionContentRequest request)
+    {
+        try
+        {
+            if (!Guid.TryParse(sectionId, out var sectionGuid))
+            {
+                return BadRequest(new { error = "Invalid section ID" });
+            }
+
+            var section = await _context.ContentSections
+                .Include(s => s.Blocks)
+                .FirstOrDefaultAsync(s => s.Id == sectionGuid);
+
+            if (section == null)
+            {
+                return NotFound(new { error = "Section not found" });
+            }
+
+            // Update section blocks based on content
+            await UpdateSectionBlocks(section, request.Content);
+            
+            section.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            // Return the updated section template
+            var updatedTemplate = new
+            {
+                id = section.Id.ToString(), // Return the actual GUID
+                sectionKey = section.SectionKey,
+                title = section.SectionName,
+                description = section.Description ?? $"Content for {section.SectionName}",
+                status = "published",
+                lastModified = section.UpdatedAt.ToString("yyyy-MM-ddTHH:mm:ssZ"),
+                pageKey = section.ContentPage.PageKey,
+                fields = GetTemplateFields(section)
+            };
+
+            return Ok(updatedTemplate);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating section content {SectionId}", sectionId);
+            return StatusCode(500, new { error = "Internal server error" });
+        }
+    }
+
+    // Publish section endpoint for frontend
+    [HttpPost("sections/{sectionId}/publish")]
+    public async Task<ActionResult<object>> PublishSection(string sectionId)
+    {
+        try
+        {
+            if (!Guid.TryParse(sectionId, out var sectionGuid))
+            {
+                return BadRequest(new { error = "Invalid section ID" });
+            }
+
+            var section = await _context.ContentSections
+                .Include(s => s.Blocks)
+                .FirstOrDefaultAsync(s => s.Id == sectionGuid);
+
+            if (section == null)
+            {
+                return NotFound(new { error = "Section not found" });
+            }
+
+            // Mark section as published (update timestamp)
+            section.UpdatedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+
+            // Return the published section template
+            var publishedTemplate = new
+            {
+                id = section.Id.ToString(), // Return the actual GUID
+                sectionKey = section.SectionKey,
+                title = section.SectionName,
+                description = section.Description ?? $"Content for {section.SectionName}",
+                status = "published",
+                lastModified = section.UpdatedAt.ToString("yyyy-MM-ddTHH:mm:ssZ"),
+                pageKey = section.ContentPage.PageKey,
+                fields = GetTemplateFields(section)
+            };
+
+            return Ok(publishedTemplate);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error publishing section {SectionId}", sectionId);
             return StatusCode(500, new { error = "Internal server error" });
         }
     }
@@ -925,9 +1063,89 @@ public class ContentController : ControllerBase
         switch (section.SectionKey.ToLower())
         {
             case "hero":
-                await UpdateOrCreateBlock(section.Id, "title", "Title", "text", contentDict.ContainsKey("title") ? contentDict["title"]?.ToString() : null);
-                await UpdateOrCreateBlock(section.Id, "subtitle", "Subtitle", "text", contentDict.ContainsKey("subtitle") ? contentDict["subtitle"]?.ToString() : null);
-                await UpdateOrCreateBlock(section.Id, "description", "Description", "text", contentDict.ContainsKey("description") ? contentDict["description"]?.ToString() : null);
+                await UpdateOrCreateBlock(section.Id, "title", "Title", "text", contentDict.ContainsKey("hero-title") ? contentDict["hero-title"]?.ToString() : null);
+                await UpdateOrCreateBlock(section.Id, "subtitle", "Subtitle", "text", contentDict.ContainsKey("hero-subtitle") ? contentDict["hero-subtitle"]?.ToString() : null);
+                await UpdateOrCreateBlock(section.Id, "cta-primary", "Primary CTA", "text", contentDict.ContainsKey("hero-cta-primary") ? contentDict["hero-cta-primary"]?.ToString() : null);
+                await UpdateOrCreateBlock(section.Id, "cta-secondary", "Secondary CTA", "text", contentDict.ContainsKey("hero-cta-secondary") ? contentDict["hero-cta-secondary"]?.ToString() : null);
+                
+                // Handle features array
+                if (contentDict.ContainsKey("features") && contentDict["features"] is IEnumerable<object> features)
+                {
+                    var featureList = features.ToList();
+                    for (int i = 0; i < featureList.Count; i++)
+                    {
+                        var feature = featureList[i] as IDictionary<string, object>;
+                        if (feature != null)
+                        {
+                            var title = feature.ContainsKey("title") ? feature["title"]?.ToString() : null;
+                            var description = feature.ContainsKey("description") ? feature["description"]?.ToString() : null;
+                            await UpdateOrCreateBlock(section.Id, $"feature_{i}", title ?? $"Feature {i + 1}", "feature", description);
+                        }
+                    }
+                }
+                
+                // Handle testimonials array
+                if (contentDict.ContainsKey("testimonials") && contentDict["testimonials"] is IEnumerable<object> testimonials)
+                {
+                    var testimonialList = testimonials.ToList();
+                    for (int i = 0; i < testimonialList.Count; i++)
+                    {
+                        var testimonial = testimonialList[i] as IDictionary<string, object>;
+                        if (testimonial != null)
+                        {
+                            var name = testimonial.ContainsKey("name") ? testimonial["name"]?.ToString() : null;
+                            var role = testimonial.ContainsKey("role") ? testimonial["role"]?.ToString() : null;
+                            var text = testimonial.ContainsKey("text") ? testimonial["text"]?.ToString() : null;
+                            var testimonialContent = $"{name} - {role}: {text}";
+                            await UpdateOrCreateBlock(section.Id, $"testimonial_{i}", name ?? $"Testimonial {i + 1}", "testimonial", testimonialContent);
+                        }
+                    }
+                }
+                break;
+            
+            case "courses":
+                await UpdateOrCreateBlock(section.Id, "title", "Page Title", "text", contentDict.ContainsKey("page-title") ? contentDict["page-title"]?.ToString() : null);
+                await UpdateOrCreateBlock(section.Id, "description", "Page Description", "text", contentDict.ContainsKey("page-description") ? contentDict["page-description"]?.ToString() : null);
+                
+                // Handle categories array
+                if (contentDict.ContainsKey("categories") && contentDict["categories"] is IEnumerable<object> categories)
+                {
+                    var categoryList = categories.ToList();
+                    for (int i = 0; i < categoryList.Count; i++)
+                    {
+                        var category = categoryList[i] as IDictionary<string, object>;
+                        if (category != null)
+                        {
+                            var name = category.ContainsKey("name") ? category["name"]?.ToString() : null;
+                            var description = category.ContainsKey("description") ? category["description"]?.ToString() : null;
+                            await UpdateOrCreateBlock(section.Id, $"category_{i}", name ?? $"Category {i + 1}", "category", description);
+                        }
+                    }
+                }
+                break;
+            
+            case "about":
+                await UpdateOrCreateBlock(section.Id, "company-name", "Company Name", "text", contentDict.ContainsKey("company-name") ? contentDict["company-name"]?.ToString() : null);
+                await UpdateOrCreateBlock(section.Id, "mission", "Mission", "text", contentDict.ContainsKey("mission") ? contentDict["mission"]?.ToString() : null);
+                await UpdateOrCreateBlock(section.Id, "vision", "Vision", "text", contentDict.ContainsKey("vision") ? contentDict["vision"]?.ToString() : null);
+                
+                // Handle team array
+                if (contentDict.ContainsKey("team") && contentDict["team"] is IEnumerable<object> team)
+                {
+                    var teamList = team.ToList();
+                    for (int i = 0; i < teamList.Count; i++)
+                    {
+                        var member = teamList[i] as IDictionary<string, object>;
+                        if (member != null)
+                        {
+                            var name = member.ContainsKey("name") ? member["name"]?.ToString() : null;
+                            var position = member.ContainsKey("position") ? member["position"]?.ToString() : null;
+                            var bio = member.ContainsKey("bio") ? member["bio"]?.ToString() : null;
+                            var memberContent = $"{name} - {position}: {bio}";
+                            await UpdateOrCreateBlock(section.Id, $"team_{i}", name ?? $"Team Member {i + 1}", "team", memberContent);
+                        }
+                    }
+                }
                 break;
             
             case "faq":
@@ -1059,5 +1277,179 @@ public class ContentController : ControllerBase
                 new() { Key = "description", Name = "Description", Type = "text", ContentEn = "Section description", SortOrder = 2 }
             }
         };
+    }
+
+    // Helper method to convert database blocks to frontend field format
+    private List<object> GetTemplateFields(ContentSection section)
+    {
+        var fields = new List<object>();
+        var blocks = section.Blocks.Where(b => b.IsActive).OrderBy(b => b.SortOrder).ToList();
+
+        switch (section.SectionKey.ToLower())
+        {
+            case "hero":
+                fields.Add(new
+                {
+                    id = "hero-title",
+                    label = "Hero Title",
+                    type = "text",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "title")?.ContentEn ?? "استكشف منصتنا التدريبية وارقى بمهاراتك لتحقيق أعلى إمكاناتك",
+                    required = true,
+                    placeholder = "Enter main hero title"
+                });
+                fields.Add(new
+                {
+                    id = "hero-subtitle",
+                    label = "Hero Subtitle",
+                    type = "textarea",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "subtitle")?.ContentEn ?? "منصة شاملة تجمع بين أحدث الطرق التدريبية والتقنيات المتطورة لتقديم تجربة تعليمية متميزة",
+                    required = true,
+                    placeholder = "Enter hero subtitle"
+                });
+                fields.Add(new
+                {
+                    id = "hero-cta-primary",
+                    label = "Primary CTA Text",
+                    type = "text",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "cta-primary")?.ContentEn ?? "استكشف الدورات",
+                    required = true,
+                    placeholder = "Enter primary button text"
+                });
+                fields.Add(new
+                {
+                    id = "hero-cta-secondary",
+                    label = "Secondary CTA Text",
+                    type = "text",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "cta-secondary")?.ContentEn ?? "اطلب استشارة",
+                    required = false,
+                    placeholder = "Enter secondary button text"
+                });
+                fields.Add(new
+                {
+                    id = "features",
+                    label = "Features",
+                    type = "array",
+                    value = new[]
+                    {
+                        new { title = "دورات متقدمة", description = "أحدث التقنيات والمناهج" },
+                        new { title = "مدربون خبراء", description = "خبرة واسعة في المجال" },
+                        new { title = "دعم متواصل", description = "مساعدة على مدار الساعة" }
+                    },
+                    required = true
+                });
+                fields.Add(new
+                {
+                    id = "testimonials",
+                    label = "Testimonials",
+                    type = "array",
+                    value = new[]
+                    {
+                        new { name = "أحمد علي", role = "طالب", text = "تجربة تدريبية ممتازة" },
+                        new { name = "سارة جونسون", role = "مدير", text = "مهني وفعال" }
+                    },
+                    required = false
+                });
+                break;
+
+            case "courses":
+                fields.Add(new
+                {
+                    id = "page-title",
+                    label = "Page Title",
+                    type = "text",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "title")?.ContentEn ?? "دوراتنا",
+                    required = true,
+                    placeholder = "Enter page title"
+                });
+                fields.Add(new
+                {
+                    id = "page-description",
+                    label = "Page Description",
+                    type = "textarea",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "description")?.ContentEn ?? "اكتشف مجموعتنا الشاملة من دورات التطوير المهني",
+                    required = true,
+                    placeholder = "Enter page description"
+                });
+                fields.Add(new
+                {
+                    id = "categories",
+                    label = "Course Categories",
+                    type = "array",
+                    value = new[]
+                    {
+                        new { name = "التصميم الجرافيكي", description = "دورات تصميم احترافية" },
+                        new { name = "تطوير الويب", description = "مهارات تطوير حديثة" },
+                        new { name = "التسويق الرقمي", description = "استراتيجيات وأدوات التسويق" }
+                    },
+                    required = true
+                });
+                break;
+
+            case "about":
+                fields.Add(new
+                {
+                    id = "company-name",
+                    label = "Company Name",
+                    type = "text",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "company-name")?.ContentEn ?? "إرساء للتدريب",
+                    required = true,
+                    placeholder = "Enter company name"
+                });
+                fields.Add(new
+                {
+                    id = "mission",
+                    label = "Mission Statement",
+                    type = "textarea",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "mission")?.ContentEn ?? "تمكين الأفراد والمنظمات من خلال حلول تدريبية عالمية المستوى",
+                    required = true,
+                    placeholder = "Enter company mission"
+                });
+                fields.Add(new
+                {
+                    id = "vision",
+                    label = "Vision Statement",
+                    type = "textarea",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "vision")?.ContentEn ?? "أن نكون الشريك التدريبي المفضل في المنطقة",
+                    required = true,
+                    placeholder = "Enter company vision"
+                });
+                fields.Add(new
+                {
+                    id = "team",
+                    label = "Team Members",
+                    type = "array",
+                    value = new[]
+                    {
+                        new { name = "أحمد محمد", position = "المدير التنفيذي", bio = "خبرة 15 عام في التدريب" },
+                        new { name = "فاطمة علي", position = "مدير التدريب", bio = "خبرة 10 أعوام في تطوير المناهج" }
+                    },
+                    required = false
+                });
+                break;
+
+            default:
+                // Generic section with title and description
+                fields.Add(new
+                {
+                    id = "title",
+                    label = "Title",
+                    type = "text",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "title")?.ContentEn ?? section.SectionName,
+                    required = true,
+                    placeholder = "Enter section title"
+                });
+                fields.Add(new
+                {
+                    id = "description",
+                    label = "Description",
+                    type = "textarea",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "description")?.ContentEn ?? "",
+                    required = false,
+                    placeholder = "Enter section description"
+                });
+                break;
+        }
+
+        return fields;
     }
 }

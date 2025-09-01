@@ -72,9 +72,9 @@ export function CourseCard({ course }: CourseCardProps) {
             {/* Course Icon/Image */}
             <div className="p-8 text-center">
               <div className="w-20 h-20 mx-auto mb-4 bg-white/20 rounded-2xl flex items-center justify-center overflow-hidden">
-                {course.thumbnailUrl ? (
+                {course.photo || course.thumbnailUrl ? (
                   <img
-                    src={course.thumbnailUrl}
+                    src={course.photo || course.thumbnailUrl}
                     alt={title}
                     className="w-full h-full object-cover rounded-2xl"
                   />

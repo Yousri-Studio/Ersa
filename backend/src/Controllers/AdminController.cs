@@ -262,12 +262,27 @@ public class AdminController : ControllerBase
                 .Select(c => new AdminCourseDto
                 {
                     Id = c.Id,
+                    Slug = c.Slug,
                     TitleAr = c.TitleAr,
                     TitleEn = c.TitleEn,
+                    SummaryAr = c.SummaryAr,
+                    SummaryEn = c.SummaryEn,
                     DescriptionAr = c.DescriptionAr,
                     DescriptionEn = c.DescriptionEn,
                     Price = c.Price,
+                    Currency = c.Currency,
+                    Type = (int)c.Type,
+                    Level = (int)c.Level,
+                    Category = (int)c.Category,
+                    VideoUrl = c.VideoUrl,
+                    Duration = c.Duration,
+                    InstructorName = c.InstructorName,
+                    Photo = c.Photo,
+                    Tags = c.Tags,
+                    InstructorsBioAr = c.InstructorsBioAr,
+                    InstructorsBioEn = c.InstructorsBioEn,
                     IsActive = c.IsActive,
+                    IsFeatured = c.IsFeatured,
                     CreatedAt = c.CreatedAt,
                     UpdatedAt = c.UpdatedAt
                 })
@@ -754,12 +769,27 @@ public class AdminController : ControllerBase
             var course = new Course
             {
                 Id = Guid.NewGuid(),
+                Slug = request.Slug,
                 TitleAr = request.TitleAr,
                 TitleEn = request.TitleEn,
+                SummaryAr = request.SummaryAr,
+                SummaryEn = request.SummaryEn,
                 DescriptionAr = request.DescriptionAr,
                 DescriptionEn = request.DescriptionEn,
                 Price = request.Price,
+                Currency = request.Currency,
+                Type = (CourseType)(request.Type ?? 1),
+                Level = (CourseLevel)(request.Level ?? 1),
+                Category = (CourseCategory)(request.Category ?? 1),
+                VideoUrl = request.VideoUrl,
+                Duration = request.Duration,
+                InstructorName = request.InstructorName,
+                Photo = !string.IsNullOrEmpty(request.Photo) ? Convert.FromBase64String(request.Photo) : null,
+                Tags = request.Tags,
+                InstructorsBioAr = request.InstructorsBioAr,
+                InstructorsBioEn = request.InstructorsBioEn,
                 IsActive = request.IsActive,
+                IsFeatured = request.IsFeatured ?? false,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -770,12 +800,27 @@ public class AdminController : ControllerBase
             var courseDto = new AdminCourseDto
             {
                 Id = course.Id,
+                Slug = course.Slug,
                 TitleAr = course.TitleAr,
                 TitleEn = course.TitleEn,
+                SummaryAr = course.SummaryAr,
+                SummaryEn = course.SummaryEn,
                 DescriptionAr = course.DescriptionAr,
                 DescriptionEn = course.DescriptionEn,
                 Price = course.Price,
+                Currency = course.Currency,
+                Type = (int)course.Type,
+                Level = (int)course.Level,
+                Category = (int)course.Category,
+                VideoUrl = course.VideoUrl,
+                Duration = course.Duration,
+                InstructorName = course.InstructorName,
+                Photo = course.Photo,
+                Tags = course.Tags,
+                InstructorsBioAr = course.InstructorsBioAr,
+                InstructorsBioEn = course.InstructorsBioEn,
                 IsActive = course.IsActive,
+                IsFeatured = course.IsFeatured,
                 CreatedAt = course.CreatedAt,
                 UpdatedAt = course.UpdatedAt
             };
@@ -799,12 +844,27 @@ public class AdminController : ControllerBase
                 return NotFound("Course not found");
             }
 
+            course.Slug = request.Slug;
             course.TitleAr = request.TitleAr;
             course.TitleEn = request.TitleEn;
+            course.SummaryAr = request.SummaryAr;
+            course.SummaryEn = request.SummaryEn;
             course.DescriptionAr = request.DescriptionAr;
             course.DescriptionEn = request.DescriptionEn;
             course.Price = request.Price;
+            course.Currency = request.Currency;
+            course.Type = (CourseType)(request.Type ?? 1);
+            course.Level = (CourseLevel)(request.Level ?? 1);
+            course.Category = (CourseCategory)(request.Category ?? 1);
+            course.VideoUrl = request.VideoUrl;
+            course.Duration = request.Duration;
+            course.InstructorName = request.InstructorName;
+            course.Photo = !string.IsNullOrEmpty(request.Photo) ? Convert.FromBase64String(request.Photo) : null;
+            course.Tags = request.Tags;
+            course.InstructorsBioAr = request.InstructorsBioAr;
+            course.InstructorsBioEn = request.InstructorsBioEn;
             course.IsActive = request.IsActive;
+            course.IsFeatured = request.IsFeatured ?? false;
             course.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
@@ -812,12 +872,27 @@ public class AdminController : ControllerBase
             var courseDto = new AdminCourseDto
             {
                 Id = course.Id,
+                Slug = course.Slug,
                 TitleAr = course.TitleAr,
                 TitleEn = course.TitleEn,
+                SummaryAr = course.SummaryAr,
+                SummaryEn = course.SummaryEn,
                 DescriptionAr = course.DescriptionAr,
                 DescriptionEn = course.DescriptionEn,
                 Price = course.Price,
+                Currency = course.Currency,
+                Type = (int)course.Type,
+                Level = (int)course.Level,
+                Category = (int)course.Category,
+                VideoUrl = course.VideoUrl,
+                Duration = course.Duration,
+                InstructorName = course.InstructorName,
+                Photo = course.Photo,
+                Tags = course.Tags,
+                InstructorsBioAr = course.InstructorsBioAr,
+                InstructorsBioEn = course.InstructorsBioEn,
                 IsActive = course.IsActive,
+                IsFeatured = course.IsFeatured,
                 CreatedAt = course.CreatedAt,
                 UpdatedAt = course.UpdatedAt
             };

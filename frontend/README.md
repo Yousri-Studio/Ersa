@@ -80,51 +80,30 @@ The application will be available at `http://localhost:3000`
 
 ### Supported Locales
 - English (`en`) - Default
-- Arabic (`ar`) - RTL support
-
-### Route Structure
-- English: `/en/...`
-- Arabic: `/ar/...`
-
-### Translation Files
-- `locales/en.json` - English translations
-- `locales/ar.json` - Arabic translations
-
-## 📱 Components
-
-### Layout Components
-- `Header` - Navigation with language switcher and user menu
-- `Footer` - Site footer with social links
-- `LanguageSwitcher` - Locale switching component
-
-### UI Components
-- `CourseCard` - Course display card with actions
-- `LoadingSpinner` - Loading state component
-- Various form components with validation
-
-### Page Components
-- Home page with hero, featured courses, stats, and testimonials
-- Authentication pages (login/register)
-- Course catalog and detail pages
-- Shopping cart and checkout flow
-- User profile and dashboard
-
-## 🔧 Development
-
-### Code Structure
 ```
 frontend/
-├── app/[locale]/          # Next.js app router pages
-├── components/            # React components
+├── app/                    # Next.js App Router
+│   ├── [locale]/          # Internationalized routes
+│   │   ├── admin/         # Admin dashboard pages
+│   │   ├── courses/       # Course pages
+│   │   └── auth/          # Authentication pages
+│   ├── globals.css        # Global styles
+│   └── layout.tsx         # Root layout
+├── components/            # Reusable UI components
+│   ├── admin/            # Admin-specific components
 │   ├── auth/             # Authentication components
-│   ├── home/             # Home page sections
-│   ├── layout/           # Layout components
-│   └── ui/               # Reusable UI components
-├── lib/                  # Utilities and stores
-│   ├── api.ts            # API client and types
-│   ├── auth-store.ts     # Authentication state
-│   ├── cart-store.ts     # Shopping cart state
-│   └── fontawesome.ts    # Font Awesome configuration
+│   ├── ui/               # Base UI components
+│   └── layout/           # Layout components
+├── lib/                  # Utilities and configurations
+│   ├── admin-api.ts      # Admin API client
+│   ├── auth.ts           # Authentication utilities
+│   └── utils.ts          # General utilities
+├── hooks/                # Custom React hooks
+│   └── useHydration.ts   # Hydration hook
+├── messages/             # Internationalization messages
+│   ├── ar.json           # Arabic translations
+│   └── en.json           # English translations
+└── middleware.ts         # Next.js middleware
 ├── locales/              # Translation files
 └── styles/               # Global styles
 ```

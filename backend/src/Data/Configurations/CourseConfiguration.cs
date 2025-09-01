@@ -33,6 +33,12 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
             .IsRequired()
             .HasMaxLength(500);
 
+        builder.Property(c => c.SummaryAr)
+            .HasMaxLength(5000);
+
+        builder.Property(c => c.SummaryEn)
+            .HasMaxLength(5000);
+
         builder.Property(c => c.DescriptionAr)
             .HasMaxLength(5000);
 
@@ -44,6 +50,8 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
 
         builder.Property(c => c.IsFeatured)
             .HasDefaultValue(false);
+        
+        builder.Property(c => c.Duration);
 
         builder.Property(c => c.CreatedAt)
             .HasDefaultValueSql("GETUTCDATE()");
@@ -66,7 +74,7 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
         builder.Property(c => c.UpdatedAt)
             .HasDefaultValueSql("GETUTCDATE()");
 
-        builder.Property(c => c.ImageUrl)
+        builder.Property(c => c.VideoUrl)
             .IsRequired()
             .HasDefaultValue("")
             .HasMaxLength(1000);
@@ -75,6 +83,19 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
             .IsRequired()
             .HasMaxLength(255)
             .HasDefaultValue("");
+
+        // New field configurations
+        builder.Property(c => c.Photo)
+            .HasMaxLength(1000);
+
+        builder.Property(c => c.Tags)
+            .HasMaxLength(2000);
+
+        builder.Property(c => c.InstructorsBioAr)
+            .HasMaxLength(2500);
+
+        builder.Property(c => c.InstructorsBioEn)
+            .HasMaxLength(2500);
     }
 }
 

@@ -8,6 +8,20 @@ public class Session
     
     public Guid CourseId { get; set; }
     
+    [Required]
+    [MaxLength(200)]
+    public string TitleAr { get; set; } = string.Empty;
+    
+    [Required]
+    [MaxLength(200)]
+    public string TitleEn { get; set; } = string.Empty;
+    
+    [MaxLength(2000)]
+    public string? DescriptionAr { get; set; }
+    
+    [MaxLength(2000)]
+    public string? DescriptionEn { get; set; }
+    
     public DateTime StartAt { get; set; }
     
     public DateTime EndAt { get; set; }

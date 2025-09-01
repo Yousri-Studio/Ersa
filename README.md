@@ -1,17 +1,16 @@
-# Ersa Training - Bilingual E-Learning Platform
+# Ersa Training Platform
 
-A comprehensive bilingual (Arabic/English) e-learning platform built with Next.js 15 and ASP.NET Core 8, featuring course management with search functionality, secure authentication, and modern responsive design.
+A comprehensive e-learning platform built with Next.js frontend and ASP.NET Core backend, featuring course management, user authentication, and admin dashboard capabilities.
 
 ## 🚀 Features
 
 ### Core Features
-- **Bilingual Support**: Full Arabic and English localization with RTL support using next-intl
-- **Course Management**: Browse, search, and filter courses by category and keywords
-- **Featured Courses**: Highlight latest courses with dynamic sorting by creation date
-- **Responsive Design**: Mobile-first approach with Tailwind CSS and modern animations
-- **Search Functionality**: Real-time course search across titles and descriptions in both languages
-- **Category Filtering**: Filter courses by Programming, Business, and Design categories
-- **Authentication**: JWT-based secure user authentication and authorization
+- **User Authentication & Authorization** - JWT-based auth with role management
+- **Course Management** - Full CRUD operations for courses with binary image storage
+- **Admin Dashboard** - Comprehensive admin interface with statistics and management tools
+- **Multi-language Support** - Arabic and English localization
+- **Responsive Design** - Mobile-first responsive UI
+- **File Upload System** - Binary image storage for course thumbnails
 - **Modern UI/UX**: Clean interface with gradient styling and smooth animations
 
 ### User Experience

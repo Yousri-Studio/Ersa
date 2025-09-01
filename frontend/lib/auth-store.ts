@@ -57,7 +57,6 @@ export const useAuthStore = create<AuthState>()(
         const token = Cookies.get('auth-token');
         if (token && !get().isAuthenticated) {
           // We have a token but not authenticated, need to validate it
-          // For now, just set the token and let the API calls handle validation
           set({ token, isAuthenticated: true });
           // Trigger token validation to get user data
           get().validateToken();
@@ -105,7 +104,7 @@ export const useAuthStore = create<AuthState>()(
         token: state.token,
         isAuthenticated: state.isAuthenticated,
       }),
-      skipHydration: true,
+      skipHydration: false,
     }
   )
 );

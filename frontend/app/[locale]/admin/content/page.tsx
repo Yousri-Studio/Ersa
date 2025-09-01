@@ -1,600 +1,332 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useLocale } from 'next-intl';
-import { useHydration } from '@/hooks/useHydration';
-import toast from 'react-hot-toast';
-import { contentAdminApi, type AdminContentSection } from '@/lib/admin-content-api';
-import type { ContentSection } from '@/lib/types/content';
+import { useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
 import { Icon } from '@/components/ui/icon';
+import { motion } from 'framer-motion';
 
-interface ContentBlock {
+interface ContentSection {
   id: string;
   title: string;
-  content: string;
-  language: 'en' | 'ar';
-  section: string;
+  description: string;
+  icon: string;
+  status: 'published' | 'draft' | 'archived';
+  lastModified: string;
+  type: 'page' | 'section' | 'component';
 }
 
-export default function ContentManagementPage() {
-  const [sections, setSections] = useState<AdminContentSection[]>([]);
-  const [selectedSection, setSelectedSection] = useState<AdminContentSection | null>(null);
-  const [selectedPageKey, setSelectedPageKey] = useState<string | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('sections');
-  const { isHydrated } = useHydration();
+const contentSections: ContentSection[] = [
+  {
+    id: 'home',
+    title: 'Home Page',
+    description: 'Hero section, features, testimonials, and main landing content',
+    icon: 'home',
+    status: 'published',
+    lastModified: '2025-01-15T10:30:00Z',
+    type: 'page'
+  },
+  {
+    id: 'courses',
+    title: 'Course Management',
+    description: 'Course descriptions, curriculum, pricing, and enrollment details',
+    icon: 'graduation-cap',
+    status: 'published',
+    lastModified: '2025-01-14T15:45:00Z',
+    type: 'page'
+  },
+  {
+    id: 'about',
+    title: 'About Company',
+    description: 'Company information, mission, vision, team, and achievements',
+    icon: 'building',
+    status: 'published',
+    lastModified: '2025-01-13T09:20:00Z',
+    type: 'page'
+  },
+  {
+    id: 'services',
+    title: 'Services & Solutions',
+    description: 'Consulting services, AI solutions, and service offerings',
+    icon: 'cogs',
+    status: 'published',
+    lastModified: '2025-01-12T14:30:00Z',
+    type: 'page'
+  },
+  {
+    id: 'contact',
+    title: 'Contact Information',
+    description: 'Contact details, office locations, and contact forms',
+    icon: 'envelope',
+    status: 'published',
+    lastModified: '2025-01-11T11:15:00Z',
+    type: 'page'
+  },
+  {
+    id: 'faq',
+    title: 'FAQ & Help',
+    description: 'Frequently asked questions, help articles, and support content',
+    icon: 'question-circle',
+    status: 'published',
+    lastModified: '2025-01-10T16:45:00Z',
+    type: 'page'
+  },
+  {
+    id: 'legal',
+    title: 'Legal & Policies',
+    description: 'Terms of service, privacy policy, and legal documents',
+    icon: 'file-contract',
+    status: 'published',
+    lastModified: '2025-01-09T13:20:00Z',
+    type: 'page'
+  },
+  {
+    id: 'blog',
+    title: 'Blog & News',
+    description: 'Company blog, industry news, and educational articles',
+    icon: 'newspaper',
+    status: 'draft',
+    lastModified: '2025-01-08T10:00:00Z',
+    type: 'page'
+  }
+];
+
+export default function ContentManagement() {
+  const t = useTranslations('admin');
   const locale = useLocale();
+  const router = useRouter();
+  const [selectedSection, setSelectedSection] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [filterStatus, setFilterStatus] = useState<string>('all');
 
-  useEffect(() => {
-    if (isHydrated) {
-      loadContentSections();
-    }
-  }, [isHydrated]);
+  const isRTL = locale === 'ar';
 
-  if (!isHydrated) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
+  const filteredSections = contentSections.filter(section => {
+    const matchesSearch = section.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         section.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = filterStatus === 'all' || section.status === filterStatus;
+    return matchesSearch && matchesStatus;
+  });
 
-  const initializeSampleData = async () => {
-    try {
-      setIsLoading(true);
-      const response = await contentAdminApi.initializeSampleData();
-      toast.success('Sample data initialized successfully');
-      // Reload content sections
-      await loadContentSections();
-    } catch (error) {
-      console.error('Error initializing sample data:', error);
-      toast.error('Failed to initialize sample data');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const loadContentSections = async () => {
-    try {
-      const response = await contentAdminApi.getContentSections();
-      // Map ContentSection to AdminContentSection
-      const adminSections: AdminContentSection[] = response.data.map((section: any) => ({
-        id: section.id,
-        name: section.name,
-        type: section.type,
-        pageKey: section.pageKey || 'unknown',
-        pageName: section.pageName || 'Unknown Page',
-        content: section.content,
-        isActive: section.isActive,
-        lastModified: section.lastModified
-      }));
-      setSections(adminSections);
-      setIsLoading(false);
-      return;
-    } catch (error) {
-      console.error('Error loading content sections:', error);
-      // Show initialization option if no data exists
-      if (sections.length === 0) {
-        toast.error('No content sections found. Initialize sample data to get started.');
-      }
-    }
-
-    // Fallback to mock data for development
-    const mockSections: AdminContentSection[] = [
-      {
-        id: 'hero',
-        name: 'Hero Section',
-        type: 'hero',
-        pageKey: 'home',
-        pageName: 'Home Page',
-        content: {
-          title: 'Welcome to Ersa Training',
-          subtitle: 'Professional Training & Consultancy Services',
-          description: 'Empowering individuals and organizations with world-class training solutions'
-        },
-        isActive: true,
-        lastModified: '2024-01-15'
-      },
-      {
-        id: 'consultation',
-        name: 'Consultation Section',
-        type: 'consultation',
-        pageKey: 'consultation',
-        pageName: 'Consultation',
-        content: {
-          title: 'Get Professional Consultation',
-          description: 'Our experts are here to help you achieve your goals'
-        },
-        isActive: true,
-        lastModified: '2024-01-14'
-      },
-      {
-        id: 'training',
-        name: 'Training Categories',
-        type: 'training',
-        pageKey: 'courses',
-        pageName: 'Courses',
-        content: {
-          categories: [
-            { name: 'Graphic Design', description: 'Professional design courses' },
-            { name: 'Web Development', description: 'Modern web development skills' },
-            { name: 'Digital Marketing', description: 'Marketing strategies and tools' }
-          ]
-        },
-        isActive: true,
-        lastModified: '2024-01-13'
-      },
-      {
-        id: 'services',
-        name: 'Services Section',
-        type: 'services',
-        pageKey: 'home',
-        pageName: 'Home Page',
-        content: {
-          services: [
-            { title: 'Online Training', description: 'Flexible online learning' },
-            { title: 'Corporate Training', description: 'Customized corporate solutions' },
-            { title: 'Consultation', description: 'Expert advice and guidance' }
-          ]
-        },
-        isActive: true,
-        lastModified: '2024-01-12'
-      },
-      {
-        id: 'ai',
-        name: 'AI Consultation',
-        type: 'ai',
-        pageKey: 'consultation',
-        pageName: 'Consultation',
-        content: {
-          title: 'AI-Powered Consultation',
-          description: 'Get instant answers to your questions'
-        },
-        isActive: true,
-        lastModified: '2024-01-11'
-      },
-      {
-        id: 'testimonials',
-        name: 'Testimonials',
-        type: 'testimonials',
-        pageKey: 'home',
-        pageName: 'Home Page',
-        content: {
-          testimonials: [
-            { name: 'Ahmed Ali', role: 'Student', text: 'Excellent training experience' },
-            { name: 'Sarah Johnson', role: 'Manager', text: 'Professional and effective' }
-          ]
-        },
-        isActive: true,
-        lastModified: '2024-01-10'
-      },
-      {
-        id: 'join',
-        name: 'Join Us Section',
-        type: 'join',
-        pageKey: 'about',
-        pageName: 'About Us',
-        content: {
-          title: 'Join Our Community',
-          description: 'Be part of our growing network of professionals'
-        },
-        isActive: true,
-        lastModified: '2024-01-09'
-      },
-      {
-        id: 'achievements',
-        name: 'Achievements',
-        type: 'achievements',
-        pageKey: 'about',
-        pageName: 'About Us',
-        content: {
-          stats: [
-            { number: '1000+', label: 'Students Trained' },
-            { number: '50+', label: 'Courses Available' },
-            { number: '95%', label: 'Success Rate' }
-          ]
-        },
-        isActive: true,
-        lastModified: '2024-01-08'
-      },
-      {
-        id: 'faq',
-        name: 'FAQ Section',
-        type: 'faq',
-        pageKey: 'faq',
-        pageName: 'FAQ',
-        content: {
-          faqs: [
-            { question: 'How do I enroll in a course?', answer: 'You can enroll through our website or contact us directly.' },
-            { question: 'What payment methods do you accept?', answer: 'We accept credit cards, bank transfers, and online payments.' }
-          ]
-        },
-        isActive: true,
-        lastModified: '2024-01-07'
-      }
-    ];
-
-    toast.error('Failed to load content sections, using mock data');
-    setSections(mockSections);
-    setIsLoading(false);
-  };
-
-  const handleSave = async (sectionId: string, content: any) => {
-    try {
-      const response = await contentAdminApi.updateContentSection(sectionId, content);
-      toast.success('Content saved successfully');
-      setIsEditing(false);
-      
-      // Refresh the content sections
-      await loadContentSections();
-    } catch (error) {
-      console.error('Error saving content:', error);
-      toast.error('Failed to save content');
-    }
-  };
-
-  const handleManagePageContent = async (pageKey: string) => {
-    try {
-      setIsLoading(true);
-      // Try to get existing page content
-      const response = await contentAdminApi.getPageContent(pageKey);
-      const responseData = response.data as any;
-      if (responseData && responseData.data && responseData.data.sections) {
-        const pageData = responseData.data;
-        const pageSections: AdminContentSection[] = pageData.sections.map((section: any) => ({
-          id: section.id,
-          name: section.name,
-          type: section.type,
-          pageKey: pageKey,
-          pageName: pageData.pageName,
-          content: section.content,
-          isActive: section.isActive,
-          lastModified: section.lastModified
-        }));
-        setSections(pageSections);
-        setSelectedPageKey(pageKey);
-        setActiveTab('sections');
-      }
-    } catch (error) {
-      // If page doesn't exist, initialize it
-      try {
-        await contentAdminApi.initializePageContent(pageKey);
-        toast.success(`Initialized content for ${pageKey} page`);
-        // Reload the page content
-        await handleManagePageContent(pageKey);
-        return;
-      } catch (initError) {
-        console.error('Error initializing page content:', initError);
-        toast.error('Failed to initialize page content');
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const renderContentEditor = (section: AdminContentSection) => {
-    switch (section.type) {
-      case 'hero':
-        return (
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
-              <input
-                type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                defaultValue={section.content.title}
-                onChange={(e) => {
-                  const newContent = { ...section.content, title: e.target.value };
-                  setSelectedSection({ ...section, content: newContent });
-                }}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Subtitle</label>
-              <input
-                type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                defaultValue={section.content.subtitle}
-                onChange={(e) => {
-                  const newContent = { ...section.content, subtitle: e.target.value };
-                  setSelectedSection({ ...section, content: newContent });
-                }}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-              <textarea
-                rows={3}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                defaultValue={section.content.description}
-                onChange={(e) => {
-                  const newContent = { ...section.content, description: e.target.value };
-                  setSelectedSection({ ...section, content: newContent });
-                }}
-              />
-            </div>
-          </div>
-        );
-
-      case 'faq':
-        return (
-          <div className="space-y-4">
-            {section.content.faqs.map((faq: any, index: number) => (
-              <div key={index} className="border border-gray-200 rounded-lg p-4">
-                <div className="mb-3">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Question {index + 1}</label>
-                  <input
-                    type="text"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    defaultValue={faq.question}
-                    onChange={(e) => {
-                      const newFaqs = [...section.content.faqs];
-                      newFaqs[index] = { ...faq, question: e.target.value };
-                      const newContent = { ...section.content, faqs: newFaqs };
-                      setSelectedSection({ ...section, content: newContent });
-                    }}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Answer {index + 1}</label>
-                  <textarea
-                    rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    defaultValue={faq.answer}
-                    onChange={(e) => {
-                      const newFaqs = [...section.content.faqs];
-                      newFaqs[index] = { ...faq, answer: e.target.value };
-                      const newContent = { ...section.content, faqs: newFaqs };
-                      setSelectedSection({ ...section, content: newContent });
-                    }}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        );
-
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'published':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'draft':
+        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'archived':
+        return 'bg-gray-100 text-gray-800 border-gray-200';
       default:
-        return (
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
-              <input
-                type="text"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                defaultValue={section.content.title}
-                onChange={(e) => {
-                  const newContent = { ...section.content, title: e.target.value };
-                  setSelectedSection({ ...section, content: newContent });
-                }}
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
-              <textarea
-                rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                defaultValue={section.content.description}
-                onChange={(e) => {
-                  const newContent = { ...section.content, description: e.target.value };
-                  setSelectedSection({ ...section, content: newContent });
-                }}
-              />
-            </div>
-          </div>
-        );
+        return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'published':
+        return locale === 'ar' ? 'منشور' : 'Published';
+      case 'draft':
+        return locale === 'ar' ? 'مسودة' : 'Draft';
+      case 'archived':
+        return locale === 'ar' ? 'مؤرشف' : 'Archived';
+      default:
+        return status;
+    }
+  };
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString(
+      locale === 'ar' ? 'ar-SA' : 'en-US',
+      { year: 'numeric', month: 'short', day: 'numeric' }
     );
-  }
+  };
 
   return (
-    <div className="space-y-6" style={{maxWidth: '90rem', paddingTop: '50px'}}>
-      {/* Page Header */}
-      <div>
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">Content Management</h1>
-            <p className="mt-1 text-sm text-gray-500">
-              {selectedPageKey ? `Managing content for ${selectedPageKey} page` : 'Manage all content sections of your website'}
-            </p>
+    <div className="bg-white min-h-screen" dir={isRTL ? 'rtl' : 'ltr'}>
+      <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{maxWidth: '90rem', paddingTop: '50px'}}>
+        {/* Header */}
+        <div className="mb-8">
+          <div className="flex items-center mb-2">
+            <Icon name="edit" className="w-8 h-8 text-blue-600 mr-3" />
+            <h1 className="text-3xl font-bold text-gray-900">
+              {t('contentManagement')}
+            </h1>
           </div>
-          {selectedPageKey && (
-            <button
-              onClick={() => {
-                setSelectedPageKey(null);
-                loadContentSections();
-              }}
-              className="px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm"
+          <p className="text-gray-600 text-lg">
+            {locale === 'ar' 
+              ? 'إدارة جميع صفحات الموقع ومحتواها العام' 
+              : 'Manage all website pages and their content'
+            }
+          </p>
+        </div>
+
+        {/* Search and Filters */}
+        <div className="mb-6 flex flex-col sm:flex-row gap-4">
+          <div className="flex-1">
+            <div className="relative">
+              <Icon name="search" className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder={locale === 'ar' ? 'البحث في المحتوى...' : 'Search content...'}
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              />
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             >
-              ← Back to All Sections
+              <option value="all">{locale === 'ar' ? 'جميع الحالات' : 'All Status'}</option>
+              <option value="published">{locale === 'ar' ? 'منشور' : 'Published'}</option>
+              <option value="draft">{locale === 'ar' ? 'مسودة' : 'Draft'}</option>
+              <option value="archived">{locale === 'ar' ? 'مؤرشف' : 'Archived'}</option>
+            </select>
+            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+              {locale === 'ar' ? 'إضافة صفحة جديدة' : 'Add New Page'}
             </button>
-          )}
+          </div>
         </div>
-      </div>
 
-      {/* Tabs */}
-      <div className="border-b border-gray-200">
-        <nav className="-mb-px flex space-x-8">
-          <button
-            onClick={() => setActiveTab('sections')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'sections'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
-          >
-            Content Sections
-          </button>
-          <button
-            onClick={() => setActiveTab('pages')}
-            className={`py-2 px-1 border-b-2 font-medium text-sm ${
-              activeTab === 'pages'
-                ? 'border-blue-500 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-            }`}
-          >
-            Pages
-          </button>
-        </nav>
-      </div>
-
-      {activeTab === 'sections' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Sections List */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-              <div className="px-6 py-4 border-b border-gray-100">
-                <h3 className="text-lg font-semibold text-gray-900">Content Sections</h3>
-                <p className="text-sm text-gray-600">Select a section to edit</p>
+        {/* Content Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredSections.map((section) => (
+            <motion.div
+              key={section.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+                             className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+               onClick={() => router.push(`/${locale}/admin/content/${section.id}`)}
+            >
+              <div className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <Icon name={section.icon} className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(section.status)}`}>
+                    {getStatusText(section.status)}
+                  </span>
+                </div>
+                
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  {section.title}
+                </h3>
+                
+                <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                  {section.description}
+                </p>
+                
+                <div className="flex items-center justify-between text-xs text-gray-500">
+                  <span className="capitalize">{section.type}</span>
+                  <span>{formatDate(section.lastModified)}</span>
+                </div>
               </div>
-              <div className="p-4">
-                {sections.length === 0 ? (
-                  <div className="text-center py-8">
-                    <Icon name="edit" className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">No Content Sections</h3>
-                    <p className="text-gray-500 mb-4">Initialize sample data to get started with content management</p>
-                    <button
-                      onClick={initializeSampleData}
-                      disabled={isLoading}
-                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
-                    >
-                      {isLoading ? 'Initializing...' : 'Initialize Sample Data'}
-                    </button>
-                  </div>
-                ) : (
-                  <div className="space-y-2">
-                    {sections.map((section) => (
-                      <button
-                        key={section.id}
-                        onClick={() => setSelectedSection(section)}
-                        className={`w-full text-left p-3 rounded-lg border transition-colors ${
-                          selectedSection?.id === section.id
-                            ? 'border-blue-500 bg-blue-50 text-blue-700'
-                            : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                        }`}
-                      >
-                        <div className="flex items-center justify-between">
-                        <div>
-                          <h4 className="font-medium">{section.name}</h4>
-                          <p className="text-sm text-gray-500">Last modified: {section.lastModified}</p>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                          <span className={`w-2 h-2 rounded-full ${
-                            section.isActive ? 'bg-green-500' : 'bg-gray-300'
-                          }`}></span>
-                          <Icon name="chevron-right" className="h-4 w-4 text-gray-400" />
-                        </div>
-                      </div>
-                    </button>
-                    ))}
-                  </div>
-                )}
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Quick Actions */}
+        <div className="mt-12 bg-gray-50 rounded-xl p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            {locale === 'ar' ? 'إجراءات سريعة' : 'Quick Actions'}
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <button className="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors">
+              <Icon name="plus" className="w-5 h-5 text-blue-600 mr-2" />
+              <span className="text-sm font-medium text-gray-700">
+                {locale === 'ar' ? 'إضافة صفحة' : 'Add Page'}
+              </span>
+            </button>
+            <button className="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:border-green-300 hover:bg-green-50 transition-colors">
+              <Icon name="upload" className="w-5 h-5 text-green-600 mr-2" />
+              <span className="text-sm font-medium text-gray-700">
+                {locale === 'ar' ? 'رفع ملفات' : 'Upload Files'}
+              </span>
+            </button>
+            <button className="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:border-purple-300 hover:bg-purple-50 transition-colors">
+              <Icon name="copy" className="w-5 h-5 text-purple-600 mr-2" />
+              <span className="text-sm font-medium text-gray-700">
+                {locale === 'ar' ? 'نسخ محتوى' : 'Copy Content'}
+              </span>
+            </button>
+            <button className="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:border-orange-300 hover:bg-orange-50 transition-colors">
+              <Icon name="download" className="w-5 h-5 text-orange-600 mr-2" />
+              <span className="text-sm font-medium text-gray-700">
+                {locale === 'ar' ? 'تصدير' : 'Export'}
+              </span>
+            </button>
+          </div>
+        </div>
+
+        {/* Content Statistics */}
+        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="bg-white p-6 rounded-xl border border-gray-200">
+            <div className="flex items-center">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                <Icon name="file-text" className="w-6 h-6 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  {locale === 'ar' ? 'إجمالي الصفحات' : 'Total Pages'}
+                </p>
+                <p className="text-2xl font-bold text-gray-900">{contentSections.length}</p>
               </div>
             </div>
           </div>
-
-          {/* Content Editor */}
-          <div className="lg:col-span-2">
-            {selectedSection ? (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-                <div className="px-6 py-4 border-b border-gray-100">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900">{selectedSection.name}</h3>
-                      <p className="text-sm text-gray-600">Edit content for this section</p>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      {isEditing ? (
-                        <>
-                          <button
-                            onClick={() => setIsEditing(false)}
-                            className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800"
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            onClick={() => handleSave(selectedSection.id, selectedSection.content)}
-                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
-                          >
-                            Save Changes
-                          </button>
-                        </>
-                      ) : (
-                        <button
-                          onClick={() => setIsEditing(true)}
-                          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
-                        >
-                          Edit Content
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <div className="p-6">
-                  {isEditing ? (
-                    renderContentEditor(selectedSection)
-                  ) : (
-                    <div className="space-y-4">
-                      <div>
-                        <h4 className="font-medium text-gray-900 mb-2">Current Content</h4>
-                        <pre className="bg-gray-50 p-4 rounded-lg text-sm overflow-auto">
-                          {JSON.stringify(selectedSection.content, null, 2)}
-                        </pre>
-                      </div>
-                    </div>
-                  )}
-                </div>
+          
+          <div className="bg-white p-6 rounded-xl border border-gray-200">
+            <div className="flex items-center">
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
+                <Icon name="check-circle" className="w-6 h-6 text-green-600" />
               </div>
-            ) : (
-              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
-                <Icon name="edit" className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">Select a Section</h3>
-                <p className="text-gray-500">Choose a content section from the list to start editing</p>
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  {locale === 'ar' ? 'منشور' : 'Published'}
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {contentSections.filter(s => s.status === 'published').length}
+                </p>
               </div>
-            )}
+            </div>
           </div>
-        </div>
-      )}
-
-      {activeTab === 'pages' && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-          <div className="px-6 py-4 border-b border-gray-100">
-            <h3 className="text-lg font-semibold text-gray-900">Page Management</h3>
-            <p className="text-sm text-gray-600">Manage individual pages and their content</p>
+          
+          <div className="bg-white p-6 rounded-xl border border-gray-200">
+            <div className="flex items-center">
+              <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mr-4">
+                <Icon name="edit" className="w-6 h-6 text-yellow-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  {locale === 'ar' ? 'مسودات' : 'Drafts'}
+                </p>
+                <p className="text-2xl font-bold text-gray-900">
+                  {contentSections.filter(s => s.status === 'draft').length}
+                </p>
+              </div>
+            </div>
           </div>
-          <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {[
-                { name: 'Home Page', path: '/', sections: 9 },
-                { name: 'Courses', path: '/courses', sections: 3 },
-                { name: 'Contact', path: '/contact', sections: 2 },
-                { name: 'FAQ', path: '/faq', sections: 1 },
-                { name: 'Consultation', path: '/consultation', sections: 2 },
-                { name: 'About Us', path: '/about', sections: 4 }
-              ].map((page) => (
-                <div key={page.path} className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors">
-                  <h4 className="font-medium text-gray-900 mb-2">{page.name}</h4>
-                  <p className="text-sm text-gray-500 mb-3">{page.sections} content sections</p>
-                  <button 
-                    onClick={() => handleManagePageContent(page.path.substring(1) || 'home')}
-                    className="text-blue-600 hover:text-blue-700 text-sm font-medium"
-                  >
-                    Manage Content →
-                  </button>
-                </div>
-              ))}
+          
+          <div className="bg-white p-6 rounded-xl border border-gray-200">
+            <div className="flex items-center">
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
+                <Icon name="clock" className="w-6 h-6 text-purple-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium text-gray-600">
+                  {locale === 'ar' ? 'آخر تحديث' : 'Last Updated'}
+                </p>
+                <p className="text-sm font-bold text-gray-900">
+                  {formatDate(contentSections[0]?.lastModified || '')}
+                </p>
+              </div>
             </div>
           </div>
         </div>
-      )}
+      </div>
     </div>
   );
 }

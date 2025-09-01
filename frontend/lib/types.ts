@@ -1,10 +1,13 @@
 import { Course as ApiCourse } from './api';
 
-export interface Course extends ApiCourse {
+export interface Course extends Omit<ApiCourse, 'description'> {
   curriculum: CurriculumSection[];
   features: string[];
   requirements: string[];
-  description: string;
+  description?: {
+    ar: string;
+    en: string;
+  };
   lessons: number;
   instructor: {
     name: string;

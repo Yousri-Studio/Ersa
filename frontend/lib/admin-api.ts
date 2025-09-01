@@ -187,12 +187,27 @@ export interface AdminUser {
 
 export interface AdminCourse {
   id: string;
+  slug?: string;
   titleAr: string;
   titleEn: string;
+  summaryAr?: string;
+  summaryEn?: string;
   descriptionAr?: string;
   descriptionEn?: string;
   price: number;
+  currency?: string;
+  type?: number;
+  level?: number;
+  category?: number;
+  videoUrl?: string;
+  duration?: string;
+  instructorName?: string;
+  photo?: number[] | string;
+  tags?: string;
+  instructorsBioAr?: string;
+  instructorsBioEn?: string;
   isActive: boolean;
+  isFeatured?: boolean;
   createdAt: string;
   updatedAt: string;
 }
@@ -239,22 +254,30 @@ export interface CreateUserRequest {
 }
 
 export interface AdminCreateCourseRequest {
+  slug: string;
   titleAr: string;
   titleEn: string;
+  summaryAr?: string;
+  summaryEn?: string;
   descriptionAr?: string;
   descriptionEn?: string;
   price: number;
+  currency: string;
+  type: number; // CourseType enum
+  level?: number; // CourseLevel enum
+  category?: number; // CourseCategory enum
+  videoUrl?: string;
+  duration?: string;
+  instructorName: string;
+  photo?: number[] | string | null;
+  tags?: string;
+  instructorsBioAr?: string;
+  instructorsBioEn?: string;
   isActive: boolean;
+  isFeatured?: boolean;
 }
 
-export interface AdminUpdateCourseRequest {
-  titleAr: string;
-  titleEn: string;
-  descriptionAr?: string;
-  descriptionEn?: string;
-  price: number;
-  isActive: boolean;
-}
+export interface AdminUpdateCourseRequest extends AdminCreateCourseRequest {}
 
 export const adminApi = {
   // Dashboard
@@ -285,11 +308,27 @@ export const adminApi = {
     isActive?: boolean;
   }) => api.get<PagedResult<AdminCourse>>('/admin/courses', { params }),
 
-  createCourse: (data: AdminCreateCourseRequest) =>
-    api.post<AdminCourse>('/admin/courses', data),
+  createCourse: (data: AdminCreateCourseRequest) => {
+    // Convert photo number array to base64 string for proper serialization
+    const requestData = {
+      ...data,
+      photo: data.photo && Array.isArray(data.photo) && data.photo.length > 0
+        ? btoa(new Uint8Array(data.photo).reduce((acc, byte) => acc + String.fromCharCode(byte), ''))
+        : null
+    };
+    return api.post<AdminCourse>('/admin/courses', requestData);
+  },
 
-  updateCourse: (courseId: string, data: AdminUpdateCourseRequest) =>
-    api.put<AdminCourse>(`/admin/courses/${courseId}`, data),
+  updateCourse: (courseId: string, data: AdminUpdateCourseRequest) => {
+    // Convert photo number array to base64 string for proper serialization
+    const requestData = {
+      ...data,
+      photo: data.photo && Array.isArray(data.photo) && data.photo.length > 0
+        ? btoa(new Uint8Array(data.photo).reduce((acc, byte) => acc + String.fromCharCode(byte), ''))
+        : null
+    };
+    return api.put<AdminCourse>(`/admin/courses/${courseId}`, requestData);
+  },
 
   deleteCourse: (courseId: string) =>
     api.delete(`/admin/courses/${courseId}`),

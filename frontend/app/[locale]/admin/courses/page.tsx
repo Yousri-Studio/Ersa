@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from 'react';
 import { Icon } from '@/components/ui/icon';
-import { adminApi, AdminCourse, PagedResult, AdminCreateCourseRequest, AdminUpdateCourseRequest } from '@/lib/admin-api';
+import { motion } from 'framer-motion';
+import { adminApi, AdminCreateCourseRequest, AdminUpdateCourseRequest, AdminCourse } from '@/lib/admin-api';
 import { useHydration } from '@/hooks/useHydration';
+import { CourseForm } from '@/components/admin/course-form';
 import toast from 'react-hot-toast';
 
 export default function AdminCourses() {
@@ -24,14 +26,29 @@ export default function AdminCourses() {
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [courseForm, setCourseForm] = useState<AdminCreateCourseRequest>({
+    slug: '',
     titleAr: '',
     titleEn: '',
+    summaryAr: '',
+    summaryEn: '',
     descriptionAr: '',
     descriptionEn: '',
     price: 0,
+    currency: 'SAR',
+    type: 1, // Live
+    level: 1, // Beginner
+    category: 1, // Programming
+    videoUrl: '',
+    duration: '',
+    instructorName: '',
+    photo: [],
+    tags: '',
+    instructorsBioAr: '',
+    instructorsBioEn: '',
     isActive: true,
+    isFeatured: false,
   });
-  const { isHydrated } = useHydration();
+  const isHydrated = useHydration();
 
   useEffect(() => {
     if (isHydrated) {
@@ -64,34 +81,113 @@ export default function AdminCourses() {
         totalPages: response.data.totalPages,
       }));
     } catch (error: any) {
-      toast.error('Failed to load courses');
-      console.error('Error fetching courses:', error);
+      console.error('Error fetching courses, using demo data:', error);
+      // Use fallback demo data
+      const demoData = [
+        {
+          id: '1',
+          slug: 'advanced-graphic-design',
+          titleAr: 'دورة التصميم الجرافيكي المتقدمة',
+          titleEn: 'Advanced Graphic Design Course',
+          summaryAr: 'تعلم أساسيات التصميم الجرافيكي',
+          summaryEn: 'Learn graphic design fundamentals',
+          descriptionAr: 'دورة شاملة في التصميم الجرافيكي',
+          descriptionEn: 'Comprehensive graphic design course',
+          price: 299,
+          currency: 'SAR',
+          type: 1,
+          level: 2,
+          category: 3,
+          videoUrl: '',
+          duration: '4 weeks',
+          instructorName: 'Ahmed Al-Rashid',
+          photo: '',
+          tags: 'design,graphics,adobe',
+          instructorsBioAr: 'مدرب خبير في التصميم',
+          instructorsBioEn: 'Expert design instructor',
+          isActive: true,
+          isFeatured: true,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        },
+        {
+          id: '2',
+          slug: 'programming-for-beginners',
+          titleAr: 'دورة البرمجة للمبتدئين',
+          titleEn: 'Programming for Beginners',
+          summaryAr: 'ابدأ رحلتك في البرمجة',
+          summaryEn: 'Start your programming journey',
+          descriptionAr: 'تعلم البرمجة من الصفر',
+          descriptionEn: 'Learn programming from scratch',
+          price: 199,
+          currency: 'SAR',
+          type: 1,
+          level: 1,
+          category: 1,
+          videoUrl: '',
+          duration: '6 weeks',
+          instructorName: 'Sarah Johnson',
+          photo: '',
+          tags: 'programming,javascript,web',
+          instructorsBioAr: 'مطور برمجيات محترف',
+          instructorsBioEn: 'Professional software developer',
+          isActive: true,
+          isFeatured: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }
+      ];
+      setCourses(demoData);
+      setPagination(prev => ({
+        ...prev,
+        totalCount: demoData.length,
+        totalPages: 1,
+      }));
+      toast.error('Using demo data - API connection failed');
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleAddCourse = async () => {
+  const handleAddCourse = async (data: AdminCreateCourseRequest) => {
     try {
-      await adminApi.createCourse(courseForm);
+      // Ensure photo is properly formatted as number array or null
+      const courseData = {
+        ...data,
+        photo: data.photo && Array.isArray(data.photo) && data.photo.length > 0 
+          ? data.photo 
+          : null
+      };
+      
+      await adminApi.createCourse(courseData);
       toast.success('Course created successfully');
       setShowAddModal(false);
       resetForm();
       fetchCourses();
     } catch (error) {
+      console.error('Create course error:', error);
       toast.error('Failed to create course');
     }
   };
 
-  const handleEditCourse = async () => {
+  const handleEditCourse = async (data: AdminUpdateCourseRequest) => {
     if (!selectedCourse) return;
     try {
-      await adminApi.updateCourse(selectedCourse.id, courseForm);
+      // Ensure photo is properly formatted as number array or null
+      const courseData = {
+        ...data,
+        photo: data.photo && Array.isArray(data.photo) && data.photo.length > 0 
+          ? data.photo 
+          : null
+      };
+      
+      await adminApi.updateCourse(selectedCourse.id, courseData);
       toast.success('Course updated successfully');
       setShowEditModal(false);
       resetForm();
       fetchCourses();
     } catch (error) {
+      console.error('Update course error:', error);
       toast.error('Failed to update course');
     }
   };
@@ -117,12 +213,27 @@ export default function AdminCourses() {
   const openEditModal = (course: AdminCourse) => {
     setSelectedCourse(course);
     setCourseForm({
+      slug: course.slug || course.id,
       titleAr: course.titleAr,
       titleEn: course.titleEn,
+      summaryAr: course.summaryAr || '',
+      summaryEn: course.summaryEn || '',
       descriptionAr: course.descriptionAr || '',
       descriptionEn: course.descriptionEn || '',
       price: course.price,
+      currency: course.currency || 'SAR',
+      type: course.type || 1,
+      level: course.level || 1,
+      category: course.category || 1,
+      videoUrl: course.videoUrl || '',
+      duration: course.duration || '',
+      instructorName: course.instructorName || '',
+      photo: course.photo || [],
+      tags: course.tags || '',
+      instructorsBioAr: course.instructorsBioAr || '',
+      instructorsBioEn: course.instructorsBioEn || '',
       isActive: course.isActive,
+      isFeatured: course.isFeatured || false,
     });
     setShowEditModal(true);
   };
@@ -134,12 +245,27 @@ export default function AdminCourses() {
 
   const resetForm = () => {
     setCourseForm({
+      slug: '',
       titleAr: '',
       titleEn: '',
+      summaryAr: '',
+      summaryEn: '',
       descriptionAr: '',
       descriptionEn: '',
       price: 0,
+      currency: 'SAR',
+      type: 1,
+      level: 1,
+      category: 1,
+      videoUrl: '',
+      duration: '',
+      instructorName: '',
+      photo: '',
+      tags: '',
+      instructorsBioAr: '',
+      instructorsBioEn: '',
       isActive: true,
+      isFeatured: false,
     });
   };
 
@@ -238,6 +364,9 @@ export default function AdminCourses() {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Thumbnail
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Course
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -261,12 +390,22 @@ export default function AdminCourses() {
                 {courses.map((course) => (
                   <tr key={course.id} className="hover:bg-gray-50">
                     <td className="px-6 py-4">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 h-12 w-12">
-                          <div className="h-12 w-12 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                            <Icon name="fa-graduation-cap" className="h-6 w-6 text-white" />
+                      <div className="flex-shrink-0 h-16 w-16">
+                        {course.photo && Array.isArray(course.photo) && course.photo.length > 0 ? (
+                          <img 
+                            src={`data:image/jpeg;base64,${btoa(String.fromCharCode(...course.photo))}`}
+                            alt={course.titleEn}
+                            className="h-16 w-16 rounded-lg object-cover"
+                          />
+                        ) : (
+                          <div className="h-16 w-16 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                            <Icon name="fa-graduation-cap" className="h-8 w-8 text-white" />
                           </div>
-                        </div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex items-center">
                         <div className="ml-4">
                           <div className="text-sm font-medium text-gray-900">
                             {course.titleEn}
@@ -304,17 +443,17 @@ export default function AdminCourses() {
                       <div className="flex justify-end space-x-2">
                         <button
                           onClick={() => openEditModal(course)}
-                          className="text-blue-600 hover:text-blue-900"
+                          className="text-blue-600 hover:text-blue-900 p-2 rounded-md hover:bg-blue-50"
                           title="Edit Course"
                         >
-                          <Icon name="fa-edit" className="h-4 w-4" />
+                          <Icon name="edit" className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => openDeleteModal(course)}
-                          className="text-red-600 hover:text-red-900"
+                          className="text-red-600 hover:text-red-900 p-2 rounded-md hover:bg-red-50"
                           title="Delete Course"
                         >
-                          <Icon name="fa-trash" className="h-4 w-4" />
+                          <Icon name="trash" className="h-4 w-4" />
                         </button>
                       </div>
                     </td>
@@ -400,94 +539,16 @@ export default function AdminCourses() {
       {/* Add Course Modal */}
       {showAddModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-[600px] shadow-lg rounded-md bg-white">
+          <div className="relative top-10 mx-auto p-5 border w-[800px] max-h-[90vh] overflow-y-auto shadow-lg rounded-md bg-white">
             <div className="mt-3">
               <h3 className="text-lg font-medium text-gray-900 mb-4">Add New Course</h3>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Title (English)</label>
-                    <input
-                      type="text"
-                      value={courseForm.titleEn}
-                      onChange={(e) => setCourseForm(prev => ({ ...prev, titleEn: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Enter English title"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Title (Arabic)</label>
-                    <input
-                      type="text"
-                      value={courseForm.titleAr}
-                      onChange={(e) => setCourseForm(prev => ({ ...prev, titleAr: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Enter Arabic title"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Description (English)</label>
-                    <textarea
-                      rows={3}
-                      value={courseForm.descriptionEn}
-                      onChange={(e) => setCourseForm(prev => ({ ...prev, descriptionEn: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Enter English description"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Description (Arabic)</label>
-                    <textarea
-                      rows={3}
-                      value={courseForm.descriptionAr}
-                      onChange={(e) => setCourseForm(prev => ({ ...prev, descriptionAr: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Enter Arabic description"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Price ($)</label>
-                    <input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={courseForm.price}
-                      onChange={(e) => setCourseForm(prev => ({ ...prev, price: parseFloat(e.target.value) || 0 }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Enter price"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                    <select
-                      value={courseForm.isActive.toString()}
-                      onChange={(e) => setCourseForm(prev => ({ ...prev, isActive: e.target.value === 'true' }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="true">Active</option>
-                      <option value="false">Inactive</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-              <div className="flex justify-end space-x-3 mt-6">
-                <button
-                  onClick={() => setShowAddModal(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleAddCourse}
-                  className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700"
-                >
-                  Add Course
-                </button>
-              </div>
+              <CourseForm
+                initialData={courseForm}
+                onSubmit={handleAddCourse}
+                onCancel={() => setShowAddModal(false)}
+                isEdit={false}
+                isLoading={false}
+              />
             </div>
           </div>
         </div>
@@ -496,94 +557,16 @@ export default function AdminCourses() {
       {/* Edit Course Modal */}
       {showEditModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-[600px] shadow-lg rounded-md bg-white">
+          <div className="relative top-10 mx-auto p-5 border w-[800px] max-h-[90vh] overflow-y-auto shadow-lg rounded-md bg-white">
             <div className="mt-3">
               <h3 className="text-lg font-medium text-gray-900 mb-4">Edit Course</h3>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Title (English)</label>
-                    <input
-                      type="text"
-                      value={courseForm.titleEn}
-                      onChange={(e) => setCourseForm(prev => ({ ...prev, titleEn: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Enter English title"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Title (Arabic)</label>
-                    <input
-                      type="text"
-                      value={courseForm.titleAr}
-                      onChange={(e) => setCourseForm(prev => ({ ...prev, titleAr: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Enter Arabic title"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Description (English)</label>
-                    <textarea
-                      rows={3}
-                      value={courseForm.descriptionEn}
-                      onChange={(e) => setCourseForm(prev => ({ ...prev, descriptionEn: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Enter English description"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Description (Arabic)</label>
-                    <textarea
-                      rows={3}
-                      value={courseForm.descriptionAr}
-                      onChange={(e) => setCourseForm(prev => ({ ...prev, descriptionAr: e.target.value }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Enter Arabic description"
-                    />
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Price ($)</label>
-                    <input
-                      type="number"
-                      min="0"
-                      step="0.01"
-                      value={courseForm.price}
-                      onChange={(e) => setCourseForm(prev => ({ ...prev, price: parseFloat(e.target.value) || 0 }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Enter price"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                    <select
-                      value={courseForm.isActive.toString()}
-                      onChange={(e) => setCourseForm(prev => ({ ...prev, isActive: e.target.value === 'true' }))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="true">Active</option>
-                      <option value="false">Inactive</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-              <div className="flex justify-end space-x-3 mt-6">
-                <button
-                  onClick={() => setShowEditModal(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleEditCourse}
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
-                >
-                  Update Course
-                </button>
-              </div>
+              <CourseForm
+                initialData={courseForm}
+                onSubmit={handleEditCourse}
+                onCancel={() => setShowEditModal(false)}
+                isEdit={true}
+                isLoading={false}
+              />
             </div>
           </div>
         </div>

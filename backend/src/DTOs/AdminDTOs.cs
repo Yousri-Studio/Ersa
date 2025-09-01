@@ -69,12 +69,27 @@ public class PagedResult<T>
 public class AdminCourseDto
 {
     public Guid Id { get; set; }
+    public string? Slug { get; set; }
     public string TitleAr { get; set; } = string.Empty;
     public string TitleEn { get; set; } = string.Empty;
+    public string? SummaryAr { get; set; }
+    public string? SummaryEn { get; set; }
     public string? DescriptionAr { get; set; }
     public string? DescriptionEn { get; set; }
     public decimal Price { get; set; }
+    public string? Currency { get; set; }
+    public int? Type { get; set; }
+    public int? Level { get; set; }
+    public int? Category { get; set; }
+    public string? VideoUrl { get; set; }
+    public string? Duration { get; set; }
+    public string? InstructorName { get; set; }
+    public byte[]? Photo { get; set; }
+    public string? Tags { get; set; }
+    public string? InstructorsBioAr { get; set; }
+    public string? InstructorsBioEn { get; set; }
     public bool IsActive { get; set; }
+    public bool? IsFeatured { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }
@@ -102,20 +117,50 @@ public class CreateUserRequest
 
 public class AdminCreateCourseRequest
 {
+    public string Slug { get; set; } = string.Empty;
     public string TitleAr { get; set; } = string.Empty;
     public string TitleEn { get; set; } = string.Empty;
+    public string? SummaryAr { get; set; }
+    public string? SummaryEn { get; set; }
     public string? DescriptionAr { get; set; }
     public string? DescriptionEn { get; set; }
     public decimal Price { get; set; }
+    public string Currency { get; set; } = "SAR";
+    public int? Type { get; set; }
+    public int? Level { get; set; }
+    public int? Category { get; set; }
+    public string? VideoUrl { get; set; }
+    public string? Duration { get; set; }
+    public string InstructorName { get; set; } = string.Empty;
+    public string? Photo { get; set; }
+    public string? Tags { get; set; }
+    public string? InstructorsBioAr { get; set; }
+    public string? InstructorsBioEn { get; set; }
     public bool IsActive { get; set; } = true;
+    public bool? IsFeatured { get; set; }
 }
 
 public class AdminUpdateCourseRequest
 {
+    public string Slug { get; set; } = string.Empty;
     public string TitleAr { get; set; } = string.Empty;
     public string TitleEn { get; set; } = string.Empty;
+    public string? SummaryAr { get; set; }
+    public string? SummaryEn { get; set; }
     public string? DescriptionAr { get; set; }
     public string? DescriptionEn { get; set; }
     public decimal Price { get; set; }
+    public string Currency { get; set; } = "SAR";
+    public int? Type { get; set; }
+    public int? Level { get; set; }
+    public int? Category { get; set; }
+    public string? VideoUrl { get; set; }
+    public string? Duration { get; set; }
+    public string InstructorName { get; set; } = string.Empty;
+    public string? Photo { get; set; }
+    public string? Tags { get; set; }
+    public string? InstructorsBioAr { get; set; }
+    public string? InstructorsBioEn { get; set; }
     public bool IsActive { get; set; }
+    public bool? IsFeatured { get; set; }
 }

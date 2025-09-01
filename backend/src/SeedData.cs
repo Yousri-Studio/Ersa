@@ -471,9 +471,119 @@ public static class SeedData
             UpdatedAt = DateTime.UtcNow
         };
 
-        context.ContentPages.AddRange(homePage, aboutPage);
-        context.ContentSections.AddRange(heroSection, aboutSection);
-        context.ContentBlocks.AddRange(heroTitle, heroSubtitle, aboutTitle, aboutDescription);
+        // Courses Page
+        var coursesPage = new ContentPage
+        {
+            Id = Guid.NewGuid(),
+            PageKey = "courses",
+            PageName = "Courses Page",
+            Description = "Courses listing page content",
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        var coursesSection = new ContentSection
+        {
+            Id = Guid.NewGuid(),
+            ContentPageId = coursesPage.Id,
+            SectionKey = "courses",
+            SectionName = "Courses Section",
+            Description = "Courses page content",
+            SortOrder = 1,
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        var coursesTitle = new ContentBlock
+        {
+            Id = Guid.NewGuid(),
+            ContentSectionId = coursesSection.Id,
+            BlockKey = "page-title",
+            BlockName = "Page Title",
+            BlockType = "text",
+            ContentEn = "Our Courses",
+            ContentAr = "دوراتنا",
+            SortOrder = 1,
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        var coursesDescription = new ContentBlock
+        {
+            Id = Guid.NewGuid(),
+            ContentSectionId = coursesSection.Id,
+            BlockKey = "page-description",
+            BlockName = "Page Description",
+            BlockType = "text",
+            ContentEn = "Discover our comprehensive collection of professional development courses",
+            ContentAr = "اكتشف مجموعتنا الشاملة من دورات التطوير المهني",
+            SortOrder = 2,
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        // Contact Page
+        var contactPage = new ContentPage
+        {
+            Id = Guid.NewGuid(),
+            PageKey = "contact",
+            PageName = "Contact Page",
+            Description = "Contact page content",
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        var contactSection = new ContentSection
+        {
+            Id = Guid.NewGuid(),
+            ContentPageId = contactPage.Id,
+            SectionKey = "contact",
+            SectionName = "Contact Section",
+            Description = "Contact page content",
+            SortOrder = 1,
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        var contactTitle = new ContentBlock
+        {
+            Id = Guid.NewGuid(),
+            ContentSectionId = contactSection.Id,
+            BlockKey = "page-title",
+            BlockName = "Page Title",
+            BlockType = "text",
+            ContentEn = "Contact Us",
+            ContentAr = "اتصل بنا",
+            SortOrder = 1,
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        var contactDescription = new ContentBlock
+        {
+            Id = Guid.NewGuid(),
+            ContentSectionId = contactSection.Id,
+            BlockKey = "page-description",
+            BlockName = "Page Description",
+            BlockType = "text",
+            ContentEn = "Get in touch with us for any questions or inquiries",
+            ContentAr = "تواصل معنا لأي أسئلة أو استفسارات",
+            SortOrder = 2,
+            IsActive = true,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        context.ContentPages.AddRange(homePage, aboutPage, coursesPage, contactPage);
+        context.ContentSections.AddRange(heroSection, aboutSection, coursesSection, contactSection);
+        context.ContentBlocks.AddRange(heroTitle, heroSubtitle, aboutTitle, aboutDescription, coursesTitle, coursesDescription, contactTitle, contactDescription);
 
         logger.LogInformation("Added content pages with sections and blocks");
     }

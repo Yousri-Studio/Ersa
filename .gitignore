@@ -1,27 +1,53 @@
-# Dependencies
-node_modules/
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-package-lock.json
 
-# Next.js
-.next/
-out/
-build/
-dist/
+# local env files
+.env*.local
 
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
+# vercel
+.vercel
 
-# Coverage directory used by tools like istanbul
-coverage/
-*.lcov
+# typescript
+*.tsbuildinfo
+next-env.d.ts
 
-# nyc test coverage
+# Backend
+/backend/src/bin/
+/backend/src/obj/
+/backend/src/Migrations/
+*.db
+*.db-shm
+*.db-wal
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
 .nyc_output
 
 # Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)

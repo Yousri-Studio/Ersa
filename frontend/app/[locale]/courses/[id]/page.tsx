@@ -144,6 +144,20 @@ export default function CourseDetailsPage() {
                   </div>
                 </div>
                 
+                {/* Tags */}
+                {course.tags && (
+                  <div className="mt-6">
+                    <h4 className="font-semibold text-gray-900 mb-2 font-cairo">Tags</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {course.tags.split(',').map((tag, index) => (
+                        <span key={index} className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full font-cairo">
+                          {tag.trim()}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* Instructor */}
                 <div className="flex items-center space-x-3 rtl:space-x-reverse mt-6 p-4 bg-gray-50 rounded-lg">
                   <img
@@ -159,6 +173,14 @@ export default function CourseDetailsPage() {
                       <span className="font-cairo">{course.instructor.studentsCount} {t('course.students')}</span>
                       <span className="font-cairo">{course.instructor.coursesCount} {t('course.courses')}</span>
                     </div>
+                    {/* Instructor Bio */}
+                    {course.instructorsBio && (
+                      <div className="mt-3">
+                        <p className="text-sm text-gray-600 font-cairo">
+                          {locale === 'ar' ? course.instructorsBio.ar : course.instructorsBio.en}
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -170,7 +192,7 @@ export default function CourseDetailsPage() {
                 {/* Video Preview */}
                 <div className="relative">
                   <img
-                    src={course.imageUrl}
+                    src={course.photo || course.imageUrl || '/images/Course Place Holder Small.png'}
                     alt={title}
                     className="w-full h-48 object-cover"
                   />
@@ -296,7 +318,7 @@ export default function CourseDetailsPage() {
                         {t('course.about')}
                       </h2>
                       <p className="text-gray-600 leading-relaxed font-cairo">
-                        {course.description}
+                        {course.description ? (locale === 'ar' ? course.description.ar : course.description.en) : (locale === 'ar' ? course.summary.ar : course.summary.en)}
                       </p>
                     </div>
                     

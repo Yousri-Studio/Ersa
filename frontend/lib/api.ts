@@ -102,6 +102,10 @@ export interface Course {
     ar: string;
     en: string;
   };
+  description?: {
+    ar: string;
+    en: string;
+  };
   price: number;
   currency: string;
   type: 'Live' | 'PDF';
@@ -112,6 +116,12 @@ export interface Course {
   category: CourseCategory;
   imageUrl?: string;
   instructorName?: string;
+  photo?: string;
+  tags?: string;
+  instructorsBio?: {
+    ar: string;
+    en: string;
+  };
 
   badge?: 'Bestseller' | 'New' | null;
   thumbnailUrl?: string;

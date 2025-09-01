@@ -371,7 +371,11 @@
         "totalOrders": "إجمالي الطلبات",
         "totalRevenue": "إجمالي الإيرادات"
       }
-    }
+    },
+    "errors": {
+      "access-denied": "تم رفض الوصول. مطلوب صلاحيات إدارية."
+    },
+    "contentManagement": "إدارة المحتوى"
   },
   "admin-login": {
     "welcome": "مرحباً بك عزيزي",

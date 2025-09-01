@@ -147,6 +147,10 @@ export default function AdminDashboard() {
 
   // Use fallback data if stats is null
   const dashboardStats = stats || fallbackStats;
+  
+  // Extract recent users and geographics data
+  const recentUsers = dashboardStats.recentUsers || [];
+  const geographics = dashboardStats.userGeographics || [];
 
   const formatDate = (dateString: string) => {
     // This function seems to be unused, but kept for potential future use.
@@ -182,61 +186,6 @@ export default function AdminDashboard() {
     }
   ];
 
-  const recentUsers = [
-    {
-      id: '1',
-      name: 'Eslam Elsayed',
-      email: 'gfxislam@gmail.com',
-      date: '2025/01/01',
-      avatar: '/images/Avatar.svg'
-    },
-    {
-      id: '2',
-      name: 'Eslam Elsayed',
-      email: 'gfxislam@gmail.com',
-      date: '2025/01/01',
-      avatar: '/images/Avatar.svg'
-    },
-    {
-      id: '3',
-      name: 'Eslam Elsayed',
-      email: 'gfxislam@gmail.com',
-      date: '2025/01/01',
-      avatar: '/images/Avatar.svg'
-    },
-    {
-      id: '4',
-      name: 'Eslam Elsayed',
-      email: 'gfxislam@gmail.com',
-      date: '2025/01/01',
-      avatar: '/images/Avatar.svg'
-    }
-  ];
-
-  // Use real geographic data from API or fallback to mock data
-  const geographics = [
-    { 
-      country: locale === 'ar' ? 'المملكة العربية السعودية' : 'Saudi Arabia', 
-      users: 20, 
-      coordinates: [45.0792, 23.8859] 
-    },
-    { 
-      country: locale === 'ar' ? 'مصر' : 'Egypt', 
-      users: 20, 
-      coordinates: [30.8025, 26.8206] 
-    },
-    { 
-      country: locale === 'ar' ? 'الولايات المتحدة' : 'United States', 
-      users: 20, 
-      coordinates: [-95.7129, 37.0902] 
-    },
-    { 
-      country: locale === 'ar' ? 'المملكة المتحدة' : 'United Kingdom', 
-      users: 20, 
-      coordinates: [-0.1278, 51.5074] 
-    }
-  ];
-
   const isRTL = locale === 'ar';
 
   return (
@@ -268,13 +217,13 @@ export default function AdminDashboard() {
         <div style={{backgroundColor: '#FAFCFF'}} className="rounded-2xl p-6">
           {/* Dashboard Header */}
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-1">{t('dashboard')}</h2>
-            <p className="text-gray-600 text-sm">{t('overview-platform')}</p>
+            <h2 className="text-xl font-bold text-gray-800 mb-1">{t('dashboard.title')}</h2>
+            <p className="text-gray-600 text-sm">{t('dashboard.overview-platform')}</p>
           </div>
 
           {/* Statistics Cards */}
           <motion.div 
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8"
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -317,6 +266,22 @@ export default function AdminDashboard() {
                     <span className="text-gray-600 text-sm font-medium">{t('total-orders')}</span>
                   </div>
                   <div className="text-3xl font-bold text-gray-800">{dashboardStats.totalOrders}</div>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div variants={itemVariants} className="bg-white rounded-xl p-6 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="flex items-center mb-2">
+                    <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+                      <Icon name="dollar-sign" className="w-4 h-4 text-purple-600" />
+                    </div>
+                    <span className="text-gray-600 text-sm font-medium">{t('total-revenue')}</span>
+                  </div>
+                  <div className="text-3xl font-bold text-gray-800">
+                    {locale === 'ar' ? `${dashboardStats.totalRevenue.toLocaleString()} ر.س` : `SAR ${dashboardStats.totalRevenue.toLocaleString()}`}
+                  </div>
                 </div>
               </div>
             </motion.div>
@@ -375,7 +340,7 @@ export default function AdminDashboard() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                          {locale === 'ar' ? 'مدفوع' : 'Paid'}
+                          {t('status-completed')}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -404,19 +369,19 @@ export default function AdminDashboard() {
                     <div key={user.id} className="flex items-center justify-between">
                       <div className="flex items-center space-x-3">
                         <div className="h-10 w-10 rounded-full overflow-hidden bg-gray-200">
-                          <img 
-                            src={user.avatar} 
-                            alt={user.name}
-                            className="h-full w-full object-cover"
-                          />
+                          <div className="h-full w-full bg-gradient-to-r from-blue-500 to-teal-600 flex items-center justify-center">
+                            <span className="text-white font-semibold text-sm">
+                              {user.fullName?.charAt(0)?.toUpperCase() || 'U'}
+                            </span>
+                          </div>
                         </div>
                         <div>
-                          <p className="text-sm font-medium text-gray-900">{user.name}</p>
+                          <p className="text-sm font-medium text-gray-900">{user.fullName}</p>
                           <p className="text-sm text-gray-500">{user.email}</p>
                         </div>
                       </div>
                       <div className="flex items-center space-x-3">
-                        <span className="text-sm text-gray-500">{user.date}</span>
+                        <span className="text-sm text-gray-500">{user.createdAt ? new Date(user.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US') : ''}</span>
                         <button className="text-gray-400 hover:text-gray-600 p-1">
                           <Icon name="ellipsis-v" className="h-4 w-4" />
                         </button>

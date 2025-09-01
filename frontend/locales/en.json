@@ -177,17 +177,6 @@
       "cart": "Add to cart"
     }
   },
-  "cart": {
-    "title": "Shopping Cart",
-    "empty": "Your cart is empty",
-    "continue-shopping": "Continue Shopping",
-    "remove": "Remove",
-    "total": "Total",
-    "checkout": "Proceed to Checkout",
-    "item-removed": "Item removed from cart",
-    "item-added": "Item added to cart",
-    "already-in-cart": "This item is already in your cart"
-  },
   "checkout": {
     "title": "Checkout",
     "order-summary": "Order Summary",
@@ -361,6 +350,7 @@
     },
     "dashboard": {
       "title": "Dashboard",
+      "overview-platform": "Platform overview",
       "stats": {
         "totalUsers": "Total Users",
         "activeUsers": "Active Users",
@@ -369,7 +359,11 @@
         "totalOrders": "Total Orders",
         "totalRevenue": "Total Revenue"
       }
-    }
+    },
+    "errors": {
+      "access-denied": "Access denied. Admin privileges required."
+    },
+    "contentManagement": "Content Management"
   },
   "admin-login": {
     "welcome": "Welcome dear",

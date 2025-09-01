@@ -23,7 +23,10 @@ public class Course
     public CourseCategory Category { get; set; }
     
     [MaxLength(1000)]
-    public string? ImageUrl { get; set; }
+    public string? VideoUrl { get; set; }
+   
+    [MaxLength(50)]
+    public string? Duration { get; set; }
     
     [Required]
     [MaxLength(255)]
@@ -41,17 +44,29 @@ public class Course
     [MaxLength(500)]
     public string TitleEn { get; set; } = string.Empty;
     
-    // [MaxLength(2000)]
-    // public string? SummaryAr { get; set; }
+    [MaxLength(2000)]
+    public string? SummaryAr { get; set; }
     
-    // [MaxLength(2000)]
-    // public string? SummaryEn { get; set; }
+    [MaxLength(2000)]
+    public string? SummaryEn { get; set; }
     
     [MaxLength(5000)]
     public string? DescriptionAr { get; set; }
     
     [MaxLength(5000)]
     public string? DescriptionEn { get; set; }
+    
+    // New fields for photo, tags, and instructor bio
+    public byte[]? Photo { get; set; }
+    
+    [MaxLength(2000)]
+    public string? Tags { get; set; }
+    
+    [MaxLength(2500)]
+    public string? InstructorsBioAr { get; set; }
+    
+    [MaxLength(2500)]
+    public string? InstructorsBioEn { get; set; }
     
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
