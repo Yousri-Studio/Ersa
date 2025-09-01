@@ -23,10 +23,21 @@ export function FileUpload({
   const [isDragging, setIsDragging] = useState(false);
   const [preview, setPreview] = useState<string>('');
   
-  // Initialize preview from value if it's a string (URL)
+  // Initialize preview from value if it's a string (URL) or number array (byte data)
   useEffect(() => {
     if (typeof value === 'string' && value) {
       setPreview(value);
+    } else if (Array.isArray(value) && value.length > 0) {
+      // Convert number array to base64 data URL for preview
+      try {
+        const base64String = btoa(new Uint8Array(value).reduce((acc, byte) => acc + String.fromCharCode(byte), ''));
+        setPreview(`data:image/jpeg;base64,${base64String}`);
+      } catch (error) {
+        console.error('Error converting photo data for preview:', error);
+        setPreview('');
+      }
+    } else {
+      setPreview('');
     }
   }, [value]);
   const fileInputRef = useRef<HTMLInputElement>(null);
