@@ -32,6 +32,7 @@ const mockCourses: Course[] = [
       en: 'Learn fundamentals and modern graphic design techniques using professional tools'
     },
     imageUrl: '/images/Course Place Holder Small.png',
+    thumbnailUrl: '/images/Course Place Holder Small.png',
     type: 'Live' as const,
     price: 1200,
     currency: 'SAR',

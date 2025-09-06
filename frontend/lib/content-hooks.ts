@@ -47,11 +47,35 @@ function transformApiCourse(apiCourse: BackendCourse, locale: string = 'ar'): Co
   const levelMap = { 'Biginner': 'مبتدئ', 'Intermediate': 'متوسط', 'Advanced': 'متقدم' };
   const categoryMap = { 'Programming': 'البرمجة', 'Business': 'الأعمال', 'Design': 'التصميم' };
   
+  // Convert photo blob to data URL if available
+  const getImageUrl = (): string => {
+    if (apiCourse.photo && typeof apiCourse.photo === 'string' && apiCourse.photo.trim() !== '') {
+      // Check if it's already a complete data URL
+      if (apiCourse.photo.startsWith('data:image/')) {
+        return apiCourse.photo;
+      } 
+      // If it's a base64 string without data URL prefix
+      else if (apiCourse.photo.match(/^[A-Za-z0-9+/]*={0,2}$/)) {
+        return `data:image/jpeg;base64,${apiCourse.photo}`;
+      }
+      // If it looks like a file path or URL
+      else if (apiCourse.photo.startsWith('http') || apiCourse.photo.startsWith('/')) {
+        return apiCourse.photo;
+      }
+    }
+    
+    // Fallback to static placeholder image
+    return '/images/Course Place Holder Small.png';
+  };
+  
   return {
     ...apiCourse,
     // Keep the original localized title and summary objects from backend
     title: apiCourse.title,
     summary: apiCourse.summary,
+    // Use blob image if available, otherwise fallback to placeholder
+    thumbnailUrl: getImageUrl(),
+    imageUrl: getImageUrl(),
     curriculum: apiCourse.sessions?.map((session, index) => ({
       id: index + 1,
       title: `الجلسة ${index + 1}`,
