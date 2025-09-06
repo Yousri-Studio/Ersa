@@ -122,6 +122,7 @@ export interface Course {
     ar: string;
     en: string;
   };
+  videoUrl?: string;
 
   badge?: 'Bestseller' | 'New' | null;
   thumbnailUrl?: string;

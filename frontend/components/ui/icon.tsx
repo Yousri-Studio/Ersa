@@ -35,6 +35,7 @@ const iconMap: Record<string, any> = {
   // Navigation & UI
   'bars': faBars,
   'xmark': faXmark,
+  'x': faXmark, // Alias for close button
   'user': faUser,
   'heart': faHeart,
   'shopping-cart': faShoppingCart,

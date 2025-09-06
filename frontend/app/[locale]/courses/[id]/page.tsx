@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Icon } from '@/components/ui/icon';
+import { VideoModal } from '@/components/ui/video-modal';
 import { useCartStore } from '@/lib/cart-store';
 import { usePageLoad, useStaggeredAnimation } from '@/lib/use-animations';
 import { ScrollAnimations } from '@/components/scroll-animations';
@@ -21,6 +22,7 @@ export default function CourseDetailsPage() {
   const [activeTab, setActiveTab] = useState('overview');
   const [expandedSection, setExpandedSection] = useState<string | number | null>(null);
   const [isInWishlist, setIsInWishlist] = useState(false);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const isLoaded = usePageLoad(100);
   const { course, loading: courseLoading, error: courseError } = useCourse(routeParams.id);
   
@@ -196,11 +198,16 @@ export default function CourseDetailsPage() {
                     alt={title}
                     className="w-full h-48 object-cover"
                   />
-                  <button className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 hover:bg-opacity-40 transition-all duration-200">
-                    <div className="h-16 w-16 bg-white rounded-full flex items-center justify-center">
-                                             <Icon name="play" className="h-6 w-6 text-gray-800 ml-1" />
-                    </div>
-                  </button>
+                  {course.videoUrl && (
+                    <button 
+                      onClick={() => setIsVideoModalOpen(true)}
+                      className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 hover:bg-opacity-40 transition-all duration-200"
+                    >
+                      <div className="h-16 w-16 bg-white rounded-full flex items-center justify-center">
+                        <Icon name="play" className="h-6 w-6 text-gray-800 ml-1" />
+                      </div>
+                    </button>
+                  )}
                 </div>
                 
                 {/* Pricing */}
@@ -488,6 +495,16 @@ export default function CourseDetailsPage() {
         </div>
       </div>
     </div>
+    
+    {/* Video Modal */}
+    {course.videoUrl && (
+      <VideoModal
+        isOpen={isVideoModalOpen}
+        onClose={() => setIsVideoModalOpen(false)}
+        videoUrl={course.videoUrl}
+        title={title}
+      />
+    )}
     </>
   );
 }
