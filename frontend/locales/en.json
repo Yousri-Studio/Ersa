@@ -309,6 +309,8 @@
     "operations-dashboard": "Operations Dashboard",
     "dashboard-subtitle": "from here you can manage all content, orders and everything",
     "using-demo-data": "Using demo data",
+    "connected-to-backend": "Connected to Backend",
+    "backend-unavailable": "Backend Unavailable",
     "online": "Online",
     "active-courses": "active",
     "this-month": "This month",

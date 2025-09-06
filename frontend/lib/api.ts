@@ -17,7 +17,8 @@ export const api = axios.create({
 api.interceptors.request.use((config) => {
   const token = Cookies.get('auth-token');
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    // Use the set method to avoid modifying read-only properties
+    config.headers.set('Authorization', `Bearer ${token}`);
   }
   return config;
 });
@@ -108,24 +109,26 @@ export interface Course {
   };
   price: number;
   currency: string;
-  type: 'Live' | 'PDF';
+  type: number; // 0 = PDF, 1 = Live (from backend enum)
+  level?: number; // Course level (from backend enum)
+  category: number; // Course category (from backend enum)
   isActive: boolean;
   isFeatured?: boolean;
   rating?: number;
   createdAt?: string;
-  category: CourseCategory;
   imageUrl?: string;
   instructorName?: string;
-  photo?: string;
+  photo?: string; // Base64 encoded photo data from backend
   tags?: string;
   instructorsBio?: {
     ar: string;
     en: string;
   };
   videoUrl?: string;
+  duration?: string;
 
   badge?: 'Bestseller' | 'New' | null;
-  thumbnailUrl?: string;
+  thumbnailUrl?: string; // Generated from photo data
   instructor?: {
     name: string;
     title?: string;

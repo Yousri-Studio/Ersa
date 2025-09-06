@@ -20,7 +20,7 @@ export default function DebugAuthPage() {
     setTestResult('Testing login...');
     
     try {
-      const response = await fetch('http://localhost:5001/api/auth/login', {
+      const response = await fetch('http://localhost:5002/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -38,7 +38,7 @@ export default function DebugAuthPage() {
         
         // Test admin API
         try {
-          const adminResponse = await fetch('http://localhost:5001/api/admin/dashboard-stats', {
+          const adminResponse = await fetch('http://localhost:5002/api/admin/dashboard-stats', {
             headers: {
               'Authorization': `Bearer ${data.token}`,
               'Content-Type': 'application/json',
@@ -181,7 +181,7 @@ export default function DebugAuthPage() {
               isAuthenticated, 
               hasToken: !!token,
               cookieToken: !!cookieToken,
-              apiBaseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5001/api'
+              apiBaseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5002/api'
             }, null, 2)}
           </pre>
         </div>

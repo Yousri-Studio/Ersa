@@ -154,7 +154,8 @@ public class AdminController : ControllerBase
                     CreatedAt = u.CreatedAt,
                     IsAdmin = u.IsAdmin,
                     IsSuperAdmin = u.IsSuperAdmin,
-                    LastLoginAt = u.LastLoginAt
+                    LastLoginAt = u.LastLoginAt,
+                    Status = u.Status.ToString()
                 })
                 .ToListAsync();
 
@@ -179,6 +180,11 @@ public class AdminController : ControllerBase
     {
         try
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
             var user = await _userManager.FindByIdAsync(userId.ToString());
             if (user == null)
             {
@@ -188,18 +194,54 @@ public class AdminController : ControllerBase
             // Only super admin can modify admin users
             if ((user.IsAdmin || user.IsSuperAdmin) && !IsSuperAdmin())
             {
-                return Forbid();
+                return StatusCode(403, new { error = "Insufficient permissions to modify admin users" });
             }
 
-            user.Status = request.Status;
+            // Parse the status string to enum
+            if (!Enum.TryParse<UserStatus>(request.Status, true, out var userStatus))
+            {
+                return BadRequest(new { error = $"Invalid status value: {request.Status}. Valid values are: PendingEmailVerification, Active, Inactive, Suspended" });
+            }
+
+            user.Status = userStatus;
             user.AdminNotes = request.AdminNotes;
-            await _userManager.UpdateAsync(user);
+            user.UpdatedAt = DateTime.UtcNow;
+
+            // Check if user has proper Identity fields set (SecurityStamp, etc.)
+            if (string.IsNullOrEmpty(user.SecurityStamp))
+            {
+                // For users created without UserManager, we need to fix their Identity fields
+                user.SecurityStamp = Guid.NewGuid().ToString();
+                user.ConcurrencyStamp = Guid.NewGuid().ToString();
+                
+                if (string.IsNullOrEmpty(user.UserName))
+                {
+                    user.UserName = user.Email;
+                }
+                
+                if (string.IsNullOrEmpty(user.NormalizedUserName))
+                {
+                    user.NormalizedUserName = user.Email?.ToUpperInvariant();
+                }
+                
+                if (string.IsNullOrEmpty(user.NormalizedEmail))
+                {
+                    user.NormalizedEmail = user.Email?.ToUpperInvariant();
+                }
+            }
+            
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                return BadRequest(new { error = "Failed to update user", details = errors });
+            }
 
             return Ok(new { message = "User status updated successfully" });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error updating user status");
+            _logger.LogError(ex, "Error updating user status for user {UserId}", userId);
             return StatusCode(500, new { error = "Internal server error" });
         }
     }
@@ -724,20 +766,26 @@ public class AdminController : ControllerBase
         {
             var user = new User
             {
-                Id = Guid.NewGuid(),
                 FullName = request.FullName,
                 Email = request.Email,
+                UserName = request.Email, // UserName is required for Identity
                 Phone = request.Phone,
                 Locale = request.Locale,
                 IsAdmin = request.IsAdmin ?? false,
                 IsSuperAdmin = request.IsSuperAdmin ?? false,
                 Status = UserStatus.Active,
+                EmailConfirmed = true, // Since admin is creating the user
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
 
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
+            // Use UserManager to create the user properly with all Identity fields
+            var result = await _userManager.CreateAsync(user);
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                return BadRequest(new { error = "Failed to create user", details = errors });
+            }
 
             var userDto = new UserDto
             {
@@ -757,7 +805,8 @@ public class AdminController : ControllerBase
         }
         catch (Exception ex)
         {
-            return BadRequest($"Failed to create user: {ex.Message}");
+            _logger.LogError(ex, "Error creating user");
+            return BadRequest(new { error = $"Failed to create user: {ex.Message}" });
         }
     }
 

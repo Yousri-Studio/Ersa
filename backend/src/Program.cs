@@ -190,6 +190,9 @@ using (var scope = app.Services.CreateScope())
         
         Log.Information("Database initialized successfully");
         
+        // Fix existing users with missing Identity fields
+        await ErsaTraining.API.Utilities.FixUserIdentityFields.FixExistingUsersAsync(app.Services);
+        
         // Seed database with initial data
         await ErsaTraining.API.SeedData.SeedAsync(app.Services);
     }
@@ -202,4 +205,7 @@ using (var scope = app.Services.CreateScope())
 
 Log.Information("Starting Ersa Training API");
 
+
+
 app.Run();
+

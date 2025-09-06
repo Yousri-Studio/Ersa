@@ -25,7 +25,7 @@ export default function AdminOrders() {
   const [statusForm, setStatusForm] = useState({
     status: '',
   });
-  const { isHydrated } = useHydration();
+  const isHydrated = useHydration();
 
   useEffect(() => {
     if (isHydrated) {
@@ -58,6 +58,10 @@ export default function AdminOrders() {
         totalCount: response.data.totalCount,
         totalPages: response.data.totalPages,
       }));
+
+      if (response.isUsingFallback) {
+        toast.error('Using demo data - API connection failed');
+      }
     } catch (error: any) {
       toast.error('Failed to load orders');
       console.error('Error fetching orders:', error);
@@ -92,7 +96,7 @@ export default function AdminOrders() {
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD',
+      currency: 'SAR',
     }).format(amount);
   };
 
@@ -197,7 +201,7 @@ export default function AdminOrders() {
               onClick={() => setPagination(prev => ({ ...prev, page: 1 }))}
               className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <Icon name="fa-search" className="mr-2" />
+              <Icon name="search" className="mr-2" />
               Search
             </button>
           </div>
@@ -251,7 +255,7 @@ export default function AdminOrders() {
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10">
                           <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                            <Icon name="fa-shopping-cart" className="h-5 w-5 text-blue-600" />
+                            <Icon name="shopping-cart" className="h-5 w-5 text-blue-600" />
                           </div>
                         </div>
                         <div className="ml-4">
@@ -293,7 +297,7 @@ export default function AdminOrders() {
                           className="text-blue-600 hover:text-blue-900"
                           title="Update Status"
                         >
-                          <Icon name="fa-edit" className="h-4 w-4" />
+                          <Icon name="edit" className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => {
@@ -303,7 +307,7 @@ export default function AdminOrders() {
                           className="text-green-600 hover:text-green-900"
                           title="View Details"
                         >
-                          <Icon name="fa-eye" className="h-4 w-4" />
+                          <Icon name="eye" className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => {
@@ -313,7 +317,7 @@ export default function AdminOrders() {
                           className="text-purple-600 hover:text-purple-900"
                           title="Download Invoice"
                         >
-                          <Icon name="fa-download" className="h-4 w-4" />
+                          <Icon name="download" className="h-4 w-4" />
                         </button>
                       </div>
                     </td>
@@ -364,7 +368,7 @@ export default function AdminOrders() {
                     disabled={pagination.page === 1}
                     className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                   >
-                    <Icon name="fa-chevron-left" className="h-5 w-5" />
+                    <Icon name="chevron-left" className="h-5 w-5" />
                   </button>
                   {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
                     const page = i + 1;
@@ -387,7 +391,7 @@ export default function AdminOrders() {
                     disabled={pagination.page === pagination.totalPages}
                     className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                   >
-                    <Icon name="fa-chevron-right" className="h-5 w-5" />
+                    <Icon name="chevron-right" className="h-5 w-5" />
                   </button>
                 </nav>
               </div>

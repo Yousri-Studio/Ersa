@@ -1,4 +1,5 @@
 import { api } from './api';
+import { apiCallWithFallback } from './backend-connection';
 
 export interface ContentPage {
   id: string;
@@ -279,17 +280,226 @@ export interface AdminCreateCourseRequest {
 
 export interface AdminUpdateCourseRequest extends AdminCreateCourseRequest {}
 
-export const adminApi = {
-  // Dashboard
-  getDashboardStats: () => api.get<DashboardStats>('/admin/dashboard-stats'),
+// Fallback data for when backend is not available
+const fallbackDashboardStats: DashboardStats = {
+  totalUsers: 156,
+  activeUsers: 142,
+  totalCourses: 28,
+  activeCourses: 24,
+  totalOrders: 89,
+  totalRevenue: 245600,
+  recentUsers: [
+    {
+      id: '1',
+      fullName: 'أحمد محمد علي',
+      email: 'ahmed.mohamed@example.com',
+      createdAt: '2025-01-15T10:30:00Z',
+      status: 'Active'
+    },
+    {
+      id: '2', 
+      fullName: 'فاطمة سعد النور',
+      email: 'fatima.saad@example.com',
+      createdAt: '2025-01-14T15:45:00Z',
+      status: 'Active'
+    },
+    {
+      id: '3',
+      fullName: 'محمد عبدالله الخالد',
+      email: 'mohamed.abdullah@example.com',
+      createdAt: '2025-01-13T09:20:00Z',
+      status: 'Active'
+    },
+    {
+      id: '4',
+      fullName: 'سارة أحمد المطيري',
+      email: 'sarah.ahmed@example.com',
+      createdAt: '2025-01-12T14:15:00Z',
+      status: 'Active'
+    }
+  ],
+  recentOrders: [
+    {
+      id: '1',
+      userName: 'أحمد محمد علي',
+      totalAmount: 1200,
+      status: 'Paid',
+      createdAt: '2025-01-15T12:00:00Z'
+    },
+    {
+      id: '2',
+      userName: 'فاطمة سعد النور',
+      totalAmount: 850,
+      status: 'Paid',
+      createdAt: '2025-01-14T16:30:00Z'
+    },
+    {
+      id: '3',
+      userName: 'محمد عبدالله الخالد',
+      totalAmount: 1500,
+      status: 'Pending',
+      createdAt: '2025-01-13T11:15:00Z'
+    }
+  ],
+  userGeographics: [
+    { country: 'Saudi Arabia', users: 89, coordinates: [45.0792, 23.8859] },
+    { country: 'Egypt', users: 34, coordinates: [30.8025, 26.8206] },
+    { country: 'United Arab Emirates', users: 21, coordinates: [54.3773, 24.2533] },
+    { country: 'Kuwait', users: 12, coordinates: [47.4818, 29.3117] }
+  ]
+};
 
-  // Users
-  getUsers: (params: {
+const fallbackUsers: PagedResult<AdminUser> = {
+  items: [
+    {
+      id: '1',
+      fullName: 'أحمد محمد علي',
+      email: 'ahmed.mohamed@example.com',
+      phone: '+966501234567',
+      locale: 'ar',
+      createdAt: '2025-01-15T10:30:00Z',
+      isAdmin: false,
+      isSuperAdmin: false,
+      lastLoginAt: '2025-01-16T08:15:00Z',
+      status: 'Active'
+    },
+    {
+      id: '2',
+      fullName: 'Sarah Johnson',
+      email: 'sarah.johnson@example.com',
+      phone: '+1234567890',
+      locale: 'en',
+      createdAt: '2025-01-14T15:45:00Z',
+      isAdmin: true,
+      isSuperAdmin: false,
+      lastLoginAt: '2025-01-16T09:30:00Z',
+      status: 'Active'
+    },
+    {
+      id: '3',
+      fullName: 'فاطمة سعد النور',
+      email: 'fatima.saad@example.com',
+      phone: '+966502345678',
+      locale: 'ar',
+      createdAt: '2025-01-13T09:20:00Z',
+      isAdmin: false,
+      isSuperAdmin: false,
+      lastLoginAt: '2025-01-15T16:45:00Z',
+      status: 'Active'
+    }
+  ],
+  totalCount: 156,
+  page: 1,
+  pageSize: 20,
+  totalPages: 8
+};
+
+const fallbackCourses: PagedResult<AdminCourse> = {
+  items: [
+    {
+      id: '1',
+      slug: 'advanced-graphic-design',
+      titleAr: 'دورة التصميم الجرافيكي المتقدمة',
+      titleEn: 'Advanced Graphic Design Course',
+      summaryAr: 'تعلم أحدث تقنيات التصميم الجرافيكي',
+      summaryEn: 'Learn the latest graphic design techniques',
+      price: 1200,
+      currency: 'SAR',
+      type: 1,
+      level: 2,
+      category: 2,
+      instructorName: 'أحمد المصمم',
+      isActive: true,
+      isFeatured: true,
+      createdAt: '2025-01-10T10:00:00Z',
+      updatedAt: '2025-01-15T14:30:00Z'
+    },
+    {
+      id: '2',
+      slug: 'web-development-fundamentals',
+      titleAr: 'أساسيات تطوير المواقع',
+      titleEn: 'Web Development Fundamentals',
+      summaryAr: 'تعلم أساسيات تطوير المواقع الإلكترونية',
+      summaryEn: 'Learn web development basics',
+      price: 950,
+      currency: 'SAR',
+      type: 0,
+      level: 1,
+      category: 0,
+      instructorName: 'محمد المطور',
+      isActive: true,
+      isFeatured: false,
+      createdAt: '2025-01-08T09:00:00Z',
+      updatedAt: '2025-01-12T11:20:00Z'
+    }
+  ],
+  totalCount: 28,
+  page: 1,
+  pageSize: 20,
+  totalPages: 2
+};
+
+const fallbackOrders: PagedResult<AdminOrder> = {
+  items: [
+    {
+      id: '1',
+      userId: '1',
+      userName: 'أحمد محمد علي',
+      totalAmount: 1200,
+      status: 'Paid',
+      createdAt: '2025-01-15T12:00:00Z',
+      updatedAt: '2025-01-15T12:05:00Z'
+    },
+    {
+      id: '2',
+      userId: '3',
+      userName: 'فاطمة سعد النور',
+      totalAmount: 850,
+      status: 'Paid',
+      createdAt: '2025-01-14T16:30:00Z',
+      updatedAt: '2025-01-14T16:35:00Z'
+    },
+    {
+      id: '3',
+      userId: '2',
+      userName: 'Sarah Johnson',
+      totalAmount: 1500,
+      status: 'Pending',
+      createdAt: '2025-01-13T11:15:00Z',
+      updatedAt: '2025-01-13T11:15:00Z'
+    }
+  ],
+  totalCount: 89,
+  page: 1,
+  pageSize: 20,
+  totalPages: 5
+};
+
+export const adminApi = {
+  // Dashboard - with fallback support
+  getDashboardStats: async () => {
+    const result = await apiCallWithFallback(
+      () => api.get<DashboardStats>('/admin/dashboard-stats'),
+      fallbackDashboardStats,
+      { fallbackMessage: 'Backend not available, using demo dashboard data' }
+    );
+    return { data: result.data, isUsingFallback: result.isUsingFallback };
+  },
+
+  // Users - with fallback support
+  getUsers: async (params: {
     page?: number;
     pageSize?: number;
     search?: string;
     status?: string;
-  }) => api.get<PagedResult<AdminUser>>('/admin/users', { params }),
+  }) => {
+    const result = await apiCallWithFallback(
+      () => api.get<PagedResult<AdminUser>>('/admin/users', { params: { ...params } }),
+      fallbackUsers,
+      { fallbackMessage: 'Backend not available, using demo user data' }
+    );
+    return { data: result.data, isUsingFallback: result.isUsingFallback };
+  },
 
   updateUserStatus: (userId: string, data: UpdateUserStatusRequest) =>
     api.put(`/admin/users/${userId}/status`, data),
@@ -300,13 +510,20 @@ export const adminApi = {
   createUser: (data: CreateUserRequest) =>
     api.post<AdminUser>('/admin/users', data),
 
-  // Courses
-  getCourses: (params: {
+  // Courses - with fallback support
+  getCourses: async (params: {
     page?: number;
     pageSize?: number;
     search?: string;
     isActive?: boolean;
-  }) => api.get<PagedResult<AdminCourse>>('/admin/courses', { params }),
+  }) => {
+    const result = await apiCallWithFallback(
+      () => api.get<PagedResult<AdminCourse>>('/admin/courses', { params: { ...params } }),
+      fallbackCourses,
+      { fallbackMessage: 'Backend not available, using demo course data' }
+    );
+    return { data: result.data, isUsingFallback: result.isUsingFallback };
+  },
 
   createCourse: (data: AdminCreateCourseRequest) => {
     // Convert photo number array to base64 string for proper serialization
@@ -333,14 +550,21 @@ export const adminApi = {
   deleteCourse: (courseId: string) =>
     api.delete(`/admin/courses/${courseId}`),
 
-  // Orders
-  getOrders: (params: {
+  // Orders - with fallback support
+  getOrders: async (params: {
     page?: number;
     pageSize?: number;
     status?: string;
     fromDate?: string;
     toDate?: string;
-  }) => api.get<PagedResult<AdminOrder>>('/admin/orders', { params }),
+  }) => {
+    const result = await apiCallWithFallback(
+      () => api.get<PagedResult<AdminOrder>>('/admin/orders', { params: { ...params } }),
+      fallbackOrders,
+      { fallbackMessage: 'Backend not available, using demo order data' }
+    );
+    return { data: result.data, isUsingFallback: result.isUsingFallback };
+  },
 
   updateOrderStatus: (orderId: string, data: UpdateOrderStatusRequest) =>
     api.put(`/admin/orders/${orderId}/status`, data),

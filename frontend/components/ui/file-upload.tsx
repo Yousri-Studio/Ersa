@@ -119,7 +119,7 @@ export function FileUpload({
             onClick={handleRemove}
             className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
           >
-            <Icon name="fa-times" className="h-3 w-3" />
+            <Icon name="times" className="h-3 w-3" />
           </button>
         </div>
       ) : (
@@ -136,7 +136,7 @@ export function FileUpload({
             }
           `}
         >
-          <Icon name="fa-cloud-upload-alt" className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+          <Icon name="cloud-upload-alt" className="h-8 w-8 text-gray-400 mx-auto mb-2" />
           <p className="text-sm text-gray-600">{placeholder}</p>
           <p className="text-xs text-gray-400 mt-1">Max size: {maxSize}MB</p>
         </div>

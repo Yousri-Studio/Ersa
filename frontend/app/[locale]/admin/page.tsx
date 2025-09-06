@@ -10,75 +10,7 @@ import WorldMap from '@/components/ui/world-map';
 import { useAuthStore } from '@/lib/auth-store';
 import { Users } from 'lucide-react';
 import { motion } from 'framer-motion';
-
-// Fallback stats for when API is not available
-const fallbackStats: DashboardStats = {
-  totalUsers: 20,
-  activeUsers: 890,
-  totalCourses: 20,
-  activeCourses: 38,
-  totalOrders: 120,
-  totalRevenue: 125000,
-  recentUsers: [
-    {
-      id: '1',
-      fullName: 'Eslam Elsayed',
-      email: 'gfxislam@gmail.com',
-      createdAt: '2025-01-15T10:30:00Z',
-      status: 'Active'
-    },
-    {
-      id: '2',
-      fullName: 'Eslam Elsayed',
-      email: 'gfxislam@gmail.com',
-      createdAt: '2025-01-14T15:45:00Z',
-      status: 'Active'
-    },
-    {
-      id: '3',
-      fullName: 'Eslam Elsayed',
-      email: 'gfxislam@gmail.com',
-      createdAt: '2025-01-13T09:20:00Z',
-      status: 'Active'
-    },
-    {
-      id: '4',
-      fullName: 'Eslam Elsayed',
-      email: 'gfxislam@gmail.com',
-      createdAt: '2025-01-13T09:20:00Z',
-      status: 'Active'
-    }
-  ],
-  recentOrders: [
-    {
-      id: '1',
-      userName: 'Eslam Elsayed',
-      totalAmount: 1200,
-      status: 'Paid',
-      createdAt: '2025-01-15T12:00:00Z'
-    },
-    {
-      id: '2',
-      userName: 'Eslam Elsayed',
-      totalAmount: 1200,
-      status: 'Paid',
-      createdAt: '2025-01-14T16:30:00Z'
-    },
-    {
-      id: '3',
-      userName: 'Eslam Elsayed',
-      totalAmount: 1200,
-      status: 'Pending',
-      createdAt: '2025-01-13T11:15:00Z'
-    }
-  ],
-  userGeographics: [
-    { country: 'Saudi Arabia', users: 20, coordinates: [45.0792, 23.8859] },
-    { country: 'Egypt', users: 20, coordinates: [30.8025, 26.8206] },
-    { country: 'United States', users: 20, coordinates: [-95.7129, 37.0902] },
-    { country: 'United Kingdom', users: 20, coordinates: [-0.1278, 51.5074] }
-  ]
-};
+import { useBackendConnection } from '@/lib/backend-connection';
 
 export default function AdminDashboard() {
   const { user } = useAuthStore();
@@ -87,7 +19,9 @@ export default function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { isHydrated } = useHydration();
+  const [isUsingFallback, setIsUsingFallback] = useState(false);
+  const isHydrated = useHydration();
+  const { status: backendStatus } = useBackendConnection();
 
   // Animation variants for cards
   const containerVariants = {
@@ -110,15 +44,18 @@ export default function AdminDashboard() {
       try {
         console.log('Fetching dashboard stats...');
         const response = await adminApi.getDashboardStats();
-        console.log('Dashboard stats received:', response.data);
+        console.log('Dashboard stats received:', response);
         setStats(response.data);
+        setIsUsingFallback(response.isUsingFallback);
         setError(null);
+        
+        if (response.isUsingFallback) {
+          toast.error(t('using-demo-data'));
+        }
       } catch (error: any) {
         console.error('Error fetching dashboard stats:', error);
         setError(error.message || 'Failed to load dashboard statistics');
-        // Use fallback data instead of showing error
-        setStats(fallbackStats);
-        toast.error(t('using-demo-data'));
+        setStats(null);
       } finally {
         setIsLoading(false);
       }
@@ -145,8 +82,19 @@ export default function AdminDashboard() {
     );
   }
 
-  // Use fallback data if stats is null
-  const dashboardStats = stats || fallbackStats;
+  // Use the stats directly since they include fallback data when needed
+  const dashboardStats = stats;
+  
+  if (!dashboardStats) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading dashboard...</p>
+        </div>
+      </div>
+    );
+  }
   
   // Extract recent users and geographics data
   const recentUsers = dashboardStats.recentUsers || [];
@@ -206,9 +154,26 @@ export default function AdminDashboard() {
             {t('dashboard-subtitle')}
           </p>
           <div className="mt-3">
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700 border border-blue-200">
-              <span className="w-2 h-2 bg-blue-400 rounded-full mr-2"></span>
-              {t('using-demo-data')}
+            <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border ${
+              isUsingFallback 
+                ? 'bg-yellow-50 text-yellow-700 border-yellow-200' 
+                : backendStatus.isAvailable 
+                  ? 'bg-green-50 text-green-700 border-green-200'
+                  : 'bg-red-50 text-red-700 border-red-200'
+            }`}>
+              <span className={`w-2 h-2 rounded-full mr-2 ${
+                isUsingFallback 
+                  ? 'bg-yellow-400' 
+                  : backendStatus.isAvailable 
+                    ? 'bg-green-400'
+                    : 'bg-red-400'
+              }`}></span>
+              {isUsingFallback 
+                ? t('using-demo-data')
+                : backendStatus.isAvailable 
+                  ? t('connected-to-backend')
+                  : t('backend-unavailable')
+              }
             </span>
           </div>
         </div>

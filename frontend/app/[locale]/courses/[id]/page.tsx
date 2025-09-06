@@ -160,6 +160,62 @@ export default function CourseDetailsPage() {
                   </div>
                 )}
 
+                {/* Course Photo */}
+                <div className="mt-6">
+                  <div className="relative aspect-video bg-gray-200 rounded-lg overflow-hidden">
+                    <img
+                      src={(() => {
+                        // Enhanced Debug: Check what we have
+                        console.log('=== MAIN COURSE PHOTO DEBUG ===');
+                        console.log('Course photo raw data type:', typeof course.photo);
+                        console.log('Course photo length:', course.photo?.length);
+                        console.log('First 50 chars:', course.photo?.substring(0, 50));
+                        
+                        // Handle base64 string data from backend (already encoded)
+                        if (course.photo && typeof course.photo === 'string' && course.photo.length > 0) {
+                          try {
+                            console.log('Photo is a base64 string, creating data URL...');
+                            // Backend already returns base64 string, just add the data URL prefix
+                            const imageUrl = `data:image/png;base64,${course.photo}`;
+                            console.log('Successfully created image URL, length:', imageUrl.length);
+                            
+                            return imageUrl;
+                          } catch (error) {
+                            console.error('Error creating data URL from base64 string:', error);
+                            return '/images/Course Place Holder Small.png';
+                          }
+                        }
+                        
+                        // Handle binary array data (if backend changes format)
+                        if (course.photo && Array.isArray(course.photo) && course.photo.length > 0) {
+                          try {
+                            console.log('Converting binary array data to base64...');
+                            const uint8Array = new Uint8Array(course.photo);
+                            const base64 = btoa(String.fromCharCode.apply(null, uint8Array));
+                            const imageUrl = `data:image/jpeg;base64,${base64}`;
+                            console.log('Successfully converted binary to base64');
+                            return imageUrl;
+                          } catch (error) {
+                            console.error('Error converting binary array:', error);
+                            return '/images/Course Place Holder Small.png';
+                          }
+                        }
+                        
+                        console.log('No valid photo data found, using fallback');
+                        console.log('Available fallbacks - imageUrl:', course.imageUrl, 'thumbnailUrl:', course.thumbnailUrl);
+                        // Fallback to processed URLs or placeholder
+                        return course.imageUrl || course.thumbnailUrl || '/images/Course Place Holder Small.png';
+                      })()}
+                      alt={title}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        console.error('Image failed to load:', e.currentTarget.src);
+                        e.currentTarget.src = '/images/Course Place Holder Small.png';
+                      }}
+                    />
+                  </div>
+                </div>
+
                 {/* Instructor */}
                 <div className="flex items-center space-x-3 rtl:space-x-reverse mt-6 p-4 bg-gray-50 rounded-lg">
                   <img
@@ -194,9 +250,37 @@ export default function CourseDetailsPage() {
                 {/* Video Preview */}
                 <div className="relative">
                   <img
-                    src={course.photo || course.imageUrl || '/images/Course Place Holder Small.png'}
+                    src={(() => {
+                      // Handle binary blob data from database for sidebar preview
+                      if (course.photo && Array.isArray(course.photo) && course.photo.length > 0) {
+                        try {
+                          // Convert number array to Uint8Array
+                          const uint8Array = new Uint8Array(course.photo);
+                          
+                          // Convert to base64
+                          let binary = '';
+                          const len = uint8Array.byteLength;
+                          for (let i = 0; i < len; i++) {
+                            binary += String.fromCharCode(uint8Array[i]);
+                          }
+                          const base64 = btoa(binary);
+                          
+                          // Return as data URL
+                          return `data:image/jpeg;base64,${base64}`;
+                        } catch (error) {
+                          console.error('Error converting photo array to data URL:', error);
+                          return '/images/Course Place Holder Small.png';
+                        }
+                      }
+                      
+                      // Fallback to processed URLs or placeholder
+                      return course.thumbnailUrl || course.imageUrl || '/images/Course Place Holder Small.png';
+                    })()}
                     alt={title}
                     className="w-full h-48 object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = '/images/Course Place Holder Small.png';
+                    }}
                   />
                   {course.videoUrl && (
                     <button 
@@ -341,6 +425,50 @@ export default function CourseDetailsPage() {
                           </li>
                         ))}
                       </ul>
+                    </div>
+
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-3 font-cairo">
+                        {t('course.details')}
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="flex items-center space-x-3 rtl:space-x-reverse p-3 bg-gray-50 rounded-lg">
+                          <Icon name="clock" className="h-5 w-5 text-gray-500" />
+                          <div>
+                            <p className="text-sm font-medium text-gray-700 font-cairo">{t('course.duration')}</p>
+                            <p className="text-sm text-gray-600 font-cairo">{course.duration}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="flex items-center space-x-3 rtl:space-x-reverse p-3 bg-gray-50 rounded-lg">
+                          <Icon name="signal" className="h-5 w-5 text-gray-500" />
+                          <div>
+                            <p className="text-sm font-medium text-gray-700 font-cairo">{t('course.level')}</p>
+                            <p className="text-sm text-gray-600 font-cairo">{course.level}</p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center space-x-3 rtl:space-x-reverse p-3 bg-gray-50 rounded-lg">
+                          <Icon name="monitor" className="h-5 w-5 text-gray-500" />
+                          <div>
+                            <p className="text-sm font-medium text-gray-700 font-cairo">نوع الدورة</p>
+                            <p className="text-sm text-gray-600 font-cairo">
+                              {course.type === 1 ? 
+                                (locale === 'ar' ? 'جلسة مباشرة' : 'Live Session') : 
+                                (locale === 'ar' ? 'التعلم الذاتي' : 'Self-Paced')
+                              }
+                            </p>
+                          </div>
+                        </div>
+
+                        <div className="flex items-center space-x-3 rtl:space-x-reverse p-3 bg-gray-50 rounded-lg">
+                          <Icon name="globe" className="h-5 w-5 text-gray-500" />
+                          <div>
+                            <p className="text-sm font-medium text-gray-700 font-cairo">{t('course.language')}</p>
+                            <p className="text-sm text-gray-600 font-cairo">{course.language}</p>
+                          </div>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 )}

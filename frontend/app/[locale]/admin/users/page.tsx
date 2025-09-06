@@ -74,40 +74,13 @@ export default function AdminUsers() {
         totalCount: response.data.totalCount,
         totalPages: response.data.totalPages,
       }));
+
+      if (response.isUsingFallback) {
+        toast.error('Using demo data - API connection failed');
+      }
     } catch (error: any) {
-      console.error('Error fetching users, using demo data:', error);
-      // Use fallback demo data
-      const demoData = [
-        {
-          id: '1',
-          fullName: 'Ahmed Mohammed',
-          email: 'ahmed@example.com',
-          phone: '+966501234567',
-          locale: 'ar',
-          createdAt: new Date().toISOString(),
-          isAdmin: false,
-          isSuperAdmin: false,
-          lastLoginAt: new Date().toISOString()
-        },
-        {
-          id: '2',
-          fullName: 'Sarah Johnson',
-          email: 'sarah@example.com',
-          phone: '+1234567890',
-          locale: 'en',
-          createdAt: new Date().toISOString(),
-          isAdmin: true,
-          isSuperAdmin: false,
-          lastLoginAt: new Date().toISOString()
-        }
-      ];
-      setUsers(demoData);
-      setPagination(prev => ({
-        ...prev,
-        totalCount: demoData.length,
-        totalPages: 1,
-      }));
-      toast.error('Using demo data - API connection failed');
+      console.error('Error fetching users:', error);
+      toast.error('Failed to load users');
     } finally {
       setIsLoading(false);
     }
@@ -116,6 +89,11 @@ export default function AdminUsers() {
   const handleStatusUpdate = async () => {
     if (!selectedUser) return;
 
+    if (!statusForm.status) {
+      toast.error('Please select a status');
+      return;
+    }
+
     try {
       await adminApi.updateUserStatus(selectedUser.id, statusForm);
       toast.success('User status updated successfully');
@@ -123,8 +101,11 @@ export default function AdminUsers() {
       setSelectedUser(null);
       fetchUsers();
     } catch (error: any) {
-      toast.error('Failed to update user status');
       console.error('Error updating user status:', error);
+      const errorMessage = error.response?.data?.error || 
+                          error.response?.data?.message || 
+                          'Failed to update user status';
+      toast.error(errorMessage);
     }
   };
 
@@ -146,7 +127,7 @@ export default function AdminUsers() {
   const openStatusModal = (user: AdminUser) => {
     setSelectedUser(user);
     setStatusForm({
-      status: user.status || '',
+      status: user.status || 'Active',
       adminNotes: '',
     });
     setShowStatusModal(true);
@@ -267,7 +248,7 @@ export default function AdminUsers() {
               onClick={() => setPagination(prev => ({ ...prev, page: 1 }))}
               className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <Icon name="fa-search" className="mr-2" />
+              <Icon name="search" className="mr-2" />
               Search
             </button>
           </div>
@@ -327,7 +308,7 @@ export default function AdminUsers() {
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10">
                           <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                            <Icon name="fa-user" className="h-5 w-5 text-gray-600" />
+                            <Icon name="user" className="h-5 w-5 text-gray-600" />
                           </div>
                         </div>
                         <div className="ml-4">
@@ -381,14 +362,14 @@ export default function AdminUsers() {
                           onClick={() => openStatusModal(user)}
                           className="text-blue-600 hover:text-blue-900"
                         >
-                          <Icon name="fa-edit" className="h-4 w-4" />
+                          <Icon name="edit" className="h-4 w-4" />
                         </button>
                         {currentUser?.isSuperAdmin && (
                           <button
                             onClick={() => openRoleModal(user)}
                             className="text-purple-600 hover:text-purple-900"
                           >
-                            <Icon name="fa-user-shield" className="h-4 w-4" />
+                            <Icon name="user-shield" className="h-4 w-4" />
                           </button>
                         )}
                       </div>
@@ -440,7 +421,7 @@ export default function AdminUsers() {
                     disabled={pagination.page === 1}
                     className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                   >
-                    <Icon name="fa-chevron-left" className="h-5 w-5" />
+                    <Icon name="chevron-left" className="h-5 w-5" />
                   </button>
                   {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
                     const page = i + 1;
@@ -463,7 +444,7 @@ export default function AdminUsers() {
                     disabled={pagination.page === pagination.totalPages}
                     className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                   >
-                    <Icon name="fa-chevron-right" className="h-5 w-5" />
+                    <Icon name="chevron-right" className="h-5 w-5" />
                   </button>
                 </nav>
               </div>
@@ -493,6 +474,7 @@ export default function AdminUsers() {
                     <option value="Active">Active</option>
                     <option value="Inactive">Inactive</option>
                     <option value="Suspended">Suspended</option>
+                    <option value="PendingEmailVerification">Pending Email Verification</option>
                   </select>
                 </div>
                 <div>

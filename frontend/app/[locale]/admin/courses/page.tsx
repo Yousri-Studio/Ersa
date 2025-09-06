@@ -80,70 +80,13 @@ export default function AdminCourses() {
         totalCount: response.data.totalCount,
         totalPages: response.data.totalPages,
       }));
+
+      if (response.isUsingFallback) {
+        toast.error('Using demo data - API connection failed');
+      }
     } catch (error: any) {
-      console.error('Error fetching courses, using demo data:', error);
-      // Use fallback demo data
-      const demoData = [
-        {
-          id: '1',
-          slug: 'advanced-graphic-design',
-          titleAr: 'دورة التصميم الجرافيكي المتقدمة',
-          titleEn: 'Advanced Graphic Design Course',
-          summaryAr: 'تعلم أساسيات التصميم الجرافيكي',
-          summaryEn: 'Learn graphic design fundamentals',
-          descriptionAr: 'دورة شاملة في التصميم الجرافيكي',
-          descriptionEn: 'Comprehensive graphic design course',
-          price: 299,
-          currency: 'SAR',
-          type: 1,
-          level: 2,
-          category: 3,
-          videoUrl: '',
-          duration: '4 weeks',
-          instructorName: 'Ahmed Al-Rashid',
-          photo: '',
-          tags: 'design,graphics,adobe',
-          instructorsBioAr: 'مدرب خبير في التصميم',
-          instructorsBioEn: 'Expert design instructor',
-          isActive: true,
-          isFeatured: true,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        },
-        {
-          id: '2',
-          slug: 'programming-for-beginners',
-          titleAr: 'دورة البرمجة للمبتدئين',
-          titleEn: 'Programming for Beginners',
-          summaryAr: 'ابدأ رحلتك في البرمجة',
-          summaryEn: 'Start your programming journey',
-          descriptionAr: 'تعلم البرمجة من الصفر',
-          descriptionEn: 'Learn programming from scratch',
-          price: 199,
-          currency: 'SAR',
-          type: 1,
-          level: 1,
-          category: 1,
-          videoUrl: '',
-          duration: '6 weeks',
-          instructorName: 'Sarah Johnson',
-          photo: '',
-          tags: 'programming,javascript,web',
-          instructorsBioAr: 'مطور برمجيات محترف',
-          instructorsBioEn: 'Professional software developer',
-          isActive: true,
-          isFeatured: false,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        }
-      ];
-      setCourses(demoData);
-      setPagination(prev => ({
-        ...prev,
-        totalCount: demoData.length,
-        totalPages: 1,
-      }));
-      toast.error('Using demo data - API connection failed');
+      console.error('Error fetching courses:', error);
+      toast.error('Failed to load courses');
     } finally {
       setIsLoading(false);
     }
@@ -269,10 +212,10 @@ export default function AdminCourses() {
     });
   };
 
-  const formatCurrency = (amount: number) => {
+  const formatCurrency = (amount: number, currency: string = 'SAR') => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD',
+      currency: currency,
     }).format(amount);
   };
 
@@ -330,7 +273,7 @@ export default function AdminCourses() {
               onClick={() => setPagination(prev => ({ ...prev, page: 1 }))}
               className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <Icon name="fa-search" className="mr-2" />
+              <Icon name="search" className="mr-2" />
               Search
             </button>
           </div>
@@ -399,7 +342,7 @@ export default function AdminCourses() {
                           />
                         ) : (
                           <div className="h-16 w-16 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                            <Icon name="fa-graduation-cap" className="h-8 w-8 text-white" />
+                            <Icon name="graduation-cap" className="h-8 w-8 text-white" />
                           </div>
                         )}
                       </div>
@@ -422,7 +365,7 @@ export default function AdminCourses() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      {formatCurrency(course.price)}
+                      {formatCurrency(course.price, course.currency)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -504,7 +447,7 @@ export default function AdminCourses() {
                     disabled={pagination.page === 1}
                     className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                   >
-                    <Icon name="fa-chevron-left" className="h-5 w-5" />
+                    <Icon name="chevron-left" className="h-5 w-5" />
                   </button>
                   {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
                     const page = i + 1;
@@ -527,7 +470,7 @@ export default function AdminCourses() {
                     disabled={pagination.page === pagination.totalPages}
                     className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                   >
-                    <Icon name="fa-chevron-right" className="h-5 w-5" />
+                    <Icon name="chevron-right" className="h-5 w-5" />
                   </button>
                 </nav>
               </div>

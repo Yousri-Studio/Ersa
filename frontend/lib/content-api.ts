@@ -42,7 +42,7 @@ class ContentAPI {
       (config) => {
         const token = Cookies.get('auth-token');
         if (token) {
-          config.headers.Authorization = `Bearer ${token}`;
+          config.headers.set('Authorization', `Bearer ${token}`);
         }
         return config;
       },

@@ -1,4 +1,5 @@
 using ErsaTraining.API.Data.Entities;
+using System.ComponentModel.DataAnnotations;
 
 namespace ErsaTraining.API.DTOs;
 
@@ -42,7 +43,11 @@ public class OrderSummaryDto
 
 public class UpdateUserStatusRequest
 {
-    public UserStatus Status { get; set; }
+    [Required]
+    [RegularExpression("^(PendingEmailVerification|Active|Inactive|Suspended)$", ErrorMessage = "Status must be one of: PendingEmailVerification, Active, Inactive, Suspended")]
+    public string Status { get; set; } = string.Empty;
+    
+    [MaxLength(1000)]
     public string? AdminNotes { get; set; }
 }
 

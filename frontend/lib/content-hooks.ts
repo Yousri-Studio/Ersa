@@ -44,27 +44,13 @@ export function usePageContent<T>(
 
 // Transform API Course to extended Course type
 function transformApiCourse(apiCourse: BackendCourse, locale: string = 'ar'): Course {
-  const levelMap = { 'Biginner': 'مبتدئ', 'Intermediate': 'متوسط', 'Advanced': 'متقدم' };
+  const levelMap = { 1: 'مبتدئ', 2: 'متوسط', 3: 'متقدم' };
   const categoryMap = { 'Programming': 'البرمجة', 'Business': 'الأعمال', 'Design': 'التصميم' };
   
-  // Convert photo blob to data URL if available
+  // Keep the original photo array data for frontend processing
   const getImageUrl = (): string => {
-    if (apiCourse.photo && typeof apiCourse.photo === 'string' && apiCourse.photo.trim() !== '') {
-      // Check if it's already a complete data URL
-      if (apiCourse.photo.startsWith('data:image/')) {
-        return apiCourse.photo;
-      } 
-      // If it's a base64 string without data URL prefix
-      else if (apiCourse.photo.match(/^[A-Za-z0-9+/]*={0,2}$/)) {
-        return `data:image/jpeg;base64,${apiCourse.photo}`;
-      }
-      // If it looks like a file path or URL
-      else if (apiCourse.photo.startsWith('http') || apiCourse.photo.startsWith('/')) {
-        return apiCourse.photo;
-      }
-    }
-    
-    // Fallback to static placeholder image
+    // Don't convert here - let the frontend components handle binary conversion
+    // Just return placeholder and let page component handle the binary data
     return '/images/Course Place Holder Small.png';
   };
   
@@ -73,6 +59,8 @@ function transformApiCourse(apiCourse: BackendCourse, locale: string = 'ar'): Co
     // Keep the original localized title and summary objects from backend
     title: apiCourse.title,
     summary: apiCourse.summary,
+    // IMPORTANT: Keep the raw photo array for binary conversion in components
+    photo: apiCourse.photo,
     // Use blob image if available, otherwise fallback to placeholder
     thumbnailUrl: getImageUrl(),
     imageUrl: getImageUrl(),
@@ -97,7 +85,7 @@ function transformApiCourse(apiCourse: BackendCourse, locale: string = 'ar'): Co
         isPreview: true
       }
     ],
-    features: apiCourse.type === 'Live' 
+    features: apiCourse.type === 1 
       ? ['جلسات مباشرة', 'شهادة إتمام', 'دعم المدرب', 'تسجيلات الجلسات', 'مواد تدريبية']
       : ['وصول مدى الحياة', 'ملفات PDF', 'شهادة إتمام', 'دعم المدرب', 'ملفات قابلة للتحميل'],
     requirements: ['معرفة أساسية بالحاسوب', 'الرغبة في التعلم والإبداع'],
@@ -115,10 +103,10 @@ function transformApiCourse(apiCourse: BackendCourse, locale: string = 'ar'): Co
     },
     reviewsCount: Math.floor(Math.random() * 2000) + 500,
     studentsCount: Math.floor(Math.random() * 5000) + 1000,
-    duration: apiCourse.type === 'Live' 
+    duration: apiCourse.type === 1 
       ? `${(apiCourse.sessions?.length || 1) * 2} ساعة` 
       : 'وصول مدى الحياة',
-    level: levelMap[apiCourse.category as keyof typeof levelMap] || 'متوسط',
+    level: levelMap[apiCourse.level as keyof typeof levelMap] || 'متوسط',
     language: 'العربية',
     originalPrice: Math.round(apiCourse.price * 1.3),
     lastUpdated: apiCourse.createdAt?.split('T')[0] || new Date().toISOString().split('T')[0],

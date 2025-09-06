@@ -20,7 +20,7 @@ export type CourseCardProps = {
   badge?: 'bestseller' | 'new' | null;
   durationLabel: Localized;
   rating?: number;
-  category: 'Programming' | 'Business' | 'Design';
+  category: Localized;
   instructorName?: string;
 
   price: number;
@@ -244,14 +244,14 @@ export const CourseCard: React.FC<CourseCardProps> & {
 
           {/* Category tag */}
           <div className="px-3 py-1 rounded-full text-xs font-medium" style={{ 
-            backgroundColor: category === 'Programming' ? '#E1F3FF' : 
-                           category === 'Business' ? '#FFE1E1' : 
+            backgroundColor: category.en === 'Programming' ? '#E1F3FF' : 
+                           category.en === 'Business' ? '#FFE1E1' : 
                            '#E1FFE9',
-            color: category === 'Programming' ? '#0078D4' : 
-                  category === 'Business' ? '#D40000' : 
+            color: category.en === 'Programming' ? '#0078D4' : 
+                  category.en === 'Business' ? '#D40000' : 
                   '#00D439'
           }}>
-            {category}
+            {isHydrated ? category[locale as keyof Localized] : (category[currentLocale as keyof Localized] || category.ar || category.en)}
           </div>
         </div>
 
