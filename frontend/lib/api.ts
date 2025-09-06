@@ -216,8 +216,13 @@ export const authApi = {
 
 // Courses API
 export const coursesApi = {
-  getCourses: (type?: 'Live' | 'PDF'): Promise<AxiosResponse<Course[]>> =>
-    api.get('/courses', { params: { type } }),
+  getCourses: (params?: {
+    type?: 'Live' | 'PDF';
+    query?: string;
+    category?: string;
+    featured?: boolean;
+  }): Promise<AxiosResponse<Course[]>> =>
+    api.get('/courses', { params }),
 
   getFeaturedCourses: (): Promise<AxiosResponse<Course[]>> =>
     api.get('/courses/featured'),

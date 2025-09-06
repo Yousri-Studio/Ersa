@@ -127,17 +127,31 @@ export function useCourses(params?: { type?: 'Live' | 'PDF'; featured?: boolean;
     const fetchCourses = async () => {
       try {
         setLoading(true);
-        const response = await coursesApi.getCourses(params?.type);
+        
+        // Prepare API parameters
+        const apiParams: {
+          type?: 'Live' | 'PDF';
+          query?: string;
+          category?: string;
+          featured?: boolean;
+        } = {};
+        
+        if (params?.type) apiParams.type = params.type;
+        if (params?.query) apiParams.query = params.query;
+        if (params?.category) apiParams.category = params.category;
+        if (params?.featured) apiParams.featured = params.featured;
+        
+        console.log('Fetching courses with params:', apiParams);
+        
+        const response = await coursesApi.getCourses(apiParams);
         let filteredCourses = response.data;
         
-        // Apply filtering based on params
-        if (params?.featured) {
-          filteredCourses = filteredCourses.filter(course => course.isFeatured);
-        }
-        
+        // Transform the courses
         const transformedCourses = filteredCourses.map(course => transformApiCourse(course));
         setCourses(transformedCourses);
         setError(null);
+        
+        console.log('Fetched courses:', transformedCourses.length, 'results');
       } catch (err) {
         console.error('Error fetching courses:', err);
         setError(err instanceof Error ? err : new Error('Failed to fetch courses'));

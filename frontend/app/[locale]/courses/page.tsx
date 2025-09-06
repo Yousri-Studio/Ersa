@@ -190,6 +190,8 @@ export default function CoursesPage() {
   const query = searchParams?.get('query') || '';
   const category = searchParams?.get('category') || '';
 
+  console.log('Courses page - URL params:', { query, category });
+
   const { courses: apiCourses, loading: coursesLoading, error: coursesError } = useCourses({ 
     query: query || undefined,
     category: category || undefined 
@@ -397,6 +399,51 @@ export default function CoursesPage() {
         {/* All Courses Section */}
         {!isLoading && !coursesError && (
           <div className="mb-16">
+          {/* Search Results Info */}
+          {(query.trim() || category) && (
+            <div className="mb-6 scroll-item">
+              <div className="flex items-center justify-between bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <div className="flex items-center space-x-3 rtl:space-x-reverse">
+                  <Icon name="search" className="h-5 w-5 text-blue-600" />
+                  <div>
+                    <p className="text-sm font-medium text-blue-900">
+                      {locale === 'ar' ? 'نتائج البحث' : 'Search Results'}
+                    </p>
+                    <p className="text-sm text-blue-700">
+                      {(() => {
+                        let searchInfo = [];
+                        if (query.trim()) {
+                          searchInfo.push(`"${query}"`);
+                        }
+                        if (category) {
+                          const categoryName = category === 'Programming' ? (locale === 'ar' ? 'البرمجة' : 'Programming') :
+                                             category === 'Business' ? (locale === 'ar' ? 'الأعمال' : 'Business') :
+                                             category === 'Design' ? (locale === 'ar' ? 'التصميم' : 'Design') : category;
+                          searchInfo.push(categoryName);
+                        }
+                        const searchText = searchInfo.join(' • ');
+                        const resultsCount = filteredCourses.length;
+                        const resultsText = locale === 'ar' ? 
+                          `${resultsCount} ${resultsCount === 1 ? 'نتيجة' : 'نتائج'} في ${searchText}` :
+                          `${resultsCount} ${resultsCount === 1 ? 'result' : 'results'} for ${searchText}`;
+                        return resultsText;
+                      })()}
+                    </p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    router.push(`/${locale}/courses`);
+                  }}
+                  className="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center space-x-1 rtl:space-x-reverse"
+                >
+                  <Icon name="x" className="h-4 w-4" />
+                  <span>{locale === 'ar' ? 'مسح البحث' : 'Clear Search'}</span>
+                </button>
+              </div>
+            </div>
+          )}
+
           {/* Section Title */}
           <h2 className={`font-cairo font-bold leading-tight mb-8 scroll-item ${
             locale === 'ar' ? 'text-center' : 'text-center'
@@ -416,23 +463,27 @@ export default function CoursesPage() {
             {/* Search Bar */}
             <div className={`mb-6 scroll-item max-w-5xl mx-auto ${isLoaded ? 'animate-slide-in-right stagger-3' : 'opacity-0'}`}>
               <div className="shadow-lg rounded-lg bg-white p-4">
-                <SearchBar categories={[
-                  {
-                    id: 'Programming',
-                    name: { ar: 'البرمجة', en: 'Programming' },
-                    slug: 'Programming'
-                  },
-                  {
-                    id: 'Business',
-                    name: { ar: 'الأعمال', en: 'Business' },
-                    slug: 'Business'
-                  },
-                  {
-                    id: 'Design',
-                    name: { ar: 'التصميم', en: 'Design' },
-                    slug: 'Design'
-                  }
-                ]} compact={true} />
+                <SearchBar 
+                  categories={[
+                    {
+                      id: 'Programming',
+                      name: { ar: 'البرمجة', en: 'Programming' },
+                      slug: 'Programming'
+                    },
+                    {
+                      id: 'Business',
+                      name: { ar: 'الأعمال', en: 'Business' },
+                      slug: 'Business'
+                    },
+                    {
+                      id: 'Design',
+                      name: { ar: 'التصميم', en: 'Design' },
+                      slug: 'Design'
+                    }
+                  ]} 
+                  compact={true}
+                  enableLiveSearch={true}
+                />
               </div>
             </div>
 
