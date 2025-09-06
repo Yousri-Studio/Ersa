@@ -292,3 +292,25 @@ export const wishlistApi = {
   removeFromWishlist: (courseId: string): Promise<AxiosResponse<any>> =>
     api.delete(`/wishlist/items/${courseId}`),
 };
+
+// Contact API
+export interface ContactFormRequest {
+  firstName: string;
+  lastName: string;
+  email: string;
+  subject: string;
+  message: string;
+  phone?: string;
+  locale: string;
+}
+
+export interface ContactFormResponse {
+  success: boolean;
+  message: string;
+  submittedAt: string;
+}
+
+export const contactApi = {
+  submitContactForm: (data: ContactFormRequest): Promise<AxiosResponse<ContactFormResponse>> =>
+    api.post('/contact', data),
+};

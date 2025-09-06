@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 import { usePageLoad } from '@/lib/use-animations';
 import { ScrollAnimations } from '@/components/scroll-animations';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import { contactApi } from '@/lib/api';
 
 interface ContactFormData {
   firstName: string;
@@ -15,6 +16,7 @@ interface ContactFormData {
   email: string;
   subject: string;
   message: string;
+  phone?: string;
 }
 
 export default function ContactPage() {
@@ -34,20 +36,29 @@ export default function ContactPage() {
     setIsLoading(true);
     
     try {
-      // TODO: Implement API call to submit contact request
-      console.log('Contact request:', data);
+      const response = await contactApi.submitContactForm({
+        firstName: data.firstName,
+        lastName: data.lastName,
+        email: data.email,
+        subject: data.subject,
+        message: data.message,
+        phone: data.phone,
+        locale: locale
+      });
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast.success(
-        locale === 'ar' 
-          ? 'تم إرسال رسالتك بنجاح! سنتواصل معك قريباً.'
-          : 'Your message has been sent successfully! We will contact you soon.'
-      );
-      
-      reset();
-    } catch (error) {
+      if (response.data.success) {
+        toast.success(
+          locale === 'ar' 
+            ? 'تم إرسال رسالتك بنجاح! سنتواصل معك قريباً.'
+            : 'Your message has been sent successfully! We will contact you soon.'
+        );
+        
+        reset();
+      } else {
+        throw new Error(response.data.message);
+      }
+    } catch (error: any) {
+      console.error('Contact form error:', error);
       toast.error(
         locale === 'ar'
           ? 'حدث خطأ أثناء إرسال الرسالة. يرجى المحاولة مرة أخرى.'

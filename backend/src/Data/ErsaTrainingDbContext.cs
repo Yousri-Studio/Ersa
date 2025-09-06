@@ -39,6 +39,9 @@ public class ErsaTrainingDbContext : IdentityDbContext<User, IdentityRole<Guid>,
     public DbSet<ContentSection> ContentSections { get; set; }
     public DbSet<ContentBlock> ContentBlocks { get; set; }
     public DbSet<ContentVersion> ContentVersions { get; set; }
+    
+    // Contact Management
+    public DbSet<ContactMessage> ContactMessages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -65,6 +68,9 @@ public class ErsaTrainingDbContext : IdentityDbContext<User, IdentityRole<Guid>,
         builder.ApplyConfiguration(new ContentSectionConfiguration());
         builder.ApplyConfiguration(new ContentBlockConfiguration());
         builder.ApplyConfiguration(new ContentVersionConfiguration());
+        
+        // Contact Management configurations
+        builder.ApplyConfiguration(new ContactMessageConfiguration());
 
         // Seed data
         SeedData(builder);
