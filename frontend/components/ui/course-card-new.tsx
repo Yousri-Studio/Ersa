@@ -184,7 +184,7 @@ export const CourseCard: React.FC<CourseCardProps> & {
   // Get mode label with hydration safety
   const getModeLabel = () => {
     if (!isHydrated) {
-      return mode === 'onsite' ? 'حضوري' : 'أونلاين';
+      return mode === 'onsite' ? 'PDF' : 'أونلاين';
     }
     return mode === 'onsite' ? t('card.mode.onsite') : t('card.mode.online');
   };

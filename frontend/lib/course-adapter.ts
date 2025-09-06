@@ -50,9 +50,14 @@ const convertPhotoToDataUrl = (photo?: string | number[]): string | undefined =>
  * Converts a CourseType enum to badge
  */
 const getCourseBadge = (course: Course): 'bestseller' | 'new' | null => {
-  // Map course type to badge: 1 = Live (new), 2 = PDF (bestseller)
-  if (course.type === 1) return 'new';      // Live courses get 'new' badge
-  if (course.type === 2) return 'bestseller'; // PDF courses get 'bestseller' badge
+  // Handle both string and numeric course types
+  const courseType = typeof course.type === 'string' ? 
+    (course.type === 'Live' ? 1 : 0) : 
+    course.type;
+  
+  // Map course type to badge: 1 = Live (new), 0 = PDF (bestseller)
+  if (courseType === 1) return 'new';      // Live courses get 'new' badge
+  if (courseType === 0) return 'bestseller'; // PDF courses get 'bestseller' badge
   return null;
 };
 
@@ -106,13 +111,18 @@ export const courseToCardProps = (
     photo: course.photo ? 'Has photo data' : 'No photo'
   });
   
-  // Convert type to mode
-  const mode: 'onsite' | 'online' = course.type === 1 ? 'online' : 'onsite';
+  // Handle both string and numeric course types
+  const courseType = typeof course.type === 'string' ? 
+    (course.type === 'Live' ? 1 : 0) : 
+    course.type;
+  
+  // Convert type to mode: 1 = Live (online), 0 = PDF (displayed as "PDF")
+  const mode: 'onsite' | 'online' = courseType === 1 ? 'online' : 'onsite';
   
   // Convert badge
   const badge = getCourseBadge(course);
   
-  console.log('courseToCardProps - Generated badge:', badge, 'for type:', course.type);
+  console.log('courseToCardProps - Generated badge:', badge, 'for type:', course.type, '(converted to:', courseType, ')');
 
   // Convert photo to thumbnailUrl or use placeholder
   const thumbnailUrl = convertPhotoToDataUrl(course.photo) || "/images/Course Place Holder Small.png";
@@ -124,15 +134,20 @@ export const courseToCardProps = (
 
   // Generate duration label based on course type
   const getDurationLabel = (): { ar: string; en: string } => {
-    if (course.type === 1) {
-      // Live courses
+    // Handle both string and numeric course types
+    const courseType = typeof course.type === 'string' ? 
+      (course.type === 'Live' ? 1 : 0) : 
+      course.type;
+      
+    if (courseType === 1) {
+      // Live courses (online)
       return {
         ar: 'المدة: حسب الجدولة',
         en: 'Duration: As scheduled'
       };
     }
     
-    // PDF courses (type 2)
+    // PDF courses (onsite/self-paced) - type 0
     return {
       ar: 'المدة: حسب وتيرتك',
       en: 'Duration: Self-paced'
