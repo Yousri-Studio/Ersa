@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import Cookies from 'js-cookie';
+import { customStorage } from './custom-storage';
 
 export interface User {
   id: string;
@@ -99,12 +100,7 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
-      partialize: (state) => ({
-        user: state.user,
-        token: state.token,
-        isAuthenticated: state.isAuthenticated,
-      }),
-      skipHydration: false,
+      storage: customStorage as any,
     }
   )
 );

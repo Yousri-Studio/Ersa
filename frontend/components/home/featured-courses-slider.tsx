@@ -18,7 +18,7 @@ export function FeaturedCoursesSlider() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const sliderRef = useRef<HTMLDivElement>(null);
-  const { isHydrated } = useHydration();
+  const isHydrated = useHydration();
   const locale = useLocale();
   const t = useTranslations();
   const router = useRouter();
@@ -33,13 +33,13 @@ export function FeaturedCoursesSlider() {
     queryKey: ['featured-courses', locale],
     queryFn: () => coursesApi.getCourses().then(res => res.data.filter(course => course.isFeatured).slice(0, 12)),
     staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: 0, // Don't retry to avoid hanging
-    retryDelay: 500, // Faster retry
+    retry: 1, // Retry once
+    retryDelay: 1000, // Wait 1 second before retry
   });
 
   // Handle query errors
   if (error) {
-    // console.error('Failed to fetch courses:', error);
+    console.warn('Failed to fetch featured courses from API, using mock data:', error.message);
   }
 
   // Mock data for development when API returns empty
@@ -58,10 +58,10 @@ export function FeaturedCoursesSlider() {
       price: 1200,
       currency: 'SAR',
       type: 'Live',
+      category: 'Business',
       isActive: true,
       isFeatured: true,
       rating: 4.8,
-
       badge: 'Bestseller',
       thumbnailUrl: ''
     },
@@ -79,10 +79,10 @@ export function FeaturedCoursesSlider() {
       price: 950,
       currency: 'SAR',
       type: 'PDF',
+      category: 'Business',
       isActive: true,
       isFeatured: true,
       rating: 4.6,
-
       badge: 'Bestseller',
       thumbnailUrl: ''
     },
@@ -100,10 +100,10 @@ export function FeaturedCoursesSlider() {
       price: 1500,
       currency: 'SAR',
       type: 'Live',
+      category: 'Business',
       isActive: true,
       isFeatured: true,
       rating: 4.9,
-
       badge: 'Bestseller',
       thumbnailUrl: ''
     },
@@ -121,10 +121,10 @@ export function FeaturedCoursesSlider() {
       price: 800,
       currency: 'SAR',
       type: 'PDF',
+      category: 'Programming',
       isActive: true,
       isFeatured: true,
       rating: 4.5,
-
       badge: 'Bestseller',
       thumbnailUrl: ''
     },
@@ -142,10 +142,10 @@ export function FeaturedCoursesSlider() {
       price: 700,
       currency: 'SAR',
       type: 'Live',
+      category: 'Business',
       isActive: true,
       isFeatured: true,
       rating: 4.7,
-
       badge: 'Bestseller',
       thumbnailUrl: ''
     },
@@ -163,19 +163,19 @@ export function FeaturedCoursesSlider() {
       price: 900,
       currency: 'SAR',
       type: 'PDF',
+      category: 'Business',
       isActive: true,
       isFeatured: true,
       rating: 4.4,
-
       badge: 'Bestseller',
       thumbnailUrl: ''
     }
   ];
 
   // Use mock data if API fails, returns empty, or is loading
-  // For testing: limit mock courses to 3 to see grid layout, or use all 6 to see slider
-  const testWith3Courses = mockCourses.slice(0, 3); // Change this to mockCourses to test with 6 courses
-  const courses: Course[] = (apiCourses && Array.isArray(apiCourses) && apiCourses.length > 0 && !error) ? apiCourses : testWith3Courses;
+  // Always show mock courses to ensure featured section displays properly
+  const courses: Course[] = (apiCourses && Array.isArray(apiCourses) && apiCourses.length > 0 && !error && !isLoading) ? 
+    apiCourses : mockCourses.slice(0, 3);
 
   // Handler functions
   const handleToggleWishlist = (courseId: string) => {
@@ -195,7 +195,7 @@ export function FeaturedCoursesSlider() {
       const wishlistItem = {
         id: courseId,
         courseId: courseId,
-        title: locale === 'ar' ? course.title.ar : course.title.en,
+        title: course.title,
         price: course.price,
         currency: course.currency,
         imageUrl: course.thumbnailUrl,

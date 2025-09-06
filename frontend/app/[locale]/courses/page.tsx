@@ -202,7 +202,7 @@ export default function CoursesPage() {
   // Animation hooks
   const isLoaded = usePageLoad(100);
   const { visibleItems: featuredVisible, setRef: setFeaturedRef } = useStaggeredAnimation(
-    apiCourses?.filter((course: Course) => course.isFeatured)?.slice(0, 2) || [], 
+    apiCourses?.filter((course: Course) => course.isFeatured)?.slice(-2) || [], 
     200
   );
   const { visibleItems: allCoursesVisible, setRef: setAllCoursesRef } = useStaggeredAnimation(
@@ -330,9 +330,9 @@ export default function CoursesPage() {
               {locale === 'ar' ? 'الدورات المميزة' : 'Featured Courses'}
             </h2>
             
-            {/* Featured Courses Grid - 2 columns only */}
+            {/* Featured Courses Grid - 2 columns only - Show last 2 featured courses */}
             <div className="grid grid-cols-2 gap-6 mb-8">
-              {apiCourses?.slice(0, 2)?.map((course: Course, index: number) => {
+              {apiCourses?.filter((course: Course) => course.isFeatured)?.slice(-2)?.map((course: Course, index: number) => {
                 const cardProps = courseToCardProps(course, locale as 'ar' | 'en', {
                   inWishlist: false,
                   inCart: hasItem(course.id),

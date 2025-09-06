@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { CartItem } from './api';
+import { customStorage } from './custom-storage';
 
 interface CartState {
   cartId: string | null;
@@ -110,13 +111,7 @@ export const useCartStore = create<CartState>()(
     }),
     {
       name: 'cart-storage',
-      partialize: (state) => ({
-        cartId: state.cartId,
-        anonymousId: state.anonymousId,
-        items: state.items,
-        total: state.total,
-        currency: state.currency,
-      }),
+      storage: customStorage as any,
       skipHydration: true,
     }
   )

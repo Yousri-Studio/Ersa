@@ -15,7 +15,7 @@ import { useHydration } from '@/hooks/useHydration';
 import toast from 'react-hot-toast';
 
 export function FeaturedCourses() {
-  const { isHydrated } = useHydration();
+  const isHydrated = useHydration();
   const locale = useLocale();
   const t = useTranslations();
   const router = useRouter();

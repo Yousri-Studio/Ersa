@@ -1,10 +1,14 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { customStorage } from './custom-storage';
 
 interface WishlistItem {
   id: string;
   courseId: string;
-  title: string;
+  title: {
+    ar: string;
+    en: string;
+  };
   price: number;
   currency: string;
   imageUrl?: string;
@@ -67,6 +71,7 @@ export const useWishlistStore = create<WishlistState>()(
     }),
     {
       name: 'wishlist-storage',
+      storage: customStorage as any,
     }
   )
 );

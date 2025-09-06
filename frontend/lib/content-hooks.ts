@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocale } from 'next-intl';
 import { contentApi } from './content-api';
+import { coursesApi, Course as BackendCourse } from './api';
 import type { 
   Course as ApiCourse, 
   Category, 
@@ -42,7 +43,7 @@ export function usePageContent<T>(
 }
 
 // Transform API Course to extended Course type
-function transformApiCourse(apiCourse: ApiCourse, locale: string = 'ar'): Course {
+function transformApiCourse(apiCourse: BackendCourse, locale: string = 'ar'): Course {
   const levelMap = { 'Biginner': 'مبتدئ', 'Intermediate': 'متوسط', 'Advanced': 'متقدم' };
   const categoryMap = { 'Programming': 'البرمجة', 'Business': 'الأعمال', 'Design': 'التصميم' };
   
@@ -78,10 +79,10 @@ function transformApiCourse(apiCourse: ApiCourse, locale: string = 'ar'): Course
     requirements: ['معرفة أساسية بالحاسوب', 'الرغبة في التعلم والإبداع'],
     description: typeof apiCourse.summary === 'object' 
       ? (locale === 'ar' ? apiCourse.summary.ar : apiCourse.summary.en) || (locale === 'ar' ? apiCourse.summary.en : apiCourse.summary.ar)
-      : apiCourse.summary,
+      : apiCourse.summary || 'وصف الدورة',
     lessons: apiCourse.sessions?.length || apiCourse.attachments?.length || 1,
     instructor: {
-      name: apiCourse.instructorName,
+      name: apiCourse.instructorName || apiCourse.instructor?.name || 'مدرب محترف',
       title: apiCourse.instructor?.title || 'مدرب معتمد',
       avatar: apiCourse.instructor?.avatar || '/api/placeholder/60/60',
       rating: 4.8,
@@ -93,10 +94,10 @@ function transformApiCourse(apiCourse: ApiCourse, locale: string = 'ar'): Course
     duration: apiCourse.type === 'Live' 
       ? `${(apiCourse.sessions?.length || 1) * 2} ساعة` 
       : 'وصول مدى الحياة',
-    level: levelMap[apiCourse.level] || apiCourse.level || 'متوسط',
+    level: levelMap[apiCourse.category as keyof typeof levelMap] || 'متوسط',
     language: 'العربية',
     originalPrice: Math.round(apiCourse.price * 1.3),
-    lastUpdated: apiCourse.updatedAt?.split('T')[0] || apiCourse.createdAt?.split('T')[0] || new Date().toISOString().split('T')[0],
+    lastUpdated: apiCourse.createdAt?.split('T')[0] || new Date().toISOString().split('T')[0],
     videoPreviewUrl: '/api/placeholder/video',
     subtitle: typeof apiCourse.summary === 'object' 
       ? (locale === 'ar' ? apiCourse.summary.ar : apiCourse.summary.en) || (locale === 'ar' ? apiCourse.summary.en : apiCourse.summary.ar)
@@ -114,8 +115,15 @@ export function useCourses(params?: { type?: 'Live' | 'PDF'; featured?: boolean;
     const fetchCourses = async () => {
       try {
         setLoading(true);
-        const response = await contentApi.getCourses(params);
-        const transformedCourses = response.data.map(course => transformApiCourse(course));
+        const response = await coursesApi.getCourses(params?.type);
+        let filteredCourses = response.data;
+        
+        // Apply filtering based on params
+        if (params?.featured) {
+          filteredCourses = filteredCourses.filter(course => course.isFeatured);
+        }
+        
+        const transformedCourses = filteredCourses.map(course => transformApiCourse(course));
         setCourses(transformedCourses);
         setError(null);
       } catch (err) {
@@ -142,7 +150,7 @@ export function useCourse(slug: string) {
     const fetchCourse = async () => {
       try {
         setLoading(true);
-        const response = await contentApi.getCourse(slug, locale);
+        const response = await coursesApi.getCourse(slug);
         const transformedCourse = transformApiCourse(response.data, locale);
         setCourse(transformedCourse);
         setError(null);

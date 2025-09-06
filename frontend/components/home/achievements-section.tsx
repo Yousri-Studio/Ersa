@@ -14,6 +14,33 @@ export function AchievementsSection() {
     { value: 95, label: t('stats.satisfaction'), suffix: '%' },
   ];
 
+  // Call hooks at the component level, not inside map
+  const animation1 = useCountAnimation({
+    targetValue: stats[0].value,
+    duration: 2000,
+    delay: 0
+  });
+  
+  const animation2 = useCountAnimation({
+    targetValue: stats[1].value,
+    duration: 2000,
+    delay: 200
+  });
+  
+  const animation3 = useCountAnimation({
+    targetValue: stats[2].value,
+    duration: 2000,
+    delay: 400
+  });
+  
+  const animation4 = useCountAnimation({
+    targetValue: stats[3].value,
+    duration: 2000,
+    delay: 600
+  });
+
+  const animations = [animation1, animation2, animation3, animation4];
+
   return (
     <section className="py-16 bg-white">
       <div className="mx-auto px-4 sm:px-6 lg:px-8">
@@ -53,11 +80,7 @@ export function AchievementsSection() {
         {/* Stats Grid */}
         <div className="grid grid-cols-2 lg:grid-cols-4" style={{ gap: '12rem' }}>
           {stats.map((stat, index) => {
-            const { count, elementRef } = useCountAnimation({
-              targetValue: stat.value,
-              duration: 2000,
-              delay: index * 200 // Stagger the animations
-            });
+            const { count, elementRef } = animations[index];
 
             return (
               <div key={index} className="text-center flex flex-col items-center">
