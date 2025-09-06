@@ -212,7 +212,7 @@ export default function CoursesPage() {
 
   // Update filtered courses when API courses change (backend now handles search/category filtering)
   useEffect(() => {
-    if (apiCourses) {
+    if (apiCourses && apiCourses.length > 0) {
       let filtered = [...apiCourses];
 
       // Only apply frontend sorting since backend handles search and category filtering
@@ -236,8 +236,12 @@ export default function CoursesPage() {
       }
 
       setFilteredCourses(filtered);
+    } else if (!isLoading && (coursesError || !apiCourses)) {
+      // Use mock courses as fallback when API fails
+      console.log('Using mock courses as fallback');
+      setFilteredCourses(mockCourses);
     }
-  }, [sortBy, apiCourses]);
+  }, [sortBy, apiCourses, isLoading, coursesError]);
 
   const handleToggleWishlist = (courseId: string) => {
     if (!user) {
@@ -319,20 +323,34 @@ export default function CoursesPage() {
             </p>
           </div>
 
-        {/* Featured Courses Section */}
-        {!isLoading && !coursesError && apiCourses && apiCourses.length > 0 && (
-          <div className="mb-16 scroll-item">
-            {/* Section Title */}
-            <h2 className={`text-2xl font-bold mb-6 ${locale === 'ar' ? 'text-right' : 'text-left'}`} style={{
-              color: 'var(--Primary, #292561)',
-              fontFamily: 'Cairo'
-            }}>
-              {locale === 'ar' ? 'الدورات المميزة' : 'Featured Courses'}
-            </h2>
-            
-            {/* Featured Courses Grid - 2 columns only - Show last 2 featured courses */}
-            <div className="grid grid-cols-2 gap-6 mb-8">
-              {apiCourses?.filter((course: Course) => course.isFeatured)?.slice(-2)?.map((course: Course, index: number) => {
+        {/* Featured Courses Section - Always show */}
+        <div className="mb-16 scroll-item">
+          {/* Section Title */}
+          <h2 className={`text-2xl font-bold mb-6 ${locale === 'ar' ? 'text-right' : 'text-left'}`} style={{
+            color: 'var(--Primary, #292561)',
+            fontFamily: 'Cairo'
+          }}>
+            {locale === 'ar' ? 'الدورات المميزة' : 'Featured Courses'}
+          </h2>
+          
+          {/* Featured Courses Grid - 2 columns only - Show last 2 featured courses */}
+          <div className="grid grid-cols-2 gap-6 mb-8">
+            {(() => {
+              // Get featured courses from API, or fallback to mock courses if API fails/empty
+              let featuredCourses: Course[] = [];
+              
+              if (apiCourses && apiCourses.length > 0) {
+                const apiFeatured = apiCourses.filter((course: Course) => course.isFeatured);
+                featuredCourses = apiFeatured.length > 0 ? apiFeatured.slice(-2) : apiCourses.slice(-2);
+              } else {
+                // Use mock courses as fallback
+                featuredCourses = mockCourses.filter(course => course.isFeatured).slice(-2);
+              }
+              
+              console.log('API courses:', !!apiCourses, 'Count:', apiCourses?.length, 'Error:', !!coursesError, 'Loading:', isLoading, 'Displaying:', featuredCourses.length, 'featured courses');
+              
+              return featuredCourses.map((course: Course, index: number) => {
+                console.log('Rendering featured course:', course.title, 'isFeatured:', course.isFeatured);
                 const cardProps = courseToCardProps(course, locale as 'ar' | 'en', {
                   inWishlist: false,
                   inCart: hasItem(course.id),
@@ -352,10 +370,10 @@ export default function CoursesPage() {
                     <CourseCard {...cardProps} />
                   </div>
                 );
-              })}
-            </div>
+              });
+            })()}
           </div>
-        )}
+        </div>
 
         {/* Loading State */}
         {isLoading && (

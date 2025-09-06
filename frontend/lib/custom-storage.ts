@@ -7,18 +7,31 @@ export const customStorage: StateStorage = {
       return null;
     }
     try {
-      return localStorage.getItem(name);
+      const item = localStorage.getItem(name);
+      if (item) {
+        // Validate that it's proper JSON before returning
+        JSON.parse(item);
+      }
+      return item;
     } catch (error) {
-      console.warn('localStorage.getItem failed:', error);
+      console.warn('localStorage.getItem failed or invalid JSON:', error);
+      // Clear corrupted data
+      try {
+        localStorage.removeItem(name);
+      } catch (removeError) {
+        console.warn('Failed to remove corrupted localStorage item:', removeError);
+      }
       return null;
     }
   },
   setItem: (name: string, value: string) => {
     if (typeof window !== 'undefined') {
       try {
+        // Validate JSON before storing
+        JSON.parse(value);
         localStorage.setItem(name, value);
       } catch (error) {
-        console.warn('localStorage.setItem failed:', error);
+        console.warn('localStorage.setItem failed or invalid JSON:', error);
       }
     }
   },
