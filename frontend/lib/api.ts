@@ -180,20 +180,22 @@ export interface Order {
   id: string;
   amount: number;
   currency: string;
-  status: 'Pending' | 'Paid' | 'Failed' | 'Refunded';
+  status: 'New' | 'PendingPayment' | 'Paid' | 'UnderProcess' | 'Processed' | 'Expired' | 'Failed' | 'Refunded';
   createdAt: string;
   items: OrderItem[];
 }
 
 export interface OrderItem {
   courseId: string;
-  courseTitle: {
+  sessionId?: string;
+  title: {
     ar: string;
     en: string;
   };
-  sessionId?: string;
-  session?: Session;
   price: number;
+  currency: string;
+  qty: number;
+  session?: Session;
 }
 
 // Auth API

@@ -25,7 +25,7 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
             .HasDefaultValue("SAR");
 
         builder.Property(o => o.Status)
-            .HasDefaultValue(OrderStatus.Pending);
+            .HasDefaultValue(OrderStatus.New);
 
         builder.Property(o => o.CreatedAt)
             .HasDefaultValueSql("GETUTCDATE()");

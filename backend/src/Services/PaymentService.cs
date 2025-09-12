@@ -7,6 +7,9 @@ using System.Security.Cryptography;
 
 namespace ErsaTraining.API.Services;
 
+/// <summary>
+/// Provides services for processing payments with HyperPay.
+/// </summary>
 public class PaymentService : IPaymentService
 {
     private readonly ErsaTrainingDbContext _context;
@@ -14,21 +17,30 @@ public class PaymentService : IPaymentService
     private readonly HttpClient _httpClient;
     private readonly ILogger<PaymentService> _logger;
     private readonly IEnrollmentService _enrollmentService;
+    private readonly IBillService _billService;
 
     public PaymentService(
         ErsaTrainingDbContext context,
         IConfiguration configuration,
         HttpClient httpClient,
         ILogger<PaymentService> logger,
-        IEnrollmentService enrollmentService)
+        IEnrollmentService enrollmentService,
+        IBillService billService)
     {
         _context = context;
         _configuration = configuration;
         _httpClient = httpClient;
         _logger = logger;
         _enrollmentService = enrollmentService;
+        _billService = billService;
     }
 
+    /// <summary>
+    /// Creates a checkout URL for the specified order.
+    /// </summary>
+    /// <param name="order">The order to create a checkout for.</param>
+    /// <param name="returnUrl">The URL to redirect the user to after payment.</param>
+    /// <returns>The URL for the payment checkout page.</returns>
     public async Task<string> CreateCheckoutUrlAsync(Order order, string returnUrl)
     {
         try
@@ -103,6 +115,12 @@ public class PaymentService : IPaymentService
         }
     }
 
+    /// <summary>
+    /// Processes a webhook notification from HyperPay.
+    /// </summary>
+    /// <param name="payload">The webhook payload.</param>
+    /// <param name="signature">The webhook signature.</param>
+    /// <returns>True if the webhook was processed successfully, otherwise false.</returns>
     public async Task<bool> ProcessWebhookAsync(string payload, string signature)
     {
         try
@@ -160,7 +178,27 @@ public class PaymentService : IPaymentService
             payment.RawPayload = payload;
             payment.UpdatedAt = DateTime.UtcNow;
 
-            // Update order status
+            // Use the BillService to update the bill and order statuses
+            if (order.Bill != null)
+            {
+                var newBillStatus = webhookData.Status.ToLower() switch
+                {
+                    "paid" or "success" => BillStatus.Paid,
+                    "failed" => BillStatus.Failed,
+                    "cancelled" => BillStatus.Failed,
+                    _ => (BillStatus?)null
+                };
+
+                if (newBillStatus.HasValue)
+                {
+                    await _billService.UpdateBillStatusAsync(order.Bill.Id, newBillStatus.Value, "HyperPay", webhookData.TransactionId);
+                }
+            }
+            else
+            {
+                _logger.LogWarning("Bill not found for order: {OrderId}", orderId);
+            }
+
             if (payment.Status == PaymentStatus.Completed)
             {
                 order.Status = OrderStatus.Paid;

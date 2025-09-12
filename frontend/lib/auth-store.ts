@@ -12,6 +12,7 @@ export interface User {
   createdAt: string;
   isAdmin?: boolean;
   isSuperAdmin?: boolean;
+  role?: 'user' | 'admin' | 'operation' | 'super_admin';
   lastLoginAt?: string;
 }
 
@@ -24,6 +25,8 @@ interface AuthState {
   updateUser: (user: Partial<User>) => void;
   initFromCookie: () => void;
   validateToken: () => Promise<void>;
+  canPurchaseCourses: () => boolean;
+  getUserRole: () => string;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -91,6 +94,16 @@ export const useAuthStore = create<AuthState>()(
             set({ user: null, token: null, isAuthenticated: false });
           }
         }
+      },
+
+      canPurchaseCourses: () => {
+        const user = get().user;
+        return user && (user.role === 'user' || user.role === 'admin' || user.role === 'operation');
+      },
+
+      getUserRole: () => {
+        const user = get().user;
+        return user ? user.role : null;
       },
 
       // Force rehydrate from storage

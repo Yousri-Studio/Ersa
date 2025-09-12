@@ -3,10 +3,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using ErsaTraining.API.Data;
+using ErsaTraining.API.Data.Entities;
 using ErsaTraining.API.DTOs;
 using ErsaTraining.API.Services;
-
-namespace ErsaTraining.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -47,7 +46,7 @@ public class PaymentsController : ControllerBase
                 return NotFound(new { error = "Order not found" });
             }
 
-            if (order.Status != Data.Entities.OrderStatus.Pending)
+            if (order.Status != OrderStatus.PendingPayment && order.Status != OrderStatus.Paid)
             {
                 return BadRequest(new { error = "Order is not in pending status" });
             }
@@ -108,7 +107,7 @@ public class PaymentsController : ControllerBase
                 var order = await _context.Orders.FindAsync(orderGuid);
                 if (order != null)
                 {
-                    if (status?.ToLower() == "success" || order.Status == Data.Entities.OrderStatus.Paid)
+                    if (status?.ToLower() == "success" || order.Status == OrderStatus.Paid)
                     {
                         return Redirect($"{frontendUrl}/checkout/success?orderId={orderId}");
                     }

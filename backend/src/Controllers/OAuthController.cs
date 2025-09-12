@@ -224,8 +224,8 @@ namespace ErsaTraining.API.Controllers
 
     public class AppleUserInfo
     {
-        public string Sub { get; set; }
-        public string Email { get; set; }
+        public string? Sub { get; set; }
+        public string? Email { get; set; }
         public bool EmailVerified { get; set; }
     }
 }

@@ -82,18 +82,24 @@ public class AdminController : ControllerBase
                 .ToListAsync();
 
             // Get geographic data
-            var userGeographics = await _context.Users
+            var userGeographicsData = await _context.Users
                 .Where(u => !string.IsNullOrEmpty(u.Country))
                 .GroupBy(u => u.Country)
-                .Select(g => new UserGeographicDto
+                .Select(g => new
                 {
                     Country = g.Key,
-                    Users = g.Count(),
-                    Coordinates = GetCountryCoordinates(g.Key)
+                    UserCount = g.Count()
                 })
-                .OrderByDescending(g => g.Users)
+                .OrderByDescending(g => g.UserCount)
                 .Take(10)
                 .ToListAsync();
+
+            var userGeographics = userGeographicsData.Select(g => new UserGeographicDto
+            {
+                Country = g.Country,
+                Users = g.UserCount,
+                Coordinates = GetCountryCoordinates(g.Country)
+            }).ToList();
 
             return Ok(new DashboardStatsDto
             {

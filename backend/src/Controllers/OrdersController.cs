@@ -5,23 +5,34 @@ using System.Security.Claims;
 using ErsaTraining.API.Data;
 using ErsaTraining.API.Data.Entities;
 using ErsaTraining.API.DTOs;
+using ErsaTraining.API.Services;
 
 namespace ErsaTraining.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
+/// <summary>
+/// API controller for managing orders.
+/// </summary>
 public class OrdersController : ControllerBase
 {
     private readonly ErsaTrainingDbContext _context;
+    private readonly IOrderService _orderService;
     private readonly ILogger<OrdersController> _logger;
 
-    public OrdersController(ErsaTrainingDbContext context, ILogger<OrdersController> logger)
+    public OrdersController(ErsaTrainingDbContext context, IOrderService orderService, ILogger<OrdersController> logger)
     {
         _context = context;
+        _orderService = orderService;
         _logger = logger;
     }
 
+    /// <summary>
+    /// Creates a new order from the user's shopping cart.
+    /// </summary>
+    /// <param name="request">The request containing the cart ID.</param>
+    /// <returns>A response containing the details of the newly created order.</returns>
     [HttpPost]
     public async Task<ActionResult<CreateOrderResponse>> CreateOrder([FromBody] CreateOrderRequest request)
     {
@@ -75,7 +86,7 @@ public class OrdersController : ControllerBase
                 UserId = userId.Value,
                 Amount = totalAmount,
                 Currency = currency,
-                Status = OrderStatus.Pending,
+                Status = OrderStatus.New,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
@@ -103,6 +114,10 @@ public class OrdersController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Retrieves all orders for the current user.
+    /// </summary>
+    /// <returns>A list of the user's orders.</returns>
     [HttpGet]
     public async Task<ActionResult<List<OrderDto>>> GetUserOrders()
     {
@@ -137,6 +152,11 @@ public class OrdersController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Retrieves a specific order by its ID.
+    /// </summary>
+    /// <param name="id">The ID of the order to retrieve.</param>
+    /// <returns>The details of the specified order.</returns>
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<OrderDto>> GetOrder(Guid id)
     {

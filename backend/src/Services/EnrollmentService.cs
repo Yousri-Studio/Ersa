@@ -28,20 +28,21 @@ public class EnrollmentService : IEnrollmentService
         {
             var enrollments = new List<Enrollment>();
 
-            // Get cart items from the order context (assuming we store them somewhere)
-            // For now, we'll need to reconstruct this from order metadata or a separate OrderItem entity
-            // This is a simplified version - in a real implementation, you'd store order items
-            
-            var cartItems = await GetCartItemsFromOrderAsync(order);
-            
-            foreach (var cartItem in cartItems)
+            // The order should already have its items loaded.
+            if (order.OrderItems == null || !order.OrderItems.Any())
+            {
+                _logger.LogWarning("Order {OrderId} has no items to enroll.", order.Id);
+                return enrollments; // Return empty list
+            }
+
+            foreach (var item in order.OrderItems)
             {
                 var enrollment = new Enrollment
                 {
                     Id = Guid.NewGuid(),
                     UserId = order.UserId,
-                    CourseId = cartItem.CourseId,
-                    SessionId = cartItem.SessionId,
+                    CourseId = item.CourseId,
+                    SessionId = item.SessionId,
                     OrderId = order.Id,
                     Status = EnrollmentStatus.Paid,
                     EnrolledAt = DateTime.UtcNow
@@ -261,17 +262,6 @@ public class EnrollmentService : IEnrollmentService
         }
     }
 
-    private async Task<List<CartItem>> GetCartItemsFromOrderAsync(Order order)
-    {
-        // This is a simplified implementation
-        // In a real scenario, you'd either:
-        // 1. Store order items in a separate OrderItem entity
-        // 2. Or store cart snapshot in the order
-        // 3. Or maintain the cart until order completion
-        
-        // For now, return empty list - this needs to be implemented based on your cart persistence strategy
-        return new List<CartItem>();
-    }
 
     private static string GenerateSecureToken()
     {

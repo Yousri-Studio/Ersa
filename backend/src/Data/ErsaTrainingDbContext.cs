@@ -20,28 +20,30 @@ public class ErsaTrainingDbContext : IdentityDbContext<User, IdentityRole<Guid>,
     }
 
     // DbSets
-    public DbSet<Course> Courses { get; set; }
-    public DbSet<Session> Sessions { get; set; }
-    public DbSet<Order> Orders { get; set; }
-    public DbSet<Payment> Payments { get; set; }
-    public DbSet<Enrollment> Enrollments { get; set; }
-    public DbSet<Attachment> Attachments { get; set; }
-    public DbSet<SecureLink> SecureLinks { get; set; }
-    public DbSet<Cart> Carts { get; set; }
-    public DbSet<CartItem> CartItems { get; set; }
-    public DbSet<Wishlist> Wishlists { get; set; }
-    public DbSet<WishlistItem> WishlistItems { get; set; }
-    public DbSet<EmailTemplate> EmailTemplates { get; set; }
-    public DbSet<EmailLog> EmailLogs { get; set; }
+    public DbSet<Course> Courses { get; set; } = null!;
+    public DbSet<Session> Sessions { get; set; } = null!;
+    public DbSet<Order> Orders { get; set; } = null!;
+    public DbSet<OrderItem> OrderItems { get; set; } = null!;
+    public DbSet<Bill> Bills { get; set; } = null!;
+    public DbSet<Payment> Payments { get; set; } = null!;
+    public DbSet<Enrollment> Enrollments { get; set; } = null!;
+    public DbSet<Attachment> Attachments { get; set; } = null!;
+    public DbSet<SecureLink> SecureLinks { get; set; } = null!;
+    public DbSet<Cart> Carts { get; set; } = null!;
+    public DbSet<CartItem> CartItems { get; set; } = null!;
+    public DbSet<Wishlist> Wishlists { get; set; } = null!;
+    public DbSet<WishlistItem> WishlistItems { get; set; } = null!;
+    public DbSet<EmailTemplate> EmailTemplates { get; set; } = null!;
+    public DbSet<EmailLog> EmailLogs { get; set; } = null!;
     
     // Content Management
-    public DbSet<ContentPage> ContentPages { get; set; }
-    public DbSet<ContentSection> ContentSections { get; set; }
-    public DbSet<ContentBlock> ContentBlocks { get; set; }
-    public DbSet<ContentVersion> ContentVersions { get; set; }
+    public DbSet<ContentPage> ContentPages { get; set; } = null!;
+    public DbSet<ContentSection> ContentSections { get; set; } = null!;
+    public DbSet<ContentBlock> ContentBlocks { get; set; } = null!;
+    public DbSet<ContentVersion> ContentVersions { get; set; } = null!;
     
     // Contact Management
-    public DbSet<ContactMessage> ContactMessages { get; set; }
+    public DbSet<ContactMessage> ContactMessages { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -52,6 +54,7 @@ public class ErsaTrainingDbContext : IdentityDbContext<User, IdentityRole<Guid>,
         builder.ApplyConfiguration(new CourseConfiguration());
         builder.ApplyConfiguration(new SessionConfiguration());
         builder.ApplyConfiguration(new OrderConfiguration());
+        builder.ApplyConfiguration(new BillConfiguration());
         builder.ApplyConfiguration(new PaymentConfiguration());
         builder.ApplyConfiguration(new EnrollmentConfiguration());
         builder.ApplyConfiguration(new AttachmentConfiguration());
