@@ -140,14 +140,14 @@ export interface BlockContent {
 }
 
 export interface DashboardStats {
-  totalUsers: number;
+  totalUsers: number; // Only public users (excluding admin users)
   activeUsers: number;
   totalCourses: number;
   activeCourses: number;
   totalOrders: number;
-  totalRevenue: number;
-  recentUsers: UserSummary[];
-  recentOrders: OrderSummary[];
+  totalRevenue: number; // Only from paid and completed/under process orders
+  recentUsers: UserSummary[]; // Only public users
+  recentOrders: OrderSummary[]; // Latest orders with full details
   userGeographics: UserGeographic[];
 }
 
@@ -167,10 +167,14 @@ export interface UserSummary {
 
 export interface OrderSummary {
   id: string;
+  userId: string;
   userName: string;
   totalAmount: number;
-  status: string;
+  status: string | number;
   createdAt: string;
+  updatedAt: string;
+  courseName?: string; // For display in dashboard
+  courseType?: string; // Online/Offline
 }
 
 export interface AdminUser {
@@ -327,12 +331,12 @@ export interface AdminUpdateCourseRequest extends AdminCreateCourseRequest {}
 
 // Fallback data for when backend is not available
 const fallbackDashboardStats: DashboardStats = {
-  totalUsers: 156,
-  activeUsers: 142,
-  totalCourses: 28,
-  activeCourses: 24,
-  totalOrders: 89,
-  totalRevenue: 245600,
+  totalUsers: 11, // Only public users (excluding admin users)
+  activeUsers: 11,
+  totalCourses: 12,
+  activeCourses: 12,
+  totalOrders: 17,
+  totalRevenue: 199.99, // Only from paid and completed/under process orders
   recentUsers: [
     {
       id: '1',
@@ -366,24 +370,36 @@ const fallbackDashboardStats: DashboardStats = {
   recentOrders: [
     {
       id: '1',
+      userId: '1',
       userName: 'أحمد محمد علي',
       totalAmount: 1200,
       status: 'Paid',
-      createdAt: '2025-01-15T12:00:00Z'
+      createdAt: '2025-01-15T12:00:00Z',
+      updatedAt: '2025-01-15T12:05:00Z',
+      courseName: 'دورة التصميم الجرافيكي المتقدمة',
+      courseType: 'أونلاين'
     },
     {
       id: '2',
+      userId: '3',
       userName: 'فاطمة سعد النور',
       totalAmount: 850,
       status: 'Paid',
-      createdAt: '2025-01-14T16:30:00Z'
+      createdAt: '2025-01-14T16:30:00Z',
+      updatedAt: '2025-01-14T16:35:00Z',
+      courseName: 'أساسيات تطوير المواقع',
+      courseType: 'أونلاين'
     },
     {
       id: '3',
+      userId: '4',
       userName: 'محمد عبدالله الخالد',
       totalAmount: 1500,
-      status: 'Pending',
-      createdAt: '2025-01-13T11:15:00Z'
+      status: 'Under Process',
+      createdAt: '2025-01-13T11:15:00Z',
+      updatedAt: '2025-01-13T11:20:00Z',
+      courseName: 'دورة التسويق الرقمي',
+      courseType: 'أونلاين'
     }
   ],
   userGeographics: [

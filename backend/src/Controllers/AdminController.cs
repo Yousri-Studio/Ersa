@@ -45,13 +45,13 @@ public class AdminController : ControllerBase
     {
         try
         {
-            var totalUsers = await _context.Users.CountAsync();
+            var totalUsers = await _context.Users.Where(u => u.Status != UserStatus.Inactive && !u.IsSuperAdmin&& !u.IsAdmin).CountAsync();
             var activeUsers = await _context.Users.CountAsync(u => u.Status == UserStatus.Active);
             var totalCourses = await _context.Courses.CountAsync();
             var activeCourses = await _context.Courses.CountAsync(c => c.IsActive);
             var totalOrders = await _context.Orders.CountAsync();
             var totalRevenue = (decimal)await _context.Orders
-                .Where(o => o.Status == OrderStatus.Paid)
+                .Where(o => o.Status == OrderStatus.Paid || o.Status == OrderStatus.Processed || o.Status == OrderStatus.UnderProcess )
                 .SumAsync(o => (double)o.Amount);
 
             var recentUsers = await _context.Users

@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { adminApi, DashboardStats } from '@/lib/admin-api';
+import { adminApi, DashboardStats, OrderSummary } from '@/lib/admin-api';
 import { useHydration } from '@/hooks/useHydration';
 import { useLocale, useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { Icon } from '@/components/ui/icon';
 import WorldMap from '@/components/ui/world-map';
@@ -16,10 +17,14 @@ export default function AdminDashboard() {
   const { user } = useAuthStore();
   const t = useTranslations('admin');
   const locale = useLocale();
+  const router = useRouter();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isUsingFallback, setIsUsingFallback] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState<OrderSummary | null>(null);
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [statusForm, setStatusForm] = useState({ status: '' });
   const isHydrated = useHydration();
   const { status: backendStatus } = useBackendConnection();
 
@@ -100,39 +105,123 @@ export default function AdminDashboard() {
   const recentUsers = dashboardStats.recentUsers || [];
   const geographics = dashboardStats.userGeographics || [];
 
-  const formatDate = (dateString: string) => {
-    // This function seems to be unused, but kept for potential future use.
-    // If it's intended to format dates from the API, it should be implemented.
-    return '01/01/2025';
+  // Helper functions
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'SAR',
+    }).format(amount);
   };
 
-  // Mock data for demonstration - replace with real data from API
-  const recentOrders = [
-    {
-      id: '1',
-      studentName: 'Eslam Elsayed',
-      courseName: locale === 'ar' ? 'دورة التصميم الجرافيكي المتقدمة' : 'Advanced Graphic Design Course',
-      orderDate: '2025/01/01',
-      courseType: locale === 'ar' ? 'أونلاين' : 'Online',
-      coursePrice: locale === 'ar' ? '1200 ر.س' : '1200 SAR'
-    },
-    {
-      id: '2',
-      studentName: 'Eslam Elsayed',
-      courseName: locale === 'ar' ? 'دورة التصميم الجرافيكي المتقدمة' : 'Advanced Graphic Design Course',
-      orderDate: '2025/01/01',
-      courseType: locale === 'ar' ? 'أونلاين' : 'Online',
-      coursePrice: locale === 'ar' ? '1200 ر.س' : '1200 SAR'
-    },
-    {
-      id: '3',
-      studentName: 'Eslam Elsayed',
-      courseName: locale === 'ar' ? 'دورة التصميم الجرافيكي المتقدمة' : 'Advanced Graphic Design Course',
-      orderDate: '2025/01/01',
-      courseType: locale === 'ar' ? 'أونلاين' : 'Online',
-      coursePrice: locale === 'ar' ? '1200 ر.س' : '1200 SAR'
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  };
+
+  const getStatusColor = (status: string | number) => {
+    // Handle enum values from backend
+    if (typeof status === 'number') {
+      switch (status) {
+        case 0: return 'bg-gray-100 text-gray-800'; // New
+        case 1: return 'bg-yellow-100 text-yellow-800'; // Pending Payment
+        case 2: return 'bg-green-100 text-green-800'; // Paid
+        case 3: return 'bg-blue-100 text-blue-800'; // Under Process
+        case 4: return 'bg-green-100 text-green-800'; // Processed
+        case 5: return 'bg-orange-100 text-orange-800'; // Expired
+        case 6: return 'bg-red-100 text-red-800'; // Failed
+        case 7: return 'bg-purple-100 text-purple-800'; // Refunded
+        default: return 'bg-gray-100 text-gray-800';
+      }
     }
-  ];
+    
+    // Handle string values
+    const statusStr = String(status || '').toLowerCase();
+    switch (statusStr) {
+      case 'new': return 'bg-gray-100 text-gray-800';
+      case 'pendingpayment': return 'bg-yellow-100 text-yellow-800';
+      case 'paid': return 'bg-green-100 text-green-800';
+      case 'underprocess': return 'bg-blue-100 text-blue-800';
+      case 'under process': return 'bg-blue-100 text-blue-800';
+      case 'processed': return 'bg-green-100 text-green-800';
+      case 'expired': return 'bg-orange-100 text-orange-800';
+      case 'failed': return 'bg-red-100 text-red-800';
+      case 'refunded': return 'bg-purple-100 text-purple-800';
+      case 'completed': return 'bg-green-100 text-green-800';
+      case 'pending': return 'bg-yellow-100 text-yellow-800';
+      case 'processing': return 'bg-blue-100 text-blue-800';
+      case 'cancelled': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getStatusLabel = (status: string | number) => {
+    // Handle enum values from backend
+    if (typeof status === 'number') {
+      switch (status) {
+        case 0: return 'New';
+        case 1: return 'Pending Payment';
+        case 2: return 'Paid';
+        case 3: return 'Under Process';
+        case 4: return 'Processed';
+        case 5: return 'Expired';
+        case 6: return 'Failed';
+        case 7: return 'Refunded';
+        default: return 'Unknown';
+      }
+    }
+    
+    // Handle string values
+    const statusStr = status.toString().toLowerCase();
+    switch (statusStr) {
+      case 'new': return 'New';
+      case 'pendingpayment': return 'Pending Payment';
+      case 'paid': return 'Paid';
+      case 'underprocess': return 'Under Process';
+      case 'under process': return 'Under Process';
+      case 'processed': return 'Processed';
+      case 'expired': return 'Expired';
+      case 'failed': return 'Failed';
+      case 'refunded': return 'Refunded';
+      case 'completed': return 'Completed';
+      case 'pending': return 'Pending';
+      case 'processing': return 'Processing';
+      case 'cancelled': return 'Cancelled';
+      default: return 'Unknown';
+    }
+  };
+
+  const handleStatusUpdate = async () => {
+    if (!selectedOrder) return;
+
+    try {
+      await adminApi.updateOrderStatus(selectedOrder.id, statusForm);
+      toast.success('Order status updated successfully');
+      setShowStatusModal(false);
+      setSelectedOrder(null);
+      // Refresh dashboard stats
+      const response = await adminApi.getDashboardStats();
+      setStats(response.data);
+    } catch (error: any) {
+      toast.error('Failed to update order status');
+      console.error('Error updating order status:', error);
+    }
+  };
+
+  const openStatusModal = (order: OrderSummary) => {
+    setSelectedOrder(order);
+    setStatusForm({
+      status: String(order.status),
+    });
+    setShowStatusModal(true);
+  };
+
+  // Use real data from API
+  const recentOrders = dashboardStats.recentOrders || [];
 
   const isRTL = locale === 'ar';
 
@@ -289,29 +378,54 @@ export default function AdminDashboard() {
                   {recentOrders.map((order) => (
                     <tr key={order.id} className="hover:bg-gray-50">
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {order.studentName}
+                        {order.userName}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {order.courseName}
+                        {order.courseName || (locale === 'ar' ? 'دورة غير محددة' : 'Course not specified')}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {order.orderDate}
+                        {formatDate(order.createdAt)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {order.courseType}
+                        {order.courseType || (locale === 'ar' ? 'أونلاين' : 'Online')}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {order.coursePrice}
+                        {formatCurrency(order.totalAmount)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                          {t('status-completed')}
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
+                          {getStatusLabel(order.status)}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <button className="text-gray-400 hover:text-gray-600 p-1">
-                          <Icon name="ellipsis-v" className="h-4 w-4" />
-                        </button>
+                        <div className="flex justify-end space-x-2">
+                          <button
+                            onClick={() => openStatusModal(order)}
+                            className="text-blue-600 hover:text-blue-900"
+                            title="Update Status"
+                          >
+                            <Icon name="edit" className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              router.push(`/${locale}/admin/orders/${order.id}`);
+                            }}
+                            className="text-green-600 hover:text-green-900"
+                            title="View Details"
+                          >
+                            <Icon name="eye" className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              // TODO: Implement download invoice
+                              toast('Download invoice functionality coming soon');
+                            }}
+                            className="text-purple-600 hover:text-purple-900"
+                            title="Download Invoice"
+                          >
+                            <Icon name="download" className="h-4 w-4" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -320,69 +434,113 @@ export default function AdminDashboard() {
             </div>
           </div>
 
-          {/* Bottom Grid - Recent Users and Geographics */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Recent Users */}
-            <div className="bg-white rounded-xl shadow-sm">
-              <div className="px-6 py-4 border-b border-gray-100">
-                <h3 className="text-lg font-bold text-gray-800 mb-1">{t('recent-users')}</h3>
-                <p className="text-gray-600 text-sm">{t('recent-users-subtitle')}</p>
+          {/* Recent Users */}
+          <div className="bg-white rounded-xl shadow-sm">
+            <div className="px-6 py-4 border-b border-gray-100">
+              <h3 className="text-lg font-bold text-gray-800 mb-1">{t('recent-users')}</h3>
+              <p className="text-gray-600 text-sm">{t('recent-users-subtitle')}</p>
+            </div>
+            <div className="p-6">
+              <div className="space-y-4">
+                {recentUsers.map((user) => (
+                  <div key={user.id} className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="h-10 w-10 rounded-full overflow-hidden bg-gray-200">
+                        <div className="h-full w-full bg-gradient-to-r from-blue-500 to-teal-600 flex items-center justify-center">
+                          <span className="text-white font-semibold text-sm">
+                            {user.fullName?.charAt(0)?.toUpperCase() || 'U'}
+                          </span>
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900">{user.fullName}</p>
+                        <p className="text-sm text-gray-500">{user.email}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <span className="text-sm text-gray-500">{user.createdAt ? new Date(user.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US') : ''}</span>
+                      <button className="text-gray-400 hover:text-gray-600 p-1">
+                        <Icon name="ellipsis-v" className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
               </div>
-              <div className="p-6">
-                <div className="space-y-4">
-                  {recentUsers.map((user) => (
-                    <div key={user.id} className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className="h-10 w-10 rounded-full overflow-hidden bg-gray-200">
-                          <div className="h-full w-full bg-gradient-to-r from-blue-500 to-teal-600 flex items-center justify-center">
-                            <span className="text-white font-semibold text-sm">
-                              {user.fullName?.charAt(0)?.toUpperCase() || 'U'}
-                            </span>
-                          </div>
-                        </div>
-                        <div>
-                          <p className="text-sm font-medium text-gray-900">{user.fullName}</p>
-                          <p className="text-sm text-gray-500">{user.email}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center space-x-3">
-                        <span className="text-sm text-gray-500">{user.createdAt ? new Date(user.createdAt).toLocaleDateString(locale === 'ar' ? 'ar-SA' : 'en-US') : ''}</span>
-                        <button className="text-gray-400 hover:text-gray-600 p-1">
-                          <Icon name="ellipsis-v" className="h-4 w-4" />
-                        </button>
-                      </div>
+            </div>
+          </div>
+
+          {/* Geographic Distribution Section - Hidden as requested */}
+          {/* 
+          <div className="bg-white rounded-xl shadow-sm">
+            <div className="px-6 py-4 border-b border-gray-100">
+              <h3 className="text-lg font-bold text-gray-800 mb-1">{t('geographics')}</h3>
+              <p className="text-gray-600 text-sm">{t('geographics-subtitle')}</p>
+            </div>
+            <div className="p-6">
+              <div className="mb-4">
+                <h4 className="text-md font-semibold text-gray-900 mb-4">{t('users-from-countries')}</h4>
+                <div className="space-y-2">
+                  {geographics.map((geo, index) => (
+                    <div key={index} className="flex justify-between items-center">
+                      <span className="text-sm text-gray-600">{geo.country}</span>
+                      <span className="text-sm font-medium text-teal-600">{geo.users} {t('user')}</span>
                     </div>
                   ))}
                 </div>
               </div>
-            </div>
-
-            {/* Geographics */}
-            <div className="bg-white rounded-xl shadow-sm">
-              <div className="px-6 py-4 border-b border-gray-100">
-                <h3 className="text-lg font-bold text-gray-800 mb-1">{t('geographics')}</h3>
-                <p className="text-gray-600 text-sm">{t('geographics-subtitle')}</p>
+              <div className="h-40">
+                <WorldMap data={geographics} />
               </div>
-              <div className="p-6">
-                <div className="mb-4">
-                  <h4 className="text-md font-semibold text-gray-900 mb-4">{t('users-from-countries')}</h4>
-                  <div className="space-y-2">
-                    {geographics.map((geo, index) => (
-                      <div key={index} className="flex justify-between items-center">
-                        <span className="text-sm text-gray-600">{geo.country}</span>
-                        <span className="text-sm font-medium text-teal-600">{geo.users} {t('user')}</span>
-                      </div>
-                    ))}
-                  </div>
+            </div>
+          </div>
+          */}
+        </div>
+      </div>
+
+      {/* Status Update Modal */}
+      {showStatusModal && selectedOrder && (
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div className="mt-3">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">
+                Update Order Status
+              </h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Status
+                  </label>
+                  <select
+                    value={statusForm.status}
+                    onChange={(e) => setStatusForm(prev => ({ ...prev, status: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="Processing">Processing</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Cancelled">Cancelled</option>
+                    <option value="Failed">Failed</option>
+                  </select>
                 </div>
-                <div className="h-40">
-                  <WorldMap data={geographics} />
-                </div>
+              </div>
+              <div className="flex justify-end space-x-3 mt-6">
+                <button
+                  onClick={() => setShowStatusModal(false)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleStatusUpdate}
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+                >
+                  Update Status
+                </button>
               </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }
