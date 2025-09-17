@@ -37,6 +37,12 @@ export default function AdminLayout({
         return; // Wait for hydration
       }
 
+      // Clear any corrupted storage first
+      if (typeof window !== 'undefined') {
+        const { clearCorruptedStorage } = await import('@/lib/custom-storage');
+        clearCorruptedStorage();
+      }
+      
       // Initialize auth from cookie first
       initFromCookie();
       

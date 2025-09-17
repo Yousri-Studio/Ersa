@@ -12,6 +12,9 @@ import { useAuthStore } from '@/lib/auth-store';
 import { Users } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useBackendConnection } from '@/lib/backend-connection';
+import { InvoiceModal } from '@/components/invoice/invoice-modal';
+import { InvoiceData } from '@/components/invoice/invoice-template';
+import { convertOrderToInvoiceData } from '@/lib/invoice-utils';
 
 export default function AdminDashboard() {
   const { user } = useAuthStore();
@@ -25,6 +28,9 @@ export default function AdminDashboard() {
   const [selectedOrder, setSelectedOrder] = useState<OrderSummary | null>(null);
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [statusForm, setStatusForm] = useState({ status: '' });
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+  const [invoiceData, setInvoiceData] = useState<InvoiceData | null>(null);
+  const [isLoadingInvoice, setIsLoadingInvoice] = useState(false);
   const isHydrated = useHydration();
   const { status: backendStatus } = useBackendConnection();
 
@@ -218,6 +224,39 @@ export default function AdminDashboard() {
       status: String(order.status),
     });
     setShowStatusModal(true);
+  };
+
+  const handleDownloadInvoice = async (order: OrderSummary) => {
+    setIsLoadingInvoice(true);
+    try {
+      console.log('Fetching order details for order:', order.id);
+      
+      // Fetch detailed order information
+      const orderDetailResponse = await adminApi.getOrderDetail(order.id);
+      console.log('Order detail response:', orderDetailResponse);
+      
+      // Ensure we have the data property
+      if (!orderDetailResponse.data) {
+        throw new Error('No order data received from API');
+      }
+      
+      // Convert to invoice data format
+      const invoice = convertOrderToInvoiceData(orderDetailResponse.data);
+      console.log('Generated invoice data:', invoice);
+      
+      // Show invoice modal
+      setInvoiceData(invoice);
+      setShowInvoiceModal(true);
+    } catch (error: any) {
+      console.error('Error fetching order details for invoice:', error);
+      toast.error(
+        locale === 'ar' 
+          ? 'فشل في تحميل تفاصيل الطلب للفاتورة' 
+          : 'Failed to load order details for invoice'
+      );
+    } finally {
+      setIsLoadingInvoice(false);
+    }
   };
 
   // Use real data from API
@@ -416,14 +455,16 @@ export default function AdminDashboard() {
                             <Icon name="eye" className="h-4 w-4" />
                           </button>
                           <button
-                            onClick={() => {
-                              // TODO: Implement download invoice
-                              toast('Download invoice functionality coming soon');
-                            }}
-                            className="text-purple-600 hover:text-purple-900"
+                            onClick={() => handleDownloadInvoice(order)}
+                            disabled={isLoadingInvoice}
+                            className="text-purple-600 hover:text-purple-900 disabled:opacity-50 disabled:cursor-not-allowed"
                             title="Download Invoice"
                           >
-                            <Icon name="download" className="h-4 w-4" />
+                            {isLoadingInvoice ? (
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
+                            ) : (
+                              <Icon name="download" className="h-4 w-4" />
+                            )}
                           </button>
                         </div>
                       </td>
@@ -540,6 +581,18 @@ export default function AdminDashboard() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Invoice Modal */}
+      {showInvoiceModal && invoiceData && (
+        <InvoiceModal
+          isOpen={showInvoiceModal}
+          onClose={() => {
+            setShowInvoiceModal(false);
+            setInvoiceData(null);
+          }}
+          invoiceData={invoiceData}
+        />
       )}
     </div>
   );

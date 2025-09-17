@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import Cookies from 'js-cookie';
-import { customStorage } from './custom-storage';
+import { customStorage, clearCorruptedStorage } from './custom-storage';
 
 export interface User {
   id: string;
@@ -26,7 +26,7 @@ interface AuthState {
   initFromCookie: () => void;
   validateToken: () => Promise<void>;
   canPurchaseCourses: () => boolean;
-  getUserRole: () => string;
+  getUserRole: () => string | null;
 }
 
 export const useAuthStore = create<AuthState>()(
@@ -98,12 +98,12 @@ export const useAuthStore = create<AuthState>()(
 
       canPurchaseCourses: () => {
         const user = get().user;
-        return user && (user.role === 'user' || user.role === 'admin' || user.role === 'operation');
+        return user ? (user.role === 'user' || user.role === 'admin' || user.role === 'operation') : false;
       },
 
       getUserRole: () => {
         const user = get().user;
-        return user ? user.role : null;
+        return user?.role || null;
       },
 
       // Force rehydrate from storage

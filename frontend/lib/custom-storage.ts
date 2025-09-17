@@ -1,5 +1,48 @@
 import { StateStorage } from 'zustand/middleware';
 
+// Utility function to clear corrupted storage
+export const clearCorruptedStorage = () => {
+  if (typeof window !== 'undefined') {
+    try {
+      // Clear specific auth-related items that might be corrupted
+      const keysToCheck = ['auth-storage', 'cart-store', 'auth-token'];
+      keysToCheck.forEach(key => {
+        const item = localStorage.getItem(key);
+        if (item && (item === '[object Object]' || item.includes('[object Object]'))) {
+          console.warn(`Clearing corrupted localStorage item: ${key}`);
+          localStorage.removeItem(key);
+        }
+      });
+    } catch (error) {
+      console.warn('Error clearing corrupted storage:', error);
+    }
+  }
+};
+
+// Utility function to completely clear all storage (for debugging)
+export const clearAllStorage = () => {
+  if (typeof window !== 'undefined') {
+    try {
+      localStorage.clear();
+      sessionStorage.clear();
+      // Clear cookies
+      document.cookie.split(";").forEach(function(c) { 
+        document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+      });
+      console.log('All storage cleared');
+      window.location.reload();
+    } catch (error) {
+      console.warn('Error clearing all storage:', error);
+    }
+  }
+};
+
+// Make it available globally for debugging
+if (typeof window !== 'undefined') {
+  (window as any).clearAllStorage = clearAllStorage;
+  (window as any).clearCorruptedStorage = clearCorruptedStorage;
+}
+
 // SSR-safe storage for Zustand persist middleware
 export const customStorage: StateStorage = {
   getItem: (name: string) => {
@@ -27,11 +70,20 @@ export const customStorage: StateStorage = {
   setItem: (name: string, value: string) => {
     if (typeof window !== 'undefined') {
       try {
-        // Validate JSON before storing
-        JSON.parse(value);
-        localStorage.setItem(name, value);
+        // Check if value is already a string and valid JSON
+        if (typeof value === 'string') {
+          // Try to parse to validate it's proper JSON
+          JSON.parse(value);
+          localStorage.setItem(name, value);
+        } else {
+          // If it's not a string, stringify it first
+          const jsonValue = JSON.stringify(value);
+          localStorage.setItem(name, jsonValue);
+        }
       } catch (error) {
         console.warn('localStorage.setItem failed or invalid JSON:', error);
+        console.warn('Attempted to store value:', value);
+        console.warn('Value type:', typeof value);
       }
     }
   },

@@ -490,6 +490,79 @@ public class AdminController : ControllerBase
         }
     }
 
+    [HttpGet("orders/{orderId}/invoice")]
+    [AllowAnonymous] // Temporary for testing
+    public async Task<ActionResult<InvoiceDto>> GenerateInvoice(Guid orderId)
+    {
+        try
+        {
+            var order = await _context.Orders
+                .Include(o => o.User)
+                .Include(o => o.OrderItems)
+                .Include(o => o.Payments)
+                .FirstOrDefaultAsync(o => o.Id == orderId);
+
+            if (order == null)
+            {
+                return NotFound(new { error = "Order not found" });
+            }
+
+            // Generate invoice number
+            var invoiceNumber = $"INV-{order.Id.ToString().Substring(0, 8).ToUpper()}";
+
+            var invoice = new InvoiceDto
+            {
+                Id = order.Id,
+                InvoiceNumber = invoiceNumber,
+                OrderId = order.Id,
+                Amount = order.Amount,
+                Currency = order.Currency,
+                Status = order.Status,
+                CreatedAt = order.CreatedAt,
+                UpdatedAt = order.UpdatedAt,
+                Customer = new InvoiceCustomerDto
+                {
+                    Id = order.User.Id,
+                    FullName = order.User.FullName,
+                    Email = order.User.Email ?? string.Empty,
+                    Phone = order.User.Phone,
+                    Country = order.User.Country,
+                    Locale = order.User.Locale,
+                    CreatedAt = order.User.CreatedAt
+                },
+                Items = order.OrderItems.Select(oi => new InvoiceItemDto
+                {
+                    Id = oi.Id,
+                    CourseId = oi.CourseId,
+                    SessionId = oi.SessionId,
+                    CourseTitleEn = oi.CourseTitleEn,
+                    CourseTitleAr = oi.CourseTitleAr,
+                    Price = oi.Price,
+                    Currency = oi.Currency,
+                    Qty = oi.Qty,
+                    CreatedAt = oi.CreatedAt
+                }).ToList(),
+                Payments = order.Payments.Select(p => new InvoicePaymentDto
+                {
+                    Id = p.Id,
+                    Provider = p.Provider,
+                    ProviderRef = p.ProviderRef,
+                    Status = p.Status,
+                    CapturedAt = p.CapturedAt,
+                    CreatedAt = p.CreatedAt,
+                    UpdatedAt = p.UpdatedAt
+                }).ToList()
+            };
+
+            return Ok(invoice);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error generating invoice for order {OrderId}", orderId);
+            return StatusCode(500, new { error = "Internal server error" });
+        }
+    }
+
     private static double[] GetCountryCoordinates(string country)
     {
         // Dictionary of country coordinates [longitude, latitude]
@@ -522,151 +595,6 @@ public class AdminController : ControllerBase
             { "Serbia", new double[] { 21.0059, 44.0165 } },
             { "Bosnia and Herzegovina", new double[] { 17.6791, 43.9159 } },
             { "Montenegro", new double[] { 19.3744, 42.7087 } },
-            { "Albania", new double[] { 20.1683, 41.1533 } },
-            { "North Macedonia", new double[] { 21.7453, 41.6086 } },
-            { "Kosovo", new double[] { 20.9029, 42.6026 } },
-            { "Bulgaria", new double[] { 25.4858, 42.7339 } },
-            { "Romania", new double[] { 24.9668, 45.9432 } },
-            { "Moldova", new double[] { 28.3699, 47.4116 } },
-            { "Ukraine", new double[] { 31.1656, 48.3794 } },
-            { "Belarus", new double[] { 27.9534, 53.7098 } },
-            { "Lithuania", new double[] { 23.8813, 55.1694 } },
-            { "Latvia", new double[] { 24.6032, 56.8796 } },
-            { "Estonia", new double[] { 25.0136, 58.5953 } },
-            { "Russia", new double[] { 105.3188, 61.5240 } },
-            { "Kazakhstan", new double[] { 66.9237, 48.0196 } },
-            { "Uzbekistan", new double[] { 64.5853, 41.3775 } },
-            { "Turkmenistan", new double[] { 59.5563, 38.9697 } },
-            { "Kyrgyzstan", new double[] { 74.7661, 41.2044 } },
-            { "Tajikistan", new double[] { 71.2761, 38.5358 } },
-            { "Afghanistan", new double[] { 67.7100, 33.9391 } },
-            { "Pakistan", new double[] { 69.3451, 30.3753 } },
-            { "India", new double[] { 78.9629, 20.5937 } },
-            { "Nepal", new double[] { 84.1240, 28.3949 } },
-            { "Bhutan", new double[] { 90.5116, 27.5142 } },
-            { "Bangladesh", new double[] { 90.3563, 23.6850 } },
-            { "Sri Lanka", new double[] { 80.7718, 7.8731 } },
-            { "Maldives", new double[] { 73.2207, 3.2028 } },
-            { "China", new double[] { 104.1954, 35.8617 } },
-            { "Mongolia", new double[] { 103.8467, 46.8625 } },
-            { "Japan", new double[] { 138.2529, 36.2048 } },
-            { "South Korea", new double[] { 127.7669, 35.9078 } },
-            { "North Korea", new double[] { 127.5101, 40.3399 } },
-            { "Taiwan", new double[] { 121.5654, 23.6978 } },
-            { "Hong Kong", new double[] { 114.1694, 22.3193 } },
-            { "Macau", new double[] { 113.5439, 22.1987 } },
-            { "Vietnam", new double[] { 108.2772, 14.0583 } },
-            { "Laos", new double[] { 102.4955, 19.8563 } },
-            { "Cambodia", new double[] { 104.9909, 12.5657 } },
-            { "Thailand", new double[] { 101.0188, 15.8700 } },
-            { "Myanmar", new double[] { 95.9562, 21.9162 } },
-            { "Malaysia", new double[] { 101.6869, 4.2105 } },
-            { "Singapore", new double[] { 103.8198, 1.3521 } },
-            { "Indonesia", new double[] { 113.9213, -0.7893 } },
-            { "Philippines", new double[] { 121.7740, 12.8797 } },
-            { "Brunei", new double[] { 114.7277, 4.5353 } },
-            { "East Timor", new double[] { 125.7275, -8.8742 } },
-            { "Papua New Guinea", new double[] { 143.9555, -6.3150 } },
-            { "Fiji", new double[] { 178.0650, -17.7134 } },
-            { "New Zealand", new double[] { 174.8860, -40.9006 } },
-            { "Brazil", new double[] { -51.9253, -14.2350 } },
-            { "Argentina", new double[] { -63.6167, -38.4161 } },
-            { "Chile", new double[] { -71.5430, -35.6751 } },
-            { "Peru", new double[] { -75.0152, -9.1900 } },
-            { "Colombia", new double[] { -74.2973, 4.5709 } },
-            { "Venezuela", new double[] { -66.5897, 6.4238 } },
-            { "Ecuador", new double[] { -78.1834, -1.8312 } },
-            { "Bolivia", new double[] { -63.5887, -16.2902 } },
-            { "Paraguay", new double[] { -58.4438, -23.4425 } },
-            { "Uruguay", new double[] { -55.7658, -32.5228 } },
-            { "Guyana", new double[] { -58.9302, 4.8604 } },
-            { "Suriname", new double[] { -56.0278, 3.9193 } },
-            { "French Guiana", new double[] { -53.1258, 3.9339 } },
-            { "Mexico", new double[] { -102.5528, 23.6345 } },
-            { "Guatemala", new double[] { -90.2308, 15.7835 } },
-            { "Belize", new double[] { -88.4976, 17.1899 } },
-            { "El Salvador", new double[] { -88.8965, 13.7942 } },
-            { "Honduras", new double[] { -86.2419, 15.1999 } },
-            { "Nicaragua", new double[] { -85.2072, 12.8654 } },
-            { "Costa Rica", new double[] { -83.7534, 9.9281 } },
-            { "Panama", new double[] { -80.7821, 8.5380 } },
-            { "Cuba", new double[] { -77.7812, 21.5218 } },
-            { "Jamaica", new double[] { -77.2975, 18.1096 } },
-            { "Haiti", new double[] { -72.2852, 18.9712 } },
-            { "Dominican Republic", new double[] { -70.1627, 18.7357 } },
-            { "Puerto Rico", new double[] { -66.5901, 18.2208 } },
-            { "Bahamas", new double[] { -77.3963, 25.0343 } },
-            { "Barbados", new double[] { -59.6132, 13.1939 } },
-            { "Trinidad and Tobago", new double[] { -61.2225, 10.6598 } },
-            { "Grenada", new double[] { -61.6790, 12.1165 } },
-            { "Saint Vincent and the Grenadines", new double[] { -61.2872, 12.9843 } },
-            { "Saint Lucia", new double[] { -60.9789, 13.9094 } },
-            { "Dominica", new double[] { -61.3709, 15.4150 } },
-            { "Antigua and Barbuda", new double[] { -61.7964, 17.0608 } },
-            { "Saint Kitts and Nevis", new double[] { -62.7829, 17.3578 } },
-            { "South Africa", new double[] { 24.9916, -30.5595 } },
-            { "Nigeria", new double[] { 7.3986, 9.0820 } },
-            { "Kenya", new double[] { 37.9062, -0.0236 } },
-            { "Ethiopia", new double[] { 40.4897, 9.1450 } },
-            { "Tanzania", new double[] { 34.8888, -6.3690 } },
-            { "Uganda", new double[] { 32.2903, 1.3733 } },
-            { "Ghana", new double[] { -1.0232, 7.9465 } },
-            { "Morocco", new double[] { -7.0926, 31.7917 } },
-            { "Algeria", new double[] { 1.6596, 28.0339 } },
-            { "Tunisia", new double[] { 9.5375, 33.8869 } },
-            { "Libya", new double[] { 17.2283, 26.3351 } },
-            { "Sudan", new double[] { 30.2176, 12.8628 } },
-            { "South Sudan", new double[] { 31.3070, 6.8770 } },
-            { "Chad", new double[] { 18.7322, 15.4542 } },
-            { "Niger", new double[] { 8.0817, 17.6078 } },
-            { "Mali", new double[] { -3.9962, 17.5707 } },
-            { "Burkina Faso", new double[] { -1.5616, 12.2383 } },
-            { "Senegal", new double[] { -14.4524, 14.4974 } },
-            { "Guinea", new double[] { -9.6966, 9.9456 } },
-            { "Guinea-Bissau", new double[] { -15.1804, 11.8037 } },
-            { "Sierra Leone", new double[] { -11.7799, 8.4606 } },
-            { "Liberia", new double[] { -9.4295, 6.4281 } },
-            { "Ivory Coast", new double[] { -5.5471, 7.5400 } },
-            { "Togo", new double[] { 0.8248, 8.6195 } },
-            { "Benin", new double[] { 2.3158, 9.3077 } },
-            { "Cameroon", new double[] { 12.3547, 7.3697 } },
-            { "Central African Republic", new double[] { 20.9394, 6.6111 } },
-            { "Equatorial Guinea", new double[] { 10.2679, 1.6508 } },
-            { "Gabon", new double[] { 11.6094, -0.8037 } },
-            { "Republic of the Congo", new double[] { 15.8277, -0.2280 } },
-            { "Democratic Republic of the Congo", new double[] { 21.7587, -4.0383 } },
-            { "Angola", new double[] { 17.8739, -11.2027 } },
-            { "Zambia", new double[] { 27.8493, -13.1339 } },
-            { "Zimbabwe", new double[] { 29.1549, -19.0154 } },
-            { "Botswana", new double[] { 24.6849, -22.3285 } },
-            { "Namibia", new double[] { 18.4904, -22.9576 } },
-            { "Lesotho", new double[] { 28.2336, -29.6099 } },
-            { "Eswatini", new double[] { 31.4659, -26.5225 } },
-            { "Madagascar", new double[] { 46.8691, -18.7669 } },
-            { "Mauritius", new double[] { 57.5522, -20.3484 } },
-            { "Seychelles", new double[] { 55.4915, -4.6796 } },
-            { "Comoros", new double[] { 43.3333, -11.6455 } },
-            { "Mayotte", new double[] { 45.1662, -12.8275 } },
-            { "Reunion", new double[] { 55.5364, -21.1151 } },
-            { "Djibouti", new double[] { 42.5903, 11.8251 } },
-            { "Somalia", new double[] { 46.1996, 5.1521 } },
-            { "Eritrea", new double[] { 39.7823, 15.1794 } },
-            { "Yemen", new double[] { 48.5164, 15.5527 } },
-            { "Oman", new double[] { 55.9233, 21.4735 } },
-            { "United Arab Emirates", new double[] { 53.8478, 23.4241 } },
-            { "Qatar", new double[] { 51.1839, 25.3548 } },
-            { "Bahrain", new double[] { 50.5577, 26.0665 } },
-            { "Kuwait", new double[] { 47.4818, 29.3117 } },
-            { "Iraq", new double[] { 43.6793, 33.2232 } },
-            { "Syria", new double[] { 38.9968, 34.8021 } },
-            { "Lebanon", new double[] { 35.8623, 33.8547 } },
-            { "Jordan", new double[] { 36.2384, 30.5852 } },
-            { "Israel", new double[] { 34.8516, 31.0461 } },
-            { "Palestine", new double[] { 35.3027, 31.9522 } },
-            { "Iran", new double[] { 53.6880, 32.4279 } },
-            { "Turkey", new double[] { 35.2433, 38.9637 } },
-            { "Cyprus", new double[] { 33.4299, 35.1264 } },
-            { "Greece", new double[] { 21.8243, 39.0742 } },
             { "Albania", new double[] { 20.1683, 41.1533 } },
             { "North Macedonia", new double[] { 21.7453, 41.6086 } },
             { "Kosovo", new double[] { 20.9029, 42.6026 } },
