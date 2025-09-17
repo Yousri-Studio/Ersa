@@ -1,12 +1,16 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import { Icon } from '@/components/ui/icon';
 import { adminApi, AdminOrder, PagedResult } from '@/lib/admin-api';
 import { useHydration } from '@/hooks/useHydration';
 import toast from 'react-hot-toast';
 
 export default function AdminOrders() {
+  const router = useRouter();
+  const locale = useLocale();
   const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [pagination, setPagination] = useState({
     page: 1,
@@ -88,7 +92,7 @@ export default function AdminOrders() {
   const openStatusModal = (order: AdminOrder) => {
     setSelectedOrder(order);
     setStatusForm({
-      status: order.status,
+      status: String(order.status),
     });
     setShowStatusModal(true);
   };
@@ -110,37 +114,73 @@ export default function AdminOrders() {
     });
   };
 
-  const getStatusColor = (status: any) => {
+  const getStatusColor = (status: string | number) => {
+    // Handle enum values from backend
+    if (typeof status === 'number') {
+      switch (status) {
+        case 0: return 'bg-gray-100 text-gray-800'; // New
+        case 1: return 'bg-yellow-100 text-yellow-800'; // Pending Payment
+        case 2: return 'bg-green-100 text-green-800'; // Paid
+        case 3: return 'bg-blue-100 text-blue-800'; // Under Process
+        case 4: return 'bg-green-100 text-green-800'; // Processed
+        case 5: return 'bg-orange-100 text-orange-800'; // Expired
+        case 6: return 'bg-red-100 text-red-800'; // Failed
+        case 7: return 'bg-purple-100 text-purple-800'; // Refunded
+        default: return 'bg-gray-100 text-gray-800';
+      }
+    }
+    
+    // Handle string values
     const statusStr = String(status || '').toLowerCase();
     switch (statusStr) {
-      case 'completed':
-        return 'bg-green-100 text-green-800';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'processing':
-        return 'bg-blue-100 text-blue-800';
-      case 'cancelled':
-      case 'failed':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
+      case 'new': return 'bg-gray-100 text-gray-800';
+      case 'pendingpayment': return 'bg-yellow-100 text-yellow-800';
+      case 'paid': return 'bg-green-100 text-green-800';
+      case 'underprocess': return 'bg-blue-100 text-blue-800';
+      case 'processed': return 'bg-green-100 text-green-800';
+      case 'expired': return 'bg-orange-100 text-orange-800';
+      case 'failed': return 'bg-red-100 text-red-800';
+      case 'refunded': return 'bg-purple-100 text-purple-800';
+      case 'completed': return 'bg-green-100 text-green-800';
+      case 'pending': return 'bg-yellow-100 text-yellow-800';
+      case 'processing': return 'bg-blue-100 text-blue-800';
+      case 'cancelled': return 'bg-red-100 text-red-800';
+      default: return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const getStatusLabel = (status: string) => {
-    switch (status.toLowerCase()) {
-      case 'completed':
-        return 'Completed';
-      case 'pending':
-        return 'Pending';
-      case 'processing':
-        return 'Processing';
-      case 'cancelled':
-        return 'Cancelled';
-      case 'failed':
-        return 'Failed';
-      default:
-        return status;
+  const getStatusLabel = (status: string | number) => {
+    // Handle enum values from backend
+    if (typeof status === 'number') {
+      switch (status) {
+        case 0: return 'New';
+        case 1: return 'Pending Payment';
+        case 2: return 'Paid';
+        case 3: return 'Under Process';
+        case 4: return 'Processed';
+        case 5: return 'Expired';
+        case 6: return 'Failed';
+        case 7: return 'Refunded';
+        default: return 'Unknown';
+      }
+    }
+    
+    // Handle string values
+    const statusStr = status.toString().toLowerCase();
+    switch (statusStr) {
+      case 'new': return 'New';
+      case 'pendingpayment': return 'Pending Payment';
+      case 'paid': return 'Paid';
+      case 'underprocess': return 'Under Process';
+      case 'processed': return 'Processed';
+      case 'expired': return 'Expired';
+      case 'failed': return 'Failed';
+      case 'refunded': return 'Refunded';
+      case 'completed': return 'Completed';
+      case 'pending': return 'Pending';
+      case 'processing': return 'Processing';
+      case 'cancelled': return 'Cancelled';
+      default: return 'Unknown';
     }
   };
 
@@ -301,8 +341,7 @@ export default function AdminOrders() {
                         </button>
                         <button
                           onClick={() => {
-                            // TODO: Implement view order details
-                            toast('View order details functionality coming soon');
+                            router.push(`/${locale}/admin/orders/${order.id}`);
                           }}
                           className="text-green-600 hover:text-green-900"
                           title="View Details"

@@ -218,7 +218,52 @@ export interface AdminOrder {
   userId: string;
   userName: string;
   totalAmount: number;
+  status: string | number; // Can be enum number from backend or string
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminOrderDetail {
+  id: string;
+  userId: string;
+  amount: number;
+  currency: string;
+  status: string | number; // Can be enum number from backend or string
+  createdAt: string;
+  updatedAt: string;
+  customer: AdminOrderCustomer;
+  items: AdminOrderItem[];
+  payments: AdminOrderPayment[];
+}
+
+export interface AdminOrderCustomer {
+  id: string;
+  fullName: string;
+  email: string;
+  phone?: string;
+  country?: string;
+  locale: string;
+  createdAt: string;
+}
+
+export interface AdminOrderItem {
+  id: string;
+  courseId: string;
+  sessionId?: string;
+  courseTitleEn: string;
+  courseTitleAr: string;
+  price: number;
+  currency: string;
+  qty: number;
+  createdAt: string;
+}
+
+export interface AdminOrderPayment {
+  id: string;
+  provider: string;
+  providerRef?: string;
   status: string;
+  capturedAt?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -568,6 +613,57 @@ export const adminApi = {
 
   updateOrderStatus: (orderId: string, data: UpdateOrderStatusRequest) =>
     api.put(`/admin/orders/${orderId}/status`, data),
+
+  getOrderDetail: async (orderId: string) => {
+    const fallbackOrderDetail: AdminOrderDetail = {
+      id: orderId,
+      userId: '1',
+      amount: 1500,
+      currency: 'SAR',
+      status: 'Paid',
+      createdAt: '2025-01-15T12:00:00Z',
+      updatedAt: '2025-01-15T12:05:00Z',
+      customer: {
+        id: '1',
+        fullName: 'أحمد محمد علي',
+        email: 'ahmed.hassan@email.com',
+        phone: '+966501234567',
+        country: 'Saudi Arabia',
+        locale: 'ar',
+        createdAt: '2024-12-01T10:00:00Z'
+      },
+      items: [
+        {
+          id: '1',
+          courseId: 'course-1',
+          courseTitleEn: 'Web Development Fundamentals',
+          courseTitleAr: 'أساسيات تطوير المواقع',
+          price: 1500,
+          currency: 'SAR',
+          qty: 1,
+          createdAt: '2025-01-15T12:00:00Z'
+        }
+      ],
+      payments: [
+        {
+          id: '1',
+          provider: 'HyperPay',
+          providerRef: 'HP_REF_001234567',
+          status: 'Completed',
+          capturedAt: '2025-01-15T12:05:00Z',
+          createdAt: '2025-01-15T12:00:00Z',
+          updatedAt: '2025-01-15T12:05:00Z'
+        }
+      ]
+    };
+
+    const result = await apiCallWithFallback(
+      () => api.get<AdminOrderDetail>(`/admin/orders/${orderId}`),
+      fallbackOrderDetail,
+      { fallbackMessage: 'Backend not available, using demo order detail data' }
+    );
+    return { data: result.data, isUsingFallback: result.isUsingFallback };
+  },
     
   // Content Management
   getContentPages: () => api.get<ContentPage[]>('/content/pages'),

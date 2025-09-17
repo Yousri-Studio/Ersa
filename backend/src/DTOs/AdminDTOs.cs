@@ -110,6 +110,61 @@ public class AdminOrderDto
     public DateTime UpdatedAt { get; set; }
 }
 
+public class AdminOrderDetailDto
+{
+    public Guid Id { get; set; }
+    public Guid UserId { get; set; }
+    public decimal Amount { get; set; }
+    public string Currency { get; set; } = string.Empty;
+    public OrderStatus Status { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+    
+    // Customer Information
+    public AdminOrderCustomerDto Customer { get; set; } = new();
+    
+    // Order Items
+    public List<AdminOrderItemDto> Items { get; set; } = new();
+    
+    // Payments
+    public List<AdminOrderPaymentDto> Payments { get; set; } = new();
+}
+
+public class AdminOrderCustomerDto
+{
+    public Guid Id { get; set; }
+    public string FullName { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string? Phone { get; set; }
+    public string? Country { get; set; }
+    public string Locale { get; set; } = string.Empty;
+    public DateTime CreatedAt { get; set; }
+}
+
+public class AdminOrderItemDto
+{
+    public Guid Id { get; set; }
+    public Guid CourseId { get; set; }
+    public Guid? SessionId { get; set; }
+    public string CourseTitleEn { get; set; } = string.Empty;
+    public string CourseTitleAr { get; set; } = string.Empty;
+    public decimal Price { get; set; }
+    public string Currency { get; set; } = string.Empty;
+    public int Qty { get; set; }
+    public DateTime CreatedAt { get; set; }
+}
+
+public class AdminOrderPaymentDto
+{
+    public Guid Id { get; set; }
+    public string Provider { get; set; } = string.Empty;
+    public string? ProviderRef { get; set; }
+    public PaymentStatus Status { get; set; }
+    public DateTime? CapturedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+}
+
 public class CreateUserRequest
 {
     public string FullName { get; set; } = string.Empty;

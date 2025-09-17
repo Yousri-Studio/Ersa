@@ -54,6 +54,7 @@ public class ErsaTrainingDbContext : IdentityDbContext<User, IdentityRole<Guid>,
         builder.ApplyConfiguration(new CourseConfiguration());
         builder.ApplyConfiguration(new SessionConfiguration());
         builder.ApplyConfiguration(new OrderConfiguration());
+        builder.ApplyConfiguration(new OrderItemConfiguration());
         builder.ApplyConfiguration(new BillConfiguration());
         builder.ApplyConfiguration(new PaymentConfiguration());
         builder.ApplyConfiguration(new EnrollmentConfiguration());
