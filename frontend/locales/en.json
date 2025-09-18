@@ -497,6 +497,19 @@
     "email": "Email",
     "address": "Address"
   },
+  "invoice": {
+    "title": "Invoice",
+    "download": "Download PDF",
+    "print": "Print",
+    "downloading": "Downloading...",
+    "printing": "Printing...",
+    "close": "Close",
+    "download-success": "Invoice downloaded successfully",
+    "print-success": "Print dialog opened",
+    "download-error": "Failed to download invoice. Please try again.",
+    "print-error": "Failed to print invoice. Please try again.",
+    "help-text": "You can download the invoice as PDF or print it directly"
+  },
   "errors": {
     "404": {
       "title": "Page Not Found",
