@@ -100,12 +100,35 @@ class ContentAPI {
   // Update content section
   async updateSectionContent(sectionId: string, content: any): Promise<ContentSection> {
     try {
-      const response = await axios.put(`${this.baseURL}/content/sections/${sectionId}/content`, { content }, {
+      console.log('🔄 ContentAPI: Updating section', sectionId, 'with content:', content);
+      
+      // Transform the content from fields array to flat object format expected by backend
+      const transformedContent: any = {};
+      
+      if (content.fields && Array.isArray(content.fields)) {
+        content.fields.forEach((field: any) => {
+          if (field.id && field.value !== undefined) {
+            transformedContent[field.id] = field.value;
+          }
+        });
+      }
+      
+      // Copy other properties
+      Object.keys(content).forEach(key => {
+        if (key !== 'fields') {
+          transformedContent[key] = content[key];
+        }
+      });
+      
+      console.log('🔄 ContentAPI: Transformed content:', transformedContent);
+      
+      const response = await axios.put(`${this.baseURL}/content/sections/${sectionId}/content`, { content: transformedContent }, {
         timeout: 5000,
         headers: {
           'Content-Type': 'application/json'
         }
       });
+      console.log('✅ ContentAPI: Update successful:', response.status, response.data);
       return response.data;
     } catch (error: any) {
       console.error('Error updating section content:', error);
@@ -214,12 +237,18 @@ class ContentAPI {
   // Get content templates
   async getContentTemplates(): Promise<Record<string, ContentSection>> {
     try {
+      console.log('🚀 ContentAPI: Making request to', `${this.baseURL}/content/templates`);
+      const token = Cookies.get('auth-token');
+      console.log('🔑 ContentAPI: Auth token present:', !!token);
+      
       const response = await axios.get(`${this.baseURL}/content/templates`, {
-        timeout: 5000, // 5 second timeout
+        timeout: 10000, // Increase timeout to 10 seconds
         headers: {
           'Content-Type': 'application/json'
         }
       });
+      
+      console.log('✅ ContentAPI: Response received:', response.status, response.data);
       
       // Convert the backend response to match our frontend interface
       const templates: Record<string, ContentSection> = {};
@@ -241,20 +270,37 @@ class ContentAPI {
       return templates;
     } catch (error: any) {
       console.error('Error fetching content templates:', error);
+      console.error('Error details:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message
+      });
       
-      // If it's an authentication error, don't return mock data
+      // If it's an authentication error, throw it to be handled by the UI
       if (error.response?.status === 401 || error.response?.status === 403) {
+        console.error('Authentication error - user needs to login or lacks permissions');
         throw new Error('Authentication required');
+      }
+      
+      // For other API errors, also throw them instead of falling back to mock data
+      if (error.response?.status >= 400 && error.response?.status < 500) {
+        throw new Error(`API Error: ${error.response?.data?.error || error.message}`);
       }
       
       // For network errors or when backend is not available, use mock data
       if (error.code === 'ERR_NETWORK' || error.message === 'Network Error' || error.code === 'ECONNREFUSED' || error.isMockFallback) {
-        console.log('Backend not available, using mock content templates for development');
+        console.warn('Backend not available, using mock content templates for development');
         return this.getMockContentTemplates();
       }
       
-      // Return mock templates for development
-      console.log('Using mock content templates for development');
+      // For server errors, throw them
+      if (error.response?.status >= 500) {
+        throw new Error(`Server Error: ${error.response?.data?.error || error.message}`);
+      }
+      
+      // Fallback to mock data only for unexpected errors
+      console.warn('Unexpected error, using mock content templates for development');
       return this.getMockContentTemplates();
     }
   }
@@ -262,10 +308,21 @@ class ContentAPI {
   // Initialize page content
   async initializePageContent(pageKey: string): Promise<ContentPage> {
     try {
-      const response = await axios.post(`${this.baseURL}/content/pages/${pageKey}/initialize`);
+      const response = await axios.post(`${this.baseURL}/content/admin/pages/${pageKey}/initialize`);
       return response.data;
     } catch (error) {
       console.error('Error initializing page content:', error);
+      throw error;
+    }
+  }
+
+  // Initialize sample data
+  async initializeSampleData(): Promise<void> {
+    try {
+      const response = await axios.post(`${this.baseURL}/content/admin/initialize-sample-data`);
+      return response.data;
+    } catch (error) {
+      console.error('Error initializing sample data:', error);
       throw error;
     }
   }
@@ -321,35 +378,55 @@ class ContentAPI {
 
   private getMockContentTemplates(): Record<string, ContentSection> {
     return {
-      home: {
-        id: 'home',
-        title: 'Home Page',
-        description: 'Main landing page content including hero, features, and testimonials',
+      hero: {
+        id: 'hero',
+        title: 'Hero Section',
+        description: 'Main banner section with bilingual content',
         status: 'published',
         lastModified: '2025-01-15T10:30:00Z',
         pageKey: 'home',
         fields: [
           {
+            id: 'hero-badge',
+            label: 'Hero Badge',
+            type: 'text',
+            value: {
+              en: 'Ersa with you for skill development',
+              ar: 'إرساء معك لتطوير المهارات'
+            },
+            required: true,
+            placeholder: 'Enter hero badge text'
+          },
+          {
             id: 'hero-title',
             label: 'Hero Title',
             type: 'text',
-            value: 'استكشف منصتنا التدريبية وارقى بمهاراتك لتحقيق أعلى إمكاناتك',
+            value: {
+              en: 'Explore our training platform and elevate your abilities to achieve your maximum potential',
+              ar: 'استكشف منصتنا التدريبية وارتقي بقدراتك لتحقيق أقصى إمكاناتك'
+            },
             required: true,
             placeholder: 'Enter main hero title'
           },
           {
-            id: 'hero-subtitle',
-            label: 'Hero Subtitle',
+            id: 'hero-description',
+            label: 'Hero Description',
             type: 'textarea',
-            value: 'منصة شاملة تجمع بين أحدث الطرق التدريبية والتقنيات المتطورة لتقديم تجربة تعليمية متميزة',
+            value: {
+              en: 'Build a promising future and lead your life with our interactive and comprehensive programs',
+              ar: 'ابن مستقبلاً واعداً وقود حياتك مع برامجنا التفاعلية والمفهمة'
+            },
             required: true,
-            placeholder: 'Enter hero subtitle'
+            placeholder: 'Enter hero description'
           },
           {
             id: 'hero-cta-primary',
             label: 'Primary CTA Text',
             type: 'text',
-            value: 'استكشف الدورات',
+            value: {
+              en: 'Explore Courses',
+              ar: 'استكشف الدورات'
+            },
             required: true,
             placeholder: 'Enter primary button text'
           },
@@ -357,7 +434,10 @@ class ContentAPI {
             id: 'hero-cta-secondary',
             label: 'Secondary CTA Text',
             type: 'text',
-            value: 'اطلب استشارة',
+            value: {
+              en: 'Request Consultation',
+              ar: 'طلب استشارة'
+            },
             required: false,
             placeholder: 'Enter secondary button text'
           },
@@ -387,26 +467,42 @@ class ContentAPI {
       courses: {
         id: 'courses',
         title: 'Course Management',
-        description: 'Course descriptions, curriculum, and enrollment details',
+        description: 'Course descriptions, curriculum, and enrollment details with bilingual content',
         status: 'published',
         lastModified: '2025-01-14T15:45:00Z',
         pageKey: 'courses',
         fields: [
           {
-            id: 'page-title',
-            label: 'Page Title',
+            id: 'page-title-en',
+            label: 'Page Title (English)',
+            type: 'text',
+            value: 'Our Courses',
+            required: true,
+            placeholder: 'Enter page title in English'
+          },
+          {
+            id: 'page-title-ar',
+            label: 'Page Title (Arabic)',
             type: 'text',
             value: 'دوراتنا',
             required: true,
-            placeholder: 'Enter page title'
+            placeholder: 'Enter page title in Arabic'
           },
           {
-            id: 'page-description',
-            label: 'Page Description',
+            id: 'page-description-en',
+            label: 'Page Description (English)',
+            type: 'textarea',
+            value: 'Discover our comprehensive collection of professional development courses',
+            required: true,
+            placeholder: 'Enter page description in English'
+          },
+          {
+            id: 'page-description-ar',
+            label: 'Page Description (Arabic)',
             type: 'textarea',
             value: 'اكتشف مجموعتنا الشاملة من دورات التطوير المهني',
             required: true,
-            placeholder: 'Enter page description'
+            placeholder: 'Enter page description in Arabic'
           },
           {
             id: 'categories',
@@ -424,34 +520,58 @@ class ContentAPI {
       about: {
         id: 'about',
         title: 'About Company',
-        description: 'Company information, mission, vision, and team details',
+        description: 'Company information, mission, vision, and team details with bilingual content',
         status: 'published',
         lastModified: '2025-01-13T09:20:00Z',
         pageKey: 'about',
         fields: [
           {
-            id: 'company-name',
-            label: 'Company Name',
+            id: 'company-name-en',
+            label: 'Company Name (English)',
+            type: 'text',
+            value: 'Ersa Training',
+            required: true,
+            placeholder: 'Enter company name in English'
+          },
+          {
+            id: 'company-name-ar',
+            label: 'Company Name (Arabic)',
             type: 'text',
             value: 'إرساء للتدريب',
             required: true,
-            placeholder: 'Enter company name'
+            placeholder: 'Enter company name in Arabic'
           },
           {
-            id: 'mission',
-            label: 'Mission Statement',
+            id: 'mission-en',
+            label: 'Mission Statement (English)',
+            type: 'textarea',
+            value: 'Empowering individuals and organizations through world-class training solutions',
+            required: true,
+            placeholder: 'Enter company mission in English'
+          },
+          {
+            id: 'mission-ar',
+            label: 'Mission Statement (Arabic)',
             type: 'textarea',
             value: 'تمكين الأفراد والمنظمات من خلال حلول تدريبية عالمية المستوى',
             required: true,
-            placeholder: 'Enter company mission'
+            placeholder: 'Enter company mission in Arabic'
           },
           {
-            id: 'vision',
-            label: 'Vision Statement',
+            id: 'vision-en',
+            label: 'Vision Statement (English)',
+            type: 'textarea',
+            value: 'To be the preferred training partner in the region',
+            required: true,
+            placeholder: 'Enter company vision in English'
+          },
+          {
+            id: 'vision-ar',
+            label: 'Vision Statement (Arabic)',
             type: 'textarea',
             value: 'أن نكون الشريك التدريبي المفضل في المنطقة',
             required: true,
-            placeholder: 'Enter company vision'
+            placeholder: 'Enter company vision in Arabic'
           },
           {
             id: 'team',
@@ -462,6 +582,200 @@ class ContentAPI {
               { name: 'فاطمة علي', position: 'مدير التدريب', bio: 'خبرة 10 أعوام في تطوير المناهج' }
             ],
             required: false
+          }
+        ]
+      },
+      services: {
+        id: 'services',
+        title: 'Services & Solutions',
+        description: 'Consulting services, AI solutions, and service offerings',
+        status: 'published',
+        lastModified: '2025-01-12T14:30:00Z',
+        pageKey: 'home',
+        fields: [
+          {
+            id: 'title-en',
+            label: 'Services Title (English)',
+            type: 'text',
+            value: 'Our Services',
+            required: true,
+            placeholder: 'Enter services title in English'
+          },
+          {
+            id: 'title-ar',
+            label: 'Services Title (Arabic)',
+            type: 'text',
+            value: 'خدماتنا',
+            required: true,
+            placeholder: 'Enter services title in Arabic'
+          },
+          {
+            id: 'description-en',
+            label: 'Services Description (English)',
+            type: 'textarea',
+            value: 'We offer comprehensive training and consultancy services',
+            required: true,
+            placeholder: 'Enter services description in English'
+          },
+          {
+            id: 'description-ar',
+            label: 'Services Description (Arabic)',
+            type: 'textarea',
+            value: 'نقدم خدمات تدريبية واستشارية شاملة',
+            required: true,
+            placeholder: 'Enter services description in Arabic'
+          }
+        ]
+      },
+      contact: {
+        id: 'contact',
+        title: 'Contact Information',
+        description: 'Contact details and location with bilingual content',
+        status: 'published',
+        lastModified: '2025-01-13T09:20:00Z',
+        pageKey: 'contact',
+        fields: [
+          {
+            id: 'title-en',
+            label: 'Contact Title (English)',
+            type: 'text',
+            value: 'Get in Touch',
+            required: true,
+            placeholder: 'Enter contact title in English'
+          },
+          {
+            id: 'title-ar',
+            label: 'Contact Title (Arabic)',
+            type: 'text',
+            value: 'تواصل معنا',
+            required: true,
+            placeholder: 'Enter contact title in Arabic'
+          },
+          {
+            id: 'address-en',
+            label: 'Address (English)',
+            type: 'text',
+            value: 'Riyadh, Saudi Arabia',
+            required: true,
+            placeholder: 'Enter address in English'
+          },
+          {
+            id: 'address-ar',
+            label: 'Address (Arabic)',
+            type: 'text',
+            value: 'الرياض، المملكة العربية السعودية',
+            required: true,
+            placeholder: 'Enter address in Arabic'
+          },
+          {
+            id: 'phone',
+            label: 'Phone Number',
+            type: 'text',
+            value: '+966 XX XXX XXXX',
+            required: true,
+            placeholder: 'Enter phone number'
+          },
+          {
+            id: 'email',
+            label: 'Email Address',
+            type: 'text',
+            value: 'info@ersatraining.com',
+            required: true,
+            placeholder: 'Enter email address'
+          }
+        ]
+      },
+      faq: {
+        id: 'faq',
+        title: 'FAQ Section',
+        description: 'Frequently asked questions with bilingual content',
+        status: 'published',
+        lastModified: '2025-01-13T09:20:00Z',
+        pageKey: 'faq',
+        fields: [
+          {
+            id: 'faq-title-en',
+            label: 'FAQ Title (English)',
+            type: 'text',
+            value: 'Frequently Asked Questions',
+            required: true,
+            placeholder: 'Enter FAQ title in English'
+          },
+          {
+            id: 'faq-title-ar',
+            label: 'FAQ Title (Arabic)',
+            type: 'text',
+            value: 'الأسئلة الشائعة',
+            required: true,
+            placeholder: 'Enter FAQ title in Arabic'
+          },
+          {
+            id: 'faqs',
+            label: 'FAQ Items',
+            type: 'array',
+            value: [
+              { 
+                question: 'How do I enroll in a course?', 
+                answer: 'You can enroll through our website or contact us directly.',
+                questionAr: 'كيف يمكنني التسجيل في دورة؟',
+                answerAr: 'يمكنك التسجيل من خلال موقعنا الإلكتروني أو التواصل معنا مباشرة.'
+              },
+              { 
+                question: 'What payment methods do you accept?', 
+                answer: 'We accept credit cards, bank transfers, and online payments.',
+                questionAr: 'ما هي طرق الدفع المقبولة؟',
+                answerAr: 'نقبل بطاقات الائتمان والتحويلات البنكية والمدفوعات الإلكترونية.'
+              },
+              { 
+                question: 'Do you offer certificates?', 
+                answer: 'Yes, we provide certificates of completion for all our courses.',
+                questionAr: 'هل تقدمون شهادات؟',
+                answerAr: 'نعم، نقدم شهادات إتمام لجميع دوراتنا.'
+              }
+            ],
+            required: true
+          }
+        ]
+      },
+      consultation: {
+        id: 'consultation',
+        title: 'Consultation Services',
+        description: 'Consultation offerings and service details',
+        status: 'published',
+        lastModified: '2025-01-09T13:20:00Z',
+        pageKey: 'home',
+        fields: [
+          {
+            id: 'title-en',
+            label: 'Consultation Title (English)',
+            type: 'text',
+            value: 'Consultation Services',
+            required: true,
+            placeholder: 'Enter consultation title in English'
+          },
+          {
+            id: 'title-ar',
+            label: 'Consultation Title (Arabic)',
+            type: 'text',
+            value: 'خدمات الاستشارة',
+            required: true,
+            placeholder: 'Enter consultation title in Arabic'
+          },
+          {
+            id: 'description-en',
+            label: 'Consultation Description (English)',
+            type: 'textarea',
+            value: 'Professional consultation services tailored to your needs',
+            required: true,
+            placeholder: 'Enter consultation description in English'
+          },
+          {
+            id: 'description-ar',
+            label: 'Consultation Description (Arabic)',
+            type: 'textarea',
+            value: 'خدمات استشارية مهنية مصممة خصيصاً لاحتياجاتك',
+            required: true,
+            placeholder: 'Enter consultation description in Arabic'
           }
         ]
       }

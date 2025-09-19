@@ -48,53 +48,32 @@ export default function ContentEditor() {
   const isRTL = locale === 'ar';
 
   useEffect(() => {
-    console.log('=== CONTENT PAGE USEEFFECT START ===');
-    console.log('Auth state:', { isHydrated, isAuthenticated, user: user ? { id: user.id, fullName: user.fullName, isAdmin: user.isAdmin, isSuperAdmin: user.isSuperAdmin } : null });
-    console.log('Params:', params);
-    
-    // Check authentication first
     if (isHydrated && !isAuthenticated) {
-      console.log('❌ Not authenticated, redirecting to login');
       toast.error(locale === 'ar' ? 'يجب تسجيل الدخول للوصول لهذه الصفحة' : 'You must be logged in to access this page');
       router.push(`/${locale}/admin-login`);
       return;
     }
 
-    // Check if user has admin privileges
     if (isHydrated && isAuthenticated && user && !user.isAdmin && !user.isSuperAdmin) {
-      console.log('❌ User lacks admin privileges');
       toast.error(locale === 'ar' ? 'ليس لديك صلاحيات للوصول لهذه الصفحة' : 'You do not have permission to access this page');
       router.push(`/${locale}/`);
       return;
     }
 
-    // Load section content
-    console.log('✅ Auth checks passed, proceeding with content loading');
-    
     if (isHydrated && isAuthenticated && params?.section) {
       const sectionId = params.section as string;
       const loadSection = async () => {
         try {
           setIsLoading(true);
-          console.log('Making API call to get content templates...');
           const templates = await contentApi.getContentTemplates();
-          console.log('Content templates received:', templates);
-          console.log('Looking for section:', sectionId);
-          console.log('Available sections:', Object.keys(templates));
           
           if (templates[sectionId]) {
-            console.log('Found section:', templates[sectionId]);
             setSection(templates[sectionId]);
           } else {
-            console.log('Section not found, available sections:', Object.keys(templates));
-            // If no templates exist, try to initialize sample data
             if (Object.keys(templates).length === 0) {
-              console.log('No templates found, trying to initialize sample data...');
               try {
                 await contentApi.initializeSampleData();
-                console.log('Sample data initialized, retrying...');
                 const newTemplates = await contentApi.getContentTemplates();
-                console.log('New templates after initialization:', newTemplates);
                 if (newTemplates[sectionId]) {
                   setSection(newTemplates[sectionId]);
                   return;
@@ -106,7 +85,7 @@ export default function ContentEditor() {
             toast.error(locale === 'ar' ? 'الصفحة غير موجودة' : 'Page not found');
             router.push(`/${locale}/admin/content`);
           }
-                 } catch (error: any) {
+        } catch (error: any) {
           console.error('Error loading content templates:', error);
           
           let errorMessage = locale === 'ar' ? 'فشل في تحميل قوالب المحتوى' : 'Failed to load content templates';
@@ -114,14 +93,9 @@ export default function ContentEditor() {
           if (error.message === 'Authentication required') {
             errorMessage = locale === 'ar' ? 'انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى' : 'Session expired. Please login again';
             setError(errorMessage);
-            // Redirect to login after a short delay
             setTimeout(() => {
               router.push(`/${locale}/admin-login`);
             }, 2000);
-          } else if (error.message.includes('API Error:')) {
-            errorMessage = error.message;
-            setError(errorMessage);
-            toast.error(errorMessage);
           } else {
             setError(errorMessage);
             toast.error(errorMessage);
@@ -135,31 +109,6 @@ export default function ContentEditor() {
     }
   }, [params?.section, locale, isHydrated, isAuthenticated, user, router]);
 
-  // Add periodic authentication check to prevent logout
-  useEffect(() => {
-    if (!isAuthenticated || !user) return;
-
-    const authCheckInterval = setInterval(() => {
-      // This will trigger a re-render and check authentication status
-      if (!isAuthenticated) {
-        toast.error(locale === 'ar' ? 'انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى' : 'Session expired. Please login again');
-        router.push(`/${locale}/admin-login`);
-      }
-    }, 30000); // Check every 30 seconds
-
-    return () => clearInterval(authCheckInterval);
-  }, [isAuthenticated, user, locale, router]);
-
-  // Debug authentication state
-  useEffect(() => {
-    console.log('Content Editor Auth State:', {
-      isHydrated,
-      isAuthenticated,
-      user: user ? { id: user.id, fullName: user.fullName, isAdmin: user.isAdmin } : null
-    });
-  }, [isHydrated, isAuthenticated, user]);
-
-  // Clear error when section changes
   useEffect(() => {
     setError(null);
   }, [section?.id]);
@@ -221,7 +170,6 @@ export default function ContentEditor() {
         status: section.status
       });
       
-      // Update the local state with the updated section
       setSection(updatedSection);
       setLastSaved(new Date().toLocaleTimeString(locale === 'ar' ? 'ar-SA' : 'en-US'));
       toast.success(locale === 'ar' ? 'تم حفظ المحتوى بنجاح' : 'Content saved successfully');
@@ -235,8 +183,6 @@ export default function ContentEditor() {
       if (error.message === 'Authentication required') {
         errorMessage = locale === 'ar' ? 'انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى' : 'Session expired. Please login again';
         router.push(`/${locale}/admin-login`);
-      } else if (error.message.includes('not found')) {
-        errorMessage = locale === 'ar' ? 'الصفحة غير موجودة' : 'Page not found';
       }
       
       toast.error(errorMessage);
@@ -245,36 +191,6 @@ export default function ContentEditor() {
     }
   };
 
-  const handlePublish = async () => {
-    if (!section) return;
-
-    setIsSaving(true);
-    try {
-      const publishedSection = await contentApi.publishSection(section.id);
-      
-      // Update the local state with the published section
-      setSection(publishedSection);
-      toast.success(locale === 'ar' ? 'تم نشر المحتوى بنجاح' : 'Content published successfully');
-      setHasChanges(false);
-    } catch (error: any) {
-      console.error('Publish error:', error);
-      
-      let errorMessage = locale === 'ar' ? 'فشل في نشر المحتوى' : 'Failed to publish content';
-      
-      if (error.message === 'Authentication required') {
-        errorMessage = locale === 'ar' ? 'انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى' : 'Session expired. Please login again';
-        router.push(`/${locale}/admin-login`);
-      } else if (error.message.includes('not found')) {
-        errorMessage = locale === 'ar' ? 'الصفحة غير موجودة' : 'Page not found';
-      }
-      
-      toast.error(errorMessage);
-    } finally {
-      setIsSaving(false);
-    }
-  };
-
-  // Show loading while checking authentication and hydration
   if (!isHydrated || isLoading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -286,7 +202,6 @@ export default function ContentEditor() {
     );
   }
 
-  // Show loading if not authenticated
   if (!isAuthenticated) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -298,7 +213,6 @@ export default function ContentEditor() {
     );
   }
 
-  // Show error if there's an error
   if (error) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -329,7 +243,6 @@ export default function ContentEditor() {
     );
   }
 
-  // Show error if no section loaded
   if (!section) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -353,7 +266,6 @@ export default function ContentEditor() {
   }
 
   const renderField = (field: ContentField) => {
-    // Check if field has bilingual structure
     const isBilingual = field.value && typeof field.value === 'object' && field.value.en !== undefined && field.value.ar !== undefined;
     const currentValue = isBilingual ? field.value[activeLang] : field.value;
     
@@ -433,8 +345,8 @@ export default function ContentEditor() {
         return (
           <input
             type="text"
-            value={field.value}
-            onChange={(e) => handleFieldChange(field.id, e.target.value)}
+            value={currentValue || ''}
+            onChange={(e) => handleChange(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             disabled={!isEditing}
           />
@@ -445,7 +357,6 @@ export default function ContentEditor() {
   return (
     <div className="bg-white min-h-screen" dir={isRTL ? 'rtl' : 'ltr'}>
       <div className="mx-auto px-4 sm:px-6 lg:px-8" style={{maxWidth: '90rem', paddingTop: '50px'}}>
-        {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
@@ -461,17 +372,16 @@ export default function ContentEditor() {
                   {section.title}
                 </h1>
               </div>
-                             <p className="text-gray-600 text-lg">{section.description}</p>
-               {lastSaved && (
-                 <p className="text-sm text-green-600 mt-1">
-                   {locale === 'ar' ? 'آخر حفظ: ' : 'Last saved: '}
-                   {lastSaved}
-                 </p>
-               )}
+              <p className="text-gray-600 text-lg">{section.description}</p>
+              {lastSaved && (
+                <p className="text-sm text-green-600 mt-1">
+                  {locale === 'ar' ? 'آخر حفظ: ' : 'Last saved: '}
+                  {lastSaved}
+                </p>
+              )}
             </div>
             
             <div className="flex items-center gap-3">
-              {/* User Info */}
               <div className="flex items-center gap-2 px-3 py-1 bg-blue-50 rounded-lg border border-blue-200">
                 <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
                   <span className="text-blue-600 text-xs font-semibold">
@@ -483,7 +393,6 @@ export default function ContentEditor() {
                 </span>
               </div>
               
-              {/* Status Badge */}
               <span className={`px-3 py-1 text-sm font-medium rounded-full border ${
                 section.status === 'published' 
                   ? 'bg-green-100 text-green-800 border-green-200'
@@ -508,29 +417,15 @@ export default function ContentEditor() {
                 </button>
               ) : (
                 <div className="flex gap-2">
-                                     <button
-                     onClick={() => {
-                       setIsEditing(false);
-                       setHasChanges(false);
-                       // Reset to original values from API
-                       const resetSection = async () => {
-                         try {
-                           const templates = await contentApi.getContentTemplates();
-                           if (templates[section.id]) {
-                             setSection(templates[section.id]);
-                           }
-                         } catch (error) {
-                           console.error('Error resetting content:', error);
-                           // If reset fails, just close editing mode
-                           toast.error(locale === 'ar' ? 'فشل في إعادة تعيين المحتوى' : 'Failed to reset content');
-                         }
-                       };
-                       resetSection();
-                     }}
-                     className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                   >
-                     {locale === 'ar' ? 'إلغاء' : 'Cancel'}
-                   </button>
+                  <button
+                    onClick={() => {
+                      setIsEditing(false);
+                      setHasChanges(false);
+                    }}
+                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    {locale === 'ar' ? 'إلغاء' : 'Cancel'}
+                  </button>
                   <button
                     onClick={handleSave}
                     disabled={isSaving || !hasChanges}
@@ -541,20 +436,12 @@ export default function ContentEditor() {
                       : (locale === 'ar' ? 'حفظ' : 'Save')
                     }
                   </button>
-                  <button
-                    onClick={handlePublish}
-                    disabled={isSaving}
-                    className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
-                  >
-                    {locale === 'ar' ? 'نشر' : 'Publish'}
-                  </button>
                 </div>
               )}
             </div>
           </div>
         </div>
 
-        {/* Content Editor */}
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm">
           <div className="px-6 py-4 border-b border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900">
@@ -566,110 +453,57 @@ export default function ContentEditor() {
                 : 'Edit the content of this page as needed'
               }
             </p>
-            
-            {!isEditing ? (
-              <button
-                onClick={() => setIsEditing(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                {locale === 'ar' ? 'تعديل' : 'Edit'}
-              </button>
-            ) : (
-              <div className="flex gap-2">
-                <button
-                  onClick={() => {
-                    setIsEditing(false);
-                    setHasChanges(false);
-                    // Reset to original values from API
-                    const resetSection = async () => {
-                      try {
-                        const templates = await contentApi.getContentTemplates();
-                        if (templates[section.id]) {
-                          setSection(templates[section.id]);
-                        }
-                      } catch (error) {
-                        console.error('Error resetting content:', error);
-                        // If reset fails, just close editing mode
-                        toast.error(locale === 'ar' ? 'فشل في إعادة تعيين المحتوى' : 'Failed to reset content');
-                      }
-                    };
-                    resetSection();
-                  }}
-                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                >
-                  {locale === 'ar' ? 'إلغاء' : 'Cancel'}
-                </button>
-                <button
-                  onClick={handleSave}
-                  disabled={isSaving || !hasChanges}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
-                >
-                  {isSaving 
-                    ? (locale === 'ar' ? 'جاري الحفظ...' : 'Saving...')
-                    : (locale === 'ar' ? 'حفظ' : 'Save')
-                  }
-                </button>
-                <button
-                  onClick={handlePublish}
-                  disabled={isSaving}
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
-                >
-                  {locale === 'ar' ? 'نشر' : 'Publish'}
-                </button>
-              </div>
-            )}
           </div>
           
           <div className="p-6">
-          {/* Language Switcher */}
-          <div className="mb-6 border-b border-gray-200">
-            <nav className="-mb-px flex space-x-8" aria-label="Tabs">
-              <button
-                onClick={() => setActiveLang('en')}
-                className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeLang === 'en'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                English
-              </button>
-              <button
-                onClick={() => setActiveLang('ar')}
-                className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeLang === 'ar'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                Arabic
-              </button>
-            </nav>
-          </div>
+            <div className="mb-6 border-b border-gray-200">
+              <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                <button
+                  onClick={() => setActiveLang('en')}
+                  className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                    activeLang === 'en'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  English
+                </button>
+                <button
+                  onClick={() => setActiveLang('ar')}
+                  className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                    activeLang === 'ar'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  Arabic
+                </button>
+              </nav>
+            </div>
 
-          <div className="space-y-6">
-            {section.fields.map((field) => (
-              <motion.div
-                key={field.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
-                className="space-y-2"
-              >
-                <label className="block text-sm font-medium text-gray-700">
-                  {field.label}
-                  {field.required && <span className="text-red-500 ml-1">*</span>}
-                </label>
-                {renderField(field)}
-                {field.placeholder && (
-                  <p className="text-xs text-gray-500">{field.placeholder}</p>
-                )}
-              </motion.div>
-            ))}
+            <div className="space-y-6">
+              {section.fields.map((field) => (
+                <motion.div
+                  key={field.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="space-y-2"
+                >
+                  <label className="block text-sm font-medium text-gray-700">
+                    {field.label}
+                    {field.required && <span className="text-red-500 ml-1">*</span>}
+                  </label>
+                  {renderField(field)}
+                  {field.placeholder && (
+                    <p className="text-xs text-gray-500">{field.placeholder}</p>
+                  )}
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Preview Section */}
         <div className="mt-8 bg-gray-50 rounded-xl p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
             {locale === 'ar' ? 'معاينة المحتوى' : 'Content Preview'}

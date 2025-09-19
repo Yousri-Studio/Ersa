@@ -43,11 +43,8 @@ export default function AdminLayout({
         clearCorruptedStorage();
       }
       
-      // Initialize auth from cookie first
-      initFromCookie();
-      
-      // Wait a bit for auth state to update
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Initialize auth from cookie first and wait for validation
+      await initFromCookie();
 
       const currentState = useAuthStore.getState();
       console.log('Admin layout check:', { 

@@ -57,13 +57,36 @@ export const useAuthStore = create<AuthState>()(
         }
       },
 
-      initFromCookie: () => {
+      initFromCookie: async () => {
         const token = Cookies.get('auth-token');
         if (token && !get().isAuthenticated) {
-          // We have a token but not authenticated, need to validate it
-          set({ token, isAuthenticated: true });
-          // Trigger token validation to get user data
-          get().validateToken();
+          // Set token but don't mark as authenticated until validation succeeds
+          set({ token });
+          
+          try {
+            // Validate token first
+            const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5002/api';
+            const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
+              method: 'POST',
+              headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json',
+              }
+            });
+            
+            if (response.ok) {
+              const data = await response.json();
+              set({ user: data.user, token: data.token, isAuthenticated: true });
+            } else {
+              // Token is invalid, clear it
+              Cookies.remove('auth-token');
+              set({ user: null, token: null, isAuthenticated: false });
+            }
+          } catch (error) {
+            console.error('Token validation failed during initialization:', error);
+            Cookies.remove('auth-token');
+            set({ user: null, token: null, isAuthenticated: false });
+          }
         }
       },
 
@@ -74,6 +97,7 @@ export const useAuthStore = create<AuthState>()(
           try {
             const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5002/api';
             const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
+              method: 'POST',
               headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',

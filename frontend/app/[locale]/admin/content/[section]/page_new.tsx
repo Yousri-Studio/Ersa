@@ -106,7 +106,7 @@ export default function ContentEditor() {
             toast.error(locale === 'ar' ? 'الصفحة غير موجودة' : 'Page not found');
             router.push(`/${locale}/admin/content`);
           }
-                 } catch (error: any) {
+        } catch (error: any) {
           console.error('Error loading content templates:', error);
           
           let errorMessage = locale === 'ar' ? 'فشل في تحميل قوالب المحتوى' : 'Failed to load content templates';
@@ -433,8 +433,8 @@ export default function ContentEditor() {
         return (
           <input
             type="text"
-            value={field.value}
-            onChange={(e) => handleFieldChange(field.id, e.target.value)}
+            value={currentValue || ''}
+            onChange={(e) => handleChange(e.target.value)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             disabled={!isEditing}
           />
@@ -461,13 +461,13 @@ export default function ContentEditor() {
                   {section.title}
                 </h1>
               </div>
-                             <p className="text-gray-600 text-lg">{section.description}</p>
-               {lastSaved && (
-                 <p className="text-sm text-green-600 mt-1">
-                   {locale === 'ar' ? 'آخر حفظ: ' : 'Last saved: '}
-                   {lastSaved}
-                 </p>
-               )}
+              <p className="text-gray-600 text-lg">{section.description}</p>
+              {lastSaved && (
+                <p className="text-sm text-green-600 mt-1">
+                  {locale === 'ar' ? 'آخر حفظ: ' : 'Last saved: '}
+                  {lastSaved}
+                </p>
+              )}
             </div>
             
             <div className="flex items-center gap-3">
@@ -508,29 +508,29 @@ export default function ContentEditor() {
                 </button>
               ) : (
                 <div className="flex gap-2">
-                                     <button
-                     onClick={() => {
-                       setIsEditing(false);
-                       setHasChanges(false);
-                       // Reset to original values from API
-                       const resetSection = async () => {
-                         try {
-                           const templates = await contentApi.getContentTemplates();
-                           if (templates[section.id]) {
-                             setSection(templates[section.id]);
-                           }
-                         } catch (error) {
-                           console.error('Error resetting content:', error);
-                           // If reset fails, just close editing mode
-                           toast.error(locale === 'ar' ? 'فشل في إعادة تعيين المحتوى' : 'Failed to reset content');
-                         }
-                       };
-                       resetSection();
-                     }}
-                     className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                   >
-                     {locale === 'ar' ? 'إلغاء' : 'Cancel'}
-                   </button>
+                  <button
+                    onClick={() => {
+                      setIsEditing(false);
+                      setHasChanges(false);
+                      // Reset to original values from API
+                      const resetSection = async () => {
+                        try {
+                          const templates = await contentApi.getContentTemplates();
+                          if (templates[section.id]) {
+                            setSection(templates[section.id]);
+                          }
+                        } catch (error) {
+                          console.error('Error resetting content:', error);
+                          // If reset fails, just close editing mode
+                          toast.error(locale === 'ar' ? 'فشل في إعادة تعيين المحتوى' : 'Failed to reset content');
+                        }
+                      };
+                      resetSection();
+                    }}
+                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    {locale === 'ar' ? 'إلغاء' : 'Cancel'}
+                  </button>
                   <button
                     onClick={handleSave}
                     disabled={isSaving || !hasChanges}
@@ -566,106 +566,55 @@ export default function ContentEditor() {
                 : 'Edit the content of this page as needed'
               }
             </p>
-            
-            {!isEditing ? (
-              <button
-                onClick={() => setIsEditing(true)}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-              >
-                {locale === 'ar' ? 'تعديل' : 'Edit'}
-              </button>
-            ) : (
-              <div className="flex gap-2">
-                <button
-                  onClick={() => {
-                    setIsEditing(false);
-                    setHasChanges(false);
-                    // Reset to original values from API
-                    const resetSection = async () => {
-                      try {
-                        const templates = await contentApi.getContentTemplates();
-                        if (templates[section.id]) {
-                          setSection(templates[section.id]);
-                        }
-                      } catch (error) {
-                        console.error('Error resetting content:', error);
-                        // If reset fails, just close editing mode
-                        toast.error(locale === 'ar' ? 'فشل في إعادة تعيين المحتوى' : 'Failed to reset content');
-                      }
-                    };
-                    resetSection();
-                  }}
-                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                >
-                  {locale === 'ar' ? 'إلغاء' : 'Cancel'}
-                </button>
-                <button
-                  onClick={handleSave}
-                  disabled={isSaving || !hasChanges}
-                  className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
-                >
-                  {isSaving 
-                    ? (locale === 'ar' ? 'جاري الحفظ...' : 'Saving...')
-                    : (locale === 'ar' ? 'حفظ' : 'Save')
-                  }
-                </button>
-                <button
-                  onClick={handlePublish}
-                  disabled={isSaving}
-                  className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50"
-                >
-                  {locale === 'ar' ? 'نشر' : 'Publish'}
-                </button>
-              </div>
-            )}
           </div>
           
           <div className="p-6">
-          {/* Language Switcher */}
-          <div className="mb-6 border-b border-gray-200">
-            <nav className="-mb-px flex space-x-8" aria-label="Tabs">
-              <button
-                onClick={() => setActiveLang('en')}
-                className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeLang === 'en'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                English
-              </button>
-              <button
-                onClick={() => setActiveLang('ar')}
-                className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeLang === 'ar'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                Arabic
-              </button>
-            </nav>
-          </div>
+            {/* Language Switcher */}
+            <div className="mb-6 border-b border-gray-200">
+              <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                <button
+                  onClick={() => setActiveLang('en')}
+                  className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                    activeLang === 'en'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  English
+                </button>
+                <button
+                  onClick={() => setActiveLang('ar')}
+                  className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                    activeLang === 'ar'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  Arabic
+                </button>
+              </nav>
+            </div>
 
-          <div className="space-y-6">
-            {section.fields.map((field) => (
-              <motion.div
-                key={field.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.2 }}
-                className="space-y-2"
-              >
-                <label className="block text-sm font-medium text-gray-700">
-                  {field.label}
-                  {field.required && <span className="text-red-500 ml-1">*</span>}
-                </label>
-                {renderField(field)}
-                {field.placeholder && (
-                  <p className="text-xs text-gray-500">{field.placeholder}</p>
-                )}
-              </motion.div>
-            ))}
+            <div className="space-y-6">
+              {section.fields.map((field) => (
+                <motion.div
+                  key={field.id}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.2 }}
+                  className="space-y-2"
+                >
+                  <label className="block text-sm font-medium text-gray-700">
+                    {field.label}
+                    {field.required && <span className="text-red-500 ml-1">*</span>}
+                  </label>
+                  {renderField(field)}
+                  {field.placeholder && (
+                    <p className="text-xs text-gray-500">{field.placeholder}</p>
+                  )}
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
 

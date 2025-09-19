@@ -149,7 +149,7 @@ public class AuthController : ControllerBase
         }
     }
 
-    [HttpPost("refresh-token")]
+    [HttpPost("refresh-token"),HttpGet("refresh-token")]
     public async Task<ActionResult<LoginResponse>> RefreshToken()
     {
         try

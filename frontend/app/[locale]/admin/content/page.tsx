@@ -5,6 +5,8 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { Icon } from '@/components/ui/icon';
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
+import { contentApi } from '@/lib/content-api';
 
 interface ContentSection {
   id: string;
@@ -18,13 +20,13 @@ interface ContentSection {
 
 const contentSections: ContentSection[] = [
   {
-    id: 'home',
-    title: 'Home Page',
-    description: 'Hero section, features, testimonials, and main landing content',
+    id: 'hero',
+    title: 'Hero Section',
+    description: 'Main banner section with title, subtitle, and call-to-action buttons',
     icon: 'home',
     status: 'published',
     lastModified: '2025-01-15T10:30:00Z',
-    type: 'page'
+    type: 'section'
   },
   {
     id: 'courses',
@@ -33,7 +35,7 @@ const contentSections: ContentSection[] = [
     icon: 'graduation-cap',
     status: 'published',
     lastModified: '2025-01-14T15:45:00Z',
-    type: 'page'
+    type: 'section'
   },
   {
     id: 'about',
@@ -42,7 +44,7 @@ const contentSections: ContentSection[] = [
     icon: 'building',
     status: 'published',
     lastModified: '2025-01-13T09:20:00Z',
-    type: 'page'
+    type: 'section'
   },
   {
     id: 'services',
@@ -51,7 +53,7 @@ const contentSections: ContentSection[] = [
     icon: 'cogs',
     status: 'published',
     lastModified: '2025-01-12T14:30:00Z',
-    type: 'page'
+    type: 'section'
   },
   {
     id: 'contact',
@@ -60,7 +62,7 @@ const contentSections: ContentSection[] = [
     icon: 'envelope',
     status: 'published',
     lastModified: '2025-01-11T11:15:00Z',
-    type: 'page'
+    type: 'section'
   },
   {
     id: 'faq',
@@ -69,25 +71,16 @@ const contentSections: ContentSection[] = [
     icon: 'question-circle',
     status: 'published',
     lastModified: '2025-01-10T16:45:00Z',
-    type: 'page'
+    type: 'section'
   },
   {
-    id: 'legal',
-    title: 'Legal & Policies',
-    description: 'Terms of service, privacy policy, and legal documents',
-    icon: 'file-contract',
+    id: 'consultation',
+    title: 'Consultation Services',
+    description: 'Consultation offerings and service details',
+    icon: 'users',
     status: 'published',
     lastModified: '2025-01-09T13:20:00Z',
-    type: 'page'
-  },
-  {
-    id: 'blog',
-    title: 'Blog & News',
-    description: 'Company blog, industry news, and educational articles',
-    icon: 'newspaper',
-    status: 'draft',
-    lastModified: '2025-01-08T10:00:00Z',
-    type: 'page'
+    type: 'section'
   }
 ];
 
@@ -235,10 +228,22 @@ export default function ContentManagement() {
             {locale === 'ar' ? 'إجراءات سريعة' : 'Quick Actions'}
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <button className="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors">
-              <Icon name="plus" className="w-5 h-5 text-blue-600 mr-2" />
+            <button 
+              onClick={async () => {
+                try {
+                  await contentApi.initializeSampleData();
+                  toast.success(locale === 'ar' ? 'تم تهيئة البيانات النموذجية بنجاح' : 'Sample data initialized successfully');
+                  window.location.reload();
+                } catch (error) {
+                  console.error('Error initializing sample data:', error);
+                  toast.error(locale === 'ar' ? 'فشل في تهيئة البيانات النموذجية' : 'Failed to initialize sample data');
+                }
+              }}
+              className="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors"
+            >
+              <Icon name="database" className="w-5 h-5 text-blue-600 mr-2" />
               <span className="text-sm font-medium text-gray-700">
-                {locale === 'ar' ? 'إضافة صفحة' : 'Add Page'}
+                {locale === 'ar' ? 'تهيئة البيانات' : 'Initialize Data'}
               </span>
             </button>
             <button className="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:border-green-300 hover:bg-green-50 transition-colors">
