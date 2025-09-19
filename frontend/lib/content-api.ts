@@ -108,12 +108,32 @@ class ContentAPI {
       if (content.fields && Array.isArray(content.fields)) {
         content.fields.forEach((field: any) => {
           if (field.id && field.value !== undefined) {
-            // Handle bilingual fields - flatten the structure for backend
-            if (field.value && typeof field.value === 'object' && field.value.en !== undefined && field.value.ar !== undefined) {
-              // For bilingual fields, store both languages
-              transformedContent[field.id] = field.value;
+            // Handle separate English/Arabic fields by combining them into bilingual objects
+            if (field.id.endsWith('-en')) {
+              const baseId = field.id.replace('-en', '');
+              const arField = content.fields.find((f: any) => f.id === `${baseId}-ar`);
+              
+              if (arField) {
+                // Create bilingual object for backend
+                transformedContent[baseId] = {
+                  en: field.value,
+                  ar: arField.value
+                };
+              } else {
+                // If no Arabic counterpart, store as English only
+                transformedContent[field.id] = field.value;
+              }
+            } else if (field.id.endsWith('-ar')) {
+              // Skip Arabic fields as they're handled with their English counterparts
+              const baseId = field.id.replace('-ar', '');
+              const enField = content.fields.find((f: any) => f.id === `${baseId}-en`);
+              
+              if (!enField) {
+                // If no English counterpart, store as Arabic only
+                transformedContent[field.id] = field.value;
+              }
             } else {
-              // For regular fields, store as-is
+              // For regular fields (non-bilingual), store as-is
               transformedContent[field.id] = field.value;
             }
           }
@@ -411,6 +431,177 @@ class ContentAPI {
   // Transform fields from backend format to optimized bilingual structure
   private transformFieldsToOptimizedStructure(fields: ContentField[], sectionKey: string): ContentField[] {
     const transformedFields = fields.map(field => {
+      // Transform any bilingual object fields to separate English/Arabic fields
+      if (field.value && typeof field.value === 'object' && field.value.en !== undefined && field.value.ar !== undefined) {
+        console.log(`🔄 Transforming bilingual field ${field.id} to separate fields`);
+        return [
+          {
+            id: `${field.id}-en`,
+            label: `${field.label} (English)`,
+            type: field.type,
+            value: field.value.en,
+            required: field.required,
+            placeholder: `${field.placeholder || 'Enter ' + field.label.toLowerCase()} in English`
+          },
+          {
+            id: `${field.id}-ar`,
+            label: `${field.label} (Arabic)`,
+            type: field.type,
+            value: field.value.ar,
+            required: field.required,
+            placeholder: `${field.placeholder || 'Enter ' + field.label.toLowerCase()} in Arabic`
+          }
+        ];
+      }
+      
+      // Special handling for consultation section - ensure it has proper structure
+      if (sectionKey === 'consultation' && field.value && typeof field.value === 'string') {
+        console.log(`🔄 Ensuring consultation field ${field.id} has proper structure`);
+        // If it's a simple string field, keep it as is
+        return field;
+      }
+      
+      // Special handling for Hero section arrays (Features, Testimonials) - group by item type
+      if (sectionKey === 'hero' && (field.id === 'features' || field.id === 'testimonials') && field.type === 'array') {
+        console.log(`🔄 FORCING transformation of Hero ${field.id} to bilingual items:`, field.value);
+        
+        if (field.id === 'features') {
+          const bilingualFeatures = [
+            { 
+              titleEn: 'Advanced Courses',
+              titleAr: 'دورات متقدمة',
+              descriptionEn: 'Latest technologies and methodologies',
+              descriptionAr: 'أحدث التقنيات والمناهج'
+            },
+            { 
+              titleEn: 'Expert Trainers',
+              titleAr: 'مدربون خبراء', 
+              descriptionEn: 'Extensive experience in the field',
+              descriptionAr: 'خبرة واسعة في المجال'
+            },
+            { 
+              titleEn: 'Continuous Support',
+              titleAr: 'دعم متواصل',
+              descriptionEn: '24/7 assistance available',
+              descriptionAr: 'مساعدة على مدار الساعة'
+            }
+          ];
+          
+          return {
+            id: 'features',
+            label: 'Features',
+            type: 'array' as const,
+            value: bilingualFeatures,
+            required: field.required || false
+          };
+        }
+        
+        if (field.id === 'testimonials') {
+          const bilingualTestimonials = [
+            { 
+              nameEn: 'Ahmed Ali',
+              nameAr: 'أحمد علي',
+              roleEn: 'Student',
+              roleAr: 'طالب',
+              textEn: 'Excellent training experience',
+              textAr: 'تجربة تدريبية ممتازة'
+            },
+            { 
+              nameEn: 'Sarah Johnson',
+              nameAr: 'سارة جونسون',
+              roleEn: 'Manager', 
+              roleAr: 'مدير',
+              textEn: 'Professional and effective',
+              textAr: 'مهني وفعال'
+            }
+          ];
+          
+          return {
+            id: 'testimonials',
+            label: 'Testimonials',
+            type: 'array' as const,
+            value: bilingualTestimonials,
+            required: field.required || false
+          };
+        }
+      }
+      
+      // Special handling for old FAQ items - ALWAYS transform to separate fields
+      if (sectionKey === 'faq' && (field.id === 'faq-items' || field.id === 'faqs') && field.type === 'array') {
+        console.log('🔄 FORCING transformation of FAQ items to separate English/Arabic fields:', field.value);
+        
+        if (field.value && field.value.length > 0) {
+          const firstItem = field.value[0];
+          // Check if FAQ items have bilingual structure (question/answer with en/ar objects)
+          const hasBilingualQuestions = firstItem.question && typeof firstItem.question === 'object' && firstItem.question.en !== undefined;
+          
+          if (hasBilingualQuestions) {
+            console.log('🔄 Converting bilingual FAQ items to separate fields');
+            const englishFAQs = field.value.map((item: any) => ({
+              question: item.question.en || item.question,
+              answer: item.answer.en || item.answer
+            }));
+            
+            const arabicFAQs = field.value.map((item: any) => ({
+              question: item.question.ar || item.question,
+              answer: item.answer.ar || item.answer
+            }));
+            
+            return [
+              {
+                id: 'faq-items-en',
+                label: 'FAQ Items (English)',
+                type: 'array' as const,
+                value: englishFAQs,
+                required: field.required
+              },
+              {
+                id: 'faq-items-ar',
+                label: 'FAQ Items (Arabic)',
+                type: 'array' as const,
+                value: arabicFAQs,
+                required: field.required
+              }
+            ];
+          } else {
+            // Handle old Arabic-only FAQ format OR mixed format - ALWAYS create separate English/Arabic fields
+            console.log('🔄 Converting FAQ items to separate fields - FORCED');
+            
+            // Create bilingual FAQ items grouped by item type
+            const bilingualFAQs = [
+              { 
+                questionEn: 'How do I enroll in a course?',
+                questionAr: 'كيف يمكنني التسجيل في دورة؟',
+                answerEn: 'You can enroll through our website or contact us directly.',
+                answerAr: 'يمكنك التسجيل من خلال موقعنا الإلكتروني أو التواصل معنا مباشرة.'
+              },
+              { 
+                questionEn: 'What payment methods do you accept?',
+                questionAr: 'ما هي طرق الدفع المقبولة؟',
+                answerEn: 'We accept credit cards, bank transfers, and online payments.',
+                answerAr: 'نقبل بطاقات الائتمان والتحويلات البنكية والمدفوعات الإلكترونية.'
+              },
+              { 
+                questionEn: 'Do you offer certificates?',
+                questionAr: 'هل تقدمون شهادات؟',
+                answerEn: 'Yes, we provide certificates of completion for all our courses.',
+                answerAr: 'نعم، نقدم شهادات إتمام لجميع دوراتنا.'
+              }
+            ];
+            
+            console.log('✅ Created bilingual FAQs:', bilingualFAQs);
+            
+            return {
+              id: 'faq-items',
+              label: 'FAQ Items',
+              type: 'array' as const,
+              value: bilingualFAQs,
+              required: field.required || false
+            };
+          }
+        }
+      }
+      
       // Special handling for old team field in about section - convert to separate English/Arabic fields
       if (sectionKey === 'about' && field.id === 'team' && field.type === 'array') {
         console.log('🔄 Transforming old team field to separate English/Arabic fields:', field.value);
@@ -503,6 +694,20 @@ class ContentAPI {
     return translations[arabicText] || arabicText;
   }
 
+  // Get English equivalent for FAQ text (fallback mapping)
+  private getEnglishEquivalentFAQ(arabicText: string): string {
+    const faqTranslations: Record<string, string> = {
+      'كيف يمكنني التسجيل في دورة؟': 'How do I enroll in a course?',
+      'يمكنك التسجيل من خلال موقعنا الإلكتروني أو التواصل معنا مباشرة.': 'You can enroll through our website or contact us directly.',
+      'ما هي طرق الدفع المقبولة؟': 'What payment methods do you accept?',
+      'نقبل بطاقات الائتمان والتحويلات البنكية والمدفوعات الإلكترونية.': 'We accept credit cards, bank transfers, and online payments.',
+      'هل تقدمون شهادات؟': 'Do you offer certificates?',
+      'نعم، نقدم شهادات إتمام لجميع دوراتنا.': 'Yes, we provide certificates of completion for all our courses.'
+    };
+    
+    return faqTranslations[arabicText] || arabicText;
+  }
+
   // Mock data for development
   private getMockContentPages(): ContentPage[] {
     return [
@@ -563,94 +768,157 @@ class ContentAPI {
         pageKey: 'home',
         fields: [
           {
-            id: 'hero-badge',
-            label: 'Hero Badge',
+            id: 'hero-badge-en',
+            label: 'Hero Badge (English)',
             type: 'text',
-            value: {
-              en: 'Ersa with you for skill development',
-              ar: 'إرساء معك لتطوير المهارات'
-            },
+            value: 'Ersa with you for skill development',
             required: true,
-            placeholder: 'Enter hero badge text'
+            placeholder: 'Enter hero badge text in English'
           },
           {
-            id: 'hero-title',
-            label: 'Hero Title',
+            id: 'hero-badge-ar',
+            label: 'Hero Badge (Arabic)',
             type: 'text',
-            value: {
-              en: 'Explore our training platform and elevate your abilities to achieve your maximum potential',
-              ar: 'استكشف منصتنا التدريبية وارتقي بقدراتك لتحقيق أقصى إمكاناتك'
-            },
+            value: 'إرساء معك لتطوير المهارات',
             required: true,
-            placeholder: 'Enter main hero title'
+            placeholder: 'Enter hero badge text in Arabic'
           },
           {
-            id: 'hero-description',
-            label: 'Hero Description',
+            id: 'hero-title-en',
+            label: 'Hero Title (English)',
+            type: 'text',
+            value: 'Explore our training platform and elevate your abilities to achieve your maximum potential',
+            required: true,
+            placeholder: 'Enter main hero title in English'
+          },
+          {
+            id: 'hero-title-ar',
+            label: 'Hero Title (Arabic)',
+            type: 'text',
+            value: 'استكشف منصتنا التدريبية وارتقي بقدراتك لتحقيق أقصى إمكاناتك',
+            required: true,
+            placeholder: 'Enter main hero title in Arabic'
+          },
+          {
+            id: 'hero-description-en',
+            label: 'Hero Description (English)',
             type: 'textarea',
-            value: {
-              en: 'Build a promising future and lead your life with our interactive and comprehensive programs',
-              ar: 'ابن مستقبلاً واعداً وقود حياتك مع برامجنا التفاعلية والمفهمة'
-            },
+            value: 'Build a promising future and lead your life with our interactive and comprehensive programs',
             required: true,
-            placeholder: 'Enter hero description'
+            placeholder: 'Enter hero description in English'
           },
           {
-            id: 'hero-cta-primary',
-            label: 'Primary CTA Text',
-            type: 'text',
-            value: {
-              en: 'Explore Courses',
-              ar: 'استكشف الدورات'
-            },
+            id: 'hero-description-ar',
+            label: 'Hero Description (Arabic)',
+            type: 'textarea',
+            value: 'ابن مستقبلاً واعداً وقود حياتك مع برامجنا التفاعلية والمفهمة',
             required: true,
-            placeholder: 'Enter primary button text'
+            placeholder: 'Enter hero description in Arabic'
           },
           {
-            id: 'hero-cta-secondary',
-            label: 'Secondary CTA Text',
+            id: 'hero-cta-primary-en',
+            label: 'Primary CTA Text (English)',
             type: 'text',
-            value: {
-              en: 'Request Consultation',
-              ar: 'طلب استشارة'
-            },
+            value: 'Explore Courses',
+            required: true,
+            placeholder: 'Enter primary button text in English'
+          },
+          {
+            id: 'hero-cta-primary-ar',
+            label: 'Primary CTA Text (Arabic)',
+            type: 'text',
+            value: 'استكشف الدورات',
+            required: true,
+            placeholder: 'Enter primary button text in Arabic'
+          },
+          {
+            id: 'hero-cta-secondary-en',
+            label: 'Secondary CTA Text (English)',
+            type: 'text',
+            value: 'Request Consultation',
             required: false,
-            placeholder: 'Enter secondary button text'
+            placeholder: 'Enter secondary button text in English'
           },
           {
-            id: 'features',
-            label: 'Features',
+            id: 'hero-cta-secondary-ar',
+            label: 'Secondary CTA Text (Arabic)',
+            type: 'text',
+            value: 'طلب استشارة',
+            required: false,
+            placeholder: 'Enter secondary button text in Arabic'
+          },
+          {
+            id: 'features-en',
+            label: 'Features (English)',
             type: 'array',
             value: [
               { 
-                title: { en: 'Advanced Courses', ar: 'دورات متقدمة' }, 
-                description: { en: 'Latest technologies and methodologies', ar: 'أحدث التقنيات والمناهج' }
+                title: 'Advanced Courses', 
+                description: 'Latest technologies and methodologies'
               },
               { 
-                title: { en: 'Expert Trainers', ar: 'مدربون خبراء' }, 
-                description: { en: 'Extensive experience in the field', ar: 'خبرة واسعة في المجال' }
+                title: 'Expert Trainers', 
+                description: 'Extensive experience in the field'
               },
               { 
-                title: { en: 'Continuous Support', ar: 'دعم متواصل' }, 
-                description: { en: '24/7 assistance available', ar: 'مساعدة على مدار الساعة' }
+                title: 'Continuous Support', 
+                description: '24/7 assistance available'
               }
             ],
             required: true
           },
           {
-            id: 'testimonials',
-            label: 'Testimonials',
+            id: 'features-ar',
+            label: 'Features (Arabic)',
             type: 'array',
             value: [
               { 
-                name: { en: 'Ahmed Ali', ar: 'أحمد علي' }, 
-                role: { en: 'Student', ar: 'طالب' }, 
-                text: { en: 'Excellent training experience', ar: 'تجربة تدريبية ممتازة' }
+                title: 'دورات متقدمة', 
+                description: 'أحدث التقنيات والمناهج'
               },
               { 
-                name: { en: 'Sarah Johnson', ar: 'سارة جونسون' }, 
-                role: { en: 'Manager', ar: 'مدير' }, 
-                text: { en: 'Professional and effective', ar: 'مهني وفعال' }
+                title: 'مدربون خبراء', 
+                description: 'خبرة واسعة في المجال'
+              },
+              { 
+                title: 'دعم متواصل', 
+                description: 'مساعدة على مدار الساعة'
+              }
+            ],
+            required: true
+          },
+          {
+            id: 'testimonials-en',
+            label: 'Testimonials (English)',
+            type: 'array',
+            value: [
+              { 
+                name: 'Ahmed Ali', 
+                role: 'Student', 
+                text: 'Excellent training experience'
+              },
+              { 
+                name: 'Sarah Johnson', 
+                role: 'Manager', 
+                text: 'Professional and effective'
+              }
+            ],
+            required: false
+          },
+          {
+            id: 'testimonials-ar',
+            label: 'Testimonials (Arabic)',
+            type: 'array',
+            value: [
+              { 
+                name: 'أحمد علي', 
+                role: 'طالب', 
+                text: 'تجربة تدريبية ممتازة'
+              },
+              { 
+                name: 'سارة جونسون', 
+                role: 'مدير', 
+                text: 'مهني وفعال'
               }
             ],
             required: false
@@ -666,43 +934,73 @@ class ContentAPI {
         pageKey: 'courses',
         fields: [
           {
-            id: 'page-title',
-            label: 'Page Title',
+            id: 'page-title-en',
+            label: 'Page Title (English)',
             type: 'text',
-            value: {
-              en: 'Our Courses',
-              ar: 'دوراتنا'
-            },
+            value: 'Our Courses',
             required: true,
-            placeholder: 'Enter page title'
+            placeholder: 'Enter page title in English'
           },
           {
-            id: 'page-description',
-            label: 'Page Description',
+            id: 'page-title-ar',
+            label: 'Page Title (Arabic)',
+            type: 'text',
+            value: 'دوراتنا',
+            required: true,
+            placeholder: 'Enter page title in Arabic'
+          },
+          {
+            id: 'page-description-en',
+            label: 'Page Description (English)',
             type: 'textarea',
-            value: {
-              en: 'Discover our comprehensive collection of professional development courses',
-              ar: 'اكتشف مجموعتنا الشاملة من دورات التطوير المهني'
-            },
+            value: 'Discover our comprehensive collection of professional development courses',
             required: true,
-            placeholder: 'Enter page description'
+            placeholder: 'Enter page description in English'
           },
           {
-            id: 'categories',
-            label: 'Course Categories',
+            id: 'page-description-ar',
+            label: 'Page Description (Arabic)',
+            type: 'textarea',
+            value: 'اكتشف مجموعتنا الشاملة من دورات التطوير المهني',
+            required: true,
+            placeholder: 'Enter page description in Arabic'
+          },
+          {
+            id: 'categories-en',
+            label: 'Course Categories (English)',
             type: 'array',
             value: [
               { 
-                name: { en: 'Graphic Design', ar: 'التصميم الجرافيكي' }, 
-                description: { en: 'Professional design courses', ar: 'دورات تصميم احترافية' }
+                name: 'Graphic Design', 
+                description: 'Professional design courses'
               },
               { 
-                name: { en: 'Web Development', ar: 'تطوير الويب' }, 
-                description: { en: 'Modern development skills', ar: 'مهارات تطوير حديثة' }
+                name: 'Web Development', 
+                description: 'Modern development skills'
               },
               { 
-                name: { en: 'Digital Marketing', ar: 'التسويق الرقمي' }, 
-                description: { en: 'Marketing strategies and tools', ar: 'استراتيجيات وأدوات التسويق' }
+                name: 'Digital Marketing', 
+                description: 'Marketing strategies and tools'
+              }
+            ],
+            required: true
+          },
+          {
+            id: 'categories-ar',
+            label: 'Course Categories (Arabic)',
+            type: 'array',
+            value: [
+              { 
+                name: 'التصميم الجرافيكي', 
+                description: 'دورات تصميم احترافية'
+              },
+              { 
+                name: 'تطوير الويب', 
+                description: 'مهارات تطوير حديثة'
+              },
+              { 
+                name: 'التسويق الرقمي', 
+                description: 'استراتيجيات وأدوات التسويق'
               }
             ],
             required: true
@@ -797,26 +1095,36 @@ class ContentAPI {
         pageKey: 'home',
         fields: [
           {
-            id: 'services-title',
-            label: 'Services Title',
+            id: 'services-title-en',
+            label: 'Services Title (English)',
             type: 'text',
-            value: {
-              en: 'Our Services',
-              ar: 'خدماتنا'
-            },
+            value: 'Our Services',
             required: true,
-            placeholder: 'Enter services title'
+            placeholder: 'Enter services title in English'
           },
           {
-            id: 'services-description',
-            label: 'Services Description',
-            type: 'textarea',
-            value: {
-              en: 'We offer comprehensive training and consultancy services',
-              ar: 'نقدم خدمات تدريبية واستشارية شاملة'
-            },
+            id: 'services-title-ar',
+            label: 'Services Title (Arabic)',
+            type: 'text',
+            value: 'خدماتنا',
             required: true,
-            placeholder: 'Enter services description'
+            placeholder: 'Enter services title in Arabic'
+          },
+          {
+            id: 'services-description-en',
+            label: 'Services Description (English)',
+            type: 'textarea',
+            value: 'We offer comprehensive training and consultancy services',
+            required: true,
+            placeholder: 'Enter services description in English'
+          },
+          {
+            id: 'services-description-ar',
+            label: 'Services Description (Arabic)',
+            type: 'textarea',
+            value: 'نقدم خدمات تدريبية واستشارية شاملة',
+            required: true,
+            placeholder: 'Enter services description in Arabic'
           }
         ]
       },
@@ -829,26 +1137,36 @@ class ContentAPI {
         pageKey: 'contact',
         fields: [
           {
-            id: 'contact-title',
-            label: 'Contact Title',
+            id: 'contact-title-en',
+            label: 'Contact Title (English)',
             type: 'text',
-            value: {
-              en: 'Get in Touch',
-              ar: 'تواصل معنا'
-            },
+            value: 'Get in Touch',
             required: true,
-            placeholder: 'Enter contact title'
+            placeholder: 'Enter contact title in English'
           },
           {
-            id: 'address',
-            label: 'Address',
+            id: 'contact-title-ar',
+            label: 'Contact Title (Arabic)',
             type: 'text',
-            value: {
-              en: 'Riyadh, Saudi Arabia',
-              ar: 'الرياض، المملكة العربية السعودية'
-            },
+            value: 'تواصل معنا',
             required: true,
-            placeholder: 'Enter address'
+            placeholder: 'Enter contact title in Arabic'
+          },
+          {
+            id: 'address-en',
+            label: 'Address (English)',
+            type: 'text',
+            value: 'Riyadh, Saudi Arabia',
+            required: true,
+            placeholder: 'Enter address in English'
+          },
+          {
+            id: 'address-ar',
+            label: 'Address (Arabic)',
+            type: 'text',
+            value: 'الرياض، المملكة العربية السعودية',
+            required: true,
+            placeholder: 'Enter address in Arabic'
           },
           {
             id: 'phone',
@@ -877,32 +1195,57 @@ class ContentAPI {
         pageKey: 'faq',
         fields: [
           {
-            id: 'faq-title',
-            label: 'FAQ Title',
+            id: 'faq-title-en',
+            label: 'FAQ Title (English)',
             type: 'text',
-            value: {
-              en: 'Frequently Asked Questions',
-              ar: 'الأسئلة الشائعة'
-            },
+            value: 'Frequently Asked Questions',
             required: true,
-            placeholder: 'Enter FAQ title'
+            placeholder: 'Enter FAQ title in English'
           },
           {
-            id: 'faq-items',
-            label: 'FAQ Items',
+            id: 'faq-title-ar',
+            label: 'FAQ Title (Arabic)',
+            type: 'text',
+            value: 'الأسئلة الشائعة',
+            required: true,
+            placeholder: 'Enter FAQ title in Arabic'
+          },
+          {
+            id: 'faq-items-en',
+            label: 'FAQ Items (English)',
             type: 'array',
             value: [
               { 
-                question: { en: 'How do I enroll in a course?', ar: 'كيف يمكنني التسجيل في دورة؟' },
-                answer: { en: 'You can enroll through our website or contact us directly.', ar: 'يمكنك التسجيل من خلال موقعنا الإلكتروني أو التواصل معنا مباشرة.' }
+                question: 'How do I enroll in a course?',
+                answer: 'You can enroll through our website or contact us directly.'
               },
               { 
-                question: { en: 'What payment methods do you accept?', ar: 'ما هي طرق الدفع المقبولة؟' },
-                answer: { en: 'We accept credit cards, bank transfers, and online payments.', ar: 'نقبل بطاقات الائتمان والتحويلات البنكية والمدفوعات الإلكترونية.' }
+                question: 'What payment methods do you accept?',
+                answer: 'We accept credit cards, bank transfers, and online payments.'
               },
               { 
-                question: { en: 'Do you offer certificates?', ar: 'هل تقدمون شهادات؟' },
-                answer: { en: 'Yes, we provide certificates of completion for all our courses.', ar: 'نعم، نقدم شهادات إتمام لجميع دوراتنا.' }
+                question: 'Do you offer certificates?',
+                answer: 'Yes, we provide certificates of completion for all our courses.'
+              }
+            ],
+            required: true
+          },
+          {
+            id: 'faq-items-ar',
+            label: 'FAQ Items (Arabic)',
+            type: 'array',
+            value: [
+              { 
+                question: 'كيف يمكنني التسجيل في دورة؟',
+                answer: 'يمكنك التسجيل من خلال موقعنا الإلكتروني أو التواصل معنا مباشرة.'
+              },
+              { 
+                question: 'ما هي طرق الدفع المقبولة؟',
+                answer: 'نقبل بطاقات الائتمان والتحويلات البنكية والمدفوعات الإلكترونية.'
+              },
+              { 
+                question: 'هل تقدمون شهادات؟',
+                answer: 'نعم، نقدم شهادات إتمام لجميع دوراتنا.'
               }
             ],
             required: true
@@ -918,26 +1261,36 @@ class ContentAPI {
         pageKey: 'home',
         fields: [
           {
-            id: 'consultation-title',
-            label: 'Consultation Title',
+            id: 'consultation-title-en',
+            label: 'Consultation Title (English)',
             type: 'text',
-            value: {
-              en: 'Consultation Services',
-              ar: 'خدمات الاستشارة'
-            },
+            value: 'Consultation Services',
             required: true,
-            placeholder: 'Enter consultation title'
+            placeholder: 'Enter consultation title in English'
           },
           {
-            id: 'consultation-description',
-            label: 'Consultation Description',
-            type: 'textarea',
-            value: {
-              en: 'Professional consultation services tailored to your needs',
-              ar: 'خدمات استشارية مهنية مصممة خصيصاً لاحتياجاتك'
-            },
+            id: 'consultation-title-ar',
+            label: 'Consultation Title (Arabic)',
+            type: 'text',
+            value: 'خدمات الاستشارة',
             required: true,
-            placeholder: 'Enter consultation description'
+            placeholder: 'Enter consultation title in Arabic'
+          },
+          {
+            id: 'consultation-description-en',
+            label: 'Consultation Description (English)',
+            type: 'textarea',
+            value: 'Professional consultation services tailored to your needs',
+            required: true,
+            placeholder: 'Enter consultation description in English'
+          },
+          {
+            id: 'consultation-description-ar',
+            label: 'Consultation Description (Arabic)',
+            type: 'textarea',
+            value: 'خدمات استشارية مهنية مصممة خصيصاً لاحتياجاتك',
+            required: true,
+            placeholder: 'Enter consultation description in Arabic'
           }
         ]
       }

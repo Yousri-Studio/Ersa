@@ -82,6 +82,10 @@ export default function ContentEditor() {
           console.log('Looking for section:', sectionId);
           console.log('Available sections:', Object.keys(templates));
           
+          console.log('🔍 Available templates:', Object.keys(templates));
+          console.log('🔍 Looking for section:', sectionId);
+          console.log('🔍 Template exists?', !!templates[sectionId]);
+          
           if (templates[sectionId]) {
             console.log('Found section:', templates[sectionId]);
             
@@ -108,9 +112,84 @@ export default function ContentEditor() {
               }
             }
             
+            // Debug: Log FAQ fields specifically for FAQ section
+            if (sectionId === 'faq') {
+              console.log('🔍 FAQ section fields:', templates[sectionId].fields);
+              const faqItemsField = templates[sectionId].fields.find(f => f.id.includes('faq-items'));
+              console.log('🔍 FAQ items field found:', faqItemsField);
+              if (faqItemsField) {
+                console.log('🔍 FAQ field ID:', faqItemsField.id);
+                console.log('🔍 FAQ field value:', faqItemsField.value);
+                console.log('🔍 First FAQ item:', faqItemsField.value[0]);
+              }
+              
+              // Check for old FAQ structure
+              const oldFaqField = templates[sectionId].fields.find(f => f.id === 'faq-items');
+              if (oldFaqField) {
+                console.log('🔍 Old FAQ field found:', oldFaqField);
+                console.log('🔍 Old FAQ value:', oldFaqField.value);
+              }
+            }
+            
+            // Debug: Log consultation fields specifically for consultation section
+            if (sectionId === 'consultation') {
+              console.log('🔍 Consultation section fields:', templates[sectionId].fields);
+              console.log('🔍 Consultation section data:', templates[sectionId]);
+            }
+            
             setSection(templates[sectionId]);
           } else {
-            console.log('Section not found, available sections:', Object.keys(templates));
+            console.log('❌ Section not found, available sections:', Object.keys(templates));
+            
+            // Special fallback for consultation section
+            if (sectionId === 'consultation') {
+              console.log('🔄 Creating fallback consultation section...');
+              const fallbackConsultation = {
+                id: 'consultation',
+                title: 'Consultation Services',
+                description: 'Consultation offerings and service details',
+                status: 'published' as const,
+                lastModified: new Date().toISOString(),
+                pageKey: 'home',
+                fields: [
+                  {
+                    id: 'consultation-title-en',
+                    label: 'Consultation Title (English)',
+                    type: 'text' as const,
+                    value: 'Consultation Services',
+                    required: true,
+                    placeholder: 'Enter consultation title in English'
+                  },
+                  {
+                    id: 'consultation-title-ar',
+                    label: 'Consultation Title (Arabic)',
+                    type: 'text' as const,
+                    value: 'خدمات الاستشارة',
+                    required: true,
+                    placeholder: 'Enter consultation title in Arabic'
+                  },
+                  {
+                    id: 'consultation-description-en',
+                    label: 'Consultation Description (English)',
+                    type: 'textarea' as const,
+                    value: 'Professional consultation services tailored to your needs',
+                    required: true,
+                    placeholder: 'Enter consultation description in English'
+                  },
+                  {
+                    id: 'consultation-description-ar',
+                    label: 'Consultation Description (Arabic)',
+                    type: 'textarea' as const,
+                    value: 'خدمات استشارية مهنية مصممة خصيصاً لاحتياجاتك',
+                    required: true,
+                    placeholder: 'Enter consultation description in Arabic'
+                  }
+                ]
+              };
+              setSection(fallbackConsultation);
+              console.log('✅ Fallback consultation section created');
+              return;
+            }
             // If no templates exist, try to initialize sample data
             if (Object.keys(templates).length === 0) {
               console.log('No templates found, trying to initialize sample data...');
@@ -219,23 +298,39 @@ export default function ContentEditor() {
 
     let newItem: any = {};
     
-    if (field.value.length > 0) {
+    // Special handling for different field types with bilingual structure
+    if (fieldId === 'faq-items') {
+      newItem = { 
+        questionEn: '', 
+        questionAr: '', 
+        answerEn: '', 
+        answerAr: '' 
+      };
+    } else if (fieldId === 'features') {
+      newItem = { 
+        titleEn: '', 
+        titleAr: '', 
+        descriptionEn: '', 
+        descriptionAr: '' 
+      };
+    } else if (fieldId === 'testimonials') {
+      newItem = { 
+        nameEn: '', 
+        nameAr: '', 
+        roleEn: '', 
+        roleAr: '', 
+        textEn: '', 
+        textAr: '' 
+      };
+    } else if (field.value.length > 0) {
       // Create new item based on the structure of existing items
       const firstItem = field.value[0];
       Object.keys(firstItem).forEach(key => {
-        const itemValue = firstItem[key];
-        // Check if this property has bilingual structure
-        if (itemValue && typeof itemValue === 'object' && itemValue.en !== undefined && itemValue.ar !== undefined) {
-          // Create bilingual structure for new item
-          newItem[key] = { en: '', ar: '' };
-        } else {
-          // Create regular property
-          newItem[key] = '';
-        }
+        newItem[key] = '';
       });
     } else {
       // Default structure if no items exist
-      newItem = { title: '', description: '' };
+      newItem = { titleEn: '', titleAr: '', descriptionEn: '', descriptionAr: '' };
     }
 
     const updatedArray = [...field.value, newItem];
@@ -440,38 +535,163 @@ export default function ContentEditor() {
         );
 
       case 'array':
+        // Special handling for FAQ items to improve layout
+        const isFAQItems = field.id.includes('faq-items');
+        
+        if (isFAQItems) {
+          return (
+            <div className="space-y-4">
+              {field.value.map((item: any, index: number) => (
+                <div key={index} className="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <div className="flex items-start justify-between mb-3">
+                    <h4 className="text-sm font-medium text-gray-700">
+                      {locale === 'ar' ? `السؤال ${index + 1}` : `Question ${index + 1}`}
+                    </h4>
+                    {isEditing && (
+                      <button
+                        onClick={() => removeArrayItem(field.id, index)}
+                        className="p-1 text-red-600 hover:bg-red-100 rounded"
+                      >
+                        <Icon name="trash" className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        Question (English)
+                      </label>
+                      <input
+                        type="text"
+                        value={item.questionEn || ''}
+                        onChange={(e) => handleArrayItemChange(field.id, index, 'questionEn', e.target.value)}
+                        placeholder="Enter question in English"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        disabled={!isEditing}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        Question (Arabic)
+                      </label>
+                      <input
+                        type="text"
+                        value={item.questionAr || ''}
+                        onChange={(e) => handleArrayItemChange(field.id, index, 'questionAr', e.target.value)}
+                        placeholder="أدخل السؤال بالعربية"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        disabled={!isEditing}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        Answer (English)
+                      </label>
+                      <textarea
+                        value={item.answerEn || ''}
+                        onChange={(e) => handleArrayItemChange(field.id, index, 'answerEn', e.target.value)}
+                        placeholder="Enter answer in English"
+                        rows={3}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                        disabled={!isEditing}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-medium text-gray-600 mb-1">
+                        Answer (Arabic)
+                      </label>
+                      <textarea
+                        value={item.answerAr || ''}
+                        onChange={(e) => handleArrayItemChange(field.id, index, 'answerAr', e.target.value)}
+                        placeholder="أدخل الإجابة بالعربية"
+                        rows={3}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                        disabled={!isEditing}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {isEditing && (
+                <button
+                  onClick={() => addArrayItem(field.id)}
+                  className="w-full p-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-blue-400 hover:text-blue-500 transition-colors"
+                >
+                  <Icon name="plus" className="w-4 h-4 inline mr-2" />
+                  {locale === 'ar' ? 'إضافة سؤال جديد' : 'Add New Question'}
+                </button>
+              )}
+            </div>
+          );
+        }
+        
+        // Default array rendering with proper bilingual field labels
         return (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {field.value.map((item: any, index: number) => (
-              <div key={index} className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg">
-                {Object.keys(item).map((key) => (
-                  <input
-                    key={key}
-                    type="text"
-                    value={item[key] || ''}
-                    onChange={(e) => handleArrayItemChange(field.id, index, key, e.target.value)}
-                    placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    disabled={!isEditing}
-                  />
-                ))}
-                {isEditing && (
-                  <button
-                    onClick={() => removeArrayItem(field.id, index)}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
-                  >
-                    <Icon name="trash" className="w-4 h-4" />
-                  </button>
-                )}
+              <div key={index} className="p-4 border border-gray-200 rounded-lg bg-gray-50">
+                <div className="flex items-start justify-between mb-3">
+                  <h4 className="text-sm font-medium text-gray-700">
+                    {field.label} {index + 1}
+                  </h4>
+                  {isEditing && (
+                    <button
+                      onClick={() => removeArrayItem(field.id, index)}
+                      className="p-1 text-red-600 hover:bg-red-100 rounded"
+                    >
+                      <Icon name="trash" className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {Object.keys(item).map((key) => {
+                    // Create proper labels for bilingual fields
+                    let label = key.charAt(0).toUpperCase() + key.slice(1);
+                    if (key.endsWith('En')) {
+                      label = key.slice(0, -2).charAt(0).toUpperCase() + key.slice(1, -2) + ' (English)';
+                    } else if (key.endsWith('Ar')) {
+                      label = key.slice(0, -2).charAt(0).toUpperCase() + key.slice(1, -2) + ' (Arabic)';
+                    }
+                    
+                    const isTextArea = key.includes('description') || key.includes('answer') || key.includes('text');
+                    
+                    return (
+                      <div key={key} className="space-y-1">
+                        <label className="block text-xs font-medium text-gray-600">
+                          {label}
+                        </label>
+                        {isTextArea ? (
+                          <textarea
+                            value={item[key] || ''}
+                            onChange={(e) => handleArrayItemChange(field.id, index, key, e.target.value)}
+                            placeholder={`Enter ${label.toLowerCase()}`}
+                            rows={3}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                            disabled={!isEditing}
+                          />
+                        ) : (
+                          <input
+                            type="text"
+                            value={item[key] || ''}
+                            onChange={(e) => handleArrayItemChange(field.id, index, key, e.target.value)}
+                            placeholder={`Enter ${label.toLowerCase()}`}
+                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            disabled={!isEditing}
+                          />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             ))}
             {isEditing && (
               <button
                 onClick={() => addArrayItem(field.id)}
-                className="w-full p-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-blue-400 hover:text-blue-500 transition-colors"
+                className="w-full p-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-blue-400 hover:text-blue-500 transition-colors"
               >
                 <Icon name="plus" className="w-4 h-4 inline mr-2" />
-                {locale === 'ar' ? 'إضافة عنصر' : 'Add Item'}
+                {locale === 'ar' ? `إضافة ${field.label} جديد` : `Add New ${field.label.slice(0, -1)}`}
               </button>
             )}
           </div>
@@ -646,7 +866,7 @@ export default function ContentEditor() {
               </div>
               
               {/* Data Refresh Button */}
-              {section.id === 'about' && (
+              {(section.id === 'about' || section.id === 'faq' || section.id === 'hero' || section.id === 'consultation') && (
                 <button
                   onClick={async () => {
                     try {
@@ -734,20 +954,26 @@ export default function ContentEditor() {
           </div>
         </div>
 
-        {/* Preview Section */}
-        <div className="mt-8 bg-gray-50 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            {locale === 'ar' ? 'معاينة المحتوى' : 'Content Preview'}
-          </h3>
-          <div className="bg-white p-4 rounded-lg border">
-            <pre className="text-sm text-gray-700 overflow-auto">
-              {JSON.stringify(section.fields.reduce((acc, field) => ({
-                ...acc,
-                [field.id]: field.value
-              }), {}), null, 2)}
-            </pre>
-          </div>
-        </div>
+            {/* Content Preview */}
+            <div className="bg-gray-50 rounded-lg p-4">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">
+                {locale === 'ar' ? 'معاينة المحتوى' : 'Content Preview'}
+              </h3>
+              <pre className="text-sm text-gray-600 whitespace-pre-wrap overflow-auto max-h-96">
+                {JSON.stringify({
+                  id: section.id,
+                  title: section.title,
+                  fields: section.fields.map(field => ({
+                    id: field.id,
+                    label: field.label,
+                    type: field.type,
+                    value: field.value,
+                    required: field.required
+                  }))
+                }, null, 2)}
+              </pre>
+            </div>
+
       </div>
     </div>
   );
