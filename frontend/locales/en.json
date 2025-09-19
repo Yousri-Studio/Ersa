@@ -154,18 +154,6 @@
     "request-consultation": "Request a Free Consultation",
     "explore-courses": "Explore Our Courses"
   },
-  "training-categories": {
-    "title": "Our Training Categories",
-    "description": "Explore our wide range of training programs designed to enhance your skills and knowledge.",
-    "view-all": "View All Categories"
-  },
-  
-  "services": {
-    "title": "Our Services",
-    "description": "Comprehensive training and consultation services tailored to your needs.",
-    "view-all": "View All Services"
-  },
-  
   "testimonials": {
     "title": "What Our Clients Say",
     "subtitle": "Testimonials",
@@ -173,24 +161,204 @@
     "view-all": "Read All Testimonials"
   },
   
+  "join-us": {
+    "title": "Join Many Trainees",
+    "subtitle": "We make it easy for trainees to choose what suits their needs, helping these categories organize training content and present it clearly and distinctly for each category separately.",
+    "benefits": [
+      "Easy learning and achieving the best results with the best methods",
+      "Easy learning and achieving the best results with the best methods",
+      "Continuous support to meet needs"
+    ],
+    "cta": "Start with Us"
+  },
+
+  
+  "admin": {
+    "title": "Admin Dashboard",
+    "welcome": "Hello",
+    "description": "from here you can manage all content, orders and everything",
+    "hello": "Hello 👋",
+    "super-admin": "Super Admin",
+    "admin": "Admin",
+    "admin-user": "Admin User",
+    "operations-dashboard": "Operations Dashboard",
+    "dashboard-subtitle": "from here you can manage all content, orders and everything",
+    "using-demo-data": "Using demo data",
+    "connected-to-backend": "Connected to Backend",
+    "backend-unavailable": "Backend Unavailable",
+    "online": "Online",
+    "active-courses": "active",
+    "this-month": "This month",
+    "revenue-this-month": "Revenue this month",
+    "amount": "Amount",
+    "status": "Status",
+    "name": "Name",
+    "email": "Email",
+    "joined": "Joined",
+    "status-completed": "Completed",
+    "status-pending": "Pending",
+    "status-failed": "Failed",
+    "total-users": "Total Users",
+    "total-courses": "Total Courses",
+    "total-orders": "Total Orders", 
+    "total-revenue": "Total Revenue",
+    "recent-orders": "Recent Orders",
+    "recent-orders-subtitle": "Latest orders registered in the system",
+    "student-name": "Student Name",
+    "course-name": "Course Name",
+    "order-date": "Order Date",
+    "course-type": "Course Type",
+    "course-price": "Course Price",
+    "actions": "Actions",
+    "recent-users": "Recent Users",
+    "recent-users-subtitle": "Latest users registered in the system",
+    "geographics": "Geographic Distribution",
+    "geographics-subtitle": "User distribution by countries",
+    "users-from-countries": "Users from Countries",
+    "user": "user",
+    "sidebar": {
+      "dashboard": "Dashboard",
+      "contentManagement": "Content Management",
+      "manageUsers": "Manage Users",
+      "manageCourses": "Manage Courses",
+      "orders": "Orders",
+      "settings": "Settings",
+      "logout": "Logout"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "overview-platform": "Platform overview",
+      "stats": {
+        "totalUsers": "Total Users",
+        "activeUsers": "Active Users",
+        "totalCourses": "Total Courses",
+        "activeCourses": "Active Courses",
+        "totalOrders": "Total Orders",
+        "totalRevenue": "Total Revenue"
+      }
+    },
+    "errors": {
+      "access-denied": "Access denied. Admin privileges required."
+    },
+    "contentManagement": "Content Management"
+  },
+  "training-categories": {
+    "title": "Training Categories",
+    "subtitle": "Browse our training categories to find the perfect course for you",
+    "badge": "Categories",
+    "categories": {
+      "general": {
+        "title": "General Training",
+        "description": "Comprehensive training programs covering essential skills"
+      },
+      "specialized": {
+        "title": "Specialized Training",
+        "description": "Advanced training in specialized fields and industries"
+      },
+      "professional": {
+        "title": "Professional Development",
+        "description": "Enhance your professional skills and career growth"
+      }
+    }
+  },
+  "services": {
+    "title": "Our Services",
+    "subtitle": "Comprehensive solutions for your training needs",
+    "badge": "Services",
+    "cards": {
+      "quality": {
+        "title": "Quality Training",
+        "description": "High-quality training programs designed by industry experts"
+      },
+      "partnership": {
+        "title": "Strategic Partnerships",
+        "description": "Collaborate with leading organizations for better outcomes"
+      },
+      "innovation": {
+        "title": "Innovative Solutions",
+        "description": "Cutting-edge training methodologies and technologies"
+      },
+      "sustainability": {
+        "title": "Sustainable Growth",
+        "description": "Long-term training solutions for continuous improvement"
+      }
+    }
+  },
   "ai-consultation": {
     "title": "AI-Powered Consultation",
-    "description": "Get personalized training recommendations using our AI consultation tool.",
-    "cta": "Try AI Consultation"
+    "subtitle": "Get personalized training recommendations using AI",
+    "badge": "AI Consultation",
+    "cards": {
+      "ai-solutions": {
+        "title": "AI Training Solutions",
+        "description": "Discover how AI can transform your training programs",
+        "cta": "Learn More"
+      },
+      "admin-consultation": {
+        "title": "Admin Consultation",
+        "description": "Expert advice for your training administration needs",
+        "cta": "Get Started"
+      }
+    }
   },
-  
-  "join-us": {
-    "title": "Join Our Community",
-    "description": "Become part of our growing community of learners and professionals.",
-    "cta": "Join Now",
-    "benefits": [
-      "Access to exclusive content",
-      "Networking opportunities",
-      "Special member discounts",
-      "Early access to new courses"
+  "achievements": {
+    "badge": "Our Numbers",
+    "title": "Our Achievements Since Establishment",
+    "subtitle": "We make it easy for trainees to choose what suits their needs, helping these categories organize training content and present it clearly and distinctly for each category separately.",
+    "stats": {
+      "trainees": "Trainees",
+      "government_courses": "Government Courses",
+      "clients": "Clients",
+      "satisfaction": "Client Satisfaction"
+    }
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Find answers to common questions about our services",
+    "view-all": "See Full FAQs",
+    "items": [
+      {
+        "question": "How do I enroll in a course?",
+        "answer": "You can enroll in a course by browsing our catalog and clicking the 'Enroll' button on your chosen course."
+      },
+      {
+        "question": "What payment methods do you accept?",
+        "answer": "We accept various payment methods including credit cards, bank transfers, and online payment gateways."
+      },
+      {
+        "question": "Can I get a certificate after completing a course?",
+        "answer": "Yes, you will receive a certificate upon successful completion of any course."
+      },
+      {
+        "question": "Do you offer corporate training?",
+        "answer": "Yes, we provide customized corporate training solutions for businesses of all sizes."
+      },
+      {
+        "question": "How can I contact support?",
+        "answer": "You can reach our support team through the contact form on our website or by emailing support@ersatraining.com."
+      }
     ]
   },
-  
+  "admin-login": {
+    "welcome": "Welcome dear",
+    "title": "Login",
+    "subtitle": "Sign in to access the full system management",
+    "email": "Email Address",
+    "password": "Password",
+    "remember-me": "Remember me",
+    "logging-in": "Logging in...",
+    "login-button": "Login",
+    "roles": {
+      "system-manager": "System Manager",
+      "system-manager-desc": "Full system management permissions",
+      "operations-manager": "Operations Manager",
+      "operations-manager-desc": "Limited permissions for operations management"
+    },
+    "footer": {
+      "copyright": "All rights reserved to Ersa Platform © 2025",
+      "designed-by": "Designed and developed by"
+    }
+  },
   "home": {
     "hero": {
       "title": "Explore our training platform and elevate your skills to achieve your full potential",
