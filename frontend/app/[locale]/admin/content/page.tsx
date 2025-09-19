@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { Icon } from '@/components/ui/icon';
@@ -18,71 +18,6 @@ interface ContentSection {
   type: 'page' | 'section' | 'component';
 }
 
-const contentSections: ContentSection[] = [
-  {
-    id: 'hero',
-    title: 'Hero Section',
-    description: 'Main banner section with title, subtitle, and call-to-action buttons',
-    icon: 'home',
-    status: 'published',
-    lastModified: '2025-01-15T10:30:00Z',
-    type: 'section'
-  },
-  {
-    id: 'courses',
-    title: 'Course Management',
-    description: 'Course descriptions, curriculum, pricing, and enrollment details',
-    icon: 'graduation-cap',
-    status: 'published',
-    lastModified: '2025-01-14T15:45:00Z',
-    type: 'section'
-  },
-  {
-    id: 'about',
-    title: 'About Company',
-    description: 'Company information, mission, vision, team, and achievements',
-    icon: 'building',
-    status: 'published',
-    lastModified: '2025-01-13T09:20:00Z',
-    type: 'section'
-  },
-  {
-    id: 'services',
-    title: 'Services & Solutions',
-    description: 'Consulting services, AI solutions, and service offerings',
-    icon: 'cogs',
-    status: 'published',
-    lastModified: '2025-01-12T14:30:00Z',
-    type: 'section'
-  },
-  {
-    id: 'contact',
-    title: 'Contact Information',
-    description: 'Contact details, office locations, and contact forms',
-    icon: 'envelope',
-    status: 'published',
-    lastModified: '2025-01-11T11:15:00Z',
-    type: 'section'
-  },
-  {
-    id: 'faq',
-    title: 'FAQ & Help',
-    description: 'Frequently asked questions, help articles, and support content',
-    icon: 'question-circle',
-    status: 'published',
-    lastModified: '2025-01-10T16:45:00Z',
-    type: 'section'
-  },
-  {
-    id: 'consultation',
-    title: 'Consultation Services',
-    description: 'Consultation offerings and service details',
-    icon: 'users',
-    status: 'published',
-    lastModified: '2025-01-09T13:20:00Z',
-    type: 'section'
-  }
-];
 
 export default function ContentManagement() {
   const t = useTranslations('admin');
@@ -91,8 +26,123 @@ export default function ContentManagement() {
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [contentSections, setContentSections] = useState<ContentSection[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const isRTL = locale === 'ar';
+
+  // Fetch content sections from database
+  useEffect(() => {
+    const fetchContentSections = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const templates = await contentApi.getContentTemplates();
+        
+        // Convert templates to ContentSection format
+        const sections: ContentSection[] = Object.entries(templates).map(([key, template]) => ({
+          id: key,
+          title: template.title,
+          description: template.description,
+          icon: getSectionIcon(key),
+          status: template.status as 'published' | 'draft' | 'archived',
+          lastModified: template.lastModified,
+          type: 'section' as const
+        }));
+        
+        setContentSections(sections);
+      } catch (error) {
+        console.error('Error fetching content sections:', error);
+        setError('Failed to load content sections');
+        // Fallback to hardcoded data if API fails
+        setContentSections(getDefaultSections());
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchContentSections();
+  }, []);
+
+  const getSectionIcon = (sectionKey: string): string => {
+    const iconMap: Record<string, string> = {
+      hero: 'home',
+      courses: 'graduation-cap',
+      about: 'building',
+      services: 'cogs',
+      contact: 'envelope',
+      faq: 'question-circle',
+      consultation: 'users'
+    };
+    return iconMap[sectionKey] || 'file-text';
+  };
+
+  const getDefaultSections = (): ContentSection[] => [
+    {
+      id: 'hero',
+      title: 'Hero Section',
+      description: 'Main banner section with title, subtitle, and call-to-action buttons',
+      icon: 'home',
+      status: 'published',
+      lastModified: '2025-01-15T10:30:00Z',
+      type: 'section'
+    },
+    {
+      id: 'courses',
+      title: 'Course Management',
+      description: 'Course descriptions, curriculum, pricing, and enrollment details',
+      icon: 'graduation-cap',
+      status: 'published',
+      lastModified: '2025-01-14T15:45:00Z',
+      type: 'section'
+    },
+    {
+      id: 'about',
+      title: 'About Company',
+      description: 'Company information, mission, vision, team, and achievements',
+      icon: 'building',
+      status: 'published',
+      lastModified: '2025-01-13T09:20:00Z',
+      type: 'section'
+    },
+    {
+      id: 'services',
+      title: 'Services & Solutions',
+      description: 'Consulting services, AI solutions, and service offerings',
+      icon: 'cogs',
+      status: 'published',
+      lastModified: '2025-01-12T14:30:00Z',
+      type: 'section'
+    },
+    {
+      id: 'contact',
+      title: 'Contact Information',
+      description: 'Contact details, office locations, and contact forms',
+      icon: 'envelope',
+      status: 'published',
+      lastModified: '2025-01-11T11:15:00Z',
+      type: 'section'
+    },
+    {
+      id: 'faq',
+      title: 'FAQ & Help',
+      description: 'Frequently asked questions, help articles, and support content',
+      icon: 'question-circle',
+      status: 'published',
+      lastModified: '2025-01-10T16:45:00Z',
+      type: 'section'
+    },
+    {
+      id: 'consultation',
+      title: 'Consultation Services',
+      description: 'Consultation offerings and service details',
+      icon: 'users',
+      status: 'published',
+      lastModified: '2025-01-09T13:20:00Z',
+      type: 'section'
+    }
+  ];
 
   const filteredSections = contentSections.filter(section => {
     const matchesSearch = section.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -178,15 +228,34 @@ export default function ContentManagement() {
               <option value="draft">{locale === 'ar' ? 'مسودة' : 'Draft'}</option>
               <option value="archived">{locale === 'ar' ? 'مؤرشف' : 'Archived'}</option>
             </select>
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-              {locale === 'ar' ? 'إضافة صفحة جديدة' : 'Add New Page'}
-            </button>
+            {/* Add New Page button hidden as requested */}
           </div>
         </div>
 
+        {/* Loading State */}
+        {loading && (
+          <div className="flex justify-center items-center py-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <span className="ml-3 text-gray-600">
+              {locale === 'ar' ? 'جاري التحميل...' : 'Loading...'}
+            </span>
+          </div>
+        )}
+
+        {/* Error State */}
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center">
+              <Icon name="alert-circle" className="w-5 h-5 text-red-600 mr-2" />
+              <span className="text-red-700">{error}</span>
+            </div>
+          </div>
+        )}
+
         {/* Content Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredSections.map((section) => (
+        {!loading && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredSections.map((section) => (
             <motion.div
               key={section.id}
               initial={{ opacity: 0, y: 20 }}
@@ -220,7 +289,8 @@ export default function ContentManagement() {
               </div>
             </motion.div>
           ))}
-        </div>
+          </div>
+        )}
 
         {/* Quick Actions */}
         <div className="mt-12 bg-gray-50 rounded-xl p-6">
@@ -268,69 +338,76 @@ export default function ContentManagement() {
         </div>
 
         {/* Content Statistics */}
-        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div className="bg-white p-6 rounded-xl border border-gray-200">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
-                <Icon name="file-text" className="w-6 h-6 text-blue-600" />
+        {!loading && (
+          <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-white p-6 rounded-xl border border-gray-200">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
+                  <Icon name="file-text" className="w-6 h-6 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-600">
+                    {locale === 'ar' ? 'إجمالي الصفحات' : 'Total Pages'}
+                  </p>
+                  <p className="text-2xl font-bold text-gray-900">{contentSections.length}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  {locale === 'ar' ? 'إجمالي الصفحات' : 'Total Pages'}
-                </p>
-                <p className="text-2xl font-bold text-gray-900">{contentSections.length}</p>
+            </div>
+            
+            <div className="bg-white p-6 rounded-xl border border-gray-200">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
+                  <Icon name="check-circle" className="w-6 h-6 text-green-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-600">
+                    {locale === 'ar' ? 'منشور' : 'Published'}
+                  </p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {contentSections.filter(s => s.status === 'published').length}
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-white p-6 rounded-xl border border-gray-200">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mr-4">
+                  <Icon name="edit" className="w-6 h-6 text-yellow-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-600">
+                    {locale === 'ar' ? 'مسودات' : 'Drafts'}
+                  </p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {contentSections.filter(s => s.status === 'draft').length}
+                  </p>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-white p-6 rounded-xl border border-gray-200">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
+                  <Icon name="clock" className="w-6 h-6 text-purple-600" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-600">
+                    {locale === 'ar' ? 'آخر تحديث' : 'Last Updated'}
+                  </p>
+                  <p className="text-sm font-bold text-gray-900">
+                    {contentSections.length > 0 
+                      ? formatDate(contentSections.reduce((latest, section) => 
+                          new Date(section.lastModified) > new Date(latest.lastModified) ? section : latest
+                        ).lastModified)
+                      : 'N/A'
+                    }
+                  </p>
+                </div>
               </div>
             </div>
           </div>
-          
-          <div className="bg-white p-6 rounded-xl border border-gray-200">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4">
-                <Icon name="check-circle" className="w-6 h-6 text-green-600" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  {locale === 'ar' ? 'منشور' : 'Published'}
-                </p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {contentSections.filter(s => s.status === 'published').length}
-                </p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white p-6 rounded-xl border border-gray-200">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mr-4">
-                <Icon name="edit" className="w-6 h-6 text-yellow-600" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  {locale === 'ar' ? 'مسودات' : 'Drafts'}
-                </p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {contentSections.filter(s => s.status === 'draft').length}
-                </p>
-              </div>
-            </div>
-          </div>
-          
-          <div className="bg-white p-6 rounded-xl border border-gray-200">
-            <div className="flex items-center">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4">
-                <Icon name="clock" className="w-6 h-6 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-sm font-medium text-gray-600">
-                  {locale === 'ar' ? 'آخر تحديث' : 'Last Updated'}
-                </p>
-                <p className="text-sm font-bold text-gray-900">
-                  {formatDate(contentSections[0]?.lastModified || '')}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );
