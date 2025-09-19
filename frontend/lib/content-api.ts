@@ -263,11 +263,13 @@ class ContentAPI {
       // The backend returns templates with section keys as keys
       // We need to convert them to match our ContentSection interface
       Object.entries(response.data).forEach(([sectionKey, templateData]: [string, any]) => {
+        const processedFields = this.transformFieldsToOptimizedStructure(templateData.fields || [], sectionKey);
+        
         templates[sectionKey] = {
           id: templateData.id, // Use the actual GUID from backend
           title: templateData.title,
           description: templateData.description,
-          fields: templateData.fields || [],
+          fields: processedFields,
           status: templateData.status || 'published',
           lastModified: templateData.lastModified,
           pageKey: templateData.pageKey
@@ -406,6 +408,101 @@ class ContentAPI {
     }
   }
 
+  // Transform fields from backend format to optimized bilingual structure
+  private transformFieldsToOptimizedStructure(fields: ContentField[], sectionKey: string): ContentField[] {
+    const transformedFields = fields.map(field => {
+      // Special handling for old team field in about section - convert to separate English/Arabic fields
+      if (sectionKey === 'about' && field.id === 'team' && field.type === 'array') {
+        console.log('🔄 Transforming old team field to separate English/Arabic fields:', field.value);
+        
+        // Check if team members are in old format (Arabic only) or bilingual format
+        if (field.value && field.value.length > 0) {
+          const firstMember = field.value[0];
+          const isAlreadyBilingual = firstMember.name && typeof firstMember.name === 'object' && firstMember.name.en !== undefined;
+          
+          if (isAlreadyBilingual) {
+            // Convert bilingual format to separate fields
+            console.log('🔄 Converting bilingual team format to separate fields');
+            const englishTeam = field.value.map((member: any) => ({
+              name: member.name.en || member.name,
+              position: member.position.en || member.position,
+              bio: member.bio.en || member.bio
+            }));
+            
+            const arabicTeam = field.value.map((member: any) => ({
+              name: member.name.ar || member.name,
+              position: member.position.ar || member.position,
+              bio: member.bio.ar || member.bio
+            }));
+            
+            // Return both English and Arabic fields
+            return [
+              {
+                id: 'team-members-en',
+                label: 'Team Members (English)',
+                type: 'array' as const,
+                value: englishTeam,
+                required: false
+              },
+              {
+                id: 'team-members-ar',
+                label: 'Team Members (Arabic)',
+                type: 'array' as const,
+                value: arabicTeam,
+                required: false
+              }
+            ];
+          } else {
+            // Convert old Arabic-only format to separate fields
+            console.log('🔄 Converting Arabic-only team format to separate fields');
+            const englishTeam = field.value.map((member: any) => ({
+              name: this.getEnglishEquivalent(member.name) || member.name,
+              position: this.getEnglishEquivalent(member.position) || member.position,
+              bio: this.getEnglishEquivalent(member.bio) || member.bio
+            }));
+            
+            // Return both English and Arabic fields
+            return [
+              {
+                id: 'team-members-en',
+                label: 'Team Members (English)',
+                type: 'array' as const,
+                value: englishTeam,
+                required: false
+              },
+              {
+                id: 'team-members-ar',
+                label: 'Team Members (Arabic)',
+                type: 'array' as const,
+                value: field.value, // Keep original Arabic data
+                required: false
+              }
+            ];
+          }
+        }
+      }
+      
+      return field;
+    });
+    
+    // Flatten the array in case we returned multiple fields for team
+    return transformedFields.flat();
+  }
+
+  // Get English equivalent for Arabic text (fallback mapping)
+  private getEnglishEquivalent(arabicText: string): string {
+    const translations: Record<string, string> = {
+      'أحمد محمد': 'Ahmed Mohammed',
+      'فاطمة علي': 'Fatima Ali',
+      'المدير التنفيذي': 'Chief Executive Officer',
+      'مدير التدريب': 'Training Manager',
+      'خبرة 15 عام في التدريب': '15 years of experience in training',
+      'خبرة 10 أعوام في تطوير المناهج': '10 years of experience in curriculum development'
+    };
+    
+    return translations[arabicText] || arabicText;
+  }
+
   // Mock data for development
   private getMockContentPages(): ContentPage[] {
     return [
@@ -525,9 +622,18 @@ class ContentAPI {
             label: 'Features',
             type: 'array',
             value: [
-              { title: 'دورات متقدمة', description: 'أحدث التقنيات والمناهج' },
-              { title: 'مدربون خبراء', description: 'خبرة واسعة في المجال' },
-              { title: 'دعم متواصل', description: 'مساعدة على مدار الساعة' }
+              { 
+                title: { en: 'Advanced Courses', ar: 'دورات متقدمة' }, 
+                description: { en: 'Latest technologies and methodologies', ar: 'أحدث التقنيات والمناهج' }
+              },
+              { 
+                title: { en: 'Expert Trainers', ar: 'مدربون خبراء' }, 
+                description: { en: 'Extensive experience in the field', ar: 'خبرة واسعة في المجال' }
+              },
+              { 
+                title: { en: 'Continuous Support', ar: 'دعم متواصل' }, 
+                description: { en: '24/7 assistance available', ar: 'مساعدة على مدار الساعة' }
+              }
             ],
             required: true
           },
@@ -536,8 +642,16 @@ class ContentAPI {
             label: 'Testimonials',
             type: 'array',
             value: [
-              { name: 'أحمد علي', role: 'طالب', text: 'تجربة تدريبية ممتازة' },
-              { name: 'سارة جونسون', role: 'مدير', text: 'مهني وفعال' }
+              { 
+                name: { en: 'Ahmed Ali', ar: 'أحمد علي' }, 
+                role: { en: 'Student', ar: 'طالب' }, 
+                text: { en: 'Excellent training experience', ar: 'تجربة تدريبية ممتازة' }
+              },
+              { 
+                name: { en: 'Sarah Johnson', ar: 'سارة جونسون' }, 
+                role: { en: 'Manager', ar: 'مدير' }, 
+                text: { en: 'Professional and effective', ar: 'مهني وفعال' }
+              }
             ],
             required: false
           }
@@ -552,45 +666,44 @@ class ContentAPI {
         pageKey: 'courses',
         fields: [
           {
-            id: 'page-title-en',
-            label: 'Page Title (English)',
+            id: 'page-title',
+            label: 'Page Title',
             type: 'text',
-            value: 'Our Courses',
+            value: {
+              en: 'Our Courses',
+              ar: 'دوراتنا'
+            },
             required: true,
-            placeholder: 'Enter page title in English'
+            placeholder: 'Enter page title'
           },
           {
-            id: 'page-title-ar',
-            label: 'Page Title (Arabic)',
-            type: 'text',
-            value: 'دوراتنا',
-            required: true,
-            placeholder: 'Enter page title in Arabic'
-          },
-          {
-            id: 'page-description-en',
-            label: 'Page Description (English)',
+            id: 'page-description',
+            label: 'Page Description',
             type: 'textarea',
-            value: 'Discover our comprehensive collection of professional development courses',
+            value: {
+              en: 'Discover our comprehensive collection of professional development courses',
+              ar: 'اكتشف مجموعتنا الشاملة من دورات التطوير المهني'
+            },
             required: true,
-            placeholder: 'Enter page description in English'
-          },
-          {
-            id: 'page-description-ar',
-            label: 'Page Description (Arabic)',
-            type: 'textarea',
-            value: 'اكتشف مجموعتنا الشاملة من دورات التطوير المهني',
-            required: true,
-            placeholder: 'Enter page description in Arabic'
+            placeholder: 'Enter page description'
           },
           {
             id: 'categories',
             label: 'Course Categories',
             type: 'array',
             value: [
-              { name: 'التصميم الجرافيكي', description: 'دورات تصميم احترافية' },
-              { name: 'تطوير الويب', description: 'مهارات تطوير حديثة' },
-              { name: 'التسويق الرقمي', description: 'استراتيجيات وأدوات التسويق' }
+              { 
+                name: { en: 'Graphic Design', ar: 'التصميم الجرافيكي' }, 
+                description: { en: 'Professional design courses', ar: 'دورات تصميم احترافية' }
+              },
+              { 
+                name: { en: 'Web Development', ar: 'تطوير الويب' }, 
+                description: { en: 'Modern development skills', ar: 'مهارات تطوير حديثة' }
+              },
+              { 
+                name: { en: 'Digital Marketing', ar: 'التسويق الرقمي' }, 
+                description: { en: 'Marketing strategies and tools', ar: 'استراتيجيات وأدوات التسويق' }
+              }
             ],
             required: true
           }
@@ -605,60 +718,71 @@ class ContentAPI {
         pageKey: 'about',
         fields: [
           {
-            id: 'company-name-en',
-            label: 'Company Name (English)',
+            id: 'company-name',
+            label: 'Company Name',
             type: 'text',
-            value: 'Ersa Training',
+            value: {
+              en: 'Ersa Training',
+              ar: 'إرساء للتدريب'
+            },
             required: true,
-            placeholder: 'Enter company name in English'
+            placeholder: 'Enter company name'
           },
           {
-            id: 'company-name-ar',
-            label: 'Company Name (Arabic)',
-            type: 'text',
-            value: 'إرساء للتدريب',
-            required: true,
-            placeholder: 'Enter company name in Arabic'
-          },
-          {
-            id: 'mission-en',
-            label: 'Mission Statement (English)',
+            id: 'mission-statement',
+            label: 'Mission Statement',
             type: 'textarea',
-            value: 'Empowering individuals and organizations through world-class training solutions',
+            value: {
+              en: 'Empowering individuals and organizations through world-class training solutions',
+              ar: 'تمكين الأفراد والمنظمات من خلال حلول تدريبية عالمية المستوى'
+            },
             required: true,
-            placeholder: 'Enter company mission in English'
+            placeholder: 'Enter company mission'
           },
           {
-            id: 'mission-ar',
-            label: 'Mission Statement (Arabic)',
+            id: 'vision-statement',
+            label: 'Vision Statement',
             type: 'textarea',
-            value: 'تمكين الأفراد والمنظمات من خلال حلول تدريبية عالمية المستوى',
+            value: {
+              en: 'To be the preferred training partner in the region',
+              ar: 'أن نكون الشريك التدريبي المفضل في المنطقة'
+            },
             required: true,
-            placeholder: 'Enter company mission in Arabic'
+            placeholder: 'Enter company vision'
           },
           {
-            id: 'vision-en',
-            label: 'Vision Statement (English)',
-            type: 'textarea',
-            value: 'To be the preferred training partner in the region',
-            required: true,
-            placeholder: 'Enter company vision in English'
-          },
-          {
-            id: 'vision-ar',
-            label: 'Vision Statement (Arabic)',
-            type: 'textarea',
-            value: 'أن نكون الشريك التدريبي المفضل في المنطقة',
-            required: true,
-            placeholder: 'Enter company vision in Arabic'
-          },
-          {
-            id: 'team',
-            label: 'Team Members',
+            id: 'team-members-en',
+            label: 'Team Members (English)',
             type: 'array',
             value: [
-              { name: 'أحمد محمد', position: 'المدير التنفيذي', bio: 'خبرة 15 عام في التدريب' },
-              { name: 'فاطمة علي', position: 'مدير التدريب', bio: 'خبرة 10 أعوام في تطوير المناهج' }
+              { 
+                name: 'Ahmed Mohammed', 
+                position: 'Chief Executive Officer', 
+                bio: '15 years of experience in training'
+              },
+              { 
+                name: 'Fatima Ali', 
+                position: 'Training Manager', 
+                bio: '10 years of experience in curriculum development'
+              }
+            ],
+            required: false
+          },
+          {
+            id: 'team-members-ar',
+            label: 'Team Members (Arabic)',
+            type: 'array',
+            value: [
+              { 
+                name: 'أحمد محمد', 
+                position: 'المدير التنفيذي', 
+                bio: 'خبرة 15 عام في التدريب'
+              },
+              { 
+                name: 'فاطمة علي', 
+                position: 'مدير التدريب', 
+                bio: 'خبرة 10 أعوام في تطوير المناهج'
+              }
             ],
             required: false
           }
@@ -673,36 +797,26 @@ class ContentAPI {
         pageKey: 'home',
         fields: [
           {
-            id: 'title-en',
-            label: 'Services Title (English)',
+            id: 'services-title',
+            label: 'Services Title',
             type: 'text',
-            value: 'Our Services',
+            value: {
+              en: 'Our Services',
+              ar: 'خدماتنا'
+            },
             required: true,
-            placeholder: 'Enter services title in English'
+            placeholder: 'Enter services title'
           },
           {
-            id: 'title-ar',
-            label: 'Services Title (Arabic)',
-            type: 'text',
-            value: 'خدماتنا',
-            required: true,
-            placeholder: 'Enter services title in Arabic'
-          },
-          {
-            id: 'description-en',
-            label: 'Services Description (English)',
+            id: 'services-description',
+            label: 'Services Description',
             type: 'textarea',
-            value: 'We offer comprehensive training and consultancy services',
+            value: {
+              en: 'We offer comprehensive training and consultancy services',
+              ar: 'نقدم خدمات تدريبية واستشارية شاملة'
+            },
             required: true,
-            placeholder: 'Enter services description in English'
-          },
-          {
-            id: 'description-ar',
-            label: 'Services Description (Arabic)',
-            type: 'textarea',
-            value: 'نقدم خدمات تدريبية واستشارية شاملة',
-            required: true,
-            placeholder: 'Enter services description in Arabic'
+            placeholder: 'Enter services description'
           }
         ]
       },
@@ -715,36 +829,26 @@ class ContentAPI {
         pageKey: 'contact',
         fields: [
           {
-            id: 'title-en',
-            label: 'Contact Title (English)',
+            id: 'contact-title',
+            label: 'Contact Title',
             type: 'text',
-            value: 'Get in Touch',
+            value: {
+              en: 'Get in Touch',
+              ar: 'تواصل معنا'
+            },
             required: true,
-            placeholder: 'Enter contact title in English'
+            placeholder: 'Enter contact title'
           },
           {
-            id: 'title-ar',
-            label: 'Contact Title (Arabic)',
+            id: 'address',
+            label: 'Address',
             type: 'text',
-            value: 'تواصل معنا',
+            value: {
+              en: 'Riyadh, Saudi Arabia',
+              ar: 'الرياض، المملكة العربية السعودية'
+            },
             required: true,
-            placeholder: 'Enter contact title in Arabic'
-          },
-          {
-            id: 'address-en',
-            label: 'Address (English)',
-            type: 'text',
-            value: 'Riyadh, Saudi Arabia',
-            required: true,
-            placeholder: 'Enter address in English'
-          },
-          {
-            id: 'address-ar',
-            label: 'Address (Arabic)',
-            type: 'text',
-            value: 'الرياض، المملكة العربية السعودية',
-            required: true,
-            placeholder: 'Enter address in Arabic'
+            placeholder: 'Enter address'
           },
           {
             id: 'phone',
@@ -773,43 +877,32 @@ class ContentAPI {
         pageKey: 'faq',
         fields: [
           {
-            id: 'faq-title-en',
-            label: 'FAQ Title (English)',
+            id: 'faq-title',
+            label: 'FAQ Title',
             type: 'text',
-            value: 'Frequently Asked Questions',
+            value: {
+              en: 'Frequently Asked Questions',
+              ar: 'الأسئلة الشائعة'
+            },
             required: true,
-            placeholder: 'Enter FAQ title in English'
+            placeholder: 'Enter FAQ title'
           },
           {
-            id: 'faq-title-ar',
-            label: 'FAQ Title (Arabic)',
-            type: 'text',
-            value: 'الأسئلة الشائعة',
-            required: true,
-            placeholder: 'Enter FAQ title in Arabic'
-          },
-          {
-            id: 'faqs',
+            id: 'faq-items',
             label: 'FAQ Items',
             type: 'array',
             value: [
               { 
-                question: 'How do I enroll in a course?', 
-                answer: 'You can enroll through our website or contact us directly.',
-                questionAr: 'كيف يمكنني التسجيل في دورة؟',
-                answerAr: 'يمكنك التسجيل من خلال موقعنا الإلكتروني أو التواصل معنا مباشرة.'
+                question: { en: 'How do I enroll in a course?', ar: 'كيف يمكنني التسجيل في دورة؟' },
+                answer: { en: 'You can enroll through our website or contact us directly.', ar: 'يمكنك التسجيل من خلال موقعنا الإلكتروني أو التواصل معنا مباشرة.' }
               },
               { 
-                question: 'What payment methods do you accept?', 
-                answer: 'We accept credit cards, bank transfers, and online payments.',
-                questionAr: 'ما هي طرق الدفع المقبولة؟',
-                answerAr: 'نقبل بطاقات الائتمان والتحويلات البنكية والمدفوعات الإلكترونية.'
+                question: { en: 'What payment methods do you accept?', ar: 'ما هي طرق الدفع المقبولة؟' },
+                answer: { en: 'We accept credit cards, bank transfers, and online payments.', ar: 'نقبل بطاقات الائتمان والتحويلات البنكية والمدفوعات الإلكترونية.' }
               },
               { 
-                question: 'Do you offer certificates?', 
-                answer: 'Yes, we provide certificates of completion for all our courses.',
-                questionAr: 'هل تقدمون شهادات؟',
-                answerAr: 'نعم، نقدم شهادات إتمام لجميع دوراتنا.'
+                question: { en: 'Do you offer certificates?', ar: 'هل تقدمون شهادات؟' },
+                answer: { en: 'Yes, we provide certificates of completion for all our courses.', ar: 'نعم، نقدم شهادات إتمام لجميع دوراتنا.' }
               }
             ],
             required: true
@@ -825,36 +918,26 @@ class ContentAPI {
         pageKey: 'home',
         fields: [
           {
-            id: 'title-en',
-            label: 'Consultation Title (English)',
+            id: 'consultation-title',
+            label: 'Consultation Title',
             type: 'text',
-            value: 'Consultation Services',
+            value: {
+              en: 'Consultation Services',
+              ar: 'خدمات الاستشارة'
+            },
             required: true,
-            placeholder: 'Enter consultation title in English'
+            placeholder: 'Enter consultation title'
           },
           {
-            id: 'title-ar',
-            label: 'Consultation Title (Arabic)',
-            type: 'text',
-            value: 'خدمات الاستشارة',
-            required: true,
-            placeholder: 'Enter consultation title in Arabic'
-          },
-          {
-            id: 'description-en',
-            label: 'Consultation Description (English)',
+            id: 'consultation-description',
+            label: 'Consultation Description',
             type: 'textarea',
-            value: 'Professional consultation services tailored to your needs',
+            value: {
+              en: 'Professional consultation services tailored to your needs',
+              ar: 'خدمات استشارية مهنية مصممة خصيصاً لاحتياجاتك'
+            },
             required: true,
-            placeholder: 'Enter consultation description in English'
-          },
-          {
-            id: 'description-ar',
-            label: 'Consultation Description (Arabic)',
-            type: 'textarea',
-            value: 'خدمات استشارية مهنية مصممة خصيصاً لاحتياجاتك',
-            required: true,
-            placeholder: 'Enter consultation description in Arabic'
+            placeholder: 'Enter consultation description'
           }
         ]
       }
@@ -864,5 +947,3 @@ class ContentAPI {
 
 export const contentApi = new ContentAPI();
 export default contentApi;
-
-

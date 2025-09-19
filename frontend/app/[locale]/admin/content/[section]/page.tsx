@@ -84,6 +84,30 @@ export default function ContentEditor() {
           
           if (templates[sectionId]) {
             console.log('Found section:', templates[sectionId]);
+            
+            // Debug: Log team field specifically for about section
+            if (sectionId === 'about') {
+              const teamField = templates[sectionId].fields.find(f => f.id === 'team' || f.id === 'team-members');
+              console.log('🔍 Team field found:', teamField);
+              if (teamField) {
+                console.log('🔍 Team field value:', teamField.value);
+                console.log('🔍 First team member:', teamField.value[0]);
+                if (teamField.value[0]) {
+                  console.log('🔍 First team member name:', teamField.value[0].name);
+                  console.log('🔍 Is name bilingual?', typeof teamField.value[0].name === 'object' && teamField.value[0].name.en !== undefined);
+                  
+                  // Check if transformation worked
+                  if (typeof teamField.value[0].name === 'object' && teamField.value[0].name.en !== undefined) {
+                    console.log('✅ Team data is properly bilingual!');
+                    console.log('🔍 English name:', teamField.value[0].name.en);
+                    console.log('🔍 Arabic name:', teamField.value[0].name.ar);
+                  } else {
+                    console.log('❌ Team data is still not bilingual');
+                  }
+                }
+              }
+            }
+            
             setSection(templates[sectionId]);
           } else {
             console.log('Section not found, available sections:', Object.keys(templates));
@@ -193,9 +217,26 @@ export default function ContentEditor() {
     const field = section.fields.find(f => f.id === fieldId);
     if (!field || field.type !== 'array') return;
 
-    const newItem = field.value.length > 0 
-      ? Object.keys(field.value[0]).reduce((acc, key) => ({ ...acc, [key]: '' }), {})
-      : { title: '', description: '' };
+    let newItem: any = {};
+    
+    if (field.value.length > 0) {
+      // Create new item based on the structure of existing items
+      const firstItem = field.value[0];
+      Object.keys(firstItem).forEach(key => {
+        const itemValue = firstItem[key];
+        // Check if this property has bilingual structure
+        if (itemValue && typeof itemValue === 'object' && itemValue.en !== undefined && itemValue.ar !== undefined) {
+          // Create bilingual structure for new item
+          newItem[key] = { en: '', ar: '' };
+        } else {
+          // Create regular property
+          newItem[key] = '';
+        }
+      });
+    } else {
+      // Default structure if no items exist
+      newItem = { title: '', description: '' };
+    }
 
     const updatedArray = [...field.value, newItem];
     handleFieldChange(fieldId, updatedArray);
@@ -345,7 +386,7 @@ export default function ContentEditor() {
           <h3 className="text-lg font-medium text-gray-900 mb-2">
             {locale === 'ar' ? 'خطأ في تحميل المحتوى' : 'Error Loading Content'}
           </h3>
-          <p className="text-gray-500 mb-4">
+          <p className="text-sm text-gray-600">
             {locale === 'ar' ? 'فشل في تحميل محتوى الصفحة' : 'Failed to load page content'}
           </p>
           <button
@@ -407,7 +448,7 @@ export default function ContentEditor() {
                   <input
                     key={key}
                     type="text"
-                    value={item[key]}
+                    value={item[key] || ''}
                     onChange={(e) => handleArrayItemChange(field.id, index, key, e.target.value)}
                     placeholder={key.charAt(0).toUpperCase() + key.slice(1)}
                     className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -448,6 +489,11 @@ export default function ContentEditor() {
         );
     }
   };
+
+  // Check if any fields have bilingual structure
+  const hasBilingualFields = section?.fields?.some(field => 
+    field.value && typeof field.value === 'object' && field.value.en !== undefined && field.value.ar !== undefined
+  ) || false;
 
   return (
     <div className="bg-white min-h-screen" dir={isRTL ? 'rtl' : 'ltr'}>
@@ -515,29 +561,29 @@ export default function ContentEditor() {
                 </button>
               ) : (
                 <div className="flex gap-2">
-                                     <button
-                     onClick={() => {
-                       setIsEditing(false);
-                       setHasChanges(false);
-                       // Reset to original values from API
-                       const resetSection = async () => {
-                         try {
-                           const templates = await contentApi.getContentTemplates();
-                           if (templates[section.id]) {
-                             setSection(templates[section.id]);
-                           }
-                         } catch (error) {
-                           console.error('Error resetting content:', error);
-                           // If reset fails, just close editing mode
-                           toast.error(locale === 'ar' ? 'فشل في إعادة تعيين المحتوى' : 'Failed to reset content');
-                         }
-                       };
-                       resetSection();
-                     }}
-                     className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                   >
-                     {locale === 'ar' ? 'إلغاء' : 'Cancel'}
-                   </button>
+                  <button
+                    onClick={() => {
+                      setIsEditing(false);
+                      setHasChanges(false);
+                      // Reset to original values from API
+                      const resetSection = async () => {
+                        try {
+                          const templates = await contentApi.getContentTemplates();
+                          if (templates[section.id]) {
+                            setSection(templates[section.id]);
+                          }
+                        } catch (error) {
+                          console.error('Error resetting content:', error);
+                          // If reset fails, just close editing mode
+                          toast.error(locale === 'ar' ? 'فشل في إعادة تعيين المحتوى' : 'Failed to reset content');
+                        }
+                      };
+                      resetSection();
+                    }}
+                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                  >
+                    {locale === 'ar' ? 'إلغاء' : 'Cancel'}
+                  </button>
                   <button
                     onClick={handleSave}
                     disabled={isSaving || !hasChanges}
@@ -557,6 +603,28 @@ export default function ContentEditor() {
                   </button>
                 </div>
               )}
+              
+              {/* Reinitialize Data Button - for debugging */}
+              <button
+                onClick={async () => {
+                  try {
+                    console.log('🔄 Reinitializing sample data...');
+                    await contentApi.reinitializeSampleData();
+                    toast.success(locale === 'ar' ? 'تم إعادة تهيئة البيانات بنجاح' : 'Data reinitialized successfully');
+                    // Reload the section
+                    const templates = await contentApi.getContentTemplates();
+                    if (templates[section.id]) {
+                      setSection(templates[section.id]);
+                    }
+                  } catch (error) {
+                    console.error('Error reinitializing data:', error);
+                    toast.error(locale === 'ar' ? 'فشل في إعادة تهيئة البيانات' : 'Failed to reinitialize data');
+                  }
+                }}
+                className="px-3 py-1 text-xs bg-orange-100 text-orange-700 rounded hover:bg-orange-200 transition-colors"
+              >
+                {locale === 'ar' ? 'إعادة تهيئة البيانات' : 'Reinit Data'}
+              </button>
             </div>
           </div>
         </div>
@@ -564,44 +632,85 @@ export default function ContentEditor() {
         {/* Content Editor */}
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm">
           <div className="px-6 py-4 border-b border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900">
-              {locale === 'ar' ? 'محرر المحتوى' : 'Content Editor'}
-            </h3>
-            <p className="text-sm text-gray-600">
-              {locale === 'ar' 
-                ? 'قم بتعديل محتوى هذه الصفحة حسب الحاجة' 
-                : 'Edit the content of this page as needed'
-              }
-            </p>
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {locale === 'ar' ? 'محرر المحتوى' : 'Content Editor'}
+                </h3>
+                <p className="text-sm text-gray-600">
+                  {locale === 'ar' 
+                    ? 'قم بتعديل محتوى هذه الصفحة حسب الحاجة' 
+                    : 'Edit the content of this page as needed'
+                  }
+                </p>
+              </div>
+              
+              {/* Data Refresh Button */}
+              {section.id === 'about' && (
+                <button
+                  onClick={async () => {
+                    try {
+                      console.log('🔄 Refreshing content data...');
+                      setIsLoading(true);
+                      
+                      // Try to reinitialize sample data first
+                      try {
+                        await contentApi.reinitializeSampleData();
+                        console.log('✅ Sample data reinitialized');
+                      } catch (reinitError) {
+                        console.log('⚠️ Reinit failed, continuing with refresh:', reinitError);
+                      }
+                      
+                      // Get fresh templates
+                      const templates = await contentApi.getContentTemplates();
+                      if (templates[section.id]) {
+                        setSection(templates[section.id]);
+                        toast.success(locale === 'ar' ? 'تم تحديث البيانات بنجاح' : 'Data refreshed successfully');
+                      }
+                    } catch (error) {
+                      console.error('Error refreshing data:', error);
+                      toast.error(locale === 'ar' ? 'فشل في تحديث البيانات' : 'Failed to refresh data');
+                    } finally {
+                      setIsLoading(false);
+                    }
+                  }}
+                  className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm"
+                >
+                  <Icon name="refresh" className="w-4 h-4 inline mr-2" />
+                  {locale === 'ar' ? 'تحديث البيانات' : 'Refresh Data'}
+                </button>
+              )}
+            </div>
           </div>
           
           <div className="p-6">
-          {/* Language Switcher */}
-          <div className="mb-6 border-b border-gray-200">
-            <nav className="-mb-px flex space-x-8" aria-label="Tabs">
-              <button
-                onClick={() => setActiveLang('en')}
-                className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeLang === 'en'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                English
-              </button>
-              <button
-                onClick={() => setActiveLang('ar')}
-                className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeLang === 'ar'
-                    ? 'border-blue-500 text-blue-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                }`}
-              >
-                Arabic
-              </button>
-            </nav>
-          </div>
-
+          {/* Language Switcher - Only show if there are bilingual fields */}
+          {hasBilingualFields && (
+            <div className="mb-6 border-b border-gray-200">
+              <nav className="-mb-px flex space-x-8" aria-label="Tabs">
+                <button
+                  onClick={() => setActiveLang('en')}
+                  className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                    activeLang === 'en'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  English
+                </button>
+                <button
+                  onClick={() => setActiveLang('ar')}
+                  className={`whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm ${
+                    activeLang === 'ar'
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  Arabic
+                </button>
+              </nav>
+            </div>
+          )}
           <div className="space-y-6">
             {section.fields.map((field) => (
               <motion.div
