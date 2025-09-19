@@ -461,8 +461,9 @@ class ContentAPI {
         return field;
       }
       
-      // Special handling for Hero section arrays (Features, Testimonials) - group by item type
-      if (sectionKey === 'hero' && (field.id === 'features' || field.id === 'testimonials') && field.type === 'array') {
+      // Special handling for arrays that should be grouped by item type (Hero section and Courses section)
+      if ((sectionKey === 'hero' && (field.id === 'features' || field.id === 'testimonials')) || 
+          (sectionKey === 'courses' && field.id === 'categories') && field.type === 'array') {
         console.log(`🔄 FORCING transformation of Hero ${field.id} to bilingual items:`, field.value);
         
         if (field.id === 'features') {
@@ -521,6 +522,37 @@ class ContentAPI {
             label: 'Testimonials',
             type: 'array' as const,
             value: bilingualTestimonials,
+            required: field.required || false
+          };
+        }
+        
+        if (field.id === 'categories') {
+          const bilingualCategories = [
+            { 
+              nameEn: 'Graphic Design',
+              nameAr: 'التصميم الجرافيكي',
+              descriptionEn: 'Professional design courses',
+              descriptionAr: 'دورات تصميم احترافية'
+            },
+            { 
+              nameEn: 'Web Development',
+              nameAr: 'تطوير الويب',
+              descriptionEn: 'Modern development skills',
+              descriptionAr: 'مهارات تطوير حديثة'
+            },
+            { 
+              nameEn: 'Digital Marketing',
+              nameAr: 'التسويق الرقمي',
+              descriptionEn: 'Marketing strategies and tools',
+              descriptionAr: 'استراتيجيات وأدوات التسويق'
+            }
+          ];
+          
+          return {
+            id: 'categories',
+            label: 'Course Categories',
+            type: 'array' as const,
+            value: bilingualCategories,
             required: field.required || false
           };
         }

@@ -141,7 +141,7 @@ export default function ContentEditor() {
           } else {
             console.log('❌ Section not found, available sections:', Object.keys(templates));
             
-            // Special fallback for consultation section
+            // Special fallback for missing sections
             if (sectionId === 'consultation') {
               console.log('🔄 Creating fallback consultation section...');
               const fallbackConsultation = {
@@ -188,6 +188,146 @@ export default function ContentEditor() {
               };
               setSection(fallbackConsultation);
               console.log('✅ Fallback consultation section created');
+              return;
+            }
+            
+            if (sectionId === 'courses') {
+              console.log('🔄 Creating fallback courses section...');
+              const fallbackCourses = {
+                id: 'courses',
+                title: 'Course Management',
+                description: 'Course descriptions, curriculum, and enrollment details with bilingual content',
+                status: 'published' as const,
+                lastModified: new Date().toISOString(),
+                pageKey: 'courses',
+                fields: [
+                  {
+                    id: 'page-title-en',
+                    label: 'Page Title (English)',
+                    type: 'text' as const,
+                    value: 'Our Courses',
+                    required: true,
+                    placeholder: 'Enter page title in English'
+                  },
+                  {
+                    id: 'page-title-ar',
+                    label: 'Page Title (Arabic)',
+                    type: 'text' as const,
+                    value: 'دوراتنا',
+                    required: true,
+                    placeholder: 'Enter page title in Arabic'
+                  },
+                  {
+                    id: 'page-description-en',
+                    label: 'Page Description (English)',
+                    type: 'textarea' as const,
+                    value: 'Discover our comprehensive collection of professional development courses',
+                    required: true,
+                    placeholder: 'Enter page description in English'
+                  },
+                  {
+                    id: 'page-description-ar',
+                    label: 'Page Description (Arabic)',
+                    type: 'textarea' as const,
+                    value: 'اكتشف مجموعتنا الشاملة من دورات التطوير المهني',
+                    required: true,
+                    placeholder: 'Enter page description in Arabic'
+                  },
+                  {
+                    id: 'categories',
+                    label: 'Course Categories',
+                    type: 'array' as const,
+                    value: [
+                      { 
+                        nameEn: 'Graphic Design',
+                        nameAr: 'التصميم الجرافيكي',
+                        descriptionEn: 'Professional design courses',
+                        descriptionAr: 'دورات تصميم احترافية'
+                      },
+                      { 
+                        nameEn: 'Web Development',
+                        nameAr: 'تطوير الويب',
+                        descriptionEn: 'Modern development skills',
+                        descriptionAr: 'مهارات تطوير حديثة'
+                      },
+                      { 
+                        nameEn: 'Digital Marketing',
+                        nameAr: 'التسويق الرقمي',
+                        descriptionEn: 'Marketing strategies and tools',
+                        descriptionAr: 'استراتيجيات وأدوات التسويق'
+                      }
+                    ],
+                    required: true
+                  }
+                ]
+              };
+              setSection(fallbackCourses);
+              console.log('✅ Fallback courses section created');
+              return;
+            }
+            
+            if (sectionId === 'contact') {
+              console.log('🔄 Creating fallback contact section...');
+              const fallbackContact = {
+                id: 'contact',
+                title: 'Contact Information',
+                description: 'Contact details and location with bilingual content',
+                status: 'published' as const,
+                lastModified: new Date().toISOString(),
+                pageKey: 'contact',
+                fields: [
+                  {
+                    id: 'contact-title-en',
+                    label: 'Contact Title (English)',
+                    type: 'text' as const,
+                    value: 'Get in Touch',
+                    required: true,
+                    placeholder: 'Enter contact title in English'
+                  },
+                  {
+                    id: 'contact-title-ar',
+                    label: 'Contact Title (Arabic)',
+                    type: 'text' as const,
+                    value: 'تواصل معنا',
+                    required: true,
+                    placeholder: 'Enter contact title in Arabic'
+                  },
+                  {
+                    id: 'address-en',
+                    label: 'Address (English)',
+                    type: 'text' as const,
+                    value: 'Riyadh, Saudi Arabia',
+                    required: true,
+                    placeholder: 'Enter address in English'
+                  },
+                  {
+                    id: 'address-ar',
+                    label: 'Address (Arabic)',
+                    type: 'text' as const,
+                    value: 'الرياض، المملكة العربية السعودية',
+                    required: true,
+                    placeholder: 'Enter address in Arabic'
+                  },
+                  {
+                    id: 'phone',
+                    label: 'Phone Number',
+                    type: 'text' as const,
+                    value: '+966 XX XXX XXXX',
+                    required: true,
+                    placeholder: 'Enter phone number'
+                  },
+                  {
+                    id: 'email',
+                    label: 'Email Address',
+                    type: 'text' as const,
+                    value: 'info@ersatraining.com',
+                    required: true,
+                    placeholder: 'Enter email address'
+                  }
+                ]
+              };
+              setSection(fallbackContact);
+              console.log('✅ Fallback contact section created');
               return;
             }
             // If no templates exist, try to initialize sample data
@@ -321,6 +461,13 @@ export default function ContentEditor() {
         roleAr: '', 
         textEn: '', 
         textAr: '' 
+      };
+    } else if (fieldId === 'categories') {
+      newItem = { 
+        nameEn: '', 
+        nameAr: '', 
+        descriptionEn: '', 
+        descriptionAr: '' 
       };
     } else if (field.value.length > 0) {
       // Create new item based on the structure of existing items
@@ -866,7 +1013,7 @@ export default function ContentEditor() {
               </div>
               
               {/* Data Refresh Button */}
-              {(section.id === 'about' || section.id === 'faq' || section.id === 'hero' || section.id === 'consultation') && (
+              {(section.id === 'about' || section.id === 'faq' || section.id === 'hero' || section.id === 'consultation' || section.id === 'courses' || section.id === 'contact') && (
                 <button
                   onClick={async () => {
                     try {
