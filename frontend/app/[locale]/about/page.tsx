@@ -3,6 +3,7 @@ import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { Metadata } from 'next';
+import contentApi from '@/lib/content-api';
 
 export async function generateMetadata({ params }: { params: { locale: string } }) {
   const t = await getTranslations('about');
@@ -17,54 +18,90 @@ export default async function AboutPage({ params }: { params: { locale: string }
   const { locale } = await Promise.resolve(params);
   const t = await getTranslations('about');
   
-  // Get values from translations
-  const values = [
-    {
-      title: t('values.excellence.title'),
-      description: t('values.excellence.description')
-    },
-    {
-      title: t('values.innovation.title'),
-      description: t('values.innovation.description')
-    },
-    {
-      title: t('values.integrity.title'),
-      description: t('values.integrity.description')
-    }
-  ];
+  // Fetch about page content from the API
+  let aboutContent;
+  try {
+    aboutContent = await contentApi.getAboutContent(locale);
+  } catch (error) {
+    console.error('Error loading about content:', error);
+    // Fallback to default content if API fails
+    aboutContent = {
+      title: locale === 'ar' ? 'من نحن' : 'About Us',
+      subtitle: locale === 'ar' ? 'تعرف على مهمتنا وقيمنا' : 'Learn more about our mission and values',
+      vision: {
+        title: locale === 'ar' ? 'رؤيتنا' : 'Our Vision',
+        description: locale === 'ar' 
+          ? 'أن نكون مزود التدريب الرائد في المنطقة'
+          : 'To be the leading training provider in the region'
+      },
+      mission: {
+        title: locale === 'ar' ? 'مهمتنا' : 'Our Mission',
+        description: locale === 'ar'
+          ? 'تمكين الأفراد والمنظمات من خلال برامج التدريب والتطوير عالية الجودة'
+          : 'To empower individuals and organizations through high-quality training and development programs'
+      },
+      values: [
+        {
+          title: locale === 'ar' ? 'التميز' : 'Excellence',
+          description: locale === 'ar'
+            ? 'نسعى للتميز في كل ما نقوم به'
+            : 'We strive for excellence in everything we do'
+        },
+        {
+          title: locale === 'ar' ? 'الابتكار' : 'Innovation',
+          description: locale === 'ar'
+            ? 'نعتمد الابتكار في مناهجنا التعليمية'
+            : 'We embrace innovation in our teaching methodologies'
+        },
+        {
+          title: locale === 'ar' ? 'النزاهة' : 'Integrity',
+          description: locale === 'ar'
+            ? 'نتميز بأعلى معايير النزاهة والاحترافية'
+            : 'We maintain the highest standards of integrity and professionalism'
+        }
+      ],
+      team: {
+        title: locale === 'ar' ? 'فريقنا' : 'Our Team',
+        members: [
+          {
+            name: locale === 'ar' ? 'أحمد محمد' : 'John Doe',
+            position: locale === 'ar' ? 'المدير التنفيذي' : 'CEO',
+            bio: locale === 'ar'
+              ? 'أكثر من 15 عامًا من الخبرة في مجال التدريب'
+              : 'Over 15 years of experience in training',
+            image: '/images/team/team-1.png'
+          },
+          {
+            name: locale === 'ar' ? 'سارة أحمد' : 'Jane Smith',
+            position: locale === 'ar' ? 'مدربة رئيسية' : 'Lead Trainer',
+            bio: locale === 'ar'
+              ? 'متخصصة في التطوير المهني والقيادة'
+              : 'Specialized in professional development and leadership',
+            image: '/images/team/team-2.png'
+          },
+          {
+            name: locale === 'ar' ? 'علي خالد' : 'Ahmed Ali',
+            position: locale === 'ar' ? 'مدرب تقني' : 'Technical Instructor',
+            bio: locale === 'ar'
+              ? 'خبير في التدريب التقني والتكنولوجيا الحديثة'
+              : 'Expert in technical training and modern technologies',
+            image: '/images/team/team-3.png'
+          }
+        ]
+      }
+    };
+  }
   
-  // Team members from translations
-  const teamMembers = [
-    {
-      name: t('team.members.ceo.name'),
-      position: t('team.members.ceo.position'),
-      bio: t('team.members.ceo.bio'),
-      image: '/images/team/team-1.png'
-    },
-    {
-      name: t('team.members.trainer.name'),
-      position: t('team.members.trainer.position'),
-      bio: t('team.members.trainer.bio'),
-      image: '/images/team/team-2.png'
-    },
-    {
-      name: t('team.members.instructor.name'),
-      position: t('team.members.instructor.position'),
-      bio: t('team.members.instructor.bio'),
-      image: '/images/team/team-3.png' 
-    }
-  ];
-
   return (
     <div className="bg-white py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Hero Section */}
         <div className="text-center mb-16">
           <h1 className="text-4xl font-extrabold text-gray-900 sm:text-5xl sm:tracking-tight lg:text-6xl">
-            {t('title')}
+            {aboutContent.title}
           </h1>
           <p className="mt-3 max-w-md mx-auto text-base text-gray-500 sm:text-lg md:mt-5 md:text-xl md:max-w-3xl">
-            {t('subtitle')}
+            {aboutContent.subtitle}
           </p>
         </div>
 
@@ -74,82 +111,39 @@ export default async function AboutPage({ params }: { params: { locale: string }
             <div className="grid md:grid-cols-2 gap-12">
               <div className={locale === 'ar' ? 'md:border-s-2 md:border-gray-200 md:ps-8' : 'md:border-e-2 md:border-gray-200 md:pe-8'}>
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                  {t('vision.title')}
+                  {aboutContent.vision.title}
                 </h2>
                 <p className="text-lg text-gray-600">
-                  {t('vision.description')}
+                  {aboutContent.vision.description}
                 </p>
               </div>
               <div>
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                  {t('mission.title')}
+                  {aboutContent.mission.title}
                 </h2>
                 <p className="text-lg text-gray-600">
-                  {t('mission.description')}
+                  {aboutContent.mission.description}
                 </p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Team Section */}
-        {teamMembers.length > 0 && (
-          <div className="mt-20">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-                {t('team.title')}
-              </h2>
-              <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
-                {t('team.subtitle')}
-              </p>
-            </div>
-
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
-              {teamMembers.map((member, index) => (
-                <div key={index} className="bg-white rounded-xl shadow-md overflow-hidden">
-                  <div className="h-48 bg-gray-200 relative">
-                    {member.image && (
-                      <Image
-                        src={member.image}
-                        alt={member.name}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      />
-                    )}
-                  </div>
-                  <div className="p-6">
-                    <h3 className="text-xl font-semibold text-gray-900">
-                      {member.name}
-                    </h3>
-                    <p className="text-indigo-600">
-                      {member.position}
-                    </p>
-                    <p className="mt-2 text-gray-600">
-                      {member.bio}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Values Section */}
-        <div className="mt-20 bg-gray-50 rounded-2xl p-8 md:p-12">
+        {/* Our Values */}
+        <div className="mt-20">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
-              {t('values.title')}
+              {locale === 'ar' ? 'قيمنا' : 'Our Values'}
             </h2>
-            <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
-              {t('values.subtitle')}
+            <p className="mt-4 text-xl text-gray-600">
+              {locale === 'ar' ? 'القيم التي نؤمن بها ونعمل من خلالها' : 'The values we believe in and work through'}
             </p>
           </div>
 
-          <div className="grid gap-8 md:grid-cols-3">
-            {values.map((value, index) => (
-              <div key={index} className="bg-white p-6 rounded-lg shadow-sm">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {aboutContent.values.map((value, index) => (
+              <div key={index} className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                <h3 className="text-xl font-semibold text-gray-900 mb-3">
                   {value.title}
                 </h3>
                 <p className="text-gray-600">
@@ -160,37 +154,42 @@ export default async function AboutPage({ params }: { params: { locale: string }
           </div>
         </div>
 
-        {/* CTA Section */}
-        <div className="mt-20 bg-indigo-700 rounded-2xl overflow-hidden">
-          <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8 lg:flex lg:items-center lg:justify-between">
-            <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-              <span className="block">
-                {t('cta.title')}
-              </span>
-              <span className="block text-indigo-200">
-                {t('cta.subtitle')}
-              </span>
-            </h2>
-            <div className="mt-8 flex lg:mt-0 lg:flex-shrink-0">
-              <div className="inline-flex rounded-md shadow">
-                <a
-                  href="/courses"
-                  className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-indigo-700 bg-indigo-100 hover:bg-indigo-200"
-                >
-                  {t('cta.browseCourses')}
-                </a>
-              </div>
-              <div className="ms-3 inline-flex rounded-md shadow">
-                <a
-                  href="/contact"
-                  className="inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 bg-opacity-60 hover:bg-opacity-70"
-                >
-                  {t('cta.contactUs')}
-                </a>
-              </div>
+        {/* Team Section */}
+        {aboutContent.team.members.length > 0 && (
+          <div className="mt-20">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+                {aboutContent.team.title}
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              {aboutContent.team.members.map((member, index) => (
+                <div key={index} className="bg-white rounded-lg overflow-hidden shadow-md">
+                  <div className="relative h-64 w-full">
+                    <Image
+                      src={member.image}
+                      alt={member.name}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-semibold text-gray-900">
+                      {member.name}
+                    </h3>
+                    <p className="text-primary-600 font-medium mt-1">
+                      {member.position}
+                    </p>
+                    <p className="mt-3 text-gray-600">
+                      {member.bio}
+                    </p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

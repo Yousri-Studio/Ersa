@@ -61,6 +61,339 @@ class ContentAPI {
       }
     );
   }
+  // Get About page content from database
+  async getAboutContent(locale: string = 'en') {
+    try {
+      // Fetch data from the correct API endpoint
+      console.log('🔄 Fetching about content from API...');
+      const response = await this.get<any>(`/Content/templates`);
+      
+      console.log('📦 API Response:', response);
+      
+      // The response is an object with section keys, not an array
+      const sectionsData = response.data;
+      console.log('📋 Available sections:', Object.keys(sectionsData));
+      
+      // Get the about section directly from the object
+      const aboutSection = sectionsData.about;
+      
+      if (!aboutSection) {
+        console.warn('❌ About section not found in templates, using default content');
+        console.log('Available section keys:', Object.keys(sectionsData));
+        return this.getDefaultAboutContent(locale);
+      }
+      
+      console.log('✅ Found about section:', aboutSection);
+      console.log('📝 Available fields:', aboutSection.fields?.map((f: any) => f.id || f.key));
+
+      // Helper function to get field value
+      const getFieldValue = (key: string, defaultValue: string = ''): string => {
+        const field = aboutSection.fields.find((f: any) => f.id === key || f.key === key);
+        console.log(`🔍 Looking for field '${key}':`, field ? 'Found' : 'Not found');
+        if (!field) {
+          console.log(`❌ Field '${key}' not found, using default: '${defaultValue}'`);
+          return defaultValue;
+        }
+        
+        console.log(`📄 Field '${key}' details:`, { type: field.type, value: field.value });
+        
+        // Handle bilingual content - check if value is an object with en/ar properties
+        if (field.value && typeof field.value === 'object' && (field.value.en || field.value.ar)) {
+          const result = field.value[locale] || field.value.en || defaultValue;
+          console.log(`🌐 Bilingual field '${key}' for locale '${locale}':`, result);
+          return result;
+        }
+        
+        // Handle regular content
+        const result = field.value || defaultValue;
+        console.log(`📝 Regular field '${key}':`, result);
+        return result;
+      };
+
+      // Return the transformed data structure
+      return {
+        title: getFieldValue('company-name', 
+          locale === 'ar' ? 'من نحن' : 'About Us'),
+        
+        subtitle: locale === 'ar' ? 'تعرف على مهمتنا وقيمنا' : 'Learn more about our mission and values',
+        
+        vision: {
+          title: locale === 'ar' ? 'رؤيتنا' : 'Our Vision',
+          description: getFieldValue('vision-statement',
+            locale === 'ar' 
+              ? 'أن نكون مزود التدريب الرائد في المنطقة'
+              : 'To be the leading training provider in the region')
+        },
+        
+        mission: {
+          title: locale === 'ar' ? 'مهمتنا' : 'Our Mission',
+          description: getFieldValue('mission-statement',
+            locale === 'ar'
+              ? 'تمكين الأفراد والمنظمات من خلال برامج التدريب والتطوير عالية الجودة'
+              : 'To empower individuals and organizations through high-quality training and development programs')
+        },
+        
+        values: [
+          {
+            title: locale === 'ar' ? 'التميز' : 'Excellence',
+            description: locale === 'ar'
+              ? 'نسعى للتميز في كل ما نقوم به'
+              : 'We strive for excellence in everything we do'
+          },
+          {
+            title: locale === 'ar' ? 'الابتكار' : 'Innovation',
+            description: locale === 'ar'
+              ? 'نعتمد الابتكار في مناهجنا التعليمية'
+              : 'We embrace innovation in our teaching methodologies'
+          },
+          {
+            title: locale === 'ar' ? 'النزاهة' : 'Integrity',
+            description: locale === 'ar'
+              ? 'نتميز بأعلى معايير النزاهة والاحترافية'
+              : 'We maintain the highest standards of integrity and professionalism'
+          }
+        ],
+        
+        team: {
+          title: locale === 'ar' ? 'فريقنا' : 'Our Team',
+          members: (() => {
+            const teamField = aboutSection.fields.find((f: any) => (f.id === 'team' || f.key === 'team'));
+            if (teamField && teamField.value && Array.isArray(teamField.value)) {
+              return teamField.value.map((member: any, index: number) => ({
+                name: locale === 'ar' ? (member.nameAr || member.name) : (member.name || member.nameEn),
+                position: locale === 'ar' ? (member.positionAr || member.position) : (member.position || member.positionEn),
+                bio: locale === 'ar' ? (member.bioAr || member.bio) : (member.bio || member.bioEn),
+                image: member.image || `/images/team/team-${index + 1}.png`
+              }));
+            }
+            // Fallback to default team members
+            return [
+              {
+                name: locale === 'ar' ? 'أحمد محمد' : 'John Doe',
+                position: locale === 'ar' ? 'المدير التنفيذي' : 'CEO',
+                bio: locale === 'ar'
+                  ? 'أكثر من 15 عامًا من الخبرة في مجال التدريب'
+                  : 'Over 15 years of experience in training',
+                image: '/images/team/team-1.png'
+              },
+              {
+                name: locale === 'ar' ? 'سارة أحمد' : 'Jane Smith',
+                position: locale === 'ar' ? 'مدربة رئيسية' : 'Lead Trainer',
+                bio: locale === 'ar'
+                  ? 'متخصصة في التطوير المهني والقيادة'
+                  : 'Specialized in professional development and leadership',
+                image: '/images/team/team-2.png'
+              },
+              {
+                name: locale === 'ar' ? 'علي خالد' : 'Ahmed Ali',
+                position: locale === 'ar' ? 'مدرب تقني' : 'Technical Instructor',
+                bio: locale === 'ar'
+                  ? 'خبير في التدريب التقني والتكنولوجيا الحديثة'
+                  : 'Expert in technical training and modern technologies',
+                image: '/images/team/team-3.png'
+              }
+            ];
+          })()
+        }
+      };
+
+    } catch (error) {
+      console.error('❌ Error fetching about content:', error);
+      console.error('🔄 Falling back to default content');
+      // Return default content in case of error
+      return this.getDefaultAboutContent(locale);
+    }
+  }
+
+  // Add the getDefaultAboutContent method
+  private getDefaultAboutContent(locale: string) {
+    return {
+      title: locale === 'ar' ? 'من نحن' : 'About Us',
+      subtitle: locale === 'ar' ? 'تعرف على مهمتنا وقيمنا' : 'Learn more about our mission and values',
+      vision: {
+        title: locale === 'ar' ? 'رؤيتنا' : 'Our Vision',
+        description: locale === 'ar' 
+          ? 'أن نكون مزود التدريب الرائد في المنطقة'
+          : 'To be the leading training provider in the region'
+      },
+      mission: {
+        title: locale === 'ar' ? 'مهمتنا' : 'Our Mission',
+        description: locale === 'ar' 
+          ? 'تمكين الأفراد والمنظمات من خلال برامج التدريب والتطوير عالية الجودة'
+          : 'To empower individuals and organizations through high-quality training and development programs'
+      },
+      values: [
+        {
+          title: locale === 'ar' ? 'التميز' : 'Excellence',
+          description: locale === 'ar' 
+            ? 'نسعى للتميز في كل ما نقوم به'
+            : 'We strive for excellence in everything we do'
+        },
+        {
+          title: locale === 'ar' ? 'الابتكار' : 'Innovation',
+          description: locale === 'ar' 
+            ? 'نعتمد الابتكار في مناهجنا التعليمية'
+            : 'We embrace innovation in our teaching methodologies'
+        },
+        {
+          title: locale === 'ar' ? 'النزاهة' : 'Integrity',
+          description: locale === 'ar' 
+            ? 'نتميز بأعلى معايير النزاهة والاحترافية'
+            : 'We maintain the highest standards of integrity and professionalism'
+        }
+      ],
+      team: {
+        title: locale === 'ar' ? 'فريقنا' : 'Our Team',
+        members: [
+          {
+            name: locale === 'ar' ? 'أحمد محمد' : 'John Doe',
+            position: locale === 'ar' ? 'المدير التنفيذي' : 'CEO',
+            bio: locale === 'ar' 
+              ? 'أكثر من 15 عامًا من الخبرة في مجال التدريب'
+              : 'Over 15 years of experience in training',
+            image: '/images/team/team-1.png'
+          },
+          {
+            name: locale === 'ar' ? 'سارة أحمد' : 'Jane Smith',
+            position: locale === 'ar' ? 'مدربة رئيسية' : 'Lead Trainer',
+            bio: locale === 'ar' 
+              ? 'متخصصة في التطوير المهني والقيادة'
+              : 'Specialized in professional development and leadership',
+            image: '/images/team/team-2.png'
+          },
+          {
+            name: locale === 'ar' ? 'علي خالد' : 'Ahmed Ali',
+            position: locale === 'ar' ? 'مدرب تقني' : 'Technical Instructor',
+            bio: locale === 'ar' 
+              ? 'خبير في التدريب التقني والتكنولوجيا الحديثة'
+              : 'Expert in technical training and modern technologies',
+            image: '/images/team/team-3.png'
+          }
+        ]
+      }
+    };
+  }
+
+ // Add the get method if it doesn't exist
+  async get<T>(url: string): Promise<{ data: T }> {
+    const response = await axios.get<T>(`${this.baseURL}${url}`);
+    return { data: response.data };
+  }
+
+  // Get page content by page key
+  async getPageContentByKey(pageKey: string, locale: string = 'en') {
+    try {
+      const response = await this.get<any>(`/api/Content/pages/${pageKey}`);
+      
+      // Transform the API response to match our component's expected structure
+      const transformField = (key: string, defaultValue: string = '') => {
+        const field = response.data.sections
+          .flatMap((s: any) => s.blocks)
+          .find((b: any) => b.blockKey === key);
+        
+        if (!field) return defaultValue;
+        return locale === 'ar' ? field.contentAr || field.contentEn || defaultValue : field.contentEn || defaultValue;
+      };
+
+      if (pageKey === 'about') {
+        return {
+          title: transformField('about-title', locale === 'ar' ? 'من نحن' : 'About Us'),
+          subtitle: transformField('about-subtitle', locale === 'ar' ? 'تعرف على مهمتنا وقيمنا' : 'Learn more about our mission and values'),
+          vision: {
+            title: transformField('about-vision-title', locale === 'ar' ? 'رؤيتنا' : 'Our Vision'),
+            description: transformField('about-vision-desc', 
+              locale === 'ar' 
+                ? 'أن نكون مزود التدريب الرائد في المنطقة' 
+                : 'To be the leading training provider in the region'
+            )
+          },
+          mission: {
+            title: transformField('about-mission-title', locale === 'ar' ? 'مهمتنا' : 'Our Mission'),
+            description: transformField('about-mission-desc',
+              locale === 'ar'
+                ? 'تمكين الأفراد والمنظمات من خلال برامج التدريب والتطوير عالية الجودة'
+                : 'To empower individuals and organizations through high-quality training and development programs'
+            )
+          },
+          values: [
+            {
+              title: transformField('about-value1-title', locale === 'ar' ? 'التميز' : 'Excellence'),
+              description: transformField('about-value1-desc',
+                locale === 'ar'
+                  ? 'نسعى للتميز في كل ما نقوم به'
+                  : 'We strive for excellence in everything we do'
+              )
+            },
+            {
+              title: transformField('about-value2-title', locale === 'ar' ? 'الابتكار' : 'Innovation'),
+              description: transformField('about-value2-desc',
+                locale === 'ar'
+                  ? 'نعتمد الابتكار في مناهجنا التعليمية'
+                  : 'We embrace innovation in our teaching methodologies'
+              )
+            },
+            {
+              title: transformField('about-value3-title', locale === 'ar' ? 'النزاهة' : 'Integrity'),
+              description: transformField('about-value3-desc',
+                locale === 'ar'
+                  ? 'نتميز بأعلى معايير النزاهة والاحترافية'
+                  : 'We maintain the highest standards of integrity and professionalism'
+              )
+            }
+          ],
+          team: {
+            title: transformField('about-team-title', locale === 'ar' ? 'فريقنا' : 'Our Team'),
+            members: [
+              {
+                name: transformField('about-team1-name', locale === 'ar' ? 'أحمد محمد' : 'John Doe'),
+                position: transformField('about-team1-pos', locale === 'ar' ? 'المدير التنفيذي' : 'CEO'),
+                bio: transformField('about-team1-bio',
+                  locale === 'ar'
+                    ? 'أكثر من 15 عامًا من الخبرة في مجال التدريب'
+                    : 'Over 15 years of experience in training'
+                ),
+                image: transformField('about-team1-img', '/images/team/team-1.png')
+              },
+              {
+                name: transformField('about-team2-name', locale === 'ar' ? 'سارة أحمد' : 'Jane Smith'),
+                position: transformField('about-team2-pos', locale === 'ar' ? 'مدربة رئيسية' : 'Lead Trainer'),
+                bio: transformField('about-team2-bio',
+                  locale === 'ar'
+                    ? 'متخصصة في التطوير المهني والقيادة'
+                    : 'Specialized in professional development and leadership'
+                ),
+                image: transformField('about-team2-img', '/images/team/team-2.png')
+              },
+              {
+                name: transformField('about-team3-name', locale === 'ar' ? 'علي خالد' : 'Ahmed Ali'),
+                position: transformField('about-team3-pos', locale === 'ar' ? 'مدرب تقني' : 'Technical Instructor'),
+                bio: transformField('about-team3-bio',
+                  locale === 'ar'
+                    ? 'خبير في التدريب التقني والتكنولوجيا الحديثة'
+                    : 'Expert in technical training and modern technologies'
+                ),
+                image: transformField('about-team3-img', '/images/team/team-3.png')
+              }
+            ]
+          }
+        };
+      }
+
+      // Return a default structure if page key doesn't match
+      return {
+        title: '',
+        subtitle: '',
+        vision: { title: '', description: '' },
+        mission: { title: '', description: '' },
+        values: [],
+        team: { title: '', members: [] }
+      };
+    } catch (error) {
+      console.error('Error fetching page content:', error);
+      // Return default content in case of error
+      return this.getDefaultAboutContent(locale);
+    }
+  }
 
   // Get all content pages
   async getContentPages(): Promise<ContentPage[]> {
