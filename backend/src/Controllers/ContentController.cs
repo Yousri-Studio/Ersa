@@ -1,11 +1,13 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 using ErsaTraining.API.Data;
 using ErsaTraining.API.Data.Entities;
 using ErsaTraining.API.DTOs;
 using ErsaTraining.API.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
+using System.Text.Json;
+
 
 namespace ErsaTraining.API.Controllers;
 
@@ -810,7 +812,7 @@ public class ContentController : ControllerBase
                 .Include(s => s.Blocks)
                 .Include(s => s.ContentPage)
                 .FirstOrDefaultAsync(s => s.Id == sectionGuid);
-
+            
             if (section == null)
             {
                 return NotFound(new { error = "Section not found" });
@@ -1167,14 +1169,82 @@ public class ContentController : ControllerBase
         }
     }
 
+
+    private Dictionary<string, object> JsonElementToDictionary(JsonElement element)
+    {
+        var dict = new Dictionary<string, object>();
+
+        foreach (var prop in element.EnumerateObject())
+        {
+            dict[prop.Name] = ConvertJsonElement(prop.Value);
+        }
+
+        return dict;
+    }
+
+    private object ConvertJsonElement(JsonElement element)
+    {
+        switch (element.ValueKind)
+        {
+            case JsonValueKind.Object:
+                return JsonElementToDictionary(element);
+            case JsonValueKind.Array:
+                var list = new List<object>();
+                foreach (var item in element.EnumerateArray())
+                {
+                    list.Add(ConvertJsonElement(item));
+                }
+                return list;
+            case JsonValueKind.String:
+                return element.GetString();
+            case JsonValueKind.Number:
+                return element.TryGetInt64(out long l) ? (object)l : element.GetDouble();
+            case JsonValueKind.True:
+            case JsonValueKind.False:
+                return element.GetBoolean();
+            case JsonValueKind.Null:
+            case JsonValueKind.Undefined:
+            default:
+                return null;
+        }
+    }
+
+    private JsonElement ConvertToJsonElement(dynamic content) 
+    {
+        // Handle content as JsonElement or JSON string
+        JsonElement jsonElement;
+
+        if (content is string jsonString)
+        {
+            jsonElement = JsonSerializer.Deserialize<JsonElement>(jsonString);
+        }
+        else if (content is JsonElement je)
+        {
+            jsonElement = je;
+        }
+        else
+        {
+            // Optionally: try parsing from object to JSON and back
+            var serialized = JsonSerializer.Serialize(content);
+            jsonElement = JsonSerializer.Deserialize<JsonElement>(serialized);
+        }
+        return jsonElement;
+    }
+
     private async Task UpdateSectionBlocks(ContentSection section, dynamic content)
     {
-        var contentDict = content as IDictionary<string, object> ?? new Dictionary<string, object>();
-        
+        // var contentDict = content as IDictionary<string, object> ?? new Dictionary<string, object>();
+
+        //get the json object
+        JsonElement jsonElement = ConvertToJsonElement(content);
+
+        // Convert JsonElement to Dictionary<string, object>
+        var contentDict = JsonElementToDictionary(jsonElement);
+
         switch (section.SectionKey.ToLower())
         {
             case "hero":
-                await UpdateOrCreateBlock(section.Id, "title", "Title", "text", contentDict.ContainsKey("hero-title") ? contentDict["hero-title"]?.ToString() : null);
+                await UpdateOrCreateBlock(section.Id, "title", "Title", "text", contentDict.ContainsKey("hero-title") ? contentDict["hero-title"]?.ToString() : null);  
                 await UpdateOrCreateBlock(section.Id, "subtitle", "Subtitle", "text", contentDict.ContainsKey("hero-subtitle") ? contentDict["hero-subtitle"]?.ToString() : null);
                 await UpdateOrCreateBlock(section.Id, "cta-primary", "Primary CTA", "text", contentDict.ContainsKey("hero-cta-primary") ? contentDict["hero-cta-primary"]?.ToString() : null);
                 await UpdateOrCreateBlock(section.Id, "cta-secondary", "Secondary CTA", "text", contentDict.ContainsKey("hero-cta-secondary") ? contentDict["hero-cta-secondary"]?.ToString() : null);
@@ -1552,7 +1622,7 @@ public class ContentController : ControllerBase
                     id = "page-title-en",
                     label = "Page Title (English)",
                     type = "text",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "page-title-en")?.ContentEn ?? "Our Courses",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "page-title")?.ContentEn ?? "Our Courses",
                     required = true,
                     placeholder = "Enter page title in English"
                 });
@@ -1561,7 +1631,7 @@ public class ContentController : ControllerBase
                     id = "page-title-ar",
                     label = "Page Title (Arabic)",
                     type = "text",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "page-title-ar")?.ContentAr ?? "دوراتنا",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "page-title")?.ContentAr ?? "دوراتنا",
                     required = true,
                     placeholder = "Enter page title in Arabic"
                 });
@@ -1570,7 +1640,7 @@ public class ContentController : ControllerBase
                     id = "page-description-en",
                     label = "Page Description (English)",
                     type = "textarea",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "page-description-en")?.ContentEn ?? "Discover our comprehensive collection of professional development courses",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "page-description")?.ContentEn ?? "Discover our comprehensive collection of professional development courses",
                     required = true,
                     placeholder = "Enter page description in English"
                 });
@@ -1579,7 +1649,7 @@ public class ContentController : ControllerBase
                     id = "page-description-ar",
                     label = "Page Description (Arabic)",
                     type = "textarea",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "page-description-ar")?.ContentAr ?? "اكتشف مجموعتنا الشاملة من دورات التطوير المهني",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "page-description")?.ContentAr ?? "اكتشف مجموعتنا الشاملة من دورات التطوير المهني",
                     required = true,
                     placeholder = "Enter page description in Arabic"
                 });
@@ -1604,7 +1674,7 @@ public class ContentController : ControllerBase
                     id = "company-name-en",
                     label = "Company Name (English)",
                     type = "text",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "company-name-en")?.ContentEn ?? "Ersa Training",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "company-name")?.ContentEn ?? "Ersa Training",
                     required = true,
                     placeholder = "Enter company name in English"
                 });
@@ -1613,7 +1683,7 @@ public class ContentController : ControllerBase
                     id = "company-name-ar",
                     label = "Company Name (Arabic)",
                     type = "text",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "company-name-ar")?.ContentAr ?? "إرساء للتدريب",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "company-name")?.ContentAr ?? "إرساء للتدريب",
                     required = true,
                     placeholder = "Enter company name in Arabic"
                 });
@@ -1622,7 +1692,7 @@ public class ContentController : ControllerBase
                     id = "mission-en",
                     label = "Mission Statement (English)",
                     type = "textarea",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "mission-en")?.ContentEn ?? "Empowering individuals and organizations through world-class training solutions",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "mission")?.ContentEn ?? "Empowering individuals and organizations through world-class training solutions",
                     required = true,
                     placeholder = "Enter company mission in English"
                 });
@@ -1631,7 +1701,7 @@ public class ContentController : ControllerBase
                     id = "mission-ar",
                     label = "Mission Statement (Arabic)",
                     type = "textarea",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "mission-ar")?.ContentAr ?? "تمكين الأفراد والمنظمات من خلال حلول تدريبية عالمية المستوى",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "mission")?.ContentAr ?? "تمكين الأفراد والمنظمات من خلال حلول تدريبية عالمية المستوى",
                     required = true,
                     placeholder = "Enter company mission in Arabic"
                 });
@@ -1640,7 +1710,7 @@ public class ContentController : ControllerBase
                     id = "vision-en",
                     label = "Vision Statement (English)",
                     type = "textarea",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "vision-en")?.ContentEn ?? "To be the preferred training partner in the region",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "vision")?.ContentEn ?? "To be the preferred training partner in the region",
                     required = true,
                     placeholder = "Enter company vision in English"
                 });
@@ -1649,7 +1719,7 @@ public class ContentController : ControllerBase
                     id = "vision-ar",
                     label = "Vision Statement (Arabic)",
                     type = "textarea",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "vision-ar")?.ContentAr ?? "أن نكون الشريك التدريبي المفضل في المنطقة",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "vision")?.ContentAr ?? "أن نكون الشريك التدريبي المفضل في المنطقة",
                     required = true,
                     placeholder = "Enter company vision in Arabic"
                 });
@@ -1673,7 +1743,7 @@ public class ContentController : ControllerBase
                     id = "title-en",
                     label = "Services Title (English)",
                     type = "text",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "title-en")?.ContentEn ?? "Our Services",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "title")?.ContentEn ?? "Our Services",
                     required = true,
                     placeholder = "Enter services title in English"
                 });
@@ -1682,13 +1752,13 @@ public class ContentController : ControllerBase
                     id = "title-ar",
                     label = "Services Title (Arabic)",
                     type = "text",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "title-ar")?.ContentAr ?? "خدماتنا",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "title")?.ContentAr ?? "خدماتنا",
                     required = true,
                     placeholder = "Enter services title in Arabic"
                 });
                 fields.Add(new
                 {
-                    id = "description-en",
+                    id = "description",
                     label = "Services Description (English)",
                     type = "textarea",
                     value = blocks.FirstOrDefault(b => b.BlockKey == "description-en")?.ContentEn ?? "We offer comprehensive training and consultancy services",
@@ -1697,7 +1767,7 @@ public class ContentController : ControllerBase
                 });
                 fields.Add(new
                 {
-                    id = "description-ar",
+                    id = "description",
                     label = "Services Description (Arabic)",
                     type = "textarea",
                     value = blocks.FirstOrDefault(b => b.BlockKey == "description-ar")?.ContentAr ?? "نقدم خدمات تدريبية واستشارية شاملة",
@@ -1709,19 +1779,19 @@ public class ContentController : ControllerBase
             case "contact":
                 fields.Add(new
                 {
-                    id = "title-en",
+                    id = "title",
                     label = "Contact Title (English)",
                     type = "text",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "title-en")?.ContentEn ?? "Get in Touch",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "title")?.ContentEn ?? "Get in Touch",
                     required = true,
                     placeholder = "Enter contact title in English"
                 });
                 fields.Add(new
                 {
-                    id = "title-ar",
+                    id = "title",
                     label = "Contact Title (Arabic)",
                     type = "text",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "title-ar")?.ContentAr ?? "تواصل معنا",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "title")?.ContentAr ?? "تواصل معنا",
                     required = true,
                     placeholder = "Enter contact title in Arabic"
                 });
@@ -1769,7 +1839,7 @@ public class ContentController : ControllerBase
                     id = "faq-title-en",
                     label = "FAQ Title (English)",
                     type = "text",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "faq-title-en")?.ContentEn ?? "Frequently Asked Questions",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "faq-title")?.ContentEn ?? "Frequently Asked Questions",
                     required = true,
                     placeholder = "Enter FAQ title in English"
                 });
@@ -1778,7 +1848,7 @@ public class ContentController : ControllerBase
                     id = "faq-title-ar",
                     label = "FAQ Title (Arabic)",
                     type = "text",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "faq-title-ar")?.ContentAr ?? "الأسئلة الشائعة",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "faq-title")?.ContentAr ?? "الأسئلة الشائعة",
                     required = true,
                     placeholder = "Enter FAQ title in Arabic"
                 });
@@ -1818,7 +1888,7 @@ public class ContentController : ControllerBase
                     id = "title-en",
                     label = "Consultation Title (English)",
                     type = "text",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "title-en")?.ContentEn ?? "Consultation Services",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "title")?.ContentEn ?? "Consultation Services",
                     required = true,
                     placeholder = "Enter consultation title in English"
                 });
@@ -1827,7 +1897,7 @@ public class ContentController : ControllerBase
                     id = "title-ar",
                     label = "Consultation Title (Arabic)",
                     type = "text",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "title-ar")?.ContentAr ?? "خدمات الاستشارة",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "title")?.ContentAr ?? "خدمات الاستشارة",
                     required = true,
                     placeholder = "Enter consultation title in Arabic"
                 });
@@ -1836,7 +1906,7 @@ public class ContentController : ControllerBase
                     id = "description-en",
                     label = "Consultation Description (English)",
                     type = "textarea",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "description-en")?.ContentEn ?? "Professional consultation services tailored to your needs",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "description")?.ContentEn ?? "Professional consultation services tailored to your needs",
                     required = true,
                     placeholder = "Enter consultation description in English"
                 });
@@ -1845,7 +1915,7 @@ public class ContentController : ControllerBase
                     id = "description-ar",
                     label = "Consultation Description (Arabic)",
                     type = "textarea",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "description-ar")?.ContentAr ?? "خدمات استشارية مهنية مصممة خصيصاً لاحتياجاتك",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "description")?.ContentAr ?? "خدمات استشارية مهنية مصممة خصيصاً لاحتياجاتك",
                     required = true,
                     placeholder = "Enter consultation description in Arabic"
                 });

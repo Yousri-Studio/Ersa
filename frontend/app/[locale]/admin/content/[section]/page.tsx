@@ -237,6 +237,13 @@ export default function ContentEditor() {
         router.push(`/${locale}/admin-login`);
       } else if (error.message.includes('not found')) {
         errorMessage = locale === 'ar' ? 'الصفحة غير موجودة' : 'Page not found';
+      } else if (error.message.includes('Network Error')) {
+        errorMessage = locale === 'ar' ? 'خطأ في الاتصال. تحقق من اتصالك بالإنترنت' : 'Network error. Please check your internet connection';
+      } else if (error.message.includes('Bad Request')) {
+        errorMessage = locale === 'ar' ? 'خطأ في البيانات المرسلة' : 'Invalid data sent to server';
+      } else {
+        // Use the specific error message from the API
+        errorMessage = error.message || errorMessage;
       }
       
       toast.error(errorMessage);

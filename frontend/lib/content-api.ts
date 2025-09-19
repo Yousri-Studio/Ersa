@@ -108,7 +108,14 @@ class ContentAPI {
       if (content.fields && Array.isArray(content.fields)) {
         content.fields.forEach((field: any) => {
           if (field.id && field.value !== undefined) {
-            transformedContent[field.id] = field.value;
+            // Handle bilingual fields - flatten the structure for backend
+            if (field.value && typeof field.value === 'object' && field.value.en !== undefined && field.value.ar !== undefined) {
+              // For bilingual fields, store both languages
+              transformedContent[field.id] = field.value;
+            } else {
+              // For regular fields, store as-is
+              transformedContent[field.id] = field.value;
+            }
           }
         });
       }
@@ -123,7 +130,7 @@ class ContentAPI {
       console.log('🔄 ContentAPI: Transformed content:', transformedContent);
       
       const response = await axios.put(`${this.baseURL}/content/sections/${sectionId}/content`, { content: transformedContent }, {
-        timeout: 5000,
+        timeout: 10000,
         headers: {
           'Content-Type': 'application/json'
         }
@@ -131,50 +138,41 @@ class ContentAPI {
       console.log('✅ ContentAPI: Update successful:', response.status, response.data);
       return response.data;
     } catch (error: any) {
-      console.error('Error updating section content:', error);
+      console.error('❌ Error updating section content:', error);
+      console.error('Error details:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message
+      });
       
       // If it's an authentication error, throw it
       if (error.response?.status === 401 || error.response?.status === 403) {
         throw new Error('Authentication required');
       }
       
-      // For network errors or when backend is not available, simulate update
-      if (error.code === 'ERR_NETWORK' || error.message === 'Network Error' || error.code === 'ECONNREFUSED' || error.isMockFallback) {
-        console.log('Backend not available, using mock update for development');
-        const templates = this.getMockContentTemplates();
-        const section = templates[sectionId];
-        
-        if (!section) {
-          throw new Error(`Section ${sectionId} not found`);
-        }
-        
-        // Update the section with new content
-        const updatedSection = {
-          ...section,
-          ...content,
-          lastModified: new Date().toISOString()
-        };
-        
-        return updatedSection;
+      // If it's a bad request, throw the specific error
+      if (error.response?.status === 400) {
+        throw new Error(`Bad Request: ${error.response?.data?.error || error.message}`);
       }
       
-      // For development, simulate successful update with mock data
-      console.log('Using mock update for development');
-      const templates = this.getMockContentTemplates();
-      const section = templates[sectionId];
-      
-      if (!section) {
-        throw new Error(`Section ${sectionId} not found`);
+      // If section not found
+      if (error.response?.status === 404) {
+        throw new Error(`Section not found: ${sectionId}`);
       }
       
-      // Update the section with new content
-      const updatedSection = {
-        ...section,
-        ...content,
-        lastModified: new Date().toISOString()
-      };
+      // For server errors, throw them
+      if (error.response?.status >= 500) {
+        throw new Error(`Server Error: ${error.response?.data?.error || error.message}`);
+      }
       
-      return updatedSection;
+      // For network errors, throw them instead of falling back to mock
+      if (error.code === 'ERR_NETWORK' || error.message === 'Network Error' || error.code === 'ECONNREFUSED') {
+        throw new Error('Network Error: Unable to connect to server. Please check your connection and try again.');
+      }
+      
+      // For any other error, throw it
+      throw new Error(`Update failed: ${error.message}`);
     }
   }
 
@@ -184,32 +182,41 @@ class ContentAPI {
       const response = await axios.post(`${this.baseURL}/content/sections/${sectionId}/publish`);
       return response.data;
     } catch (error: any) {
-      console.error('Error publishing section:', error);
+      console.error('❌ Error publishing section:', error);
+      console.error('Error details:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message
+      });
       
       // If it's an authentication error, throw it
       if (error.response?.status === 401 || error.response?.status === 403) {
         throw new Error('Authentication required');
       }
       
-      // For development, simulate successful publish with mock data
-      console.log('Using mock publish for development');
-      const templates = this.getMockContentTemplates();
-      const section = templates[sectionId];
-      
-      if (!section) {
-        throw new Error(`Section ${sectionId} not found`);
+      // If it's a bad request, throw the specific error
+      if (error.response?.status === 400) {
+        throw new Error(`Bad Request: ${error.response?.data?.error || error.message}`);
       }
       
-      // Update the section status to published
-      const publishedSection = {
-        ...section,
-        status: 'published' as const,
-        lastModified: new Date().toISOString()
-      };
+      // If section not found
+      if (error.response?.status === 404) {
+        throw new Error(`Section not found: ${sectionId}`);
+      }
       
-      // In a real app, you'd update the database here
-      // For now, we'll just return the updated section
-      return publishedSection;
+      // For server errors, throw them
+      if (error.response?.status >= 500) {
+        throw new Error(`Server Error: ${error.response?.data?.error || error.message}`);
+      }
+      
+      // For network errors, throw them
+      if (error.code === 'ERR_NETWORK' || error.message === 'Network Error' || error.code === 'ECONNREFUSED') {
+        throw new Error('Network Error: Unable to connect to server. Please check your connection and try again.');
+      }
+      
+      // For any other error, throw it
+      throw new Error(`Publish failed: ${error.message}`);
     }
   }
 
@@ -319,10 +326,82 @@ class ContentAPI {
   // Initialize sample data
   async initializeSampleData(): Promise<void> {
     try {
-      const response = await axios.post(`${this.baseURL}/content/admin/initialize-sample-data`);
+      console.log('🔄 ContentAPI: Initializing sample data...');
+      const response = await axios.post(`${this.baseURL}/content/admin/initialize-sample-data`, {}, {
+        timeout: 30000, // 30 seconds timeout for initialization
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      console.log('✅ ContentAPI: Sample data initialized successfully');
       return response.data;
-    } catch (error) {
-      console.error('Error initializing sample data:', error);
+    } catch (error: any) {
+      console.error('❌ Error initializing sample data:', error);
+      console.error('Error details:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message
+      });
+      
+      // If it's an authentication error, throw it
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        throw new Error('Authentication required');
+      }
+      
+      // For other errors, provide more specific messages
+      if (error.response?.status >= 400) {
+        throw new Error(`Failed to initialize sample data: ${error.response?.data?.error || error.message}`);
+      }
+      
+      throw error;
+    }
+  }
+
+  // Get database status
+  async getDatabaseStatus(): Promise<any> {
+    try {
+      console.log('🔄 ContentAPI: Checking database status...');
+      const response = await axios.get(`${this.baseURL}/content/admin/database-status`, {
+        timeout: 10000,
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      console.log('✅ ContentAPI: Database status retrieved');
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ Error getting database status:', error);
+      
+      // If it's an authentication error, throw it
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        throw new Error('Authentication required');
+      }
+      
+      throw error;
+    }
+  }
+
+  // Reinitialize sample data
+  async reinitializeSampleData(): Promise<void> {
+    try {
+      console.log('🔄 ContentAPI: Reinitializing sample data...');
+      const response = await axios.post(`${this.baseURL}/content/admin/reinitialize-sample-data`, {}, {
+        timeout: 30000, // 30 seconds timeout for reinitialization
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      console.log('✅ ContentAPI: Sample data reinitialized successfully');
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ Error reinitializing sample data:', error);
+      
+      // If it's an authentication error, throw it
+      if (error.response?.status === 401 || error.response?.status === 403) {
+        throw new Error('Authentication required');
+      }
+      
       throw error;
     }
   }
