@@ -41,8 +41,8 @@ const mockCourses: Course[] = [
     isActive: true,
     isFeatured: true,
     badge: 'Bestseller' as const,
-    level: 'Biginner',
-    category: 'Programming',
+    level: 1, // 1: Beginner, 2: Intermediate, 3: Advanced
+    category: 'Programming' as const,
     instructorName: '',
     createdAt: '',
     updatedAt: ''
@@ -67,8 +67,8 @@ const mockCourses: Course[] = [
     isActive: true,
     isFeatured: true,
     badge: 'Bestseller' as const,
-    level: 'Biginner',
-    category: 'Programming',
+    level: 1, // 1: Beginner, 2: Intermediate, 3: Advanced
+    category: 'Programming' as const,
     instructorName: '',
     createdAt: '',
     updatedAt: ''
@@ -93,8 +93,8 @@ const mockCourses: Course[] = [
     isActive: true,
     isFeatured: false,
     badge: 'Bestseller' as const,
-    level: 'Biginner',
-    category: 'Programming',
+    level: 1, // 1: Beginner, 2: Intermediate, 3: Advanced
+    category: 'Programming' as const,
     instructorName: '',
     createdAt: '',
     updatedAt: ''
@@ -119,8 +119,8 @@ const mockCourses: Course[] = [
     isActive: true,
     isFeatured: false,
     badge: 'Bestseller' as const,
-    level: 'Biginner',
-    category: 'Programming',
+    level: 1, // 1: Beginner, 2: Intermediate, 3: Advanced
+    category: 'Programming' as const,
     instructorName: '',
     createdAt: '',
     updatedAt: ''
@@ -145,8 +145,8 @@ const mockCourses: Course[] = [
     isActive: true,
     isFeatured: true,
     badge: 'Bestseller' as const,
-    level: 'Biginner',
-    category: 'Programming',
+    level: 1, // 1: Beginner, 2: Intermediate, 3: Advanced
+    category: 'Programming' as const,
     instructorName: '',
     createdAt: '',
     updatedAt: ''
@@ -171,8 +171,8 @@ const mockCourses: Course[] = [
     isActive: true,
     isFeatured: false,
     badge: 'Bestseller' as const,
-    level: 'Biginner',
-    category: 'Programming',
+    level: 1, // 1: Beginner, 2: Intermediate, 3: Advanced
+    category: 'Programming' as const,
     instructorName: '',
     createdAt: '',
     updatedAt: ''
@@ -182,7 +182,7 @@ const mockCourses: Course[] = [
 export default function CoursesPage() {
   const searchParams = useSearchParams();
   const locale = useLocale();
-  const t = useTranslations();
+  const t = useTranslations('consultation');
   const router = useRouter();
   const { addItem, hasItem } = useCartStore();
   const { user } = useAuthStore();
@@ -304,7 +304,7 @@ export default function CoursesPage() {
             {/* Tagline */}
             <div className={`mb-6 ${isLoaded ? 'animate-fade-in-down' : 'opacity-0'}`}>
               <div className="inline-flex items-center text-brand text-sm font-semibold font-cairo">
-                🔥 {t('consultation.badge')}
+                🔥 {t('badge')}
               </div>
             </div>
             
@@ -317,12 +317,12 @@ export default function CoursesPage() {
               fontStyle: 'normal',
               fontWeight: '700'
             }}>
-              {t('consultation.title')}
+              {t('title')}
             </h1>
             
             {/* Description */}
             <p className={`text-lg text-gray-600 leading-relaxed font-cairo ${locale === 'ar' ? 'text-right' : 'text-left'} ${isLoaded ? 'animate-fade-in-up stagger-2' : 'opacity-0'}`}>
-              {t('consultation.description')}
+              {t('description')}
             </p>
           </div>
 

@@ -20,6 +20,7 @@
     "@tailwindcss/typography": "^0.5.15",
     "@tanstack/react-query": "^5.62.7",
     "axios": "^1.7.9",
+    "canvas": "^3.2.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.12",
     "html2canvas": "^1.4.1",

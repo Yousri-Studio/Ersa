@@ -13,7 +13,6 @@
     "next": "Next",
     "previous": "Previous",
     "home": "Home",
-    "about": "About",
     "contact": "Contact",
     "login": "Login",
     "register": "Register",
@@ -26,6 +25,61 @@
     "first-name": "First Name",
     "last-name": "Last Name",
     "email": "Email Address"
+  },
+  "about": {
+    "title": "About Us",
+    "subtitle": "Learn more about our mission, vision, and the team behind Ersa Training",
+    "vision": {
+      "title": "Our Vision",
+      "description": "To be the leading provider of professional training and development programs in the region."
+    },
+    "mission": {
+      "title": "Our Mission",
+      "description": "Empowering individuals and organizations through high-quality, accessible, and innovative training solutions."
+    },
+    "team": {
+      "title": "Our Team",
+      "subtitle": "Meet our team of dedicated professionals",
+      "members": {
+        "ceo": {
+          "name": "John Doe",
+          "position": "CEO & Founder",
+          "bio": "10+ years of experience in education and training"
+        },
+        "trainer": {
+          "name": "Jane Smith",
+          "position": "Head of Training",
+          "bio": "Expert in curriculum development and instructional design"
+        },
+        "instructor": {
+          "name": "Michael Johnson",
+          "position": "Lead Instructor",
+          "bio": "15+ years of industry experience"
+        }
+      }
+    },
+    "values": {
+      "title": "Our Values",
+      "subtitle": "The principles that guide our work",
+      "excellence": {
+        "title": "Excellence",
+        "description": "We strive for the highest standards in everything we do."
+      },
+      "innovation": {
+        "title": "Innovation",
+        "description": "We embrace new ideas and creative solutions."
+      },
+      "integrity": {
+        "title": "Integrity",
+        "description": "We conduct our business with honesty and transparency."
+      }
+    },
+    "cta": {
+      "title": "Ready to start your learning journey?",
+      "subtitle": "Join us today and start your journey to excellence",
+      "browseCourses": "Browse Courses",
+      "contactUs": "Contact Us"
+    }
   },
   "navigation": {
     "home": "Home",
@@ -89,13 +143,61 @@
       "required-field": "This field is required"
     }
   },
+  "consultation": {
+    "badge": "Free Consultation",
+    "title": "Expert Training & Consultation Services",
+    "description": "Get expert advice and training tailored to your needs. Our professional consultants are here to help you achieve your goals.",
+    "navigation": {
+      "courses": "Our Courses"
+    },
+    "image-alt": "Professional consultation services",
+    "request-consultation": "Request a Free Consultation",
+    "explore-courses": "Explore Our Courses"
+  },
+  "training-categories": {
+    "title": "Our Training Categories",
+    "description": "Explore our wide range of training programs designed to enhance your skills and knowledge.",
+    "view-all": "View All Categories"
+  },
+  
+  "services": {
+    "title": "Our Services",
+    "description": "Comprehensive training and consultation services tailored to your needs.",
+    "view-all": "View All Services"
+  },
+  
+  "testimonials": {
+    "title": "What Our Clients Say",
+    "subtitle": "Testimonials",
+    "description": "Hear from our satisfied clients about their experience with our training programs.",
+    "view-all": "Read All Testimonials"
+  },
+  
+  "ai-consultation": {
+    "title": "AI-Powered Consultation",
+    "description": "Get personalized training recommendations using our AI consultation tool.",
+    "cta": "Try AI Consultation"
+  },
+  
+  "join-us": {
+    "title": "Join Our Community",
+    "description": "Become part of our growing community of learners and professionals.",
+    "cta": "Join Now",
+    "benefits": [
+      "Access to exclusive content",
+      "Networking opportunities",
+      "Special member discounts",
+      "Early access to new courses"
+    ]
+  },
+  
   "home": {
     "hero": {
       "title": "Explore our training platform and elevate your skills to achieve your full potential",
       "subtitle": "A comprehensive platform combining the latest training methods and advanced technologies to deliver an exceptional learning experience",
       "cta": {
-        "explore": "Explore Courses",
-        "consult": "Request Consultation"
+        "browseCourses": "Browse Our Courses",
+        "contactUs": "Contact Us"
       }
     },
     "search": {
@@ -103,9 +205,11 @@
       "categoryAll": "Choose Category",
       "button": "Search"
     },
-    "featured": {
-      "title": "Explore our training platform and unlock your potential",
-      "subtitle": "Achieve your full potential with top courses"
+    "ctaSection": {
+      "title": "Ready to start your learning journey?",
+      "subtitle": "Join us today and start your journey to excellence",
+      "browseCourses": "Browse Courses",
+      "contactUs": "Contact Us"
     }
   },
   "hero": {
@@ -161,6 +265,10 @@
     }
   },
   "card": {
+    "actions": {
+      "wishlist": "Add to wishlist",
+      "cart": "Add to cart"
+    },
     "badge": {
       "bestseller": "Bestseller",
       "new": "New"
@@ -168,361 +276,6 @@
     "mode": {
       "onsite": "PDF",
       "online": "Online"
-    },
-    "labels": {
-      "duration": "Duration"
-    },
-    "actions": {
-      "wishlist": "Add to wishlist",
-      "cart": "Add to cart"
-    }
-  },
-  "checkout": {
-    "title": "Checkout",
-    "order-summary": "Order Summary",
-    "payment-method": "Payment Method",
-    "billing-info": "Billing Information",
-    "place-order": "Place Order",
-    "processing": "Processing...",
-    "success": {
-      "title": "Order Successful!",
-      "message": "Thank you for your purchase. You will receive an email with your course details shortly.",
-      "order-id": "Order ID",
-      "continue": "Continue Learning"
-    },
-    "failed": {
-      "title": "Payment Failed",
-      "message": "There was an issue processing your payment. Please try again.",
-      "retry": "Try Again"
-    }
-  },
-  "profile": {
-    "title": "My Profile",
-    "personal-info": "Personal Information",
-    "enrollments": "My Enrollments",
-    "orders": "Order History",
-    "settings": "Account Settings",
-    "update-success": "Profile updated successfully"
-  },
-  "cart": {
-    "title": "Shopping Cart",
-    "subtitle": "Review your selected items before purchase",
-    "items": "Items",
-    "items-count": "{count} items in cart",
-    "session": "Session",
-    "instructor": "Instructor",
-    "each": "each",
-    "remove": "Remove",
-    "move-to-wishlist": "Move to Wishlist",
-    "order-summary": "Order Summary",
-    "subtotal": "Subtotal",
-    "tax": "Tax",
-    "included": "Included",
-    "total": "Total",
-    "proceed-to-checkout": "Proceed to Checkout",
-    "continue-shopping": "Continue Shopping",
-    "promo-code": "Promo Code",
-    "promo-placeholder": "Enter promo code",
-    "apply": "Apply",
-    "clear-all": "Clear All",
-    "empty": {
-      "title": "Your cart is empty",
-      "description": "You haven't added any courses to your cart yet. Start browsing our featured courses.",
-      "browse-courses": "Browse Courses",
-      "go-to-home": "Go to Home Page"
-    }
-  },
-  "wishlist": {
-    "title": "Wishlist",
-    "subtitle": "Courses saved for later review",
-    "items-count": "{count} courses in wishlist",
-    "add-to-cart": "Add to Cart",
-    "continue-shopping": "Continue Shopping",
-    "empty": {
-      "title": "Your wishlist is empty now!",
-      "description": "Start saving your favorite products, click the button below",
-      "browse-courses": "Browse Courses",
-      "login-required": "Login",
-      "go-to-home": "Go to Home"
-    },
-    "item-added": "Item added to wishlist",
-    "item-removed": "Item removed from wishlist"
-  },
-  "course": {
-    "reviews": "reviews",
-    "students": "students",
-    "courses": "courses",
-    "lessons": "lessons",
-    "lesson": "Lesson",
-    "lesson-title": "Lesson Title",
-    "add-to-cart": "Add to Cart",
-    "view-in-cart": "View in Cart",
-    "add-to-wishlist": "Add to Wishlist",
-    "remove-from-wishlist": "Remove from Wishlist",
-    "includes": "This course includes",
-    "about": "About this course",
-    "requirements": "Requirements",
-    "curriculum": "Curriculum",
-    "instructor-info": "Instructor Information",
-    "student-reviews": "Student Reviews",
-    "reviews-coming-soon": "Reviews coming soon",
-    "details": "Course Details",
-    "level": "Level",
-    "duration": "Duration",
-    "language": "Language",
-    "last-updated": "Last Updated",
-    "preview": "Preview",
-    "tabs": {
-      "overview": "Overview",
-      "curriculum": "Curriculum",
-      "instructor": "Instructor",
-      "reviews": "Reviews"
-    }
-  },
-  "consultation": {
-    "badge": "Ersa with you for skill development",
-    "title": "Explore our training platform and elevate your abilities to achieve your maximum potential",
-    "description": "Build a promising future and lead your life with our interactive and comprehensive programs",
-    "request-consultation": "Request Consultation",
-    "explore-courses": "Explore Courses",
-    "image-alt": "Training Consultation",
-    "general-courses": "General Courses",
-    "courses": "courses",
-    "stats": {
-      "trainees": "trainees",
-      "courses": "courses"
-    }
-  },
-  "testimonials": {
-    "title": "Trainees' Opinions",
-    "subtitle": "Our Clients' Opinions",
-    "description": "Discover the experiences of learners who transformed their careers with us"
-  },
-  "admin": {
-    "title": "Admin Dashboard",
-    "welcome": "Hello",
-    "description": "from here you can manage all content, orders and everything",
-    "hello": "Hello 👋",
-    "super-admin": "Super Admin",
-    "admin": "Admin",
-    "admin-user": "Admin User",
-    "operations-dashboard": "Operations Dashboard",
-    "dashboard-subtitle": "from here you can manage all content, orders and everything",
-    "using-demo-data": "Using demo data",
-    "connected-to-backend": "Connected to Backend",
-    "backend-unavailable": "Backend Unavailable",
-    "online": "Online",
-    "active-courses": "active",
-    "this-month": "This month",
-    "revenue-this-month": "Revenue this month",
-    "amount": "Amount",
-    "status": "Status",
-    "name": "Name",
-    "email": "Email",
-    "joined": "Joined",
-    "status-completed": "Completed",
-    "status-pending": "Pending",
-    "status-failed": "Failed",
-    "total-users": "Total Users",
-    "total-courses": "Total Courses",
-    "total-orders": "Total Orders", 
-    "total-revenue": "Total Revenue",
-    "recent-orders": "Recent Orders",
-    "recent-orders-subtitle": "Latest orders registered in the system",
-    "student-name": "Student Name",
-    "course-name": "Course Name",
-    "order-date": "Order Date",
-    "course-type": "Course Type",
-    "course-price": "Course Price",
-    "actions": "Actions",
-    "recent-users": "Recent Users",
-    "recent-users-subtitle": "Latest users registered in the system",
-    "geographics": "Geographic Distribution",
-    "geographics-subtitle": "User distribution by countries",
-    "users-from-countries": "Users from Countries",
-    "user": "user",
-    "sidebar": {
-      "dashboard": "Dashboard",
-      "contentManagement": "Content Management",
-      "manageUsers": "Manage Users",
-      "manageCourses": "Manage Courses",
-      "orders": "Orders",
-      "settings": "Settings",
-      "logout": "Logout"
-    },
-    "dashboard": {
-      "title": "Dashboard",
-      "overview-platform": "Platform overview",
-      "stats": {
-        "totalUsers": "Total Users",
-        "activeUsers": "Active Users",
-        "totalCourses": "Total Courses",
-        "activeCourses": "Active Courses",
-        "totalOrders": "Total Orders",
-        "totalRevenue": "Total Revenue"
-      }
-    },
-    "errors": {
-      "access-denied": "Access denied. Admin privileges required."
-    },
-    "contentManagement": "Content Management"
-  },
-  "admin-login": {
-    "welcome": "Welcome dear",
-    "title": "Login",
-    "subtitle": "Sign in to access the full system management",
-    "email": "Email Address",
-    "password": "Password",
-    "remember-me": "Remember me",
-    "logging-in": "Logging in...",
-    "login-button": "Login",
-    "roles": {
-      "system-manager": "System Manager",
-      "system-manager-desc": "Full system management permissions",
-      "operations-manager": "Operations Manager",
-      "operations-manager-desc": "Limited permissions for operations management"
-    },
-    "footer": {
-      "copyright": "All rights reserved to Ersa Platform © 2025",
-      "designed-by": "Designed and developed by"
-    }
-  },
-  "join-us": {
-    "title": "Join Many Trainees",
-    "subtitle": "We make it easy for trainees to choose what suits their needs, helping these categories organize training content and present it clearly and distinctly for each category separately.",
-    "benefits": [
-      "Easy learning and achieving the best results with the best methods",
-      "Easy learning and achieving the best results with the best methods",
-      "Continuous support to meet needs"
-    ],
-    "cta": "Start with Us"
-  },
-  "achievements": {
-    "badge": "Our Numbers",
-    "title": "Our Achievements Since Establishment",
-    "subtitle": "We make it easy for trainees to choose what suits their needs, helping these categories organize training content and present it clearly and distinctly for each category separately.",
-    "stats": {
-      "trainees": "Trainees",
-      "government_courses": "Government Courses",
-      "clients": "Clients",
-      "satisfaction": "Client Satisfaction"
-    }
-  },
-  "training-categories": {
-    "badge": "Our Training Categories",
-    "title": "We offer at Ersa a diverse range of training categories covering multiple fields",
-    "subtitle": "We make it easy for trainees to choose what suits their needs, helping these categories organize training content and present it clearly and distinctly for each category separately.",
-    "categories": {
-      "general": {
-        "title": "General Courses",
-        "description": "We work to facilitate the process of trainees choosing what suits their needs."
-      },
-      "specialized": {
-        "title": "Specialized Programs",
-        "description": "We work to facilitate the process of trainees choosing what suits their needs."
-      },
-      "professional": {
-        "title": "Professional Certificates",
-        "description": "We work to facilitate the process of trainees choosing what suits their needs."
-      }
-    }
-  },
-  "services": {
-    "badge": "Your Best Choice",
-    "title": "Why Ersa Platform",
-    "subtitle": "We make it easy for trainees to choose what suits their needs, helping these categories organize training content and present it clearly and distinctly for each category separately.",
-    "cards": {
-      "quality": {
-        "title": "Quality and Commitment",
-        "description": "At Ersa, quality is not an additional option but the foundation of our work and the essence of what we provide to ensure the highest levels of excellence and distinction."
-      },
-      "partnership": {
-        "title": "Your Partner in Transformation Journey",
-        "description": "At Ersa, quality is not an additional option but the foundation of our work and the essence of what we provide to ensure the highest levels of excellence and distinction."
-      },
-      "innovation": {
-        "title": "Innovation and Creativity",
-        "description": "We constantly strive to renew our ideas and adopt new technologies, which enhances our ability to provide innovative solutions that meet our clients' needs."
-      },
-      "sustainability": {
-        "title": "Sustainability and Responsibility",
-        "description": "We recognize the importance of sustainability in our world today and therefore commit to implementing positive practices that preserve the environment and contribute to improving the communities in which we work."
-      }
-    }
-  },
-  "ai-consultation": {
-    "badge": "Your Best Choice",
-    "title": "Advanced Solutions Serving All Categories",
-    "subtitle": "We make it easy for trainees to choose what suits their needs, helping these categories organize training content and present it clearly and distinctly for each category separately and organize training content clearly and distinctly for each category.",
-    "cards": {
-      "ai-solutions": {
-        "title": "AI Solutions",
-        "description": "We make it easy for trainees to choose what suits their needs, helping these categories organize training content and present it clearly and distinctly for each category separately and organize training content clearly and distinctly for each category.",
-        "cta": "Request Consultation"
-      },
-      "admin-consultation": {
-        "title": "Administrative Consultation",
-        "description": "We make it easy for trainees to choose what suits their needs, helping these categories organize training content and present it clearly and distinctly for each category separately and organize training content clearly and distinctly for each category.",
-        "cta": "Request Consultation"
-      }
-    }
-  },
-  "faq": {
-    "title": "Frequently Asked Questions",
-    "subtitle": "We make it easy for trainers to choose what suits their needs, to help us these categories organize training content and present it clearly and distinctly for each category separately.",
-    "view-all": "See Full FAQs",
-    "moreQuestions": "Have more questions?",
-    "contactUs": "Contact Us",
-    "questions": {
-      "0": {
-        "question": "What is the best way to learn programming?",
-        "answer": "The best way to learn programming is through consistent practice and working on real projects. Start with one programming language and master it well before moving to others."
-      },
-      "1": {
-        "question": "How long does it take for a beginner to learn development?",
-        "answer": "The time varies depending on the person and effort invested, but typically a beginner needs 6 to 12 months to build a strong foundation in programming with daily practice."
-      },
-      "2": {
-        "question": "Can I learn programming without a technical background?",
-        "answer": "Yes, absolutely! Programming is a skill that anyone can learn regardless of their background. What matters is patience, persistence, and continuous practice."
-      }
-    }
-  },
-  "contact": {
-    "subtitle": "Get in touch with our team. We're here to help you achieve your learning goals.",
-    "subject": "Subject",
-    "message": "Message",
-    "send-message": "Send Message",
-    "phone": "Phone",
-    "email": "Email",
-    "address": "Address"
-  },
-  "invoice": {
-    "title": "Invoice",
-    "download": "Download PDF",
-    "print": "Print",
-    "downloading": "Downloading...",
-    "printing": "Printing...",
-    "close": "Close",
-    "download-success": "Invoice downloaded successfully",
-    "print-success": "Print dialog opened",
-    "download-error": "Failed to download invoice. Please try again.",
-    "print-error": "Failed to print invoice. Please try again.",
-    "help-text": "You can download the invoice as PDF or print it directly"
-  },
-  "errors": {
-    "404": {
-      "title": "Page Not Found",
-      "description": "Sorry, the page you are looking for doesn't exist. Please check the URL or return to the homepage.",
-      "go-home": "Go to Homepage",
-      "browse-courses": "Browse Courses",
-      "contact-support": "Contact Support"
-    },
-    "server": {
-      "title": "Server Error",
-      "description": "An unexpected error occurred on our server. Please check your internet connection or try again later.",
-      "retry": "Try Again",
-      "go-home": "Go to Homepage"
     }
   }
 }

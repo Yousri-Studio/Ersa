@@ -20,7 +20,7 @@ export interface Course extends Omit<ApiCourse, 'description'> {
   reviewsCount: number;
   studentsCount: number;
   duration: string;
-  level: string;
+  level: number;
   language: string;
   originalPrice: number;
   lastUpdated: string;

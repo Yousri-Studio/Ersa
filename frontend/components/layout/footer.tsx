@@ -9,7 +9,7 @@ export function Footer() {
 
   const footerLinks = {
     company: [
-      { name: t('common.about'), href: `/${locale}/about` },
+      { name: t('about.title'), href: `/${locale}/about` },
       { name: t('common.contact'), href: `/${locale}/contact` },
       { name: 'Privacy Policy', href: `/${locale}/privacy` },
       { name: 'Terms of Service', href: `/${locale}/terms` },
