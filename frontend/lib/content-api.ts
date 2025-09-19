@@ -634,73 +634,51 @@ class ContentAPI {
         }
       }
       
-      // Special handling for old team field in about section - convert to separate English/Arabic fields
+      // Special handling for team field in about section - keep as single array with bilingual fields per member
       if (sectionKey === 'about' && field.id === 'team' && field.type === 'array') {
-        console.log('🔄 Transforming old team field to separate English/Arabic fields:', field.value);
+        console.log('🔄 Processing team field with bilingual structure per member:', field.value);
         
-        // Check if team members are in old format (Arabic only) or bilingual format
+        // Check if team members already have the correct bilingual structure (nameEn, nameAr, etc.)
         if (field.value && field.value.length > 0) {
           const firstMember = field.value[0];
-          const isAlreadyBilingual = firstMember.name && typeof firstMember.name === 'object' && firstMember.name.en !== undefined;
+          const hasCorrectStructure = firstMember.nameEn !== undefined && firstMember.nameAr !== undefined;
           
-          if (isAlreadyBilingual) {
-            // Convert bilingual format to separate fields
-            console.log('🔄 Converting bilingual team format to separate fields');
-            const englishTeam = field.value.map((member: any) => ({
-              name: member.name.en || member.name,
-              position: member.position.en || member.position,
-              bio: member.bio.en || member.bio
-            }));
-            
-            const arabicTeam = field.value.map((member: any) => ({
-              name: member.name.ar || member.name,
-              position: member.position.ar || member.position,
-              bio: member.bio.ar || member.bio
-            }));
-            
-            // Return both English and Arabic fields
-            return [
-              {
-                id: 'team-members-en',
-                label: 'Team Members (English)',
-                type: 'array' as const,
-                value: englishTeam,
-                required: false
-              },
-              {
-                id: 'team-members-ar',
-                label: 'Team Members (Arabic)',
-                type: 'array' as const,
-                value: arabicTeam,
-                required: false
-              }
-            ];
+          if (hasCorrectStructure) {
+            // Team members already have the correct structure, return as-is
+            console.log('✅ Team members already have correct bilingual structure');
+            return field;
           } else {
-            // Convert old Arabic-only format to separate fields
-            console.log('🔄 Converting Arabic-only team format to separate fields');
-            const englishTeam = field.value.map((member: any) => ({
-              name: this.getEnglishEquivalent(member.name) || member.name,
-              position: this.getEnglishEquivalent(member.position) || member.position,
-              bio: this.getEnglishEquivalent(member.bio) || member.bio
-            }));
-            
-            // Return both English and Arabic fields
-            return [
-              {
-                id: 'team-members-en',
-                label: 'Team Members (English)',
-                type: 'array' as const,
-                value: englishTeam,
-                required: false
-              },
-              {
-                id: 'team-members-ar',
-                label: 'Team Members (Arabic)',
-                type: 'array' as const,
-                value: field.value, // Keep original Arabic data
-                required: false
+            // Convert old format to new bilingual structure per member
+            console.log('🔄 Converting team members to bilingual structure per member');
+            const bilingualTeam = field.value.map((member: any) => {
+              // Handle different possible formats
+              if (member.name && typeof member.name === 'object' && member.name.en !== undefined) {
+                // Old bilingual object format: { name: { en: "...", ar: "..." } }
+                return {
+                  nameEn: member.name.en || '',
+                  nameAr: member.name.ar || '',
+                  positionEn: member.position?.en || '',
+                  positionAr: member.position?.ar || '',
+                  bioEn: member.bio?.en || '',
+                  bioAr: member.bio?.ar || ''
+                };
+              } else {
+                // Old Arabic-only format or mixed format
+                return {
+                  nameEn: this.getEnglishEquivalent(member.name) || member.name || '',
+                  nameAr: member.name || '',
+                  positionEn: this.getEnglishEquivalent(member.position) || member.position || '',
+                  positionAr: member.position || '',
+                  bioEn: this.getEnglishEquivalent(member.bio) || member.bio || '',
+                  bioAr: member.bio || ''
+                };
               }
-            ];
+            });
+            
+            return {
+              ...field,
+              value: bilingualTeam
+            };
           }
         }
       }
@@ -880,77 +858,51 @@ class ContentAPI {
             placeholder: 'Enter secondary button text in Arabic'
           },
           {
-            id: 'features-en',
-            label: 'Features (English)',
+            id: 'features',
+            label: 'Features',
             type: 'array',
             value: [
               { 
-                title: 'Advanced Courses', 
-                description: 'Latest technologies and methodologies'
+                titleEn: 'Advanced Courses',
+                titleAr: 'دورات متقدمة',
+                descriptionEn: 'Latest technologies and methodologies',
+                descriptionAr: 'أحدث التقنيات والمناهج'
               },
               { 
-                title: 'Expert Trainers', 
-                description: 'Extensive experience in the field'
+                titleEn: 'Expert Trainers',
+                titleAr: 'مدربون خبراء', 
+                descriptionEn: 'Extensive experience in the field',
+                descriptionAr: 'خبرة واسعة في المجال'
               },
               { 
-                title: 'Continuous Support', 
-                description: '24/7 assistance available'
+                titleEn: 'Continuous Support',
+                titleAr: 'دعم متواصل',
+                descriptionEn: '24/7 assistance available',
+                descriptionAr: 'مساعدة على مدار الساعة'
               }
             ],
             required: true
           },
           {
-            id: 'features-ar',
-            label: 'Features (Arabic)',
+            id: 'testimonials',
+            label: 'Testimonials',
             type: 'array',
             value: [
               { 
-                title: 'دورات متقدمة', 
-                description: 'أحدث التقنيات والمناهج'
+                nameEn: 'Ahmed Ali',
+                nameAr: 'أحمد علي',
+                roleEn: 'Student',
+                roleAr: 'طالب',
+                textEn: 'Excellent training experience',
+                textAr: 'تجربة تدريبية ممتازة'
               },
               { 
-                title: 'مدربون خبراء', 
-                description: 'خبرة واسعة في المجال'
-              },
-              { 
-                title: 'دعم متواصل', 
-                description: 'مساعدة على مدار الساعة'
-              }
-            ],
-            required: true
-          },
-          {
-            id: 'testimonials-en',
-            label: 'Testimonials (English)',
-            type: 'array',
-            value: [
-              { 
-                name: 'Ahmed Ali', 
-                role: 'Student', 
-                text: 'Excellent training experience'
-              },
-              { 
-                name: 'Sarah Johnson', 
-                role: 'Manager', 
-                text: 'Professional and effective'
-              }
-            ],
-            required: false
-          },
-          {
-            id: 'testimonials-ar',
-            label: 'Testimonials (Arabic)',
-            type: 'array',
-            value: [
-              { 
-                name: 'أحمد علي', 
-                role: 'طالب', 
-                text: 'تجربة تدريبية ممتازة'
-              },
-              { 
-                name: 'سارة جونسون', 
-                role: 'مدير', 
-                text: 'مهني وفعال'
+                nameEn: 'Sarah Johnson',
+                nameAr: 'سارة جونسون',
+                roleEn: 'Manager', 
+                roleAr: 'مدير',
+                textEn: 'Professional and effective',
+                textAr: 'مهني وفعال'
               }
             ],
             required: false
@@ -998,41 +950,27 @@ class ContentAPI {
             placeholder: 'Enter page description in Arabic'
           },
           {
-            id: 'categories-en',
-            label: 'Course Categories (English)',
+            id: 'categories',
+            label: 'Course Categories',
             type: 'array',
             value: [
               { 
-                name: 'Graphic Design', 
-                description: 'Professional design courses'
+                nameEn: 'Graphic Design',
+                nameAr: 'التصميم الجرافيكي',
+                descriptionEn: 'Professional design courses',
+                descriptionAr: 'دورات تصميم احترافية'
               },
               { 
-                name: 'Web Development', 
-                description: 'Modern development skills'
+                nameEn: 'Web Development',
+                nameAr: 'تطوير الويب',
+                descriptionEn: 'Modern development skills',
+                descriptionAr: 'مهارات تطوير حديثة'
               },
               { 
-                name: 'Digital Marketing', 
-                description: 'Marketing strategies and tools'
-              }
-            ],
-            required: true
-          },
-          {
-            id: 'categories-ar',
-            label: 'Course Categories (Arabic)',
-            type: 'array',
-            value: [
-              { 
-                name: 'التصميم الجرافيكي', 
-                description: 'دورات تصميم احترافية'
-              },
-              { 
-                name: 'تطوير الويب', 
-                description: 'مهارات تطوير حديثة'
-              },
-              { 
-                name: 'التسويق الرقمي', 
-                description: 'استراتيجيات وأدوات التسويق'
+                nameEn: 'Digital Marketing',
+                nameAr: 'التسويق الرقمي',
+                descriptionEn: 'Marketing strategies and tools',
+                descriptionAr: 'استراتيجيات وأدوات التسويق'
               }
             ],
             required: true
@@ -1081,37 +1019,25 @@ class ContentAPI {
             placeholder: 'Enter company vision'
           },
           {
-            id: 'team-members-en',
-            label: 'Team Members (English)',
+            id: 'team',
+            label: 'Team Members',
             type: 'array',
             value: [
               { 
-                name: 'Ahmed Mohammed', 
-                position: 'Chief Executive Officer', 
-                bio: '15 years of experience in training'
+                nameEn: 'Ahmed Mohammed',
+                nameAr: 'أحمد محمد',
+                positionEn: 'Chief Executive Officer',
+                positionAr: 'المدير التنفيذي',
+                bioEn: '15 years of experience in training',
+                bioAr: 'خبرة 15 عام في التدريب'
               },
               { 
-                name: 'Fatima Ali', 
-                position: 'Training Manager', 
-                bio: '10 years of experience in curriculum development'
-              }
-            ],
-            required: false
-          },
-          {
-            id: 'team-members-ar',
-            label: 'Team Members (Arabic)',
-            type: 'array',
-            value: [
-              { 
-                name: 'أحمد محمد', 
-                position: 'المدير التنفيذي', 
-                bio: 'خبرة 15 عام في التدريب'
-              },
-              { 
-                name: 'فاطمة علي', 
-                position: 'مدير التدريب', 
-                bio: 'خبرة 10 أعوام في تطوير المناهج'
+                nameEn: 'Fatima Ali',
+                nameAr: 'فاطمة علي',
+                positionEn: 'Training Manager',
+                positionAr: 'مدير التدريب',
+                bioEn: '10 years of experience in curriculum development',
+                bioAr: 'خبرة 10 أعوام في تطوير المناهج'
               }
             ],
             required: false

@@ -469,6 +469,15 @@ export default function ContentEditor() {
         descriptionEn: '', 
         descriptionAr: '' 
       };
+    } else if (fieldId === 'team') {
+      newItem = { 
+        nameEn: '', 
+        nameAr: '', 
+        positionEn: '', 
+        positionAr: '', 
+        bioEn: '', 
+        bioAr: '' 
+      };
     } else if (field.value.length > 0) {
       // Create new item based on the structure of existing items
       const firstItem = field.value[0];

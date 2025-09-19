@@ -1231,6 +1231,226 @@ public class ContentController : ControllerBase
         return jsonElement;
     }
 
+    // Helper method to handle bilingual fields with {en, ar} structure
+    private async Task UpdateOrCreateBlockFromBilingualField(Guid sectionId, string blockKey, string blockName, string blockType, Dictionary<string, object> contentDict, string fieldKey)
+    {
+        string? contentEn = null;
+        string? contentAr = null;
+
+        // Check if the field has bilingual structure {en: "...", ar: "..."}
+        if (contentDict.ContainsKey(fieldKey) && contentDict[fieldKey] is IDictionary<string, object> bilingualField)
+        {
+            contentEn = bilingualField.ContainsKey("en") ? bilingualField["en"]?.ToString() : null;
+            contentAr = bilingualField.ContainsKey("ar") ? bilingualField["ar"]?.ToString() : null;
+        }
+        // Check for separate -en and -ar fields
+        else
+        {
+            contentEn = contentDict.ContainsKey($"{fieldKey}-en") ? contentDict[$"{fieldKey}-en"]?.ToString() : null;
+            contentAr = contentDict.ContainsKey($"{fieldKey}-ar") ? contentDict[$"{fieldKey}-ar"]?.ToString() : null;
+        }
+
+        await UpdateOrCreateBlock(sectionId, blockKey, blockName, blockType, contentEn, contentAr);
+    }
+
+    // Helper method to handle separate English/Arabic arrays (features, testimonials, categories)
+    private async Task HandleSeparateBilingualArrays(Guid sectionId, Dictionary<string, object> contentDict, string arrayName, string itemType)
+    {
+        // Handle separate English and Arabic arrays
+        if (contentDict.ContainsKey($"{arrayName}-en") && contentDict[$"{arrayName}-en"] is IEnumerable<object> englishItems &&
+            contentDict.ContainsKey($"{arrayName}-ar") && contentDict[$"{arrayName}-ar"] is IEnumerable<object> arabicItems)
+        {
+            var englishList = englishItems.ToList();
+            var arabicList = arabicItems.ToList();
+            var maxCount = Math.Max(englishList.Count, arabicList.Count);
+
+            for (int i = 0; i < maxCount; i++)
+            {
+                var englishItem = i < englishList.Count ? englishList[i] as IDictionary<string, object> : null;
+                var arabicItem = i < arabicList.Count ? arabicList[i] as IDictionary<string, object> : null;
+
+                string? contentEn = null;
+                string? contentAr = null;
+                string? nameEn = null;
+                string? nameAr = null;
+
+                if (itemType == "feature")
+                {
+                    nameEn = englishItem?.ContainsKey("title") == true ? englishItem["title"]?.ToString() : null;
+                    nameAr = arabicItem?.ContainsKey("title") == true ? arabicItem["title"]?.ToString() : null;
+                    var descEn = englishItem?.ContainsKey("description") == true ? englishItem["description"]?.ToString() : null;
+                    var descAr = arabicItem?.ContainsKey("description") == true ? arabicItem["description"]?.ToString() : null;
+                    contentEn = $"{nameEn}: {descEn}";
+                    contentAr = $"{nameAr}: {descAr}";
+                }
+                else if (itemType == "testimonial")
+                {
+                    nameEn = englishItem?.ContainsKey("name") == true ? englishItem["name"]?.ToString() : null;
+                    nameAr = arabicItem?.ContainsKey("name") == true ? arabicItem["name"]?.ToString() : null;
+                    var roleEn = englishItem?.ContainsKey("role") == true ? englishItem["role"]?.ToString() : null;
+                    var roleAr = arabicItem?.ContainsKey("role") == true ? arabicItem["role"]?.ToString() : null;
+                    var textEn = englishItem?.ContainsKey("text") == true ? englishItem["text"]?.ToString() : null;
+                    var textAr = arabicItem?.ContainsKey("text") == true ? arabicItem["text"]?.ToString() : null;
+                    contentEn = $"{nameEn} - {roleEn}: {textEn}";
+                    contentAr = $"{nameAr} - {roleAr}: {textAr}";
+                }
+                else if (itemType == "category")
+                {
+                    nameEn = englishItem?.ContainsKey("name") == true ? englishItem["name"]?.ToString() : null;
+                    nameAr = arabicItem?.ContainsKey("name") == true ? arabicItem["name"]?.ToString() : null;
+                    var descEn = englishItem?.ContainsKey("description") == true ? englishItem["description"]?.ToString() : null;
+                    var descAr = arabicItem?.ContainsKey("description") == true ? arabicItem["description"]?.ToString() : null;
+                    contentEn = $"{nameEn}: {descEn}";
+                    contentAr = $"{nameAr}: {descAr}";
+                }
+
+                await UpdateOrCreateBlock(sectionId, $"{itemType}_{i}", nameEn ?? nameAr ?? $"{itemType} {i + 1}", itemType, contentEn, contentAr);
+            }
+        }
+        // Handle single bilingual array with mixed structure (titleEn, titleAr, etc.)
+        else if (contentDict.ContainsKey(arrayName) && contentDict[arrayName] is IEnumerable<object> bilingualItems)
+        {
+            var itemList = bilingualItems.ToList();
+            for (int i = 0; i < itemList.Count; i++)
+            {
+                var item = itemList[i] as IDictionary<string, object>;
+                if (item != null)
+                {
+                    string? contentEn = null;
+                    string? contentAr = null;
+                    string? nameEn = null;
+                    string? nameAr = null;
+
+                    if (itemType == "feature")
+                    {
+                        nameEn = item.ContainsKey("titleEn") ? item["titleEn"]?.ToString() : null;
+                        nameAr = item.ContainsKey("titleAr") ? item["titleAr"]?.ToString() : null;
+                        var descEn = item.ContainsKey("descriptionEn") ? item["descriptionEn"]?.ToString() : null;
+                        var descAr = item.ContainsKey("descriptionAr") ? item["descriptionAr"]?.ToString() : null;
+                        contentEn = $"{nameEn}: {descEn}";
+                        contentAr = $"{nameAr}: {descAr}";
+                    }
+                    else if (itemType == "testimonial")
+                    {
+                        nameEn = item.ContainsKey("nameEn") ? item["nameEn"]?.ToString() : null;
+                        nameAr = item.ContainsKey("nameAr") ? item["nameAr"]?.ToString() : null;
+                        var roleEn = item.ContainsKey("roleEn") ? item["roleEn"]?.ToString() : null;
+                        var roleAr = item.ContainsKey("roleAr") ? item["roleAr"]?.ToString() : null;
+                        var textEn = item.ContainsKey("textEn") ? item["textEn"]?.ToString() : null;
+                        var textAr = item.ContainsKey("textAr") ? item["textAr"]?.ToString() : null;
+                        contentEn = $"{nameEn} - {roleEn}: {textEn}";
+                        contentAr = $"{nameAr} - {roleAr}: {textAr}";
+                    }
+                    else if (itemType == "category")
+                    {
+                        nameEn = item.ContainsKey("nameEn") ? item["nameEn"]?.ToString() : null;
+                        nameAr = item.ContainsKey("nameAr") ? item["nameAr"]?.ToString() : null;
+                        var descEn = item.ContainsKey("descriptionEn") ? item["descriptionEn"]?.ToString() : null;
+                        var descAr = item.ContainsKey("descriptionAr") ? item["descriptionAr"]?.ToString() : null;
+                        contentEn = $"{nameEn}: {descEn}";
+                        contentAr = $"{nameAr}: {descAr}";
+                    }
+
+                    await UpdateOrCreateBlock(sectionId, $"{itemType}_{i}", nameEn ?? nameAr ?? $"{itemType} {i + 1}", itemType, contentEn, contentAr);
+                }
+            }
+        }
+    }
+
+    // Helper method to handle team members array with bilingual fields per member
+    private async Task HandleTeamMembersArray(Guid sectionId, Dictionary<string, object> contentDict)
+    {
+        if (contentDict.ContainsKey("team") && contentDict["team"] is IEnumerable<object> teamMembers)
+        {
+            var teamList = teamMembers.ToList();
+            for (int i = 0; i < teamList.Count; i++)
+            {
+                var member = teamList[i] as IDictionary<string, object>;
+                if (member != null)
+                {
+                    var nameEn = member.ContainsKey("nameEn") ? member["nameEn"]?.ToString() : null;
+                    var nameAr = member.ContainsKey("nameAr") ? member["nameAr"]?.ToString() : null;
+                    var positionEn = member.ContainsKey("positionEn") ? member["positionEn"]?.ToString() : null;
+                    var positionAr = member.ContainsKey("positionAr") ? member["positionAr"]?.ToString() : null;
+                    var bioEn = member.ContainsKey("bioEn") ? member["bioEn"]?.ToString() : null;
+                    var bioAr = member.ContainsKey("bioAr") ? member["bioAr"]?.ToString() : null;
+
+                    var memberContentEn = $"{nameEn} - {positionEn}: {bioEn}";
+                    var memberContentAr = $"{nameAr} - {positionAr}: {bioAr}";
+
+                    await UpdateOrCreateBlock(sectionId, $"team_{i}", nameEn ?? nameAr ?? $"Team Member {i + 1}", "team", memberContentEn, memberContentAr);
+                }
+            }
+        }
+    }
+
+    // Helper method to handle FAQ items array (separate English/Arabic arrays or bilingual items)
+    private async Task HandleFAQItemsArray(Guid sectionId, Dictionary<string, object> contentDict)
+    {
+        // Handle separate English and Arabic FAQ arrays
+        if (contentDict.ContainsKey("faq-items-en") && contentDict["faq-items-en"] is IEnumerable<object> englishFAQs &&
+            contentDict.ContainsKey("faq-items-ar") && contentDict["faq-items-ar"] is IEnumerable<object> arabicFAQs)
+        {
+            var englishList = englishFAQs.ToList();
+            var arabicList = arabicFAQs.ToList();
+            var maxCount = Math.Max(englishList.Count, arabicList.Count);
+
+            for (int i = 0; i < maxCount; i++)
+            {
+                var englishFAQ = i < englishList.Count ? englishList[i] as IDictionary<string, object> : null;
+                var arabicFAQ = i < arabicList.Count ? arabicList[i] as IDictionary<string, object> : null;
+
+                var questionEn = englishFAQ?.ContainsKey("question") == true ? englishFAQ["question"]?.ToString() : null;
+                var questionAr = arabicFAQ?.ContainsKey("question") == true ? arabicFAQ["question"]?.ToString() : null;
+                var answerEn = englishFAQ?.ContainsKey("answer") == true ? englishFAQ["answer"]?.ToString() : null;
+                var answerAr = arabicFAQ?.ContainsKey("answer") == true ? arabicFAQ["answer"]?.ToString() : null;
+
+                var contentEn = $"{questionEn}|{answerEn}";
+                var contentAr = $"{questionAr}|{answerAr}";
+
+                await UpdateOrCreateBlock(sectionId, $"faq_{i}", questionEn ?? questionAr ?? $"FAQ {i + 1}", "faq", contentEn, contentAr);
+            }
+        }
+        // Handle single bilingual FAQ array with mixed structure (questionEn, questionAr, etc.)
+        else if (contentDict.ContainsKey("faq-items") && contentDict["faq-items"] is IEnumerable<object> bilingualFAQs)
+        {
+            var faqList = bilingualFAQs.ToList();
+            for (int i = 0; i < faqList.Count; i++)
+            {
+                var faq = faqList[i] as IDictionary<string, object>;
+                if (faq != null)
+                {
+                    var questionEn = faq.ContainsKey("questionEn") ? faq["questionEn"]?.ToString() : null;
+                    var questionAr = faq.ContainsKey("questionAr") ? faq["questionAr"]?.ToString() : null;
+                    var answerEn = faq.ContainsKey("answerEn") ? faq["answerEn"]?.ToString() : null;
+                    var answerAr = faq.ContainsKey("answerAr") ? faq["answerAr"]?.ToString() : null;
+
+                    var contentEn = $"{questionEn}|{answerEn}";
+                    var contentAr = $"{questionAr}|{answerAr}";
+
+                    await UpdateOrCreateBlock(sectionId, $"faq_{i}", questionEn ?? questionAr ?? $"FAQ {i + 1}", "faq", contentEn, contentAr);
+                }
+            }
+        }
+        // Handle old format with single faqs array
+        else if (contentDict.ContainsKey("faqs") && contentDict["faqs"] is IEnumerable<object> faqs)
+        {
+            var faqList = faqs.ToList();
+            for (int i = 0; i < faqList.Count; i++)
+            {
+                var faq = faqList[i] as IDictionary<string, object>;
+                if (faq != null)
+                {
+                    var question = faq.ContainsKey("question") ? faq["question"]?.ToString() : null;
+                    var answer = faq.ContainsKey("answer") ? faq["answer"]?.ToString() : null;
+                    var content = $"{question}|{answer}";
+
+                    await UpdateOrCreateBlock(sectionId, $"faq_{i}", question ?? $"FAQ {i + 1}", "faq", content);
+                }
+            }
+        }
+    }
+
     private async Task UpdateSectionBlocks(ContentSection section, dynamic content)
     {
         // var contentDict = content as IDictionary<string, object> ?? new Dictionary<string, object>();
@@ -1244,117 +1464,73 @@ public class ContentController : ControllerBase
         switch (section.SectionKey.ToLower())
         {
             case "hero":
-                await UpdateOrCreateBlock(section.Id, "title", "Title", "text", contentDict.ContainsKey("hero-title") ? contentDict["hero-title"]?.ToString() : null);  
-                await UpdateOrCreateBlock(section.Id, "subtitle", "Subtitle", "text", contentDict.ContainsKey("hero-subtitle") ? contentDict["hero-subtitle"]?.ToString() : null);
-                await UpdateOrCreateBlock(section.Id, "cta-primary", "Primary CTA", "text", contentDict.ContainsKey("hero-cta-primary") ? contentDict["hero-cta-primary"]?.ToString() : null);
-                await UpdateOrCreateBlock(section.Id, "cta-secondary", "Secondary CTA", "text", contentDict.ContainsKey("hero-cta-secondary") ? contentDict["hero-cta-secondary"]?.ToString() : null);
+                // Handle bilingual fields with {en, ar} structure
+                await UpdateOrCreateBlockFromBilingualField(section.Id, "hero-badge", "Hero Badge", "text", contentDict, "hero-badge");
+                await UpdateOrCreateBlockFromBilingualField(section.Id, "hero-title", "Hero Title", "text", contentDict, "hero-title");
+                await UpdateOrCreateBlockFromBilingualField(section.Id, "hero-description", "Hero Description", "textarea", contentDict, "hero-description");
+                await UpdateOrCreateBlockFromBilingualField(section.Id, "hero-cta-primary", "Primary CTA", "text", contentDict, "hero-cta-primary");
+                await UpdateOrCreateBlockFromBilingualField(section.Id, "hero-cta-secondary", "Secondary CTA", "text", contentDict, "hero-cta-secondary");
                 
-                // Handle features array
-                if (contentDict.ContainsKey("features") && contentDict["features"] is IEnumerable<object> features)
-                {
-                    var featureList = features.ToList();
-                    for (int i = 0; i < featureList.Count; i++)
-                    {
-                        var feature = featureList[i] as IDictionary<string, object>;
-                        if (feature != null)
-                        {
-                            var title = feature.ContainsKey("title") ? feature["title"]?.ToString() : null;
-                            var description = feature.ContainsKey("description") ? feature["description"]?.ToString() : null;
-                            await UpdateOrCreateBlock(section.Id, $"feature_{i}", title ?? $"Feature {i + 1}", "feature", description);
-                        }
-                    }
-                }
+                // Handle separate English/Arabic features arrays
+                await HandleSeparateBilingualArrays(section.Id, contentDict, "features", "feature");
                 
-                // Handle testimonials array
-                if (contentDict.ContainsKey("testimonials") && contentDict["testimonials"] is IEnumerable<object> testimonials)
-                {
-                    var testimonialList = testimonials.ToList();
-                    for (int i = 0; i < testimonialList.Count; i++)
-                    {
-                        var testimonial = testimonialList[i] as IDictionary<string, object>;
-                        if (testimonial != null)
-                        {
-                            var name = testimonial.ContainsKey("name") ? testimonial["name"]?.ToString() : null;
-                            var role = testimonial.ContainsKey("role") ? testimonial["role"]?.ToString() : null;
-                            var text = testimonial.ContainsKey("text") ? testimonial["text"]?.ToString() : null;
-                            var testimonialContent = $"{name} - {role}: {text}";
-                            await UpdateOrCreateBlock(section.Id, $"testimonial_{i}", name ?? $"Testimonial {i + 1}", "testimonial", testimonialContent);
-                        }
-                    }
-                }
+                // Handle separate English/Arabic testimonials arrays
+                await HandleSeparateBilingualArrays(section.Id, contentDict, "testimonials", "testimonial");
                 break;
             
             case "courses":
-                await UpdateOrCreateBlock(section.Id, "title", "Page Title", "text", contentDict.ContainsKey("page-title") ? contentDict["page-title"]?.ToString() : null);
-                await UpdateOrCreateBlock(section.Id, "description", "Page Description", "text", contentDict.ContainsKey("page-description") ? contentDict["page-description"]?.ToString() : null);
+                // Handle bilingual page title and description
+                await UpdateOrCreateBlockFromBilingualField(section.Id, "page-title", "Page Title", "text", contentDict, "page-title");
+                await UpdateOrCreateBlockFromBilingualField(section.Id, "page-description", "Page Description", "textarea", contentDict, "page-description");
                 
-                // Handle categories array
-                if (contentDict.ContainsKey("categories") && contentDict["categories"] is IEnumerable<object> categories)
-                {
-                    var categoryList = categories.ToList();
-                    for (int i = 0; i < categoryList.Count; i++)
-                    {
-                        var category = categoryList[i] as IDictionary<string, object>;
-                        if (category != null)
-                        {
-                            var name = category.ContainsKey("name") ? category["name"]?.ToString() : null;
-                            var description = category.ContainsKey("description") ? category["description"]?.ToString() : null;
-                            await UpdateOrCreateBlock(section.Id, $"category_{i}", name ?? $"Category {i + 1}", "category", description);
-                        }
-                    }
-                }
+                // Handle separate English/Arabic categories arrays
+                await HandleSeparateBilingualArrays(section.Id, contentDict, "categories", "category");
                 break;
             
             case "about":
-                await UpdateOrCreateBlock(section.Id, "company-name", "Company Name", "text", 
-                    contentDict.ContainsKey("company-name-en") ? contentDict["company-name-en"]?.ToString() : null,
-                    contentDict.ContainsKey("company-name-ar") ? contentDict["company-name-ar"]?.ToString() : null);
-                await UpdateOrCreateBlock(section.Id, "mission", "Mission", "text", 
-                    contentDict.ContainsKey("mission-en") ? contentDict["mission-en"]?.ToString() : null,
-                    contentDict.ContainsKey("mission-ar") ? contentDict["mission-ar"]?.ToString() : null);
-                await UpdateOrCreateBlock(section.Id, "vision", "Vision", "text", 
-                    contentDict.ContainsKey("vision-en") ? contentDict["vision-en"]?.ToString() : null,
-                    contentDict.ContainsKey("vision-ar") ? contentDict["vision-ar"]?.ToString() : null);
+                // Handle bilingual fields with {en, ar} structure
+                await UpdateOrCreateBlockFromBilingualField(section.Id, "company-name", "Company Name", "text", contentDict, "company-name");
+                await UpdateOrCreateBlockFromBilingualField(section.Id, "mission", "Mission Statement", "textarea", contentDict, "mission-statement");
+                await UpdateOrCreateBlockFromBilingualField(section.Id, "vision", "Vision Statement", "textarea", contentDict, "vision-statement");
                 
-                // Handle team array
-                if (contentDict.ContainsKey("team") && contentDict["team"] is IEnumerable<object> team)
-                {
-                    var teamList = team.ToList();
-                    for (int i = 0; i < teamList.Count; i++)
-                    {
-                        var member = teamList[i] as IDictionary<string, object>;
-                        if (member != null)
-                        {
-                            var name = member.ContainsKey("name") ? member["name"]?.ToString() : null;
-                            var position = member.ContainsKey("position") ? member["position"]?.ToString() : null;
-                            var bio = member.ContainsKey("bio") ? member["bio"]?.ToString() : null;
-                            var memberContent = $"{name} - {position}: {bio}";
-                            await UpdateOrCreateBlock(section.Id, $"team_{i}", name ?? $"Team Member {i + 1}", "team", memberContent);
-                        }
-                    }
-                }
+                // Handle team array with bilingual fields per member (nameEn, nameAr, positionEn, positionAr, etc.)
+                await HandleTeamMembersArray(section.Id, contentDict);
                 break;
             
             case "faq":
-                if (contentDict.ContainsKey("faqs") && contentDict["faqs"] is IEnumerable<object> faqs)
-                {
-                    var faqList = faqs.ToList();
-                    for (int i = 0; i < faqList.Count; i++)
-                    {
-                        var faq = faqList[i] as IDictionary<string, object>;
-                        if (faq != null)
-                        {
-                            var question = faq.ContainsKey("question") ? faq["question"]?.ToString() : null;
-                            var answer = faq.ContainsKey("answer") ? faq["answer"]?.ToString() : null;
-                            await UpdateOrCreateBlock(section.Id, $"faq_{i}", question ?? $"FAQ {i + 1}", "faq", answer);
-                        }
-                    }
-                }
+                // Handle bilingual FAQ title
+                await UpdateOrCreateBlockFromBilingualField(section.Id, "faq-title", "FAQ Title", "text", contentDict, "faq-title");
+                
+                // Handle separate English/Arabic FAQ items arrays or bilingual FAQ items
+                await HandleFAQItemsArray(section.Id, contentDict);
                 break;
             
+            case "services":
+                // Handle bilingual services fields
+                await UpdateOrCreateBlockFromBilingualField(section.Id, "title", "Services Title", "text", contentDict, "services-title");
+                await UpdateOrCreateBlockFromBilingualField(section.Id, "description", "Services Description", "textarea", contentDict, "services-description");
+                break;
+                
+            case "contact":
+                // Handle bilingual contact fields
+                await UpdateOrCreateBlockFromBilingualField(section.Id, "title", "Contact Title", "text", contentDict, "contact-title");
+                await UpdateOrCreateBlockFromBilingualField(section.Id, "address", "Address", "text", contentDict, "address");
+                
+                // Handle monolingual fields
+                await UpdateOrCreateBlock(section.Id, "phone", "Phone Number", "text", contentDict.ContainsKey("phone") ? contentDict["phone"]?.ToString() : null);
+                await UpdateOrCreateBlock(section.Id, "email", "Email Address", "text", contentDict.ContainsKey("email") ? contentDict["email"]?.ToString() : null);
+                break;
+                
+            case "consultation":
+                // Handle bilingual consultation fields
+                await UpdateOrCreateBlockFromBilingualField(section.Id, "title", "Consultation Title", "text", contentDict, "consultation-title");
+                await UpdateOrCreateBlockFromBilingualField(section.Id, "description", "Consultation Description", "textarea", contentDict, "consultation-description");
+                break;
+                
             default:
-                await UpdateOrCreateBlock(section.Id, "title", "Title", "text", contentDict.ContainsKey("title") ? contentDict["title"]?.ToString() : null);
-                await UpdateOrCreateBlock(section.Id, "description", "Description", "text", contentDict.ContainsKey("description") ? contentDict["description"]?.ToString() : null);
+                // Handle generic bilingual fields
+                await UpdateOrCreateBlockFromBilingualField(section.Id, "title", "Title", "text", contentDict, "title");
+                await UpdateOrCreateBlockFromBilingualField(section.Id, "description", "Description", "textarea", contentDict, "description");
                 break;
         }
     }
@@ -1418,6 +1594,7 @@ public class ContentController : ControllerBase
             _context.ContentBlocks.Add(newBlock);
         }
     }
+
 
     private string GetPageDisplayName(string pageKey)
     {
@@ -1524,94 +1701,115 @@ public class ContentController : ControllerBase
         switch (section.SectionKey.ToLower())
         {
             case "hero":
+                // Bilingual fields with {en, ar} structure
                 fields.Add(new
                 {
-                    id = "hero-badge",
-                    label = "Hero Badge",
+                    id = "hero-badge-en",
+                    label = "Hero Badge (English)",
                     type = "text",
-                    value = new
-                    {
-                        en = blocks.FirstOrDefault(b => b.BlockKey == "hero-badge")?.ContentEn ?? "Ersa with you for skill development",
-                        ar = blocks.FirstOrDefault(b => b.BlockKey == "hero-badge")?.ContentAr ?? "إرساء معك لتطوير المهارات"
-                    },
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "hero-badge")?.ContentEn ?? "Ersa with you for skill development",
                     required = true,
-                    placeholder = "Enter hero badge text"
+                    placeholder = "Enter hero badge text in English"
                 });
                 fields.Add(new
                 {
-                    id = "hero-title",
-                    label = "Hero Title",
+                    id = "hero-badge-ar",
+                    label = "Hero Badge (Arabic)",
                     type = "text",
-                    value = new
-                    {
-                        en = blocks.FirstOrDefault(b => b.BlockKey == "hero-title")?.ContentEn ?? "Explore our training platform and elevate your abilities to achieve your maximum potential",
-                        ar = blocks.FirstOrDefault(b => b.BlockKey == "hero-title")?.ContentAr ?? "استكشف منصتنا التدريبية وارتقي بقدراتك لتحقيق أقصى إمكاناتك"
-                    },
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "hero-badge")?.ContentAr ?? "إرساء معك لتطوير المهارات",
                     required = true,
-                    placeholder = "Enter main hero title"
+                    placeholder = "Enter hero badge text in Arabic"
                 });
                 fields.Add(new
                 {
-                    id = "hero-description",
-                    label = "Hero Description",
+                    id = "hero-title-en",
+                    label = "Hero Title (English)",
+                    type = "text",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "hero-title")?.ContentEn ?? "Explore our training platform and elevate your abilities to achieve your maximum potential",
+                    required = true,
+                    placeholder = "Enter main hero title in English"
+                });
+                fields.Add(new
+                {
+                    id = "hero-title-ar",
+                    label = "Hero Title (Arabic)",
+                    type = "text",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "hero-title")?.ContentAr ?? "استكشف منصتنا التدريبية وارتقي بقدراتك لتحقيق أقصى إمكاناتك",
+                    required = true,
+                    placeholder = "Enter main hero title in Arabic"
+                });
+                fields.Add(new
+                {
+                    id = "hero-description-en",
+                    label = "Hero Description (English)",
                     type = "textarea",
-                    value = new
-                    {
-                        en = blocks.FirstOrDefault(b => b.BlockKey == "hero-description")?.ContentEn ?? "Build a promising future and lead your life with our interactive and comprehensive programs",
-                        ar = blocks.FirstOrDefault(b => b.BlockKey == "hero-description")?.ContentAr ?? "ابن مستقبلاً واعداً وقود حياتك مع برامجنا التفاعلية والمفهمة"
-                    },
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "hero-description")?.ContentEn ?? "Build a promising future and lead your life with our interactive and comprehensive programs",
                     required = true,
-                    placeholder = "Enter hero description"
+                    placeholder = "Enter hero description in English"
                 });
                 fields.Add(new
                 {
-                    id = "hero-cta-primary",
-                    label = "Primary CTA Text",
-                    type = "text",
-                    value = new
-                    {
-                        en = blocks.FirstOrDefault(b => b.BlockKey == "hero-cta-primary")?.ContentEn ?? "Explore Courses",
-                        ar = blocks.FirstOrDefault(b => b.BlockKey == "hero-cta-primary")?.ContentAr ?? "استكشف الدورات"
-                    },
+                    id = "hero-description-ar",
+                    label = "Hero Description (Arabic)",
+                    type = "textarea",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "hero-description")?.ContentAr ?? "ابن مستقبلاً واعداً وقود حياتك مع برامجنا التفاعلية والمفهمة",
                     required = true,
-                    placeholder = "Enter primary button text"
+                    placeholder = "Enter hero description in Arabic"
                 });
                 fields.Add(new
                 {
-                    id = "hero-cta-secondary",
-                    label = "Secondary CTA Text",
+                    id = "hero-cta-primary-en",
+                    label = "Primary CTA Text (English)",
                     type = "text",
-                    value = new
-                    {
-                        en = blocks.FirstOrDefault(b => b.BlockKey == "hero-cta-secondary")?.ContentEn ?? "Request Consultation",
-                        ar = blocks.FirstOrDefault(b => b.BlockKey == "hero-cta-secondary")?.ContentAr ?? "طلب استشارة"
-                    },
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "hero-cta-primary")?.ContentEn ?? "Explore Courses",
+                    required = true,
+                    placeholder = "Enter primary button text in English"
+                });
+                fields.Add(new
+                {
+                    id = "hero-cta-primary-ar",
+                    label = "Primary CTA Text (Arabic)",
+                    type = "text",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "hero-cta-primary")?.ContentAr ?? "استكشف الدورات",
+                    required = true,
+                    placeholder = "Enter primary button text in Arabic"
+                });
+                fields.Add(new
+                {
+                    id = "hero-cta-secondary-en",
+                    label = "Secondary CTA Text (English)",
+                    type = "text",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "hero-cta-secondary")?.ContentEn ?? "Request Consultation",
                     required = false,
-                    placeholder = "Enter secondary button text"
+                    placeholder = "Enter secondary button text in English"
                 });
+                fields.Add(new
+                {
+                    id = "hero-cta-secondary-ar",
+                    label = "Secondary CTA Text (Arabic)",
+                    type = "text",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "hero-cta-secondary")?.ContentAr ?? "طلب استشارة",
+                    required = false,
+                    placeholder = "Enter secondary button text in Arabic"
+                });
+                
+                // Features array with bilingual items
                 fields.Add(new
                 {
                     id = "features",
                     label = "Features",
                     type = "array",
-                    value = new[]
-                    {
-                        new { title = "دورات متقدمة", description = "أحدث التقنيات والمناهج" },
-                        new { title = "مدربون خبراء", description = "خبرة واسعة في المجال" },
-                        new { title = "دعم متواصل", description = "مساعدة على مدار الساعة" }
-                    },
+                    value = GetBilingualArrayFromBlocks(blocks, "feature"),
                     required = true
                 });
+                
+                // Testimonials array with bilingual items
                 fields.Add(new
                 {
                     id = "testimonials",
                     label = "Testimonials",
                     type = "array",
-                    value = new[]
-                    {
-                        new { name = "أحمد علي", role = "طالب", text = "تجربة تدريبية ممتازة" },
-                        new { name = "سارة جونسون", role = "مدير", text = "مهني وفعال" }
-                    },
+                    value = GetBilingualArrayFromBlocks(blocks, "testimonial"),
                     required = false
                 });
                 break;
@@ -1653,86 +1851,67 @@ public class ContentController : ControllerBase
                     required = true,
                     placeholder = "Enter page description in Arabic"
                 });
+                
+                // Categories array with bilingual items
                 fields.Add(new
                 {
                     id = "categories",
                     label = "Course Categories",
                     type = "array",
-                    value = new[]
-                    {
-                        new { name = "التصميم الجرافيكي", description = "دورات تصميم احترافية" },
-                        new { name = "تطوير الويب", description = "مهارات تطوير حديثة" },
-                        new { name = "التسويق الرقمي", description = "استراتيجيات وأدوات التسويق" }
-                    },
+                    value = GetBilingualArrayFromBlocks(blocks, "category"),
                     required = true
                 });
                 break;
 
             case "about":
+                // Bilingual fields with {en, ar} structure
                 fields.Add(new
                 {
-                    id = "company-name-en",
-                    label = "Company Name (English)",
+                    id = "company-name",
+                    label = "Company Name",
                     type = "text",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "company-name")?.ContentEn ?? "Ersa Training",
+                    value = new
+                    {
+                        en = blocks.FirstOrDefault(b => b.BlockKey == "company-name")?.ContentEn ?? "Ersa Training",
+                        ar = blocks.FirstOrDefault(b => b.BlockKey == "company-name")?.ContentAr ?? "إرساء للتدريب"
+                    },
                     required = true,
-                    placeholder = "Enter company name in English"
+                    placeholder = "Enter company name"
                 });
                 fields.Add(new
                 {
-                    id = "company-name-ar",
-                    label = "Company Name (Arabic)",
-                    type = "text",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "company-name")?.ContentAr ?? "إرساء للتدريب",
-                    required = true,
-                    placeholder = "Enter company name in Arabic"
-                });
-                fields.Add(new
-                {
-                    id = "mission-en",
-                    label = "Mission Statement (English)",
+                    id = "mission-statement",
+                    label = "Mission Statement",
                     type = "textarea",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "mission")?.ContentEn ?? "Empowering individuals and organizations through world-class training solutions",
+                    value = new
+                    {
+                        en = blocks.FirstOrDefault(b => b.BlockKey == "mission")?.ContentEn ?? "Empowering individuals and organizations through world-class training solutions",
+                        ar = blocks.FirstOrDefault(b => b.BlockKey == "mission")?.ContentAr ?? "تمكين الأفراد والمنظمات من خلال حلول تدريبية عالمية المستوى"
+                    },
                     required = true,
-                    placeholder = "Enter company mission in English"
+                    placeholder = "Enter company mission"
                 });
                 fields.Add(new
                 {
-                    id = "mission-ar",
-                    label = "Mission Statement (Arabic)",
+                    id = "vision-statement",
+                    label = "Vision Statement",
                     type = "textarea",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "mission")?.ContentAr ?? "تمكين الأفراد والمنظمات من خلال حلول تدريبية عالمية المستوى",
+                    value = new
+                    {
+                        en = blocks.FirstOrDefault(b => b.BlockKey == "vision")?.ContentEn ?? "To be the preferred training partner in the region",
+                        ar = blocks.FirstOrDefault(b => b.BlockKey == "vision")?.ContentAr ?? "أن نكون الشريك التدريبي المفضل في المنطقة"
+                    },
                     required = true,
-                    placeholder = "Enter company mission in Arabic"
+                    placeholder = "Enter company vision"
                 });
-                fields.Add(new
-                {
-                    id = "vision-en",
-                    label = "Vision Statement (English)",
-                    type = "textarea",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "vision")?.ContentEn ?? "To be the preferred training partner in the region",
-                    required = true,
-                    placeholder = "Enter company vision in English"
-                });
-                fields.Add(new
-                {
-                    id = "vision-ar",
-                    label = "Vision Statement (Arabic)",
-                    type = "textarea",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "vision")?.ContentAr ?? "أن نكون الشريك التدريبي المفضل في المنطقة",
-                    required = true,
-                    placeholder = "Enter company vision in Arabic"
-                });
+                
+                // Team array with bilingual fields per member
                 fields.Add(new
                 {
                     id = "team",
                     label = "Team Members",
                     type = "array",
-                    value = new[]
-                    {
-                        new { name = "أحمد محمد", position = "المدير التنفيذي", bio = "خبرة 15 عام في التدريب" },
-                        new { name = "فاطمة علي", position = "مدير التدريب", bio = "خبرة 10 أعوام في تطوير المناهج" }
-                    },
+                    value = GetTeamMembersFromBlocks(blocks),
                     required = false
                 });
                 break;
@@ -1852,32 +2031,22 @@ public class ContentController : ControllerBase
                     required = true,
                     placeholder = "Enter FAQ title in Arabic"
                 });
+                
+                // Separate English/Arabic arrays for FAQ items
                 fields.Add(new
                 {
-                    id = "faqs",
-                    label = "FAQ Items",
+                    id = "faq-items-en",
+                    label = "FAQ Items (English)",
                     type = "array",
-                    value = new[]
-                    {
-                        new { 
-                            question = "How do I enroll in a course?", 
-                            answer = "You can enroll through our website or contact us directly.",
-                            questionAr = "كيف يمكنني التسجيل في دورة؟",
-                            answerAr = "يمكنك التسجيل من خلال موقعنا الإلكتروني أو التواصل معنا مباشرة."
-                        },
-                        new { 
-                            question = "What payment methods do you accept?", 
-                            answer = "We accept credit cards, bank transfers, and online payments.",
-                            questionAr = "ما هي طرق الدفع المقبولة؟",
-                            answerAr = "نقبل بطاقات الائتمان والتحويلات البنكية والمدفوعات الإلكترونية."
-                        },
-                        new { 
-                            question = "Do you offer certificates?", 
-                            answer = "Yes, we provide certificates of completion for all our courses.",
-                            questionAr = "هل تقدمون شهادات؟",
-                            answerAr = "نعم، نقدم شهادات إتمام لجميع دوراتنا."
-                        }
-                    },
+                    value = GetFAQItemsFromBlocks(blocks, true), // English content
+                    required = true
+                });
+                fields.Add(new
+                {
+                    id = "faq-items-ar",
+                    label = "FAQ Items (Arabic)",
+                    type = "array",
+                    value = GetFAQItemsFromBlocks(blocks, false), // Arabic content
                     required = true
                 });
                 break;
@@ -1945,6 +2114,382 @@ public class ContentController : ControllerBase
         }
 
         return fields;
+    }
+
+    // Helper method to get array items from blocks (features, testimonials, categories)
+    private object[] GetArrayFromBlocks(List<ContentBlock> blocks, string itemType, bool isEnglish)
+    {
+        var arrayBlocks = blocks.Where(b => b.BlockKey.StartsWith($"{itemType}_")).OrderBy(b => b.BlockKey).ToList();
+        var result = new List<object>();
+
+        foreach (var block in arrayBlocks)
+        {
+            var content = isEnglish ? block.ContentEn : block.ContentAr;
+            if (!string.IsNullOrEmpty(content))
+            {
+                // Parse the content based on item type
+                if (itemType == "feature")
+                {
+                    var parts = content.Split(':', 2);
+                    result.Add(new
+                    {
+                        title = parts.Length > 0 ? parts[0].Trim() : "",
+                        description = parts.Length > 1 ? parts[1].Trim() : ""
+                    });
+                }
+                else if (itemType == "testimonial")
+                {
+                    var parts = content.Split(" - ", 2);
+                    if (parts.Length > 1)
+                    {
+                        var nameAndRole = parts[0].Trim();
+                        var textPart = parts[1].Trim();
+                        var roleParts = textPart.Split(':', 2);
+                        
+                        result.Add(new
+                        {
+                            name = nameAndRole,
+                            role = roleParts.Length > 0 ? roleParts[0].Trim() : "",
+                            text = roleParts.Length > 1 ? roleParts[1].Trim() : ""
+                        });
+                    }
+                }
+                else if (itemType == "category")
+                {
+                    var parts = content.Split(':', 2);
+                    result.Add(new
+                    {
+                        name = parts.Length > 0 ? parts[0].Trim() : "",
+                        description = parts.Length > 1 ? parts[1].Trim() : ""
+                    });
+                }
+            }
+        }
+
+        // If no data from database, return default values
+        if (result.Count == 0)
+        {
+            if (itemType == "feature")
+            {
+                if (isEnglish)
+                {
+                    result.AddRange(new[]
+                    {
+                        new { title = "Advanced Courses", description = "Latest technologies and methodologies" },
+                        new { title = "Expert Trainers", description = "Extensive experience in the field" },
+                        new { title = "Continuous Support", description = "24/7 assistance available" }
+                    });
+                }
+                else
+                {
+                    result.AddRange(new[]
+                    {
+                        new { title = "دورات متقدمة", description = "أحدث التقنيات والمناهج" },
+                        new { title = "مدربون خبراء", description = "خبرة واسعة في المجال" },
+                        new { title = "دعم متواصل", description = "مساعدة على مدار الساعة" }
+                    });
+                }
+            }
+            else if (itemType == "testimonial")
+            {
+                if (isEnglish)
+                {
+                    result.AddRange(new[]
+                    {
+                        new { name = "Ahmed Ali", role = "Student", text = "Excellent training experience" },
+                        new { name = "Sarah Johnson", role = "Manager", text = "Professional and effective" }
+                    });
+                }
+                else
+                {
+                    result.AddRange(new[]
+                    {
+                        new { name = "أحمد علي", role = "طالب", text = "تجربة تدريبية ممتازة" },
+                        new { name = "سارة جونسون", role = "مدير", text = "مهني وفعال" }
+                    });
+                }
+            }
+            else if (itemType == "category")
+            {
+                if (isEnglish)
+                {
+                    result.AddRange(new[]
+                    {
+                        new { name = "Graphic Design", description = "Professional design courses" },
+                        new { name = "Web Development", description = "Modern development skills" },
+                        new { name = "Digital Marketing", description = "Marketing strategies and tools" }
+                    });
+                }
+                else
+                {
+                    result.AddRange(new[]
+                    {
+                        new { name = "التصميم الجرافيكي", description = "دورات تصميم احترافية" },
+                        new { name = "تطوير الويب", description = "مهارات تطوير حديثة" },
+                        new { name = "التسويق الرقمي", description = "استراتيجيات وأدوات التسويق" }
+                    });
+                }
+            }
+        }
+
+        return result.ToArray();
+    }
+
+    // Helper method to get bilingual array items from blocks (features, testimonials, categories)
+    private object[] GetBilingualArrayFromBlocks(List<ContentBlock> blocks, string itemType)
+    {
+        var arrayBlocks = blocks.Where(b => b.BlockKey.StartsWith($"{itemType}_")).OrderBy(b => b.BlockKey).ToList();
+        var result = new List<object>();
+
+        foreach (var block in arrayBlocks)
+        {
+            if (!string.IsNullOrEmpty(block.ContentEn) && !string.IsNullOrEmpty(block.ContentAr))
+            {
+                // Parse the content based on item type
+                if (itemType == "feature")
+                {
+                    var enParts = block.ContentEn.Split(':', 2);
+                    var arParts = block.ContentAr.Split(':', 2);
+                    
+                    result.Add(new
+                    {
+                        titleEn = enParts.Length > 0 ? enParts[0].Trim() : "",
+                        titleAr = arParts.Length > 0 ? arParts[0].Trim() : "",
+                        descriptionEn = enParts.Length > 1 ? enParts[1].Trim() : "",
+                        descriptionAr = arParts.Length > 1 ? arParts[1].Trim() : ""
+                    });
+                }
+                else if (itemType == "testimonial")
+                {
+                    var enParts = block.ContentEn.Split(" - ", 2);
+                    var arParts = block.ContentAr.Split(" - ", 2);
+                    
+                    if (enParts.Length > 1 && arParts.Length > 1)
+                    {
+                        var nameEn = enParts[0].Trim();
+                        var nameAr = arParts[0].Trim();
+                        var textPartEn = enParts[1].Trim();
+                        var textPartAr = arParts[1].Trim();
+                        var rolePartsEn = textPartEn.Split(':', 2);
+                        var rolePartsAr = textPartAr.Split(':', 2);
+                        
+                        result.Add(new
+                        {
+                            nameEn = nameEn,
+                            nameAr = nameAr,
+                            roleEn = rolePartsEn.Length > 0 ? rolePartsEn[0].Trim() : "",
+                            roleAr = rolePartsAr.Length > 0 ? rolePartsAr[0].Trim() : "",
+                            textEn = rolePartsEn.Length > 1 ? rolePartsEn[1].Trim() : "",
+                            textAr = rolePartsAr.Length > 1 ? rolePartsAr[1].Trim() : ""
+                        });
+                    }
+                }
+                else if (itemType == "category")
+                {
+                    var enParts = block.ContentEn.Split(':', 2);
+                    var arParts = block.ContentAr.Split(':', 2);
+                    
+                    result.Add(new
+                    {
+                        nameEn = enParts.Length > 0 ? enParts[0].Trim() : "",
+                        nameAr = arParts.Length > 0 ? arParts[0].Trim() : "",
+                        descriptionEn = enParts.Length > 1 ? enParts[1].Trim() : "",
+                        descriptionAr = arParts.Length > 1 ? arParts[1].Trim() : ""
+                    });
+                }
+            }
+        }
+
+        // If no data from database, return default values
+        if (result.Count == 0)
+        {
+            if (itemType == "feature")
+            {
+                result.AddRange(new[]
+                {
+                    new { 
+                        titleEn = "Advanced Courses", 
+                        titleAr = "دورات متقدمة",
+                        descriptionEn = "Latest technologies and methodologies", 
+                        descriptionAr = "أحدث التقنيات والمناهج"
+                    },
+                    new { 
+                        titleEn = "Expert Trainers", 
+                        titleAr = "مدربون خبراء",
+                        descriptionEn = "Extensive experience in the field", 
+                        descriptionAr = "خبرة واسعة في المجال"
+                    },
+                    new { 
+                        titleEn = "Continuous Support", 
+                        titleAr = "دعم متواصل",
+                        descriptionEn = "24/7 assistance available", 
+                        descriptionAr = "مساعدة على مدار الساعة"
+                    }
+                });
+            }
+            else if (itemType == "testimonial")
+            {
+                result.AddRange(new[]
+                {
+                    new { 
+                        nameEn = "Ahmed Ali", 
+                        nameAr = "أحمد علي",
+                        roleEn = "Student", 
+                        roleAr = "طالب",
+                        textEn = "Excellent training experience", 
+                        textAr = "تجربة تدريبية ممتازة"
+                    },
+                    new { 
+                        nameEn = "Sarah Johnson", 
+                        nameAr = "سارة جونسون",
+                        roleEn = "Manager", 
+                        roleAr = "مدير",
+                        textEn = "Professional and effective", 
+                        textAr = "مهني وفعال"
+                    }
+                });
+            }
+            else if (itemType == "category")
+            {
+                result.AddRange(new[]
+                {
+                    new { 
+                        nameEn = "Graphic Design", 
+                        nameAr = "التصميم الجرافيكي",
+                        descriptionEn = "Professional design courses", 
+                        descriptionAr = "دورات تصميم احترافية"
+                    },
+                    new { 
+                        nameEn = "Web Development", 
+                        nameAr = "تطوير الويب",
+                        descriptionEn = "Modern development skills", 
+                        descriptionAr = "مهارات تطوير حديثة"
+                    },
+                    new { 
+                        nameEn = "Digital Marketing", 
+                        nameAr = "التسويق الرقمي",
+                        descriptionEn = "Marketing strategies and tools", 
+                        descriptionAr = "استراتيجيات وأدوات التسويق"
+                    }
+                });
+            }
+        }
+
+        return result.ToArray();
+    }
+
+    // Helper method to get team members from blocks
+    private object[] GetTeamMembersFromBlocks(List<ContentBlock> blocks)
+    {
+        var teamBlocks = blocks.Where(b => b.BlockKey.StartsWith("team_")).OrderBy(b => b.BlockKey).ToList();
+        var result = new List<object>();
+
+        foreach (var block in teamBlocks)
+        {
+            if (!string.IsNullOrEmpty(block.ContentEn) && !string.IsNullOrEmpty(block.ContentAr))
+            {
+                // Parse English content: "Name - Position: Bio"
+                var enParts = block.ContentEn.Split(" - ", 2);
+                var nameEn = enParts.Length > 0 ? enParts[0].Trim() : "";
+                var positionBioEn = enParts.Length > 1 ? enParts[1].Trim() : "";
+                var enBioParts = positionBioEn.Split(':', 2);
+                var positionEn = enBioParts.Length > 0 ? enBioParts[0].Trim() : "";
+                var bioEn = enBioParts.Length > 1 ? enBioParts[1].Trim() : "";
+
+                // Parse Arabic content: "Name - Position: Bio"
+                var arParts = block.ContentAr.Split(" - ", 2);
+                var nameAr = arParts.Length > 0 ? arParts[0].Trim() : "";
+                var positionBioAr = arParts.Length > 1 ? arParts[1].Trim() : "";
+                var arBioParts = positionBioAr.Split(':', 2);
+                var positionAr = arBioParts.Length > 0 ? arBioParts[0].Trim() : "";
+                var bioAr = arBioParts.Length > 1 ? arBioParts[1].Trim() : "";
+
+                result.Add(new
+                {
+                    nameEn = nameEn,
+                    nameAr = nameAr,
+                    positionEn = positionEn,
+                    positionAr = positionAr,
+                    bioEn = bioEn,
+                    bioAr = bioAr
+                });
+            }
+        }
+
+        // If no data from database, return default values
+        if (result.Count == 0)
+        {
+            result.AddRange(new[]
+            {
+                new
+                {
+                    nameEn = "Ahmed Mohammed",
+                    nameAr = "أحمد محمد",
+                    positionEn = "Chief Executive Officer",
+                    positionAr = "المدير التنفيذي",
+                    bioEn = "15 years of experience in training",
+                    bioAr = "خبرة 15 عام في التدريب"
+                },
+                new
+                {
+                    nameEn = "Fatima Ali",
+                    nameAr = "فاطمة علي",
+                    positionEn = "Training Manager",
+                    positionAr = "مدير التدريب",
+                    bioEn = "10 years of experience in curriculum development",
+                    bioAr = "خبرة 10 أعوام في تطوير المناهج"
+                }
+            });
+        }
+
+        return result.ToArray();
+    }
+
+    // Helper method to get FAQ items from blocks
+    private object[] GetFAQItemsFromBlocks(List<ContentBlock> blocks, bool isEnglish)
+    {
+        var faqBlocks = blocks.Where(b => b.BlockKey.StartsWith("faq_")).OrderBy(b => b.BlockKey).ToList();
+        var result = new List<object>();
+
+        foreach (var block in faqBlocks)
+        {
+            var content = isEnglish ? block.ContentEn : block.ContentAr;
+            if (!string.IsNullOrEmpty(content))
+            {
+                // Parse the content: "Question|Answer"
+                var parts = content.Split('|', 2);
+                result.Add(new
+                {
+                    question = parts.Length > 0 ? parts[0].Trim() : "",
+                    answer = parts.Length > 1 ? parts[1].Trim() : ""
+                });
+            }
+        }
+
+        // If no data from database, return default values
+        if (result.Count == 0)
+        {
+            if (isEnglish)
+            {
+                result.AddRange(new[]
+                {
+                    new { question = "How do I enroll in a course?", answer = "You can enroll through our website or contact us directly." },
+                    new { question = "What payment methods do you accept?", answer = "We accept credit cards, bank transfers, and online payments." },
+                    new { question = "Do you offer certificates?", answer = "Yes, we provide certificates of completion for all our courses." }
+                });
+            }
+            else
+            {
+                result.AddRange(new[]
+                {
+                    new { question = "كيف يمكنني التسجيل في دورة؟", answer = "يمكنك التسجيل من خلال موقعنا الإلكتروني أو التواصل معنا مباشرة." },
+                    new { question = "ما هي طرق الدفع المقبولة؟", answer = "نقبل بطاقات الائتمان والتحويلات البنكية والمدفوعات الإلكترونية." },
+                    new { question = "هل تقدمون شهادات؟", answer = "نعم، نقدم شهادات إتمام لجميع دوراتنا." }
+                });
+            }
+        }
+
+        return result.ToArray();
     }
 }
 
