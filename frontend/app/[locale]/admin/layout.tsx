@@ -8,6 +8,7 @@ import { useAuthStore } from '@/lib/auth-store';
 import { Icon } from '@/components/ui/icon';
 import { useHydration } from '@/hooks/useHydration';
 import { adminApi } from '@/lib/admin-api';
+import { LanguageSwitcher } from '@/components/layout/language-switcher';
 import toast from 'react-hot-toast';
 import Image from 'next/image';
 
@@ -167,6 +168,13 @@ export default function AdminLayout({
                 </Link>
               ))}
             </nav>
+
+            {/* Language Switcher */}
+            <div className="flex-shrink-0 px-4 sm:px-6 py-3 border-t border-gray-200">
+              <div className="flex justify-center">
+                <LanguageSwitcher />
+              </div>
+            </div>
 
             {/* User Info */}
             <div className="flex-shrink-0 px-4 sm:px-6 py-4 border-t border-gray-200" dir={isRTL ? 'rtl' : 'ltr'}>

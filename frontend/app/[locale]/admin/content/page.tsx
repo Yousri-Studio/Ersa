@@ -252,94 +252,9 @@ export default function ContentManagement() {
           </div>
         )}
 
-        {/* Content Grid */}
-        {!loading && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredSections.map((section) => (
-            <motion.div
-              key={section.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.3 }}
-                             className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-               onClick={() => router.push(`/${locale}/admin/content/${section.id}`)}
-            >
-              <div className="p-6">
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Icon name={section.icon} className="w-6 h-6 text-blue-600" />
-                  </div>
-                  <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(section.status)}`}>
-                    {getStatusText(section.status)}
-                  </span>
-                </div>
-                
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                  {section.title}
-                </h3>
-                
-                <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                  {section.description}
-                </p>
-                
-                <div className="flex items-center justify-between text-xs text-gray-500">
-                  <span className="capitalize">{section.type}</span>
-                  <span>{formatDate(section.lastModified)}</span>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-          </div>
-        )}
-
-        {/* Quick Actions */}
-        <div className="mt-12 bg-gray-50 rounded-xl p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            {locale === 'ar' ? 'إجراءات سريعة' : 'Quick Actions'}
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <button 
-              onClick={async () => {
-                try {
-                  await contentApi.initializeSampleData();
-                  toast.success(locale === 'ar' ? 'تم تهيئة البيانات النموذجية بنجاح' : 'Sample data initialized successfully');
-                  window.location.reload();
-                } catch (error) {
-                  console.error('Error initializing sample data:', error);
-                  toast.error(locale === 'ar' ? 'فشل في تهيئة البيانات النموذجية' : 'Failed to initialize sample data');
-                }
-              }}
-              className="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-colors"
-            >
-              <Icon name="database" className="w-5 h-5 text-blue-600 mr-2" />
-              <span className="text-sm font-medium text-gray-700">
-                {locale === 'ar' ? 'تهيئة البيانات' : 'Initialize Data'}
-              </span>
-            </button>
-            <button className="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:border-green-300 hover:bg-green-50 transition-colors">
-              <Icon name="upload" className="w-5 h-5 text-green-600 mr-2" />
-              <span className="text-sm font-medium text-gray-700">
-                {locale === 'ar' ? 'رفع ملفات' : 'Upload Files'}
-              </span>
-            </button>
-            <button className="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:border-purple-300 hover:bg-purple-50 transition-colors">
-              <Icon name="copy" className="w-5 h-5 text-purple-600 mr-2" />
-              <span className="text-sm font-medium text-gray-700">
-                {locale === 'ar' ? 'نسخ محتوى' : 'Copy Content'}
-              </span>
-            </button>
-            <button className="flex items-center p-3 bg-white rounded-lg border border-gray-200 hover:border-orange-300 hover:bg-orange-50 transition-colors">
-              <Icon name="download" className="w-5 h-5 text-orange-600 mr-2" />
-              <span className="text-sm font-medium text-gray-700">
-                {locale === 'ar' ? 'تصدير' : 'Export'}
-              </span>
-            </button>
-          </div>
-        </div>
-
         {/* Content Statistics */}
         {!loading && (
-          <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="mb-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-white p-6 rounded-xl border border-gray-200">
               <div className="flex items-center">
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mr-4">
@@ -406,6 +321,46 @@ export default function ContentManagement() {
                 </div>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Content Grid */}
+        {!loading && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredSections.map((section) => (
+            <motion.div
+              key={section.id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+                             className="bg-white border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+               onClick={() => router.push(`/${locale}/admin/content/${section.id}`)}
+            >
+              <div className="p-6">
+                <div className="flex items-start justify-between mb-4">
+                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                    <Icon name={section.icon} className="w-6 h-6 text-blue-600" />
+                  </div>
+                  <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getStatusColor(section.status)}`}>
+                    {getStatusText(section.status)}
+                  </span>
+                </div>
+                
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  {section.title}
+                </h3>
+                
+                <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                  {section.description}
+                </p>
+                
+                <div className="flex items-center justify-between text-xs text-gray-500">
+                  <span className="capitalize">{section.type}</span>
+                  <span>{formatDate(section.lastModified)}</span>
+                </div>
+              </div>
+            </motion.div>
+          ))}
           </div>
         )}
       </div>
