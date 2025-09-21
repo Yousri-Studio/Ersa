@@ -42,10 +42,10 @@ export function AchievementsSection() {
   const animations = [animation1, animation2, animation3, animation4];
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-8 md:py-16 bg-white">
       <div className="mx-auto px-4 sm:px-6 lg:px-8">
         <div 
-          className="mx-auto max-w-7xl p-5 sm:p-8 lg:p-16"
+          className="mx-auto max-w-7xl p-4 sm:p-8 lg:p-16"
           style={{
             display: 'flex',
             width: '100%',

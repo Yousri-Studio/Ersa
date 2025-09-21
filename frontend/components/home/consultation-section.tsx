@@ -17,10 +17,10 @@ export function ConsultationSection() {
   ];
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-8 md:py-16 bg-white">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Layout changes based on locale */}
-        <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 items-center ${
+        <div className={`grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center ${
           locale === 'en' ? 'lg:grid-flow-col-dense' : ''
         }`} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
           

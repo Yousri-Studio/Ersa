@@ -48,7 +48,7 @@ export function TestimonialsSection() {
   }));
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-8 md:py-16 bg-white">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-12">
@@ -64,9 +64,9 @@ export function TestimonialsSection() {
         </div>
 
         {/* Testimonials Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
           {testimonials.map((testimonial) => (
-            <div key={testimonial.id} className="bg-white border border-gray-100 p-8 transition-all duration-300" style={{borderRadius: '20px'}}>
+            <div key={testimonial.id} className="bg-white border border-gray-100 p-6 md:p-8 transition-all duration-300" style={{borderRadius: '20px'}}>
               {/* Profile Section */}
               <div className="flex items-center mb-6">
                 <div className="h-16 w-16 rounded-full overflow-hidden flex-shrink-0">

@@ -91,7 +91,7 @@ export function Header() {
       <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8" aria-label="Top">
         <div className="flex h-16 items-center justify-between">
           {/* Logo and Navigation */}
-          <div className="flex items-center" style={{gap: '65px'}}>
+          <div className="flex items-center md:gap-16 gap-4">
             <Link
               href={`/${locale}`}
               className="flex items-center"
@@ -122,8 +122,8 @@ export function Header() {
             </div>
           </div>
 
-          {/* Right side */}
-          <div className="flex items-center space-x-4 rtl:space-x-reverse">
+          {/* Right side - Desktop only */}
+          <div className="hidden md:flex items-center space-x-4 rtl:space-x-reverse">
             {/* Language Switcher */}
             <LanguageSwitcher />
 
@@ -225,124 +225,202 @@ export function Header() {
                 {t('common.login')}
               </Link>
             )}
-
-            {/* Mobile menu button */}
-            <button
-              type="button"
-              className="md:hidden p-2 text-gray-700 hover:text-primary-600 transition-colors duration-200"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            >
-              {mobileMenuOpen ? (
-                <Icon name="xmark" className="h-6 w-6" />
-              ) : (
-                <Icon name="bars" className="h-6 w-6" />
-              )}
-            </button>
           </div>
+
+          {/* Mobile menu button */}
+          <button
+            type="button"
+            className="md:hidden p-2 text-gray-700 hover:text-primary-600 transition-colors duration-200"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? (
+              <Icon name="xmark" className="h-6 w-6" />
+            ) : (
+              <Icon name="bars" className="h-6 w-6" />
+            )}
+          </button>
         </div>
 
-        {/* Mobile menu */}
+        {/* Mobile menu overlay */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-200 py-4">
-            <div className="space-y-1">
-              {navigation.map((item) => (
+          <div className="fixed inset-0 z-40 md:hidden">
+            {/* Backdrop */}
+            <div 
+              className="fixed inset-0 bg-black bg-opacity-25"
+              onClick={() => setMobileMenuOpen(false)}
+            />
+            
+            {/* Menu panel */}
+            <div className="fixed top-0 left-0 right-0 bg-white shadow-lg max-h-screen overflow-y-auto">
+              {/* Menu header */}
+              <div className="flex items-center justify-between p-4 border-b border-gray-200">
                 <Link
-                  key={item.name}
-                  href={item.href}
-                  className={`block px-3 py-2 nav-link rounded-md transition-colors duration-200 ${
-                    pathname === item.href
-                      ? 'text-primary-600 bg-primary-50'
-                      : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
-                  }`}
-                  onClick={(e) => {
-                    if (item.sectionId) {
-                      handleNavClick(e, item.sectionId);
-                    }
-                    setMobileMenuOpen(false);
-                  }}
+                  href={`/${locale}`}
+                  className="flex items-center"
+                  onClick={() => setMobileMenuOpen(false)}
                 >
-                  {item.name}
+                  <img 
+                    src="/Header Logo.svg" 
+                    alt={t('hero.company')}
+                    className="h-8 w-auto"
+                  />
                 </Link>
-              ))}
-              
-              {isAuthenticated && (
-                <>
-                  <hr className="my-2" />
-                  <Link
-                    href={`/${locale}/profile/enrollments`}
-                    className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-md transition-colors duration-200"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <Icon name="graduation-cap" className="h-5 w-5 mr-3 rtl:mr-0 rtl:ml-3" />
-                    {t('navigation.my-learning')}
-                  </Link>
-                  <Link
-                    href={`/${locale}/profile/wishlist`}
-                    className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-md transition-colors duration-200"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <div className="relative mr-3 rtl:mr-0 rtl:ml-3">
-                      <Icon icon={['fas', 'heart']} className="h-5 w-5" style={{ color: '#00AC96' }} />
-                      {wishlistCount() > 0 && (
-                        <span className="absolute -top-1 -right-1 h-4 w-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-semibold">
-                          {wishlistCount()}
-                        </span>
-                      )}
-                    </div>
-                    {t('navigation.wishlist')}
-                  </Link>
-                  <Link
-                    href={`/${locale}/profile`}
-                    className="flex items-center px-3 py-2 text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-md transition-colors duration-200"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <Icon name="user" className="h-5 w-5 mr-3 rtl:mr-0 rtl:ml-3" />
-                    {t('common.profile')}
-                  </Link>
-                  <button
-                    onClick={() => {
-                      handleLogout();
-                      setMobileMenuOpen(false);
-                    }}
-                    className="w-full text-left px-3 py-2 text-base font-medium text-red-600 hover:bg-red-50 rounded-md transition-colors duration-200"
-                  >
-                    {t('common.logout')}
-                  </button>
-                </>
-              )}
+                <button
+                  type="button"
+                  className="p-2 text-gray-700 hover:text-primary-600 transition-colors duration-200"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Icon name="xmark" className="h-6 w-6" />
+                </button>
+              </div>
 
-              {!isAuthenticated && (
-                <>
-                  <hr className="my-2" />
+              {/* Menu content */}
+              <div className="p-4 space-y-4">
+                {/* Navigation links */}
+                <div className="space-y-1">
+                  {navigation.map((item) => (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className={`block px-3 py-3 nav-link rounded-md transition-colors duration-200 text-base ${
+                        pathname === item.href
+                          ? 'text-primary-600 bg-primary-50'
+                          : 'text-gray-700 hover:text-primary-600 hover:bg-gray-50'
+                      }`}
+                      onClick={(e) => {
+                        if (item.sectionId) {
+                          handleNavClick(e, item.sectionId);
+                        }
+                        setMobileMenuOpen(false);
+                      }}
+                    >
+                      {item.name}
+                    </Link>
+                  ))}
+                </div>
+
+                {/* Language Switcher - Mobile only */}
+                <div className="flex justify-center py-2 border-t border-gray-200">
+                  <LanguageSwitcher />
+                </div>
+
+                {/* Action buttons row */}
+                <div className="flex items-center justify-center py-4 border-t border-gray-200 gap-5">
+                  {/* Wishlist */}
                   <Link
-                    href={`/${locale}/auth/login`}
-                    className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-md transition-colors duration-200"
+                    href={`/${locale}/wishlist`}
+                    className="relative flex items-center justify-center w-12 h-12 bg-gray-50 rounded-full hover:bg-gray-100 transition-all duration-200"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    {t('common.login')}
+                    <Icon 
+                      icon={['fas', 'heart']} 
+                      className="h-5 w-5" 
+                      style={{ color: '#00AC96' }}
+                    />
+                    {wishlistCount() > 0 && (
+                      <span className="absolute -top-1 -right-1 rtl:right-auto rtl:left-0 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-semibold">
+                        {wishlistCount()}
+                      </span>
+                    )}
                   </Link>
+
+                  {/* Cart */}
                   <Link
-                    href={`/${locale}/auth/register`}
-                    className="block px-3 py-2 text-base font-medium text-primary-600 hover:bg-primary-50 rounded-md transition-colors duration-200"
+                    href={`/${locale}/cart`}
+                    className="relative flex items-center justify-center w-12 h-12 bg-gray-50 rounded-full hover:bg-gray-100 transition-all duration-200"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    {t('common.register')}
+                    <Icon 
+                      name="shopping-cart" 
+                      className="h-5 w-5" 
+                      style={{ color: '#3F3D56' }}
+                    />
+                    {itemCount() > 0 && (
+                      <span className="absolute -top-1 -right-1 rtl:right-auto rtl:left-0 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-semibold">
+                        {itemCount()}
+                      </span>
+                    )}
                   </Link>
-                </>
-              )}
+                </div>
+
+                {/* User section */}
+                {isAuthenticated ? (
+                  <>
+                    <div className="border-t border-gray-200 pt-4 space-y-2">
+                      <div className="flex items-center px-3 py-2">
+                        <Icon name="user" className="h-5 w-5 mr-3 rtl:mr-0 rtl:ml-3 text-gray-500" />
+                        <span className="text-base font-medium text-gray-700">
+                          {user?.fullName}
+                        </span>
+                      </div>
+                      
+                      <Link
+                        href={`/${locale}/profile/enrollments`}
+                        className="flex items-center px-3 py-3 text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-md transition-colors duration-200"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <Icon name="graduation-cap" className="h-5 w-5 mr-3 rtl:mr-0 rtl:ml-3" />
+                        {t('navigation.my-learning')}
+                      </Link>
+                      
+                      <Link
+                        href={`/${locale}/profile/wishlist`}
+                        className="flex items-center px-3 py-3 text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-md transition-colors duration-200"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <Icon icon={['fas', 'heart']} className="h-5 w-5 mr-3 rtl:mr-0 rtl:ml-3" style={{ color: '#00AC96' }} />
+                        {t('navigation.wishlist')}
+                      </Link>
+                      
+                      <Link
+                        href={`/${locale}/profile`}
+                        className="flex items-center px-3 py-3 text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-md transition-colors duration-200"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <Icon name="user" className="h-5 w-5 mr-3 rtl:mr-0 rtl:ml-3" />
+                        {t('common.profile')}
+                      </Link>
+                      
+                      <button
+                        onClick={() => {
+                          handleLogout();
+                          setMobileMenuOpen(false);
+                        }}
+                        className="w-full text-left px-3 py-3 text-base font-medium text-red-600 hover:bg-red-50 rounded-md transition-colors duration-200"
+                      >
+                        {t('common.logout')}
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="border-t border-gray-200 pt-4 space-y-2">
+                    <Link
+                      href={`/${locale}/auth/login`}
+                      className="block w-full text-center px-4 py-3 text-base font-medium text-white bg-primary-600 hover:bg-primary-700 rounded-md transition-colors duration-200"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {t('common.login')}
+                    </Link>
+                    <Link
+                      href={`/${locale}/auth/register`}
+                      className="block w-full text-center px-4 py-3 text-base font-medium text-primary-600 border border-primary-600 hover:bg-primary-50 rounded-md transition-colors duration-200"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      {t('common.register')}
+                    </Link>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
       </nav>
 
-      {/* Backdrop for mobile menu */}
-      {(mobileMenuOpen || userMenuOpen) && (
+      {/* Backdrop for desktop user menu */}
+      {userMenuOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black bg-opacity-25 md:hidden"
-          onClick={() => {
-            setMobileMenuOpen(false);
-            setUserMenuOpen(false);
-          }}
+          className="fixed inset-0 z-40 bg-transparent md:hidden"
+          onClick={() => setUserMenuOpen(false)}
         />
       )}
     </header>

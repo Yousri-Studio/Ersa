@@ -179,7 +179,7 @@ export default function FAQPage() {
                 {/* Question Header */}
                 <button
                   onClick={() => toggleItem(index)}
-                  className={`w-full px-6 py-4 flex items-center justify-between hover:bg-gray-50 transition-all duration-300 ${
+                  className={`w-full px-4 md:px-6 py-3 md:py-4 flex items-center justify-between hover:bg-gray-50 transition-all duration-300 ${
                     locale === 'ar' ? 'text-right' : 'text-left'
                   }`}
                 >
@@ -203,14 +203,14 @@ export default function FAQPage() {
                   </div>
                   
                   {/* Question Text - Center */}
-                  <div className="flex-1 mx-4">
+                  <div className="flex-1 mx-2 md:mx-4">
                     <h3 
                       className={`font-semibold font-cairo transition-all duration-300 ${
                         locale === 'ar' ? 'text-right' : 'text-left'
                       }`}
                       style={{
                         color: openItem === index ? '#00AC96' : '#292561',
-                        fontSize: '18px'
+                        fontSize: 'clamp(14px, 3vw, 18px)'
                       }}
                     >
                       {item.question}
@@ -228,8 +228,8 @@ export default function FAQPage() {
 
                 {/* Answer Content */}
                 {openItem === index && (
-                  <div className="px-6 pb-4 pt-2 border-t border-gray-100 animate-fade-in-up">
-                    <p className={`text-gray-600 font-cairo leading-relaxed ${
+                  <div className="px-4 md:px-6 pb-4 pt-2 border-t border-gray-100 animate-fade-in-up">
+                    <p className={`text-gray-600 font-cairo leading-relaxed text-sm md:text-base ${
                       locale === 'ar' ? 'text-right' : 'text-left'
                     }`}>
                       {item.answer}
@@ -245,13 +245,12 @@ export default function FAQPage() {
         <div className="flex justify-center scroll-item">
           {/* Card Container */}
           <div 
-            className="p-12 text-center flex-shrink-0 contact-card hover-lift"
+            className="p-6 md:p-12 text-center flex-shrink-0 contact-card hover-lift w-full max-w-4xl"
             style={{
               borderRadius: '10px',
               border: '1px solid #F6F6FA',
               background: '#FFF',
-              width: '973px',
-              height: '429px'
+              minHeight: '300px'
             }}
           >
             {/* Title */}
@@ -287,12 +286,12 @@ export default function FAQPage() {
             </p>
 
             {/* Input Field */}
-            <div className="mb-8 mx-auto max-w-2xl">
+            <div className="mb-6 md:mb-8 mx-auto max-w-2xl px-4 md:px-0">
               <div 
                 className="flex items-center justify-between transition-all duration-300 hover:shadow-md"
                 style={{
                   display: 'flex',
-                  padding: '20px 24px',
+                  padding: '16px 20px',
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   borderRadius: '6px',
@@ -328,13 +327,12 @@ export default function FAQPage() {
             </div>
 
             {/* Send Button */}
-            <div className="flex justify-center">
+            <div className="flex justify-center px-4 md:px-0">
               <button
                 onClick={() => window.location.href = `/${locale}/contact`}
-                className="font-cairo font-bold text-white btn-animate"
+                className="font-cairo font-bold text-white btn-animate w-full max-w-md md:w-auto"
                 style={{
                   display: 'flex',
-                  width: '398px',
                   padding: '14px 30px',
                   justifyContent: 'center',
                   alignItems: 'center',
@@ -342,7 +340,8 @@ export default function FAQPage() {
                   borderRadius: '10px',
                   background: '#292561',
                   fontSize: '16px',
-                  fontWeight: 600
+                  fontWeight: 600,
+                  minWidth: '200px'
                 }}
               >
                 {locale === 'ar' ? 'إرسال' : 'Send'}

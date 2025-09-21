@@ -336,8 +336,8 @@ export default function CoursesPage() {
             {locale === 'ar' ? 'الدورات المميزة' : 'Featured Courses'}
           </h2>
           
-          {/* Featured Courses Grid - 2 columns only - Show last 2 featured courses */}
-          <div className="grid grid-cols-2 gap-6 mb-8">
+          {/* Featured Courses Grid - 1 column on mobile, 2 columns on desktop - Show last 2 featured courses */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             {(() => {
               // Get featured courses from API, or fallback to mock courses if API fails/empty
               let featuredCourses: Course[] = [];
