@@ -123,18 +123,18 @@ export default function AdminLayout({
           } border-gray-200 shadow-lg lg:shadow-none`}>
             {/* Logo Section */}
             <div className="flex-shrink-0 px-4 sm:px-6 py-4 border-b border-gray-200">
-              <div className={`flex items-center ${isRTL ? 'justify-end' : 'justify-between'}`}>
+              <div className="flex items-center justify-center relative">
                 <Image
                   src="/Header Logo.svg"
                   alt="Ersa Training"
                   width={100}
                   height={38}
                   priority
-                  className={isRTL ? 'order-2' : 'order-1'}
+                  className="mx-auto"
                 />
                 <button
                   onClick={() => setIsMenuOpen(false)}
-                  className={`lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 ${isRTL ? 'order-1' : 'order-2'}`}
+                  className={`lg:hidden absolute ${isRTL ? 'left-2' : 'right-2'} p-2 rounded-md text-gray-400 hover:text-gray-500`}
                 >
                   <Icon name="times" className="h-5 w-5" />
                 </button>

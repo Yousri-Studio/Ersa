@@ -219,7 +219,7 @@ export const CourseCard: React.FC<CourseCardProps> & {
           
           {/* Mode badge (top-right) */}
           <div className={`absolute rounded-full text-white px-3 py-1 flex items-center gap-1.5 shadow-sm ${
-            currentLocale === 'ar' ? 'right-5' : 'left-5'
+            currentLocale === 'ar' ? 'left-5' : 'right-5'
           }`} style={{ backgroundColor: '#282660', top: '18px' }}>
             <Icon icon={getModeIcon()} className="w-3 h-3" />
             <span className="text-sm font-medium">{getModeLabel()}</span>

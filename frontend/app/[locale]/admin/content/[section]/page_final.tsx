@@ -389,11 +389,11 @@ export default function ContentEditor() {
               <div className="flex items-center mb-2">
                 <button
                   onClick={() => router.back()}
-                  className="p-2 text-gray-400 hover:text-gray-600 mr-3"
+                  className="p-2 text-gray-400 hover:text-gray-600 mr-3 rtl:mr-0 rtl:ml-3"
                 >
                   <Icon name="arrow-left" className="w-5 h-5" />
                 </button>
-                <Icon name="edit" className="w-8 h-8 text-blue-600 mr-3" />
+                <Icon name="edit" className="w-8 h-8 text-blue-600 mr-3 rtl:mr-0 rtl:ml-3" />
                 <h1 className="text-3xl font-bold text-gray-900">
                   {section.title}
                 </h1>

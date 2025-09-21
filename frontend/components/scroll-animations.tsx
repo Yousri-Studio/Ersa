@@ -1,9 +1,14 @@
 'use client';
 
 import { useEffect } from 'react';
+import { useClientOnly } from '@/hooks/use-client-only';
 
 export function ScrollAnimations() {
+  const isClient = useClientOnly();
+
   useEffect(() => {
+    if (!isClient) return;
+    
     // Wait for next tick to ensure DOM is fully rendered
     const timer = setTimeout(() => {
       // Create intersection observer for scroll animations
@@ -39,7 +44,12 @@ export function ScrollAnimations() {
     return () => {
       clearTimeout(timer);
     };
-  }, []);
+  }, [isClient]);
+
+  // Don't render anything during SSR to prevent hydration mismatch
+  if (!isClient) {
+    return null;
+  }
 
   return null; // This component doesn't render anything
 }

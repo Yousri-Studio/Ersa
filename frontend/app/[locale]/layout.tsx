@@ -3,6 +3,7 @@ import { getMessages } from 'next-intl/server';
 import { Providers } from '@/components/providers';
 import { ConditionalLayout } from '@/components/layout/conditional-layout';
 import { ScrollAnimations } from '@/components/scroll-animations';
+import { HtmlAttributes } from '@/components/layout/html-attributes';
 import { cairo } from '../fonts';
 import '../globals.css';
 
@@ -22,6 +23,7 @@ export default async function LocaleLayout({
 
   return (
     <NextIntlClientProvider messages={messages}>
+      <HtmlAttributes />
       <Providers>
         <ScrollAnimations />
         <ConditionalLayout>

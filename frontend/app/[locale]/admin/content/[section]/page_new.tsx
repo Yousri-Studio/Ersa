@@ -55,7 +55,7 @@ export default function ContentEditor() {
     // Check authentication first
     if (isHydrated && !isAuthenticated) {
       console.log('❌ Not authenticated, redirecting to login');
-      toast.error(locale === 'ar' ? 'يجب تسجيل الدخول للوصول لهذه الصفحة' : 'You must be logged in to access this page');
+      toast.error(t('mustBeLoggedIn'));
       router.push(`/${locale}/admin-login`);
       return;
     }
@@ -63,7 +63,7 @@ export default function ContentEditor() {
     // Check if user has admin privileges
     if (isHydrated && isAuthenticated && user && !user.isAdmin && !user.isSuperAdmin) {
       console.log('❌ User lacks admin privileges');
-      toast.error(locale === 'ar' ? 'ليس لديك صلاحيات للوصول لهذه الصفحة' : 'You do not have permission to access this page');
+      toast.error(t('noPermission'));
       router.push(`/${locale}/`);
       return;
     }
@@ -103,16 +103,16 @@ export default function ContentEditor() {
                 console.error('Failed to initialize sample data:', initError);
               }
             }
-            toast.error(locale === 'ar' ? 'الصفحة غير موجودة' : 'Page not found');
+            toast.error(t('pageNotFound'));
             router.push(`/${locale}/admin/content`);
           }
         } catch (error: any) {
           console.error('Error loading content templates:', error);
           
-          let errorMessage = locale === 'ar' ? 'فشل في تحميل قوالب المحتوى' : 'Failed to load content templates';
+          let errorMessage = t('failedToLoadTemplates');
           
           if (error.message === 'Authentication required') {
-            errorMessage = locale === 'ar' ? 'انتهت صلاحية الجلسة. يرجى تسجيل الدخول مرة أخرى' : 'Session expired. Please login again';
+            errorMessage = t('sessionExpired');
             setError(errorMessage);
             // Redirect to login after a short delay
             setTimeout(() => {
@@ -224,7 +224,7 @@ export default function ContentEditor() {
       // Update the local state with the updated section
       setSection(updatedSection);
       setLastSaved(new Date().toLocaleTimeString(locale === 'ar' ? 'ar-SA' : 'en-US'));
-      toast.success(locale === 'ar' ? 'تم حفظ المحتوى بنجاح' : 'Content saved successfully');
+      toast.success(t('contentSavedSuccessfully'));
       setIsEditing(false);
       setHasChanges(false);
     } catch (error: any) {
@@ -452,11 +452,11 @@ export default function ContentEditor() {
               <div className="flex items-center mb-2">
                 <button
                   onClick={() => router.back()}
-                  className="p-2 text-gray-400 hover:text-gray-600 mr-3"
+                  className="p-2 text-gray-400 hover:text-gray-600 mr-3 rtl:mr-0 rtl:ml-3"
                 >
                   <Icon name="arrow-left" className="w-5 h-5" />
                 </button>
-                <Icon name="edit" className="w-8 h-8 text-blue-600 mr-3" />
+                <Icon name="edit" className="w-8 h-8 text-blue-600 mr-3 rtl:mr-0 rtl:ml-3" />
                 <h1 className="text-3xl font-bold text-gray-900">
                   {section.title}
                 </h1>
@@ -558,7 +558,7 @@ export default function ContentEditor() {
         <div className="bg-white border border-gray-200 rounded-xl shadow-sm">
           <div className="px-6 py-4 border-b border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900">
-              {locale === 'ar' ? 'محرر المحتوى' : 'Content Editor'}
+              {t('contentEditor')}
             </h3>
             <p className="text-sm text-gray-600">
               {locale === 'ar' 
@@ -621,7 +621,7 @@ export default function ContentEditor() {
         {/* Preview Section */}
         <div className="mt-8 bg-gray-50 rounded-xl p-6">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            {locale === 'ar' ? 'معاينة المحتوى' : 'Content Preview'}
+            {t('contentPreview')}
           </h3>
           <div className="bg-white p-4 rounded-lg border">
             <pre className="text-sm text-gray-700 overflow-auto">

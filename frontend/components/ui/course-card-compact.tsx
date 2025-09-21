@@ -74,7 +74,7 @@ export function CourseCardCompact({ course, onAddToWishlist, onAddToCart }: Cour
       <Link href={`/${locale}/courses/${course.slug}`}>
         {/* Badge */}
         {course.badge && (
-          <div className="absolute top-3 right-3 z-10 px-2 py-1 bg-orange-500 text-white text-xs font-semibold rounded-full">
+          <div className="absolute top-3 right-3 rtl:right-auto rtl:left-3 z-10 px-2 py-1 bg-orange-500 text-white text-xs font-semibold rounded-full">
             {isHydrated ? (course.badge === 'Bestseller' ? t('courses.bestseller') : course.badge === 'New' ? t('courses.new') : course.badge) : course.badge}
           </div>
         )}

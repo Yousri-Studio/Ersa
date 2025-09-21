@@ -270,7 +270,7 @@ export default function AdminDashboard() {
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center mb-2">
-            <span className="text-2xl mr-2">👋</span>
+            <span className="text-2xl mr-2 rtl:mr-0 rtl:ml-2">👋</span>
             <h1 className="text-2xl font-bold text-gray-900">
               {t('hello')} {user?.fullName || t('admin')} 👋
             </h1>
@@ -289,7 +289,7 @@ export default function AdminDashboard() {
                   ? 'bg-green-50 text-green-700 border-green-200'
                   : 'bg-red-50 text-red-700 border-red-200'
             }`}>
-              <span className={`w-2 h-2 rounded-full mr-2 ${
+              <span className={`w-2 h-2 rounded-full mr-2 rtl:mr-0 rtl:ml-2 ${
                 isUsingFallback 
                   ? 'bg-yellow-400' 
                   : backendStatus.isAvailable 
@@ -325,7 +325,7 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="flex items-center mb-2">
-                    <div className="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center mr-3">
+                    <div className="w-8 h-8 bg-teal-100 rounded-lg flex items-center justify-center mr-3 rtl:mr-0 rtl:ml-3">
                       <Icon name="users" className="w-4 h-4 text-teal-600" />
                     </div>
                     <span className="text-gray-600 text-sm font-medium">{t('total-users')}</span>
@@ -339,7 +339,7 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="flex items-center mb-2">
-                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3">
+                    <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center mr-3 rtl:mr-0 rtl:ml-3">
                       <Icon name="graduation-cap" className="w-4 h-4 text-blue-600" />
                     </div>
                     <span className="text-gray-600 text-sm font-medium">{t('total-courses')}</span>
@@ -353,7 +353,7 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="flex items-center mb-2">
-                    <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3">
+                    <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3 rtl:mr-0 rtl:ml-3">
                       <Icon name="shopping-cart" className="w-4 h-4 text-green-600" />
                     </div>
                     <span className="text-gray-600 text-sm font-medium">{t('total-orders')}</span>
@@ -367,7 +367,7 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="flex items-center mb-2">
-                    <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3">
+                    <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3 rtl:mr-0 rtl:ml-3">
                       <Icon name="dollar-sign" className="w-4 h-4 text-purple-600" />
                     </div>
                     <span className="text-gray-600 text-sm font-medium">{t('total-revenue')}</span>

@@ -561,6 +561,15 @@ body {
   animation: slideInFromRight 0.8s ease-out forwards;
 }
 
+/* RTL support for slide animations */
+[dir="rtl"] .animate-slide-in-left {
+  animation: slideInFromRight 0.8s ease-out forwards;
+}
+
+[dir="rtl"] .animate-slide-in-right {
+  animation: slideInFromLeft 0.8s ease-out forwards;
+}
+
 .animate-scale-in {
   animation: scaleIn 0.6s ease-out forwards;
 }
@@ -586,6 +595,7 @@ body {
   transform: translateY(0);
 }
 
+/* LTR: slide from left */
 .scroll-item-left {
   opacity: 0;
   transform: translateX(-80px);
@@ -598,6 +608,16 @@ body {
   transform: translateX(0);
 }
 
+/* RTL: slide from right (in RTL, left means right) */
+[dir="rtl"] .scroll-item-left {
+  transform: translateX(80px);
+}
+
+[dir="rtl"] .scroll-item-left.visible {
+  transform: translateX(0);
+}
+
+/* LTR: slide from right */
 .scroll-item-right {
   opacity: 0;
   transform: translateX(80px);
@@ -607,6 +627,15 @@ body {
 
 .scroll-item-right.visible {
   opacity: 1;
+  transform: translateX(0);
+}
+
+/* RTL: slide from left (in RTL, right means left) */
+[dir="rtl"] .scroll-item-right {
+  transform: translateX(-80px);
+}
+
+[dir="rtl"] .scroll-item-right.visible {
   transform: translateX(0);
 }
 
@@ -898,4 +927,59 @@ a {
 
 .filter-dropdown-selected:focus {
   border-color: #00AC96;
+}
+
+/* RTL Select Dropdown Arrow Fix */
+[dir="rtl"] select {
+  background-position: left 0.5rem center !important;
+  padding-left: 2.5rem !important;
+  padding-right: 0.75rem !important;
+}
+
+[dir="rtl"] select:focus {
+  background-position: left 0.5rem center !important;
+}
+
+/* Custom select wrapper for better RTL support */
+.select-wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.select-wrapper::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #6B7280;
+}
+
+/* RTL positioning for select arrow */
+[dir="rtl"] .select-wrapper::after {
+  left: 0.75rem;
+  right: auto;
+}
+
+[dir="ltr"] .select-wrapper::after {
+  right: 0.75rem;
+  left: auto;
+}
+
+/* Hide default arrow and add custom one */
+.select-wrapper select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: none;
+  padding-right: 2.5rem;
+}
+
+[dir="rtl"] .select-wrapper select {
+  padding-left: 2.5rem;
+  padding-right: 0.75rem;
 }

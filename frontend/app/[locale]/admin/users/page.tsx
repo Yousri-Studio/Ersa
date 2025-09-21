@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { Icon } from '@/components/ui/icon';
 import { adminApi, AdminUser, PagedResult, CreateUserRequest } from '@/lib/admin-api';
 import { useAuthStore } from '@/lib/auth-store';
@@ -8,6 +9,10 @@ import { useHydration } from '@/hooks/useHydration';
 import toast from 'react-hot-toast';
 
 export default function AdminUsers() {
+  const locale = useLocale();
+  const t = useTranslations('admin');
+  const isRTL = locale === 'ar';
+  
   const [users, setUsers] = useState<AdminUser[]>([]);
   const [pagination, setPagination] = useState({
     page: 1,
@@ -36,7 +41,7 @@ export default function AdminUsers() {
     fullName: '',
     email: '',
     phone: '',
-    locale: 'en',
+    locale: locale as 'en' | 'ar',
     isAdmin: false,
     isSuperAdmin: false,
   });
@@ -162,13 +167,16 @@ export default function AdminUsers() {
   };
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
-    });
+    return new Date(dateString).toLocaleDateString(
+      locale === 'ar' ? 'ar-SA' : 'en-US', 
+      {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }
+    );
   };
 
   const getStatusColor = (status: any) => {
@@ -190,25 +198,30 @@ export default function AdminUsers() {
   const getStatusLabel = (status: string) => {
     switch (status.toLowerCase()) {
       case 'active':
-        return 'Active';
+        return locale === 'ar' ? 'نشط' : 'Active';
       case 'pendingemailverification':
-        return 'Pending Verification';
+        return locale === 'ar' ? 'في انتظار التحقق' : 'Pending Verification';
       case 'inactive':
-        return 'Inactive';
+        return locale === 'ar' ? 'غير نشط' : 'Inactive';
       case 'suspended':
-        return 'Suspended';
+        return locale === 'ar' ? 'معلق' : 'Suspended';
       default:
         return status;
     }
   };
 
   return (
-    <div className="space-y-6" style={{maxWidth: '90rem', paddingTop: '50px'}}>
+    <div className="space-y-6" style={{maxWidth: '90rem', paddingTop: '50px'}} dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Users Management</h1>
+        <h1 className="text-2xl font-bold text-gray-900">
+          {locale === 'ar' ? 'إدارة المستخدمين' : 'Users Management'}
+        </h1>
         <p className="mt-1 text-sm text-gray-500">
-          Manage user accounts, status, and permissions
+          {locale === 'ar' 
+            ? 'إدارة حسابات المستخدمين والحالة والصلاحيات' 
+            : 'Manage user accounts, status, and permissions'
+          }
         </p>
       </div>
 
@@ -217,39 +230,42 @@ export default function AdminUsers() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Search
+              {locale === 'ar' ? 'البحث' : 'Search'}
             </label>
             <input
               type="text"
-              placeholder="Search by name, email, or phone..."
+              placeholder={locale === 'ar' ? 'البحث بالاسم أو البريد الإلكتروني أو الهاتف...' : 'Search by name, email, or phone...'}
               value={filters.search}
               onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              dir={locale === 'ar' ? 'rtl' : 'ltr'}
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Status
+              {locale === 'ar' ? 'الحالة' : 'Status'}
             </label>
-            <select
-              value={filters.status}
-              onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">All Statuses</option>
-              <option value="Active">Active</option>
-              <option value="PendingEmailVerification">Pending Verification</option>
-              <option value="Inactive">Inactive</option>
-              <option value="Suspended">Suspended</option>
-            </select>
+            <div className="select-wrapper w-full">
+              <select
+                value={filters.status}
+                onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">{locale === 'ar' ? 'جميع الحالات' : 'All Statuses'}</option>
+                <option value="Active">{locale === 'ar' ? 'نشط' : 'Active'}</option>
+                <option value="PendingEmailVerification">{locale === 'ar' ? 'في انتظار التحقق' : 'Pending Verification'}</option>
+                <option value="Inactive">{locale === 'ar' ? 'غير نشط' : 'Inactive'}</option>
+                <option value="Suspended">{locale === 'ar' ? 'معلق' : 'Suspended'}</option>
+              </select>
+            </div>
           </div>
           <div className="flex items-end">
             <button
               onClick={() => setPagination(prev => ({ ...prev, page: 1 }))}
               className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <Icon name="search" className="mr-2" />
-              Search
+              <Icon name="search" className="mr-2 rtl:mr-0 rtl:ml-2" />
+              {locale === 'ar' ? 'بحث' : 'Search'}
             </button>
           </div>
           <div className="flex items-end">
@@ -257,8 +273,8 @@ export default function AdminUsers() {
               onClick={() => setShowAddUserModal(true)}
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <Icon name="plus" className="h-4 w-4 mr-2" />
-              Add User
+              <Icon name="plus" className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
+              {locale === 'ar' ? 'إضافة مستخدم' : 'Add User'}
             </button>
           </div>
         </div>
@@ -268,7 +284,7 @@ export default function AdminUsers() {
       <div className="bg-white shadow rounded-lg overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
           <h3 className="text-lg font-medium text-gray-900">
-            Users ({pagination.totalCount.toLocaleString()})
+            {locale === 'ar' ? 'المستخدمين' : 'Users'} ({pagination.totalCount.toLocaleString()})
           </h3>
         </div>
         
@@ -281,23 +297,35 @@ export default function AdminUsers() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    User
+                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${
+                    locale === 'ar' ? 'text-right' : 'text-left'
+                  }`}>
+                    {locale === 'ar' ? 'المستخدم' : 'User'}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
+                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${
+                    locale === 'ar' ? 'text-right' : 'text-left'
+                  }`}>
+                    {locale === 'ar' ? 'الحالة' : 'Status'}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Role
+                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${
+                    locale === 'ar' ? 'text-right' : 'text-left'
+                  }`}>
+                    {locale === 'ar' ? 'الدور' : 'Role'}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Created
+                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${
+                    locale === 'ar' ? 'text-right' : 'text-left'
+                  }`}>
+                    {locale === 'ar' ? 'تاريخ الإنشاء' : 'Created'}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Last Login
+                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${
+                    locale === 'ar' ? 'text-right' : 'text-left'
+                  }`}>
+                    {locale === 'ar' ? 'آخر تسجيل دخول' : 'Last Login'}
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
+                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${
+                    locale === 'ar' ? 'text-left' : 'text-right'
+                  }`}>
+                    {locale === 'ar' ? 'الإجراءات' : 'Actions'}
                   </th>
                 </tr>
               </thead>
@@ -400,8 +428,8 @@ export default function AdminUsers() {
                 Next
               </button>
             </div>
-            <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-              <div>
+            <div className="hidden sm:flex sm:items-center sm:justify-center w-full">
+              <div className="flex flex-col items-center space-y-2">
                 <p className="text-sm text-gray-700">
                   Showing{' '}
                   <span className="font-medium">{(pagination.page - 1) * pagination.pageSize + 1}</span>
@@ -413,15 +441,13 @@ export default function AdminUsers() {
                   <span className="font-medium">{pagination.totalCount}</span>
                   {' '}results
                 </p>
-              </div>
-              <div>
                 <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
                   <button
                     onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
                     disabled={pagination.page === 1}
                     className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                   >
-                    <Icon name="chevron-left" className="h-5 w-5" />
+                    <Icon name={isRTL ? "chevron-right" : "chevron-left"} className="h-5 w-5" />
                   </button>
                   {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
                     const page = i + 1;
@@ -444,7 +470,7 @@ export default function AdminUsers() {
                     disabled={pagination.page === pagination.totalPages}
                     className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                   >
-                    <Icon name="chevron-right" className="h-5 w-5" />
+                    <Icon name={isRTL ? "chevron-left" : "chevron-right"} className="h-5 w-5" />
                   </button>
                 </nav>
               </div>
@@ -466,16 +492,18 @@ export default function AdminUsers() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Status
                   </label>
-                  <select
-                    value={statusForm.status}
-                    onChange={(e) => setStatusForm(prev => ({ ...prev, status: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                    <option value="Suspended">Suspended</option>
-                    <option value="PendingEmailVerification">Pending Email Verification</option>
-                  </select>
+                  <div className="select-wrapper w-full">
+                    <select
+                      value={statusForm.status}
+                      onChange={(e) => setStatusForm(prev => ({ ...prev, status: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                        <option value="Suspended">Suspended</option>
+                        <option value="PendingEmailVerification">Pending Email Verification</option>
+                      </select>
+                    </div>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">

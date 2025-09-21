@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useLocale, useTranslations } from 'next-intl';
 import { Icon } from '@/components/ui/icon';
 import { motion } from 'framer-motion';
 import { adminApi, AdminCreateCourseRequest, AdminUpdateCourseRequest, AdminCourse } from '@/lib/admin-api';
@@ -9,6 +10,8 @@ import { CourseForm } from '@/components/admin/course-form';
 import toast from 'react-hot-toast';
 
 export default function AdminCourses() {
+  const t = useTranslations('admin');
+  const locale = useLocale();
   const [courses, setCourses] = useState<AdminCourse[]>([]);
   const [pagination, setPagination] = useState({
     page: 1,
@@ -49,6 +52,7 @@ export default function AdminCourses() {
     isFeatured: false,
   });
   const isHydrated = useHydration();
+  const isRTL = locale === 'ar';
 
   useEffect(() => {
     if (isHydrated) {
@@ -230,12 +234,12 @@ export default function AdminCourses() {
   };
 
   return (
-    <div className="space-y-6" style={{maxWidth: '90rem', paddingTop: '50px'}}>
+    <div className="space-y-6" style={{maxWidth: '90rem', paddingTop: '50px'}} dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Courses Management</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('manageCourses')}</h1>
         <p className="mt-1 text-sm text-gray-500">
-          View and manage all courses on the platform
+          {locale === 'ar' ? 'عرض وإدارة جميع الدورات في المنصة' : 'View and manage all courses on the platform'}
         </p>
       </div>
 
@@ -244,37 +248,40 @@ export default function AdminCourses() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Search
+              {locale === 'ar' ? 'بحث' : 'Search'}
             </label>
             <input
               type="text"
-              placeholder="Search by title or description..."
+              placeholder={locale === 'ar' ? 'البحث بالعنوان أو الوصف...' : 'Search by title or description...'}
               value={filters.search}
               onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              dir={isRTL ? 'rtl' : 'ltr'}
             />
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Status
+              {locale === 'ar' ? 'الحالة' : 'Status'}
             </label>
-            <select
-              value={filters.isActive}
-              onChange={(e) => setFilters(prev => ({ ...prev, isActive: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">All Statuses</option>
-              <option value="true">Active</option>
-              <option value="false">Inactive</option>
-            </select>
+            <div className="select-wrapper w-full">
+              <select
+                value={filters.isActive}
+                onChange={(e) => setFilters(prev => ({ ...prev, isActive: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">{locale === 'ar' ? 'جميع الحالات' : 'All Statuses'}</option>
+                <option value="true">{locale === 'ar' ? 'نشط' : 'Active'}</option>
+                <option value="false">{locale === 'ar' ? 'غير نشط' : 'Inactive'}</option>
+              </select>
+            </div>
           </div>
           <div className="flex items-end">
             <button
               onClick={() => setPagination(prev => ({ ...prev, page: 1 }))}
               className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <Icon name="search" className="mr-2" />
-              Search
+              <Icon name="search" className={`${isRTL ? 'ml-2' : 'mr-2'}`} />
+              {locale === 'ar' ? 'بحث' : 'Search'}
             </button>
           </div>
           <div className="flex items-end">
@@ -282,8 +289,8 @@ export default function AdminCourses() {
               onClick={openAddModal}
               className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
             >
-              <Icon name="plus" className="h-4 w-4 mr-2" />
-              Add Course
+              <Icon name="plus" className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+              {locale === 'ar' ? 'إضافة دورة' : 'Add Course'}
             </button>
           </div>
         </div>
@@ -306,26 +313,26 @@ export default function AdminCourses() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Thumbnail
+                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
+                    {locale === 'ar' ? 'الصورة المصغرة' : 'Thumbnail'}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Course
+                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
+                    {locale === 'ar' ? 'الدورة' : 'Course'}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Price
+                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
+                    {locale === 'ar' ? 'السعر' : 'Price'}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
+                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
+                    {locale === 'ar' ? 'الحالة' : 'Status'}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Created
+                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
+                    {locale === 'ar' ? 'تاريخ الإنشاء' : 'Created'}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Updated
+                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
+                    {locale === 'ar' ? 'تاريخ التحديث' : 'Updated'}
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
+                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${isRTL ? 'text-left' : 'text-right'}`}>
+                    {locale === 'ar' ? 'الإجراءات' : 'Actions'}
                   </th>
                 </tr>
               </thead>
@@ -349,7 +356,7 @@ export default function AdminCourses() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center">
-                        <div className="ml-4">
+                        <div className={`${isRTL ? 'mr-4' : 'ml-4'}`}>
                           <div className="text-sm font-medium text-gray-900">
                             {course.titleEn}
                           </div>
@@ -373,7 +380,7 @@ export default function AdminCourses() {
                           ? 'bg-green-100 text-green-800' 
                           : 'bg-red-100 text-red-800'
                       }`}>
-                        {course.isActive ? 'Active' : 'Inactive'}
+                        {course.isActive ? (locale === 'ar' ? 'نشط' : 'Active') : (locale === 'ar' ? 'غير نشط' : 'Inactive')}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
@@ -382,19 +389,19 @@ export default function AdminCourses() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {formatDate(course.updatedAt)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex justify-end space-x-2">
+                    <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${isRTL ? 'text-left' : 'text-right'}`}>
+                      <div className={`flex ${isRTL ? 'justify-start' : 'justify-end'} ${isRTL ? 'space-x-reverse' : ''} space-x-2`}>
                         <button
                           onClick={() => openEditModal(course)}
                           className="text-blue-600 hover:text-blue-900 p-2 rounded-md hover:bg-blue-50"
-                          title="Edit Course"
+                          title={locale === 'ar' ? 'تعديل الدورة' : 'Edit Course'}
                         >
                           <Icon name="edit" className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => openDeleteModal(course)}
                           className="text-red-600 hover:text-red-900 p-2 rounded-md hover:bg-red-50"
-                          title="Delete Course"
+                          title={locale === 'ar' ? 'حذف الدورة' : 'Delete Course'}
                         >
                           <Icon name="trash" className="h-4 w-4" />
                         </button>
@@ -416,38 +423,36 @@ export default function AdminCourses() {
                 disabled={pagination.page === 1}
                 className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
               >
-                Previous
+                {locale === 'ar' ? 'السابق' : 'Previous'}
               </button>
               <button
                 onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
                 disabled={pagination.page === pagination.totalPages}
-                className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                className={`${isRTL ? 'mr-3' : 'ml-3'} relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50`}
               >
-                Next
+                {locale === 'ar' ? 'التالي' : 'Next'}
               </button>
             </div>
-            <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-              <div>
+            <div className="hidden sm:flex sm:items-center sm:justify-center w-full">
+              <div className="flex flex-col items-center space-y-2">
                 <p className="text-sm text-gray-700">
-                  Showing{' '}
+                  {locale === 'ar' ? 'عرض' : 'Showing'}{' '}
                   <span className="font-medium">{(pagination.page - 1) * pagination.pageSize + 1}</span>
-                  {' '}to{' '}
+                  {' '}{locale === 'ar' ? 'إلى' : 'to'}{' '}
                   <span className="font-medium">
                     {Math.min(pagination.page * pagination.pageSize, pagination.totalCount)}
                   </span>
-                  {' '}of{' '}
+                  {' '}{locale === 'ar' ? 'من' : 'of'}{' '}
                   <span className="font-medium">{pagination.totalCount}</span>
-                  {' '}results
+                  {' '}{locale === 'ar' ? 'نتيجة' : 'results'}
                 </p>
-              </div>
-              <div>
                 <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
                   <button
                     onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
                     disabled={pagination.page === 1}
                     className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                   >
-                    <Icon name="chevron-left" className="h-5 w-5" />
+                    <Icon name={isRTL ? "chevron-right" : "chevron-left"} className="h-5 w-5" />
                   </button>
                   {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
                     const page = i + 1;
@@ -470,7 +475,7 @@ export default function AdminCourses() {
                     disabled={pagination.page === pagination.totalPages}
                     className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                   >
-                    <Icon name="chevron-right" className="h-5 w-5" />
+                    <Icon name={isRTL ? "chevron-left" : "chevron-right"} className="h-5 w-5" />
                   </button>
                 </nav>
               </div>
@@ -484,7 +489,7 @@ export default function AdminCourses() {
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
           <div className="relative top-10 mx-auto p-5 border w-[800px] max-h-[90vh] overflow-y-auto shadow-lg rounded-md bg-white">
             <div className="mt-3">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Add New Course</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">{locale === 'ar' ? 'إضافة دورة جديدة' : 'Add New Course'}</h3>
               <CourseForm
                 initialData={courseForm}
                 onSubmit={handleAddCourse}
@@ -502,7 +507,7 @@ export default function AdminCourses() {
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
           <div className="relative top-10 mx-auto p-5 border w-[800px] max-h-[90vh] overflow-y-auto shadow-lg rounded-md bg-white">
             <div className="mt-3">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Edit Course</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">{locale === 'ar' ? 'تعديل الدورة' : 'Edit Course'}</h3>
               <CourseForm
                 initialData={courseForm}
                 onSubmit={handleEditCourse}
@@ -520,22 +525,25 @@ export default function AdminCourses() {
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
           <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div className="mt-3">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Delete Course</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">{locale === 'ar' ? 'حذف الدورة' : 'Delete Course'}</h3>
               <p className="text-sm text-gray-500 mb-4">
-                Are you sure you want to delete the course "{selectedCourse.titleEn}"? This action cannot be undone.
+                {locale === 'ar' 
+                  ? `هل أنت متأكد من حذف الدورة "${selectedCourse.titleAr || selectedCourse.titleEn}"؟ لا يمكن التراجع عن هذا الإجراء.`
+                  : `Are you sure you want to delete the course "${selectedCourse.titleEn}"? This action cannot be undone.`
+                }
               </p>
-              <div className="flex justify-end space-x-3">
+              <div className={`flex ${isRTL ? 'justify-start' : 'justify-end'} ${isRTL ? 'space-x-reverse' : ''} space-x-3`}>
                 <button
                   onClick={() => setShowDeleteModal(false)}
                   className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
                 >
-                  Cancel
+                  {locale === 'ar' ? 'إلغاء' : 'Cancel'}
                 </button>
                 <button
                   onClick={handleDeleteCourse}
                   className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-md hover:bg-red-700"
                 >
-                  Delete Course
+                  {locale === 'ar' ? 'حذف الدورة' : 'Delete Course'}
                 </button>
               </div>
             </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
+import { useLocale } from 'next-intl';
 import { Header } from './header';
 import { Footer } from './footer';
 
@@ -10,6 +11,8 @@ interface ConditionalLayoutProps {
 
 export function ConditionalLayout({ children }: ConditionalLayoutProps) {
   const pathname = usePathname();
+  const locale = useLocale();
+  const isRTL = locale === 'ar';
   
   // Check if current page is an auth page or admin page
   const isAuthPage = pathname?.includes('/auth/login') || pathname?.includes('/auth/register') || pathname?.includes('/admin-login') || false;
@@ -18,7 +21,7 @@ export function ConditionalLayout({ children }: ConditionalLayoutProps) {
   if (isAuthPage || isAdminPage) {
     // Auth pages and admin pages without header and footer
     return (
-      <div className="min-h-screen">
+      <div className="min-h-screen" dir={isRTL ? 'rtl' : 'ltr'}>
         {children}
       </div>
     );
@@ -26,7 +29,7 @@ export function ConditionalLayout({ children }: ConditionalLayoutProps) {
 
   // Regular pages with header and footer
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
       <Header />
       <main className="flex-1 pt-[100px]">
         {children}

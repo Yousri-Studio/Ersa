@@ -138,7 +138,7 @@ export function Header() {
                 style={{ color: '#00AC96' }}
               />
               {wishlistCount() > 0 && (
-                <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-semibold">
+                <span className="absolute -top-1 -right-1 rtl:right-auto rtl:left-0 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-semibold">
                   {wishlistCount()}
                 </span>
               )}
@@ -162,7 +162,7 @@ export function Header() {
                 />
               </div>
               {itemCount() > 0 && (
-                <span className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-semibold">
+                <span className="absolute -top-1 -right-1 rtl:right-auto rtl:left-0 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-semibold">
                   {itemCount()}
                 </span>
               )}

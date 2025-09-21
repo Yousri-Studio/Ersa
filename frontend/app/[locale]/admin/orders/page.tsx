@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { Icon } from '@/components/ui/icon';
 import { adminApi, AdminOrder, PagedResult } from '@/lib/admin-api';
 import { useHydration } from '@/hooks/useHydration';
@@ -14,6 +14,7 @@ import { convertOrderToInvoiceData } from '@/lib/invoice-utils';
 export default function AdminOrders() {
   const router = useRouter();
   const locale = useLocale();
+  const t = useTranslations('admin');
   const [orders, setOrders] = useState<AdminOrder[]>([]);
   const [pagination, setPagination] = useState({
     page: 1,
@@ -36,6 +37,7 @@ export default function AdminOrders() {
   const [invoiceData, setInvoiceData] = useState<InvoiceData | null>(null);
   const [isLoadingInvoice, setIsLoadingInvoice] = useState(false);
   const isHydrated = useHydration();
+  const isRTL = locale === 'ar';
 
   useEffect(() => {
     if (isHydrated) {
@@ -159,34 +161,34 @@ export default function AdminOrders() {
     // Handle enum values from backend
     if (typeof status === 'number') {
       switch (status) {
-        case 0: return 'New';
-        case 1: return 'Pending Payment';
-        case 2: return 'Paid';
-        case 3: return 'Under Process';
-        case 4: return 'Processed';
-        case 5: return 'Expired';
-        case 6: return 'Failed';
-        case 7: return 'Refunded';
-        default: return 'Unknown';
+        case 0: return locale === 'ar' ? 'جديد' : 'New';
+        case 1: return locale === 'ar' ? 'في انتظار الدفع' : 'Pending Payment';
+        case 2: return locale === 'ar' ? 'مدفوع' : 'Paid';
+        case 3: return locale === 'ar' ? 'قيد المعالجة' : 'Under Process';
+        case 4: return locale === 'ar' ? 'تم المعالجة' : 'Processed';
+        case 5: return locale === 'ar' ? 'منتهي الصلاحية' : 'Expired';
+        case 6: return locale === 'ar' ? 'فشل' : 'Failed';
+        case 7: return locale === 'ar' ? 'مسترد' : 'Refunded';
+        default: return locale === 'ar' ? 'غير معروف' : 'Unknown';
       }
     }
     
     // Handle string values
     const statusStr = status.toString().toLowerCase();
     switch (statusStr) {
-      case 'new': return 'New';
-      case 'pendingpayment': return 'Pending Payment';
-      case 'paid': return 'Paid';
-      case 'underprocess': return 'Under Process';
-      case 'processed': return 'Processed';
-      case 'expired': return 'Expired';
-      case 'failed': return 'Failed';
-      case 'refunded': return 'Refunded';
-      case 'completed': return 'Completed';
-      case 'pending': return 'Pending';
-      case 'processing': return 'Processing';
-      case 'cancelled': return 'Cancelled';
-      default: return 'Unknown';
+      case 'new': return locale === 'ar' ? 'جديد' : 'New';
+      case 'pendingpayment': return locale === 'ar' ? 'في انتظار الدفع' : 'Pending Payment';
+      case 'paid': return locale === 'ar' ? 'مدفوع' : 'Paid';
+      case 'underprocess': return locale === 'ar' ? 'قيد المعالجة' : 'Under Process';
+      case 'processed': return locale === 'ar' ? 'تم المعالجة' : 'Processed';
+      case 'expired': return locale === 'ar' ? 'منتهي الصلاحية' : 'Expired';
+      case 'failed': return locale === 'ar' ? 'فشل' : 'Failed';
+      case 'refunded': return locale === 'ar' ? 'مسترد' : 'Refunded';
+      case 'completed': return locale === 'ar' ? 'مكتمل' : 'Completed';
+      case 'pending': return locale === 'ar' ? 'قيد الانتظار' : 'Pending';
+      case 'processing': return locale === 'ar' ? 'قيد المعالجة' : 'Processing';
+      case 'cancelled': return locale === 'ar' ? 'ملغي' : 'Cancelled';
+      default: return locale === 'ar' ? 'غير معروف' : 'Unknown';
     }
   };
 
@@ -224,12 +226,12 @@ export default function AdminOrders() {
   };
 
   return (
-    <div className="space-y-6" style={{maxWidth: '90rem', paddingTop: '50px'}}>
+    <div className="space-y-6" style={{maxWidth: '90rem', paddingTop: '50px'}} dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">Orders Management</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('orders')}</h1>
         <p className="mt-1 text-sm text-gray-500">
-          View and manage all orders on the platform
+          {locale === 'ar' ? 'عرض وإدارة جميع الطلبات في المنصة' : 'View and manage all orders on the platform'}
         </p>
       </div>
 
@@ -238,24 +240,26 @@ export default function AdminOrders() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Status
+              {locale === 'ar' ? 'الحالة' : 'Status'}
             </label>
-            <select
-              value={filters.status}
-              onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">All Statuses</option>
-              <option value="Pending">Pending</option>
-              <option value="Processing">Processing</option>
-              <option value="Completed">Completed</option>
-              <option value="Cancelled">Cancelled</option>
-              <option value="Failed">Failed</option>
-            </select>
+            <div className="select-wrapper w-full">
+              <select
+                value={filters.status}
+                onChange={(e) => setFilters(prev => ({ ...prev, status: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">{locale === 'ar' ? 'جميع الحالات' : 'All Statuses'}</option>
+                <option value="Pending">{locale === 'ar' ? 'قيد الانتظار' : 'Pending'}</option>
+                <option value="Processing">{locale === 'ar' ? 'قيد المعالجة' : 'Processing'}</option>
+                <option value="Completed">{locale === 'ar' ? 'مكتمل' : 'Completed'}</option>
+                <option value="Cancelled">{locale === 'ar' ? 'ملغي' : 'Cancelled'}</option>
+                <option value="Failed">{locale === 'ar' ? 'فشل' : 'Failed'}</option>
+              </select>
+            </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              From Date
+              {locale === 'ar' ? 'من تاريخ' : 'From Date'}
             </label>
             <input
               type="date"
@@ -266,7 +270,7 @@ export default function AdminOrders() {
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              To Date
+              {locale === 'ar' ? 'إلى تاريخ' : 'To Date'}
             </label>
             <input
               type="date"
@@ -280,8 +284,8 @@ export default function AdminOrders() {
               onClick={() => setPagination(prev => ({ ...prev, page: 1 }))}
               className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <Icon name="search" className="mr-2" />
-              Search
+              <Icon name="search" className={`${isRTL ? 'ml-2' : 'mr-2'}`} />
+              {locale === 'ar' ? 'بحث' : 'Search'}
             </button>
           </div>
         </div>
@@ -304,26 +308,26 @@ export default function AdminOrders() {
             <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Order ID
+                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
+                    {locale === 'ar' ? 'رقم الطلب' : 'Order ID'}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Customer
+                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
+                    {locale === 'ar' ? 'العميل' : 'Customer'}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Amount
+                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
+                    {locale === 'ar' ? 'المبلغ' : 'Amount'}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
+                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
+                    {locale === 'ar' ? 'الحالة' : 'Status'}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Created
+                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
+                    {locale === 'ar' ? 'تاريخ الإنشاء' : 'Created'}
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Updated
+                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
+                    {locale === 'ar' ? 'تاريخ التحديث' : 'Updated'}
                   </th>
-                  <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Actions
+                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${isRTL ? 'text-left' : 'text-right'}`}>
+                    {locale === 'ar' ? 'الإجراءات' : 'Actions'}
                   </th>
                 </tr>
               </thead>
@@ -337,7 +341,7 @@ export default function AdminOrders() {
                             <Icon name="shopping-cart" className="h-5 w-5 text-blue-600" />
                           </div>
                         </div>
-                        <div className="ml-4">
+                        <div className={`${isRTL ? 'mr-4' : 'ml-4'}`}>
                           <div className="text-sm font-medium text-gray-900">
                             #{order.id.slice(0, 8)}
                           </div>
@@ -369,12 +373,12 @@ export default function AdminOrders() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {formatDate(order.updatedAt)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex justify-end space-x-2">
+                    <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${isRTL ? 'text-left' : 'text-right'}`}>
+                      <div className={`flex ${isRTL ? 'justify-start' : 'justify-end'} ${isRTL ? 'space-x-reverse' : ''} space-x-2`}>
                         <button
                           onClick={() => openStatusModal(order)}
                           className="text-blue-600 hover:text-blue-900"
-                          title="Update Status"
+                          title={locale === 'ar' ? 'تحديث الحالة' : 'Update Status'}
                         >
                           <Icon name="edit" className="h-4 w-4" />
                         </button>
@@ -383,7 +387,7 @@ export default function AdminOrders() {
                             router.push(`/${locale}/admin/orders/${order.id}`);
                           }}
                           className="text-green-600 hover:text-green-900"
-                          title="View Details"
+                          title={locale === 'ar' ? 'عرض التفاصيل' : 'View Details'}
                         >
                           <Icon name="eye" className="h-4 w-4" />
                         </button>
@@ -391,7 +395,7 @@ export default function AdminOrders() {
                           onClick={() => handleDownloadInvoice(order)}
                           disabled={isLoadingInvoice}
                           className="text-purple-600 hover:text-purple-900 disabled:opacity-50 disabled:cursor-not-allowed"
-                          title="Download Invoice"
+                          title={locale === 'ar' ? 'تحميل الفاتورة' : 'Download Invoice'}
                         >
                           {isLoadingInvoice ? (
                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
@@ -417,38 +421,36 @@ export default function AdminOrders() {
                 disabled={pagination.page === 1}
                 className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
               >
-                Previous
+                {locale === 'ar' ? 'السابق' : 'Previous'}
               </button>
               <button
                 onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
                 disabled={pagination.page === pagination.totalPages}
-                className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
+                className={`${isRTL ? 'mr-3' : 'ml-3'} relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50`}
               >
-                Next
+                {locale === 'ar' ? 'التالي' : 'Next'}
               </button>
             </div>
-            <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-              <div>
+            <div className="hidden sm:flex sm:items-center sm:justify-center w-full">
+              <div className="flex flex-col items-center space-y-2">
                 <p className="text-sm text-gray-700">
-                  Showing{' '}
+                  {locale === 'ar' ? 'عرض' : 'Showing'}{' '}
                   <span className="font-medium">{(pagination.page - 1) * pagination.pageSize + 1}</span>
-                  {' '}to{' '}
+                  {' '}{locale === 'ar' ? 'إلى' : 'to'}{' '}
                   <span className="font-medium">
                     {Math.min(pagination.page * pagination.pageSize, pagination.totalCount)}
                   </span>
-                  {' '}of{' '}
+                  {' '}{locale === 'ar' ? 'من' : 'of'}{' '}
                   <span className="font-medium">{pagination.totalCount}</span>
-                  {' '}results
+                  {' '}{locale === 'ar' ? 'نتيجة' : 'results'}
                 </p>
-              </div>
-              <div>
                 <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
                   <button
                     onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
                     disabled={pagination.page === 1}
                     className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                   >
-                    <Icon name="chevron-left" className="h-5 w-5" />
+                    <Icon name={isRTL ? "chevron-right" : "chevron-left"} className="h-5 w-5" />
                   </button>
                   {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
                     const page = i + 1;
@@ -471,7 +473,7 @@ export default function AdminOrders() {
                     disabled={pagination.page === pagination.totalPages}
                     className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
                   >
-                    <Icon name="chevron-right" className="h-5 w-5" />
+                    <Icon name={isRTL ? "chevron-left" : "chevron-right"} className="h-5 w-5" />
                   </button>
                 </nav>
               </div>
@@ -486,38 +488,40 @@ export default function AdminOrders() {
           <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
             <div className="mt-3">
               <h3 className="text-lg font-medium text-gray-900 mb-4">
-                Update Order Status
+                {locale === 'ar' ? 'تحديث حالة الطلب' : 'Update Order Status'}
               </h3>
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Status
+                    {locale === 'ar' ? 'الحالة' : 'Status'}
                   </label>
-                  <select
-                    value={statusForm.status}
-                    onChange={(e) => setStatusForm(prev => ({ ...prev, status: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="Pending">Pending</option>
-                    <option value="Processing">Processing</option>
-                    <option value="Completed">Completed</option>
-                    <option value="Cancelled">Cancelled</option>
-                    <option value="Failed">Failed</option>
-                  </select>
+                  <div className="select-wrapper w-full">
+                    <select
+                      value={statusForm.status}
+                      onChange={(e) => setStatusForm(prev => ({ ...prev, status: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="Pending">{locale === 'ar' ? 'قيد الانتظار' : 'Pending'}</option>
+                      <option value="Processing">{locale === 'ar' ? 'قيد المعالجة' : 'Processing'}</option>
+                      <option value="Completed">{locale === 'ar' ? 'مكتمل' : 'Completed'}</option>
+                      <option value="Cancelled">{locale === 'ar' ? 'ملغي' : 'Cancelled'}</option>
+                      <option value="Failed">{locale === 'ar' ? 'فشل' : 'Failed'}</option>
+                    </select>
+                  </div>
                 </div>
               </div>
-              <div className="flex justify-end space-x-3 mt-6">
+              <div className={`flex ${isRTL ? 'justify-start' : 'justify-end'} ${isRTL ? 'space-x-reverse' : ''} space-x-3 mt-6`}>
                 <button
                   onClick={() => setShowStatusModal(false)}
                   className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
                 >
-                  Cancel
+                  {locale === 'ar' ? 'إلغاء' : 'Cancel'}
                 </button>
                 <button
                   onClick={handleStatusUpdate}
                   className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
                 >
-                  Update Status
+                  {locale === 'ar' ? 'تحديث الحالة' : 'Update Status'}
                 </button>
               </div>
             </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, ReactNode } from 'react';
+import { useClientOnly } from '@/hooks/use-client-only';
 
 interface StaggeredChildrenProps {
   children: ReactNode;
@@ -16,8 +17,10 @@ export function StaggeredChildren({
   animationClass = 'stagger-child'
 }: StaggeredChildrenProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const isClient = useClientOnly();
 
   useEffect(() => {
+    if (!isClient) return;
     const container = containerRef.current;
     if (!container) return;
 
@@ -51,7 +54,7 @@ export function StaggeredChildren({
     return () => {
       observer.unobserve(container);
     };
-  }, [animationClass, staggerDelay]);
+  }, [animationClass, staggerDelay, isClient]);
 
   return (
     <div ref={containerRef} className={className}>
