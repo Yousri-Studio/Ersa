@@ -276,7 +276,17 @@
     "errors": {
       "access-denied": "Access denied. Admin privileges required."
     },
-    "contentManagement": "Content Management"
+    "contentManagement": "Content Management",
+    "addNewUser": "Add New User",
+    "fullName": "Full Name",
+    "enterFullName": "Enter full name",
+    "enterEmailAddress": "Enter email address",
+    "phoneOptional": "Phone (Optional)",
+    "enterPhoneNumber": "Enter phone number",
+    "language": "Language",
+    "english": "English",
+    "arabic": "Arabic",
+    "addUser": "Add User"
   },
   "training-categories": {
     "title": "Training Categories",

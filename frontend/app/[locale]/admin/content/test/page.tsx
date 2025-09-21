@@ -142,7 +142,7 @@ export default function ContentTestPage() {
                     key={index}
                     className={`p-4 rounded-lg border ${
                       result.status === 'success'
-                        ? 'bg-green-50 border-green-200'
+                        ? 'bg-primary-50 border-primary-200'
                         : result.status === 'error'
                         ? 'bg-red-50 border-red-200'
                         : 'bg-blue-50 border-blue-200'
@@ -159,7 +159,7 @@ export default function ContentTestPage() {
                         }
                         className={`w-5 h-5 mr-3 rtl:mr-0 rtl:ml-3 mt-0.5 ${
                           result.status === 'success'
-                            ? 'text-green-600'
+                            ? 'text-primary-600'
                             : result.status === 'error'
                             ? 'text-red-600'
                             : 'text-blue-600'

@@ -144,7 +144,7 @@ export default function DebugAuthPage() {
             <button
               onClick={testAdminAPI}
               disabled={loading}
-              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50 mr-4"
+              className="bg-primary-600 text-white px-4 py-2 rounded hover:bg-primary-700 disabled:opacity-50 mr-4"
             >
               Test Admin API
             </button>
@@ -152,7 +152,7 @@ export default function DebugAuthPage() {
             <button
               onClick={testTokenValidation}
               disabled={loading}
-              className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 disabled:opacity-50 mr-4"
+              className="bg-secondary-600 text-white px-4 py-2 rounded hover:bg-secondary-700 disabled:opacity-50 mr-4"
             >
               Test Token Validation
             </button>

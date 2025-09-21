@@ -154,7 +154,7 @@ export default function ContentManagement() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'published':
-        return 'bg-green-100 text-green-800 border-green-200';
+        return 'bg-primary-100 text-primary-800 border-primary-200';
       case 'draft':
         return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       case 'archived':
@@ -275,8 +275,8 @@ export default function ContentManagement() {
             
             <div className="bg-white p-6 rounded-xl border border-gray-200">
               <div className="flex items-center">
-                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mr-4 rtl:mr-0 rtl:ml-4">
-                  <Icon name="check-circle" className="w-6 h-6 text-green-600" />
+                <div className="w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center mr-4 rtl:mr-0 rtl:ml-4">
+                  <Icon name="check-circle" className="w-6 h-6 text-primary-600" />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-600">
@@ -307,8 +307,8 @@ export default function ContentManagement() {
             
             <div className="bg-white p-6 rounded-xl border border-gray-200">
               <div className="flex items-center">
-                <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mr-4 rtl:mr-0 rtl:ml-4">
-                  <Icon name="clock" className="w-6 h-6 text-purple-600" />
+                <div className="w-12 h-12 bg-secondary-100 rounded-lg flex items-center justify-center mr-4 rtl:mr-0 rtl:ml-4">
+                  <Icon name="clock" className="w-6 h-6 text-secondary-600" />
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-600">

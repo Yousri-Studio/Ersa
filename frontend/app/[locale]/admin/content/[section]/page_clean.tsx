@@ -374,7 +374,7 @@ export default function ContentEditor() {
               </div>
               <p className="text-gray-600 text-lg">{section.description}</p>
               {lastSaved && (
-                <p className="text-sm text-green-600 mt-1">
+                <p className="text-sm text-primary-600 mt-1">
                   {locale === 'ar' ? 'آخر حفظ: ' : 'Last saved: '}
                   {lastSaved}
                 </p>
@@ -395,7 +395,7 @@ export default function ContentEditor() {
               
               <span className={`px-3 py-1 text-sm font-medium rounded-full border ${
                 section.status === 'published' 
-                  ? 'bg-green-100 text-green-800 border-green-200'
+                  ? 'bg-primary-100 text-primary-800 border-primary-200'
                   : section.status === 'draft'
                   ? 'bg-yellow-100 text-yellow-800 border-yellow-200'
                   : 'bg-gray-100 text-gray-800 border-gray-200'
@@ -429,7 +429,7 @@ export default function ContentEditor() {
                   <button
                     onClick={handleSave}
                     disabled={isSaving || !hasChanges}
-                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors disabled:opacity-50"
+                    className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors disabled:opacity-50"
                   >
                     {isSaving 
                       ? (locale === 'ar' ? 'جاري الحفظ...' : 'Saving...')

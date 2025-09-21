@@ -570,6 +570,93 @@ body {
   animation: slideInFromLeft 0.8s ease-out forwards;
 }
 
+/* Force RTL table alignment - more specific */
+[dir="rtl"] .admin-orders table td:not(.text-left):not(.text-center),
+[dir="rtl"] .admin-courses table td:not(.text-left):not(.text-center),
+[dir="rtl"] .admin-users table td:not(.text-left):not(.text-center) {
+  text-align: right !important;
+}
+
+[dir="rtl"] .admin-orders table th:not(.text-left):not(.text-center),
+[dir="rtl"] .admin-courses table th:not(.text-left):not(.text-center),
+[dir="rtl"] .admin-users table th:not(.text-left):not(.text-center) {
+  text-align: right !important;
+}
+
+/* RTL override for text-left class */
+[dir="rtl"] table td.text-left,
+[dir="rtl"] table th.text-left {
+  text-align: right !important;
+}
+
+[dir="rtl"] table td.text-right,
+[dir="rtl"] table th.text-right {
+  text-align: right !important;
+}
+
+[dir="rtl"] table td.text-center,
+[dir="rtl"] table th.text-center {
+  text-align: center !important;
+}
+
+/* RTL alignment for status badges and flex elements */
+[dir="rtl"] table td .inline-flex {
+  justify-content: flex-end !important;
+}
+
+[dir="rtl"] table td .flex:not(.justify-start) {
+  justify-content: stretch;
+}
+
+/* Override for action buttons in RTL */
+[dir="rtl"] table td .flex.justify-start {
+  justify-content: flex-start !important;
+}
+
+/* Center user icon in avatar circle */
+.admin-users .flex.items-center .h-10.w-10 .flex.items-center.justify-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Add gap between avatar and user name */
+.admin-users .flex.items-center {
+  gap: 10px;
+}
+
+/* Center graduation cap icons in course cards */
+.course-card .graduation-cap,
+.admin-courses .graduation-cap,
+.course-card [data-icon="graduation-cap"],
+.admin-courses [data-icon="graduation-cap"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Center all icons within flex containers */
+.flex.items-center.justify-center svg,
+.flex.items-center.justify-center [data-icon] {
+  display: block;
+  margin: auto;
+}
+
+/* Ensure consistent height for form elements */
+.admin-users input[type="text"],
+.admin-users select,
+.admin-users button,
+.admin-courses input[type="text"],
+.admin-courses select,
+.admin-courses button,
+.admin-orders input[type="text"],
+.admin-orders select,
+.admin-orders button {
+  min-height: 2.5rem;
+  box-sizing: border-box;
+}
+
+
 .animate-scale-in {
   animation: scaleIn 0.6s ease-out forwards;
 }

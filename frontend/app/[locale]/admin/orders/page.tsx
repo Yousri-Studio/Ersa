@@ -128,12 +128,12 @@ export default function AdminOrders() {
       switch (status) {
         case 0: return 'bg-gray-100 text-gray-800'; // New
         case 1: return 'bg-yellow-100 text-yellow-800'; // Pending Payment
-        case 2: return 'bg-green-100 text-green-800'; // Paid
+        case 2: return 'bg-primary-100 text-primary-800'; // Paid
         case 3: return 'bg-blue-100 text-blue-800'; // Under Process
-        case 4: return 'bg-green-100 text-green-800'; // Processed
+        case 4: return 'bg-primary-100 text-primary-800'; // Processed
         case 5: return 'bg-orange-100 text-orange-800'; // Expired
         case 6: return 'bg-red-100 text-red-800'; // Failed
-        case 7: return 'bg-purple-100 text-purple-800'; // Refunded
+        case 7: return 'bg-secondary-100 text-secondary-800'; // Refunded
         default: return 'bg-gray-100 text-gray-800';
       }
     }
@@ -143,13 +143,13 @@ export default function AdminOrders() {
     switch (statusStr) {
       case 'new': return 'bg-gray-100 text-gray-800';
       case 'pendingpayment': return 'bg-yellow-100 text-yellow-800';
-      case 'paid': return 'bg-green-100 text-green-800';
+      case 'paid': return 'bg-primary-100 text-primary-800';
       case 'underprocess': return 'bg-blue-100 text-blue-800';
-      case 'processed': return 'bg-green-100 text-green-800';
+      case 'processed': return 'bg-primary-100 text-primary-800';
       case 'expired': return 'bg-orange-100 text-orange-800';
       case 'failed': return 'bg-red-100 text-red-800';
-      case 'refunded': return 'bg-purple-100 text-purple-800';
-      case 'completed': return 'bg-green-100 text-green-800';
+      case 'refunded': return 'bg-secondary-100 text-secondary-800';
+      case 'completed': return 'bg-primary-100 text-primary-800';
       case 'pending': return 'bg-yellow-100 text-yellow-800';
       case 'processing': return 'bg-blue-100 text-blue-800';
       case 'cancelled': return 'bg-red-100 text-red-800';
@@ -158,6 +158,9 @@ export default function AdminOrders() {
   };
 
   const getStatusLabel = (status: string | number) => {
+    // Debug logging to see what status values we're getting
+    console.log('Status value:', status, 'Type:', typeof status, 'Locale:', locale);
+    
     // Handle enum values from backend
     if (typeof status === 'number') {
       switch (status) {
@@ -174,12 +177,14 @@ export default function AdminOrders() {
     }
     
     // Handle string values
-    const statusStr = status.toString().toLowerCase();
+    const statusStr = status.toString().toLowerCase().replace(/\s+/g, '');
     switch (statusStr) {
       case 'new': return locale === 'ar' ? 'جديد' : 'New';
       case 'pendingpayment': return locale === 'ar' ? 'في انتظار الدفع' : 'Pending Payment';
       case 'paid': return locale === 'ar' ? 'مدفوع' : 'Paid';
-      case 'underprocess': return locale === 'ar' ? 'قيد المعالجة' : 'Under Process';
+      case 'underprocess': 
+      case 'under_process': 
+      case 'under process': return locale === 'ar' ? 'قيد المعالجة' : 'Under Process';
       case 'processed': return locale === 'ar' ? 'تم المعالجة' : 'Processed';
       case 'expired': return locale === 'ar' ? 'منتهي الصلاحية' : 'Expired';
       case 'failed': return locale === 'ar' ? 'فشل' : 'Failed';
@@ -229,7 +234,7 @@ export default function AdminOrders() {
     <div className="space-y-6" style={{maxWidth: '90rem', paddingTop: '50px'}} dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl font-bold text-gray-900">{t('orders')}</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{t('sidebar.orders')}</h1>
         <p className="mt-1 text-sm text-gray-500">
           {locale === 'ar' ? 'عرض وإدارة جميع الطلبات في المنصة' : 'View and manage all orders on the platform'}
         </p>
@@ -305,7 +310,7 @@ export default function AdminOrders() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+            <table className="min-w-full divide-y divide-gray-200 admin-orders">
               <thead className="bg-gray-50">
                 <tr>
                   <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
@@ -359,21 +364,21 @@ export default function AdminOrders() {
                         ID: {order.userId.slice(0, 8)}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-left">
                       {formatCurrency(order.totalAmount)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 whitespace-nowrap text-left">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
                         {getStatusLabel(order.status)}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-left">
                       {formatDate(order.createdAt)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-left">
                       {formatDate(order.updatedAt)}
                     </td>
-                    <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${isRTL ? 'text-left' : 'text-right'}`}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-left">
                       <div className={`flex ${isRTL ? 'justify-start' : 'justify-end'} ${isRTL ? 'space-x-reverse' : ''} space-x-2`}>
                         <button
                           onClick={() => openStatusModal(order)}
@@ -386,7 +391,7 @@ export default function AdminOrders() {
                           onClick={() => {
                             router.push(`/${locale}/admin/orders/${order.id}`);
                           }}
-                          className="text-green-600 hover:text-green-900"
+                          className="text-primary-600 hover:text-primary-900"
                           title={locale === 'ar' ? 'عرض التفاصيل' : 'View Details'}
                         >
                           <Icon name="eye" className="h-4 w-4" />
@@ -394,11 +399,11 @@ export default function AdminOrders() {
                         <button
                           onClick={() => handleDownloadInvoice(order)}
                           disabled={isLoadingInvoice}
-                          className="text-purple-600 hover:text-purple-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="text-secondary-600 hover:text-secondary-700 disabled:opacity-50 disabled:cursor-not-allowed"
                           title={locale === 'ar' ? 'تحميل الفاتورة' : 'Download Invoice'}
                         >
                           {isLoadingInvoice ? (
-                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
+                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-secondary-600"></div>
                           ) : (
                             <Icon name="download" className="h-4 w-4" />
                           )}

@@ -75,7 +75,7 @@ export default function MyOrdersPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'Paid':
-        return 'bg-green-100 text-green-800';
+        return 'bg-primary-100 text-primary-800';
       case 'Pending':
         return 'bg-yellow-100 text-yellow-800';
       case 'Failed':

@@ -135,12 +135,12 @@ export default function AdminDashboard() {
       switch (status) {
         case 0: return 'bg-gray-100 text-gray-800'; // New
         case 1: return 'bg-yellow-100 text-yellow-800'; // Pending Payment
-        case 2: return 'bg-green-100 text-green-800'; // Paid
+        case 2: return 'bg-primary-100 text-primary-800'; // Paid
         case 3: return 'bg-blue-100 text-blue-800'; // Under Process
-        case 4: return 'bg-green-100 text-green-800'; // Processed
+        case 4: return 'bg-primary-100 text-primary-800'; // Processed
         case 5: return 'bg-orange-100 text-orange-800'; // Expired
         case 6: return 'bg-red-100 text-red-800'; // Failed
-        case 7: return 'bg-purple-100 text-purple-800'; // Refunded
+        case 7: return 'bg-secondary-100 text-secondary-800'; // Refunded
         default: return 'bg-gray-100 text-gray-800';
       }
     }
@@ -150,14 +150,14 @@ export default function AdminDashboard() {
     switch (statusStr) {
       case 'new': return 'bg-gray-100 text-gray-800';
       case 'pendingpayment': return 'bg-yellow-100 text-yellow-800';
-      case 'paid': return 'bg-green-100 text-green-800';
+      case 'paid': return 'bg-primary-100 text-primary-800';
       case 'underprocess': return 'bg-blue-100 text-blue-800';
       case 'under process': return 'bg-blue-100 text-blue-800';
-      case 'processed': return 'bg-green-100 text-green-800';
+      case 'processed': return 'bg-primary-100 text-primary-800';
       case 'expired': return 'bg-orange-100 text-orange-800';
       case 'failed': return 'bg-red-100 text-red-800';
-      case 'refunded': return 'bg-purple-100 text-purple-800';
-      case 'completed': return 'bg-green-100 text-green-800';
+      case 'refunded': return 'bg-secondary-100 text-secondary-800';
+      case 'completed': return 'bg-primary-100 text-primary-800';
       case 'pending': return 'bg-yellow-100 text-yellow-800';
       case 'processing': return 'bg-blue-100 text-blue-800';
       case 'cancelled': return 'bg-red-100 text-red-800';
@@ -286,7 +286,7 @@ export default function AdminDashboard() {
               isUsingFallback 
                 ? 'bg-yellow-50 text-yellow-700 border-yellow-200' 
                 : backendStatus.isAvailable 
-                  ? 'bg-green-50 text-green-700 border-green-200'
+                  ? 'bg-primary-50 text-primary-700 border-primary-200'
                   : 'bg-red-50 text-red-700 border-red-200'
             }`}>
               <span className={`w-2 h-2 rounded-full mr-2 rtl:mr-0 rtl:ml-2 ${
@@ -353,8 +353,8 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="flex items-center mb-2">
-                    <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center mr-3 rtl:mr-0 rtl:ml-3">
-                      <Icon name="shopping-cart" className="w-4 h-4 text-green-600" />
+                    <div className="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center mr-3 rtl:mr-0 rtl:ml-3">
+                      <Icon name="shopping-cart" className="w-4 h-4 text-primary-600" />
                     </div>
                     <span className="text-gray-600 text-sm font-medium">{t('total-orders')}</span>
                   </div>
@@ -367,8 +367,8 @@ export default function AdminDashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <div className="flex items-center mb-2">
-                    <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center mr-3 rtl:mr-0 rtl:ml-3">
-                      <Icon name="dollar-sign" className="w-4 h-4 text-purple-600" />
+                    <div className="w-8 h-8 bg-secondary-100 rounded-lg flex items-center justify-center mr-3 rtl:mr-0 rtl:ml-3">
+                      <Icon name="dollar-sign" className="w-4 h-4 text-secondary-600" />
                     </div>
                     <span className="text-gray-600 text-sm font-medium">{t('total-revenue')}</span>
                   </div>
@@ -449,7 +449,7 @@ export default function AdminDashboard() {
                             onClick={() => {
                               router.push(`/${locale}/admin/orders/${order.id}`);
                             }}
-                            className="text-green-600 hover:text-green-900"
+                            className="text-primary-600 hover:text-primary-900"
                             title="View Details"
                           >
                             <Icon name="eye" className="h-4 w-4" />
@@ -457,11 +457,11 @@ export default function AdminDashboard() {
                           <button
                             onClick={() => handleDownloadInvoice(order)}
                             disabled={isLoadingInvoice}
-                            className="text-purple-600 hover:text-purple-900 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="text-secondary-600 hover:text-secondary-700 disabled:opacity-50 disabled:cursor-not-allowed"
                             title="Download Invoice"
                           >
                             {isLoadingInvoice ? (
-                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-purple-600"></div>
+                              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-secondary-600"></div>
                             ) : (
                               <Icon name="download" className="h-4 w-4" />
                             )}

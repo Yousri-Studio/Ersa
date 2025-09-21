@@ -172,7 +172,7 @@ export default function AdminTestDashboard() {
                   <h1 className="text-2xl font-semibold text-gray-700 mb-1">
                     Hello 👋
                   </h1>
-                  <h2 className="text-xl font-bold text-green-600 mb-1">
+                  <h2 className="text-xl font-bold text-primary-600 mb-1">
                     Super Admin
                   </h2>
                   <p className="text-gray-600 text-sm">
@@ -205,8 +205,8 @@ export default function AdminTestDashboard() {
                           <p className="text-2xl font-bold text-gray-900 mb-1">{mockStats.totalCourses}</p>
                           <p className="text-sm font-medium text-gray-600">Total Courses</p>
                         </div>
-                        <div className="h-12 w-12 bg-green-50 rounded-full flex items-center justify-center border-2 border-green-200">
-                          <Icon name="desktop" className="h-6 w-6 text-green-600" />
+                        <div className="h-12 w-12 bg-primary-50 rounded-full flex items-center justify-center border-2 border-primary-200">
+                          <Icon name="desktop" className="h-6 w-6 text-primary-600" />
                         </div>
                       </div>
                     </div>
@@ -217,8 +217,8 @@ export default function AdminTestDashboard() {
                           <p className="text-2xl font-bold text-gray-900 mb-1">{mockStats.totalOrders}</p>
                           <p className="text-sm font-medium text-gray-600">Total Orders</p>
                         </div>
-                        <div className="h-12 w-12 bg-purple-50 rounded-full flex items-center justify-center border-2 border-purple-200">
-                          <Icon name="shopping-cart" className="h-6 w-6 text-purple-600" />
+                        <div className="h-12 w-12 bg-secondary-50 rounded-full flex items-center justify-center border-2 border-secondary-200">
+                          <Icon name="shopping-cart" className="h-6 w-6 text-secondary-600" />
                         </div>
                       </div>
                     </div>

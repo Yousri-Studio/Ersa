@@ -91,7 +91,7 @@ export default function TestConnectionPage() {
           <button
             onClick={testFetchConnection}
             disabled={isLoading}
-            className="w-full bg-green-600 text-white py-2 px-4 rounded-md hover:bg-green-700 disabled:opacity-50"
+            className="w-full bg-primary-600 text-white py-2 px-4 rounded-md hover:bg-primary-700 disabled:opacity-50"
           >
             {isLoading ? 'Testing...' : 'Test Fetch Connection'}
           </button>

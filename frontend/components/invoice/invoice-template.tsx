@@ -183,7 +183,7 @@ export const InvoiceTemplate: React.FC<InvoiceTemplateProps> = ({
               </span>
               <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                 invoiceData.status === 'Paid' || invoiceData.status === 'Processed'
-                  ? 'bg-green-100 text-green-800'
+                  ? 'bg-primary-100 text-primary-800'
                   : invoiceData.status === 'Pending' || invoiceData.status === 'UnderProcess'
                   ? 'bg-yellow-100 text-yellow-800'
                   : 'bg-red-100 text-red-800'

@@ -69,12 +69,12 @@ export default function AdminOrderDetail() {
       switch (status) {
         case 0: return 'bg-gray-100 text-gray-800'; // New
         case 1: return 'bg-yellow-100 text-yellow-800'; // Pending Payment
-        case 2: return 'bg-green-100 text-green-800'; // Paid
+        case 2: return 'bg-primary-100 text-primary-800'; // Paid
         case 3: return 'bg-blue-100 text-blue-800'; // Under Process
-        case 4: return 'bg-green-100 text-green-800'; // Processed
+        case 4: return 'bg-primary-100 text-primary-800'; // Processed
         case 5: return 'bg-orange-100 text-orange-800'; // Expired
         case 6: return 'bg-red-100 text-red-800'; // Failed
-        case 7: return 'bg-purple-100 text-purple-800'; // Refunded
+        case 7: return 'bg-secondary-100 text-secondary-800'; // Refunded
         default: return 'bg-gray-100 text-gray-800';
       }
     }
@@ -84,13 +84,13 @@ export default function AdminOrderDetail() {
     switch (statusStr) {
       case 'new': return 'bg-gray-100 text-gray-800';
       case 'pendingpayment': return 'bg-yellow-100 text-yellow-800';
-      case 'paid': return 'bg-green-100 text-green-800';
+      case 'paid': return 'bg-primary-100 text-primary-800';
       case 'underprocess': return 'bg-blue-100 text-blue-800';
-      case 'processed': return 'bg-green-100 text-green-800';
+      case 'processed': return 'bg-primary-100 text-primary-800';
       case 'expired': return 'bg-orange-100 text-orange-800';
       case 'failed': return 'bg-red-100 text-red-800';
-      case 'refunded': return 'bg-purple-100 text-purple-800';
-      case 'completed': return 'bg-green-100 text-green-800';
+      case 'refunded': return 'bg-secondary-100 text-secondary-800';
+      case 'completed': return 'bg-primary-100 text-primary-800';
       case 'pending': return 'bg-yellow-100 text-yellow-800';
       case 'processing': return 'bg-blue-100 text-blue-800';
       case 'cancelled': return 'bg-red-100 text-red-800';

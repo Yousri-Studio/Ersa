@@ -15,7 +15,7 @@ const getStatusAppearance = (status: Order['status']) => {
     case 'UnderProcess':
       return { text: 'In Process', color: 'bg-blue-200 text-blue-800' };
     case 'Processed':
-      return { text: 'Completed', color: 'bg-green-200 text-green-800' };
+      return { text: 'Completed', color: 'bg-primary-200 text-primary-800' };
     case 'Expired':
     case 'Failed':
       return { text: 'Failed', color: 'bg-red-200 text-red-800' };

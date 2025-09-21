@@ -95,8 +95,8 @@ export default function CheckoutSuccessPage() {
           {/* Success Header */}
           <div className="text-center mb-8">
             <div className={`mb-6 ${isLoaded ? 'animate-bounce-in' : 'opacity-0'}`}>
-              <div className="mx-auto w-20 h-20 bg-green-100 rounded-full flex items-center justify-center">
-                <Icon name="check" className="h-10 w-10 text-green-600" />
+              <div className="mx-auto w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center">
+                <Icon name="check" className="h-10 w-10 text-primary-600" />
               </div>
             </div>
             
@@ -130,7 +130,7 @@ export default function CheckoutSuccessPage() {
                 <div className="flex justify-between">
                   <span className="text-gray-600 font-cairo">{t('checkout.success.status')}</span>
                   <span className={`font-semibold font-cairo ${
-                    order.status === 'Paid' ? 'text-green-600' : 
+                    order.status === 'Paid' ? 'text-primary-600' : 
                     order.status === 'Pending' ? 'text-yellow-600' : 'text-red-600'
                   }`}>
                     {t(`checkout.success.status-${order.status.toLowerCase()}`)}

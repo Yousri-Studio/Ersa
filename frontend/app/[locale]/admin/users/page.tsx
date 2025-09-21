@@ -183,7 +183,7 @@ export default function AdminUsers() {
     const statusStr = String(status || '').toLowerCase();
     switch (statusStr) {
       case 'active':
-        return 'bg-green-100 text-green-800';
+        return 'bg-primary-100 text-primary-800';
       case 'pendingemailverification':
         return 'bg-yellow-100 text-yellow-800';
       case 'inactive':
@@ -206,23 +206,34 @@ export default function AdminUsers() {
       case 'suspended':
         return locale === 'ar' ? 'معلق' : 'Suspended';
       default:
-        return status;
+        return locale === 'ar' ? 'غير معروف' : 'Unknown';
     }
   };
 
   return (
     <div className="space-y-6" style={{maxWidth: '90rem', paddingTop: '50px'}} dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Page Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">
-          {locale === 'ar' ? 'إدارة المستخدمين' : 'Users Management'}
-        </h1>
-        <p className="mt-1 text-sm text-gray-500">
-          {locale === 'ar' 
-            ? 'إدارة حسابات المستخدمين والحالة والصلاحيات' 
-            : 'Manage user accounts, status, and permissions'
-          }
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">
+            {locale === 'ar' ? 'إدارة المستخدمين' : 'Users Management'}
+          </h1>
+          <p className="mt-1 text-sm text-gray-500">
+            {locale === 'ar' 
+              ? 'إدارة حسابات المستخدمين والحالة والصلاحيات' 
+              : 'Manage user accounts, status, and permissions'
+            }
+          </p>
+        </div>
+        <div>
+          <button
+            onClick={() => setShowAddUserModal(true)}
+            className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
+          >
+            <Icon name="plus" className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
+            {locale === 'ar' ? 'إضافة مستخدم' : 'Add User'}
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -232,14 +243,17 @@ export default function AdminUsers() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               {locale === 'ar' ? 'البحث' : 'Search'}
             </label>
-            <input
-              type="text"
-              placeholder={locale === 'ar' ? 'البحث بالاسم أو البريد الإلكتروني أو الهاتف...' : 'Search by name, email, or phone...'}
-              value={filters.search}
-              onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              dir={locale === 'ar' ? 'rtl' : 'ltr'}
-            />
+            <div className="relative">
+              <input
+                type="text"
+                placeholder={locale === 'ar' ? 'البحث بالاسم أو البريد الإلكتروني أو الهاتف...' : 'Search by name, email, or phone...'}
+                value={filters.search}
+                onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                className={`w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${isRTL ? 'pr-10 pl-3' : 'pl-10 pr-3'}`}
+                dir={locale === 'ar' ? 'rtl' : 'ltr'}
+              />
+              <Icon name="search" className={`absolute top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 ${isRTL ? 'right-3' : 'left-3'}`} />
+            </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -264,17 +278,7 @@ export default function AdminUsers() {
               onClick={() => setPagination(prev => ({ ...prev, page: 1 }))}
               className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <Icon name="search" className="mr-2 rtl:mr-0 rtl:ml-2" />
               {locale === 'ar' ? 'بحث' : 'Search'}
-            </button>
-          </div>
-          <div className="flex items-end">
-            <button
-              onClick={() => setShowAddUserModal(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <Icon name="plus" className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
-              {locale === 'ar' ? 'إضافة مستخدم' : 'Add User'}
             </button>
           </div>
         </div>
@@ -294,37 +298,25 @@ export default function AdminUsers() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+            <table className="min-w-full divide-y divide-gray-200 admin-users">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${
-                    locale === 'ar' ? 'text-right' : 'text-left'
-                  }`}>
+                  <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                     {locale === 'ar' ? 'المستخدم' : 'User'}
                   </th>
-                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${
-                    locale === 'ar' ? 'text-right' : 'text-left'
-                  }`}>
+                  <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                     {locale === 'ar' ? 'الحالة' : 'Status'}
                   </th>
-                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${
-                    locale === 'ar' ? 'text-right' : 'text-left'
-                  }`}>
+                  <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                     {locale === 'ar' ? 'الدور' : 'Role'}
                   </th>
-                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${
-                    locale === 'ar' ? 'text-right' : 'text-left'
-                  }`}>
+                  <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                     {locale === 'ar' ? 'تاريخ الإنشاء' : 'Created'}
                   </th>
-                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${
-                    locale === 'ar' ? 'text-right' : 'text-left'
-                  }`}>
+                  <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                     {locale === 'ar' ? 'آخر تسجيل دخول' : 'Last Login'}
                   </th>
-                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${
-                    locale === 'ar' ? 'text-left' : 'text-right'
-                  }`}>
+                  <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
                     {locale === 'ar' ? 'الإجراءات' : 'Actions'}
                   </th>
                 </tr>
@@ -332,14 +324,14 @@ export default function AdminUsers() {
               <tbody className="bg-white divide-y divide-gray-200">
                 {users.map((user) => (
                   <tr key={user.id} className="hover:bg-gray-50">
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 whitespace-nowrap text-left">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10">
                           <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
                             <Icon name="user" className="h-5 w-5 text-gray-600" />
                           </div>
                         </div>
-                        <div className="ml-4">
+                        <div>
                           <div className="text-sm font-medium text-gray-900">
                             {user.fullName}
                           </div>
@@ -354,38 +346,38 @@ export default function AdminUsers() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 whitespace-nowrap text-left">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(user.status || '')}`}>
                         {getStatusLabel(user.status || '')}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex space-x-1">
+                    <td className="px-6 py-4 whitespace-nowrap text-left">
+                      <div className={`flex ${isRTL ? 'justify-end' : 'justify-start'} ${isRTL ? 'space-x-reverse' : ''} space-x-1`}>
                         {user.isSuperAdmin && (
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                            Super Admin
+                            {locale === 'ar' ? 'مدير عام' : 'Super Admin'}
                           </span>
                         )}
                         {user.isAdmin && !user.isSuperAdmin && (
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                            Admin
+                            {locale === 'ar' ? 'مدير' : 'Admin'}
                           </span>
                         )}
                         {!user.isAdmin && !user.isSuperAdmin && (
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                            User
+                            {locale === 'ar' ? 'مستخدم' : 'User'}
                           </span>
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-left">
                       {formatDate(user.createdAt)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-left">
                       {user.lastLoginAt ? formatDate(user.lastLoginAt) : 'Never'}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <div className="flex justify-end space-x-2">
+                    <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${isRTL ? 'text-left' : 'text-right'}`}>
+                      <div className={`flex ${isRTL ? 'justify-start' : 'justify-end'} ${isRTL ? 'space-x-reverse' : ''} space-x-2`}>
                         <button
                           onClick={() => openStatusModal(user)}
                           className="text-blue-600 hover:text-blue-900"
@@ -395,7 +387,7 @@ export default function AdminUsers() {
                         {currentUser?.isSuperAdmin && (
                           <button
                             onClick={() => openRoleModal(user)}
-                            className="text-purple-600 hover:text-purple-900"
+                            className="text-secondary-600 hover:text-secondary-700"
                           >
                             <Icon name="user-shield" className="h-4 w-4" />
                           </button>
@@ -580,7 +572,7 @@ export default function AdminUsers() {
                 </button>
                 <button
                   onClick={handleRoleUpdate}
-                  className="px-4 py-2 text-sm font-medium text-white bg-purple-600 rounded-md hover:bg-purple-700"
+                  className="px-4 py-2 text-sm font-medium text-white bg-secondary-600 rounded-md hover:bg-secondary-700"
                 >
                   Update Role
                 </button>
@@ -593,49 +585,62 @@ export default function AdminUsers() {
       {/* Add User Modal */}
       {showAddUserModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
             <div className="mt-3">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Add New User</h3>
+              <h3 className="text-lg font-medium text-gray-900 mb-4">
+                {locale === 'ar' ? 'إضافة مستخدم جديد' : 'Add New User'}
+              </h3>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {locale === 'ar' ? 'الاسم الكامل' : 'Full Name'}
+                  </label>
                   <input
                     type="text"
                     value={addUserForm.fullName}
                     onChange={(e) => setAddUserForm(prev => ({ ...prev, fullName: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter full name"
+                    placeholder={locale === 'ar' ? 'أدخل الاسم الكامل' : 'Enter full name'}
+                    dir={locale === 'ar' ? 'rtl' : 'ltr'}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {locale === 'ar' ? 'البريد الإلكتروني' : 'Email'}
+                  </label>
                   <input
                     type="email"
                     value={addUserForm.email}
                     onChange={(e) => setAddUserForm(prev => ({ ...prev, email: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter email address"
+                    placeholder={locale === 'ar' ? 'أدخل عنوان البريد الإلكتروني' : 'Enter email address'}
+                    dir="ltr"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Phone (Optional)</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {locale === 'ar' ? 'رقم الجوال (اختياري)' : 'Phone (Optional)'}
+                  </label>
                   <input
                     type="tel"
                     value={addUserForm.phone}
                     onChange={(e) => setAddUserForm(prev => ({ ...prev, phone: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Enter phone number"
+                    placeholder={locale === 'ar' ? 'أدخل رقم الجوال' : 'Enter phone number'}
+                    dir={locale === 'ar' ? 'rtl' : 'ltr'}
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Language</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {locale === 'ar' ? 'اللغة' : 'Language'}
+                  </label>
                   <select
                     value={addUserForm.locale}
                     onChange={(e) => setAddUserForm(prev => ({ ...prev, locale: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    <option value="en">English</option>
-                    <option value="ar">Arabic</option>
+                    <option value="en">{locale === 'ar' ? 'الإنجليزية' : 'English'}</option>
+                    <option value="ar">{locale === 'ar' ? 'العربية' : 'Arabic'}</option>
                   </select>
                 </div>
                 <div className="space-y-2">
@@ -648,7 +653,7 @@ export default function AdminUsers() {
                       className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                     />
                     <label htmlFor="addUserIsAdmin" className="ml-2 block text-sm text-gray-900">
-                      Admin
+                      {locale === 'ar' ? 'مدير' : 'Admin'}
                     </label>
                   </div>
                   <div className="flex items-center">
@@ -660,7 +665,7 @@ export default function AdminUsers() {
                       className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
                     />
                     <label htmlFor="addUserIsSuperAdmin" className="ml-2 block text-sm text-gray-900">
-                      Super Admin
+                      {locale === 'ar' ? 'مدير النظام' : 'Super Admin'}
                     </label>
                   </div>
                 </div>
@@ -670,13 +675,13 @@ export default function AdminUsers() {
                   onClick={() => setShowAddUserModal(false)}
                   className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
                 >
-                  Cancel
+                  {locale === 'ar' ? 'إلغاء' : 'Cancel'}
                 </button>
                 <button
                   onClick={handleAddUser}
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700"
+                  className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-md hover:bg-primary-700"
                 >
-                  Add User
+                  {locale === 'ar' ? 'إضافة مستخدم' : 'Add User'}
                 </button>
               </div>
             </div>

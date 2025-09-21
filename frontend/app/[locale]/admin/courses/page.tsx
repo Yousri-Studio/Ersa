@@ -236,11 +236,22 @@ export default function AdminCourses() {
   return (
     <div className="space-y-6" style={{maxWidth: '90rem', paddingTop: '50px'}} dir={isRTL ? 'rtl' : 'ltr'}>
       {/* Page Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">{t('manageCourses')}</h1>
-        <p className="mt-1 text-sm text-gray-500">
-          {locale === 'ar' ? 'عرض وإدارة جميع الدورات في المنصة' : 'View and manage all courses on the platform'}
-        </p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">{t('sidebar.manageCourses')}</h1>
+          <p className="mt-1 text-sm text-gray-500">
+            {locale === 'ar' ? 'عرض وإدارة جميع الدورات في المنصة' : 'View and manage all courses on the platform'}
+          </p>
+        </div>
+        <div>
+          <button
+            onClick={openAddModal}
+            className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
+          >
+            <Icon name="plus" className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
+            {locale === 'ar' ? 'إضافة دورة' : 'Add Course'}
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -250,14 +261,17 @@ export default function AdminCourses() {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               {locale === 'ar' ? 'بحث' : 'Search'}
             </label>
-            <input
-              type="text"
-              placeholder={locale === 'ar' ? 'البحث بالعنوان أو الوصف...' : 'Search by title or description...'}
-              value={filters.search}
-              onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              dir={isRTL ? 'rtl' : 'ltr'}
-            />
+            <div className="relative">
+              <input
+                type="text"
+                placeholder={locale === 'ar' ? 'البحث بالعنوان أو الوصف...' : 'Search by title or description...'}
+                value={filters.search}
+                onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                className={`w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${isRTL ? 'pr-10 pl-3' : 'pl-10 pr-3'}`}
+                dir={isRTL ? 'rtl' : 'ltr'}
+              />
+              <Icon name="search" className={`absolute top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 ${isRTL ? 'right-3' : 'left-3'}`} />
+            </div>
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -280,17 +294,7 @@ export default function AdminCourses() {
               onClick={() => setPagination(prev => ({ ...prev, page: 1 }))}
               className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <Icon name="search" className={`${isRTL ? 'ml-2' : 'mr-2'}`} />
               {locale === 'ar' ? 'بحث' : 'Search'}
-            </button>
-          </div>
-          <div className="flex items-end">
-            <button
-              onClick={openAddModal}
-              className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
-            >
-              <Icon name="plus" className={`h-4 w-4 ${isRTL ? 'ml-2' : 'mr-2'}`} />
-              {locale === 'ar' ? 'إضافة دورة' : 'Add Course'}
             </button>
           </div>
         </div>
@@ -300,7 +304,7 @@ export default function AdminCourses() {
       <div className="bg-white shadow rounded-lg overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200">
           <h3 className="text-lg font-medium text-gray-900">
-            Courses ({pagination.totalCount.toLocaleString()})
+            {locale === 'ar' ? `الدورات (${pagination.totalCount.toLocaleString()})` : `Courses (${pagination.totalCount.toLocaleString()})`}
           </h3>
         </div>
         
@@ -310,7 +314,7 @@ export default function AdminCourses() {
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
+            <table className="min-w-full divide-y divide-gray-200 admin-courses">
               <thead className="bg-gray-50">
                 <tr>
                   <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
@@ -348,7 +352,7 @@ export default function AdminCourses() {
                             className="h-16 w-16 rounded-lg object-cover"
                           />
                         ) : (
-                          <div className="h-16 w-16 rounded-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
+                          <div className="h-16 w-16 rounded-lg bg-gradient-to-br from-blue-500 to-secondary-600 flex items-center justify-center">
                             <Icon name="graduation-cap" className="h-8 w-8 text-white" />
                           </div>
                         )}
@@ -356,7 +360,7 @@ export default function AdminCourses() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center">
-                        <div className={`${isRTL ? 'mr-4' : 'ml-4'}`}>
+                        <div className={`${isRTL ? 'mr-4' : 'ml-4'}`} style={locale === 'en' ? { marginLeft: '0rem' } : {}}>
                           <div className="text-sm font-medium text-gray-900">
                             {course.titleEn}
                           </div>
@@ -371,22 +375,22 @@ export default function AdminCourses() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-left">
                       {formatCurrency(course.price, course.currency)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
+                    <td className="px-6 py-4 whitespace-nowrap text-left">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         course.isActive 
-                          ? 'bg-green-100 text-green-800' 
+                          ? 'bg-primary-100 text-primary-800' 
                           : 'bg-red-100 text-red-800'
                       }`}>
                         {course.isActive ? (locale === 'ar' ? 'نشط' : 'Active') : (locale === 'ar' ? 'غير نشط' : 'Inactive')}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-left">
                       {formatDate(course.createdAt)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-left">
                       {formatDate(course.updatedAt)}
                     </td>
                     <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${isRTL ? 'text-left' : 'text-right'}`}>
