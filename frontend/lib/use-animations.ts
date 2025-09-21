@@ -16,31 +16,38 @@ export function useScrollAnimation() {
   const itemRefs = useRef<(HTMLElement | null)[]>([]);
 
   useEffect(() => {
-    const observers = itemRefs.current.map((ref, index) => {
-      if (!ref) return null;
-      
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) {
-            setVisibleItems(prev => {
-              const newSet = new Set(prev);
-              newSet.add(index);
-              return newSet;
-            });
+    // Wait for hydration to complete before starting intersection observers
+    const timer = setTimeout(() => {
+      const observers = itemRefs.current.map((ref, index) => {
+        if (!ref) return null;
+        
+        const observer = new IntersectionObserver(
+          ([entry]) => {
+            if (entry.isIntersecting) {
+              setVisibleItems(prev => {
+                const newSet = new Set(prev);
+                newSet.add(index);
+                return newSet;
+              });
+            }
+          },
+          { 
+            threshold: 0.1, 
+            rootMargin: '50px' 
           }
-        },
-        { 
-          threshold: 0.1, 
-          rootMargin: '50px' 
-        }
-      );
-      
-      observer.observe(ref);
-      return observer;
-    });
+        );
+        
+        observer.observe(ref);
+        return observer;
+      });
+
+      return () => {
+        observers.forEach(observer => observer?.disconnect());
+      };
+    }, 150); // Wait for hydration to complete
 
     return () => {
-      observers.forEach(observer => observer?.disconnect());
+      clearTimeout(timer);
     };
   }, [itemRefs.current.length]);
 
@@ -56,33 +63,40 @@ export function useStaggeredAnimation(items: any[], baseDelay = 0) {
   const itemRefs = useRef<(HTMLElement | null)[]>([]);
 
   useEffect(() => {
-    const observers = itemRefs.current.map((ref, index) => {
-      if (!ref) return null;
-      
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (entry.isIntersecting) {
-            setTimeout(() => {
-              setVisibleItems(prev => {
-                const newSet = new Set(prev);
-                newSet.add(index);
-                return newSet;
-              });
-            }, baseDelay + (index * 100));
+    // Wait for hydration to complete before starting intersection observers
+    const timer = setTimeout(() => {
+      const observers = itemRefs.current.map((ref, index) => {
+        if (!ref) return null;
+        
+        const observer = new IntersectionObserver(
+          ([entry]) => {
+            if (entry.isIntersecting) {
+              setTimeout(() => {
+                setVisibleItems(prev => {
+                  const newSet = new Set(prev);
+                  newSet.add(index);
+                  return newSet;
+                });
+              }, baseDelay + (index * 100));
+            }
+          },
+          { 
+            threshold: 0.1, 
+            rootMargin: '100px' 
           }
-        },
-        { 
-          threshold: 0.1, 
-          rootMargin: '100px' 
-        }
-      );
-      
-      observer.observe(ref);
-      return observer;
-    });
+        );
+        
+        observer.observe(ref);
+        return observer;
+      });
+
+      return () => {
+        observers.forEach(observer => observer?.disconnect());
+      };
+    }, 150); // Wait for hydration to complete
 
     return () => {
-      observers.forEach(observer => observer?.disconnect());
+      clearTimeout(timer);
     };
   }, [items.length, baseDelay]);
 

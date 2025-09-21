@@ -229,22 +229,6 @@ export default function CartPage() {
                 </Link>
               </div>
               
-              {/* Promo Code */}
-              <div className="mt-6 pt-6 border-t border-gray-200">
-                <h3 className="text-sm font-semibold text-gray-900 mb-3 font-cairo">
-                  {t('cart.promo-code')}
-                </h3>
-                <div className="flex space-x-2 rtl:space-x-reverse">
-                  <input
-                    type="text"
-                    placeholder={t('cart.promo-placeholder')}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm font-cairo focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  />
-                  <button className="px-4 py-2 bg-gray-800 text-white text-sm font-semibold rounded-md hover:bg-gray-700 transition-colors font-cairo">
-                    {t('cart.apply')}
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
         </div>

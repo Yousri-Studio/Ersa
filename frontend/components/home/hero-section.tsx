@@ -38,7 +38,7 @@ export function HeroSection() {
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         
         {/* Hero Copy + Actions */}
-        <div className={`text-center mb-12 ${isLoaded ? 'animate-fade-in-up' : 'opacity-0'}`}>
+        <div className={`text-center mb-12 ${isLoaded ? 'animate-fade-in-up' : 'opacity-0'}`} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
           {/* Tagline */}
           <p className="mb-6 hero-tagline">
             {t('consultation.badge')}

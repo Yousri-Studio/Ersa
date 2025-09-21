@@ -141,7 +141,8 @@
       "email-exists": "Email already exists",
       "weak-password": "Password is too weak",
       "required-field": "This field is required"
-    }
+    },
+    "login-required": "Please login to add items to wishlist"
   },
   "consultation": {
     "badge": "Free Consultation",
@@ -152,7 +153,10 @@
     },
     "image-alt": "Professional consultation services",
     "request-consultation": "Request a Free Consultation",
-    "explore-courses": "Explore Our Courses"
+    "explore-courses": "Explore Our Courses",
+    "errors": {
+      "load-failed": "Failed to load consultation data"
+    }
   },
   "testimonials": {
     "title": "What Our Clients Say",
@@ -538,5 +542,62 @@
       "onsite": "PDF",
       "online": "Online"
     }
+  },
+  "wishlist": {
+    "title": "Wishlist",
+    "items-count": "{count} items in wishlist",
+    "add-to-cart": "Add to Cart",
+    "continue-shopping": "Continue Shopping",
+    "empty": {
+      "title": "Your wishlist is empty",
+      "description": "You haven't added any courses to your wishlist yet. Start browsing our courses and discover what suits you.",
+      "login-required": "Login Required",
+      "go-to-home": "Go to Home",
+      "browse-courses": "Browse Courses"
+    }
+  },
+  "cart": {
+    "title": "Shopping Cart",
+    "items-count": "{count} items in cart",
+    "clear-all": "Clear All",
+    "items": "Items",
+    "session": "Session",
+    "instructor": "Instructor",
+    "each": "each",
+    "remove": "Remove",
+    "move-to-wishlist": "Move to Wishlist",
+    "order-summary": "Order Summary",
+    "subtotal": "Subtotal",
+    "tax": "Tax",
+    "included": "Included",
+    "total": "Total",
+    "proceed-to-checkout": "Proceed to Checkout",
+    "continue-shopping": "Continue Shopping",
+    "promo-code": "Promo Code",
+    "promo-placeholder": "Enter promo code",
+    "apply": "Apply",
+    "empty": {
+      "title": "Your cart is empty",
+      "description": "You haven't added any courses to your cart yet. Start browsing our courses and discover what suits you.",
+      "browse-courses": "Browse Courses",
+      "go-to-home": "Go to Home"
+    }
+  },
+  "errors": {
+    "load-failed": "Failed to load data",
+    "course-not-found": "Course not found",
+    "course-not-found-message": "Sorry, we couldn't find the requested course."
+  },
+  "footer": {
+    "company": "Company",
+    "learning": "Learning",
+    "support": "Support",
+    "privacy-policy": "Privacy Policy",
+    "terms-of-service": "Terms of Service",
+    "certificates": "Certificates",
+    "help-center": "Help Center",
+    "technical-support": "Technical Support",
+    "all-rights-reserved": "All rights reserved",
+    "made-with-love": "Made with ❤️ in Saudi Arabia"
   }
 }

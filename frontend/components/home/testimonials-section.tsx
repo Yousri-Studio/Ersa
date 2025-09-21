@@ -80,17 +80,17 @@ export function TestimonialsSection() {
                   <div className="font-bold text-gray-900 text-lg font-cairo">
                     {testimonial.name}
                   </div>
-                  {/* Rating Stars */}
-                  <div className="flex items-center mt-1">
+                  {/* Rating Stars - Hidden */}
+                  {/* <div className="flex items-center mt-1">
                     {[...Array(5)].map((_, i) => (
                       <Icon 
                         key={i} 
-                                        name="star"
-                className={`h-4 w-4 ${i < testimonial.rating ? '' : 'text-gray-300'}`}
-                style={{ color: i < testimonial.rating ? '#FB831D' : undefined }} 
+                        name="star"
+                        className={`h-4 w-4 ${i < testimonial.rating ? '' : 'text-gray-300'}`}
+                        style={{ color: i < testimonial.rating ? '#FB831D' : undefined }} 
                       />
                     ))}
-                  </div>
+                  </div> */}
                 </div>
               </div>
 

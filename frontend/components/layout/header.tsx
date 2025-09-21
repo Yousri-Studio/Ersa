@@ -149,18 +149,11 @@ export function Header() {
               href={`/${locale}/cart`}
               className="relative flex items-center justify-center w-12 h-12 bg-white rounded-full shadow-sm hover:shadow-md transition-all duration-200"
             >
-              <div className="relative">
-                <Icon 
-                  name="shopping-cart" 
-                  className="h-5 w-5" 
-                  style={{ color: '#3F3D56' }}
-                />
-                <Icon 
-                  name="plus" 
-                  className="h-3 w-3 absolute -bottom-1 -right-1" 
-                  style={{ color: '#3F3D56' }}
-                />
-              </div>
+              <Icon 
+                name="shopping-cart" 
+                className="h-5 w-5" 
+                style={{ color: '#3F3D56' }}
+              />
               {itemCount() > 0 && (
                 <span className="absolute -top-1 -right-1 rtl:right-auto rtl:left-0 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-semibold">
                   {itemCount()}

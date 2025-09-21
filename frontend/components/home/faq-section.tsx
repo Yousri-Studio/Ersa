@@ -39,7 +39,7 @@ export default function FAQSection() {
   ];
 
   return (
-    <section className="py-16 bg-white">
+    <section className="py-16 bg-white" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
@@ -59,24 +59,44 @@ export default function FAQSection() {
               <div
                 key={index}
                 className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden"
+                dir={locale === 'ar' ? 'rtl' : 'ltr'}
               >
                 <button
                   onClick={() => toggleItem(index)}
-                  className={`w-full px-6 py-5 flex items-center transition-all duration-200 ${
+                  className={`w-full px-6 py-5 relative flex items-center transition-all duration-200 ${
                     isOpen ? 'bg-gray-50' : 'hover:bg-gray-50'
-                  } ${locale === 'ar' ? 'flex-row-reverse justify-between' : 'text-right flex items-center justify-between'}`}
+                  }`}
+                  dir={locale === 'ar' ? 'rtl' : 'ltr'}
                 >
-                  <div className="flex-shrink-0">
-                    <Icon 
-                      name={isOpen ? 'minus' : 'plus'} 
-                      className={`h-5 w-5 text-gray-600`}
-                    />
-                  </div>
-                  <span className={`font-medium text-lg transition-colors ${
-                    isOpen ? 'text-[#00AC96]' : 'text-gray-700'
-                  } ${locale === 'ar' ? 'pr-4' : 'pr-4'}`}>
-                    {item.question}
-                  </span>
+                  {locale === 'ar' ? (
+                    <>
+                      <div className="absolute left-6 top-1/2 transform -translate-y-1/2">
+                        <Icon 
+                          name={isOpen ? 'minus' : 'plus'} 
+                          className={`h-5 w-5 text-gray-600`}
+                        />
+                      </div>
+                      <span className={`font-medium text-lg transition-colors w-full text-right pr-12 ${
+                        isOpen ? 'text-[#00AC96]' : 'text-gray-700'
+                      }`}>
+                        {item.question}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      <span className={`font-medium text-lg transition-colors flex-1 text-left pl-4 ${
+                        isOpen ? 'text-[#00AC96]' : 'text-gray-700'
+                      }`}>
+                        {item.question}
+                      </span>
+                      <div className="flex-shrink-0">
+                        <Icon 
+                          name={isOpen ? 'minus' : 'plus'} 
+                          className={`h-5 w-5 text-gray-600`}
+                        />
+                      </div>
+                    </>
+                  )}
                 </button>
                 
                 {/* Animated content */}
@@ -84,10 +104,11 @@ export default function FAQSection() {
                   className={`overflow-hidden transition-all duration-300 ease-in-out ${
                     isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
                   }`}
+                  dir={locale === 'ar' ? 'rtl' : 'ltr'}
                 >
                   <div className="px-6 pb-5">
                     <div className="border-t border-gray-100 pt-4">
-                      <p className={`text-gray-600 leading-relaxed text-base font-cairo ${locale === 'ar' ? 'text-right' : ''}`}>
+                      <p className={`text-gray-600 leading-relaxed text-base font-cairo ${locale === 'ar' ? 'text-right' : 'text-left'}`}>
                         {item.answer}
                       </p>
                     </div>

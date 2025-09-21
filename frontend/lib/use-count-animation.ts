@@ -18,52 +18,60 @@ export function useCountAnimation({
   const elementRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting && !hasAnimated) {
-            setHasAnimated(true);
-            
-            // Start animation after delay
-            setTimeout(() => {
-              const startTime = performance.now();
+    // Wait for hydration to complete before starting intersection observer
+    const timer = setTimeout(() => {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting && !hasAnimated) {
+              setHasAnimated(true);
               
-              const animate = () => {
-                const elapsed = performance.now() - startTime;
-                const progress = Math.min(elapsed / duration, 1);
+              // Start animation after delay
+              setTimeout(() => {
+                const startTime = performance.now();
                 
-                // Easing function for smooth animation
-                const easeOutQuart = 1 - Math.pow(1 - progress, 4);
-                const currentCount = Math.floor(startValue + (targetValue - startValue) * easeOutQuart);
+                const animate = () => {
+                  const elapsed = performance.now() - startTime;
+                  const progress = Math.min(elapsed / duration, 1);
+                  
+                  // Easing function for smooth animation
+                  const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+                  const currentCount = Math.floor(startValue + (targetValue - startValue) * easeOutQuart);
+                  
+                  setCount(currentCount);
+                  
+                  if (progress < 1) {
+                    requestAnimationFrame(animate);
+                  } else {
+                    setCount(targetValue);
+                  }
+                };
                 
-                setCount(currentCount);
-                
-                if (progress < 1) {
-                  requestAnimationFrame(animate);
-                } else {
-                  setCount(targetValue);
-                }
-              };
-              
-              requestAnimationFrame(animate);
-            }, delay);
-          }
-        });
-      },
-      {
-        threshold: 0.1,
-        rootMargin: '50px'
-      }
-    );
+                requestAnimationFrame(animate);
+              }, delay);
+            }
+          });
+        },
+        {
+          threshold: 0.1,
+          rootMargin: '50px'
+        }
+      );
 
-    if (elementRef.current) {
-      observer.observe(elementRef.current);
-    }
+      if (elementRef.current) {
+        observer.observe(elementRef.current);
+      }
+
+      return () => {
+        if (elementRef.current) {
+          observer.unobserve(elementRef.current);
+        }
+        observer.disconnect();
+      };
+    }, 150); // Wait for hydration to complete
 
     return () => {
-      if (elementRef.current) {
-        observer.unobserve(elementRef.current);
-      }
+      clearTimeout(timer);
     };
   }, [targetValue, duration, delay, hasAnimated, startValue]);
 

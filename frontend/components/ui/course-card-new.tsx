@@ -203,7 +203,7 @@ export const CourseCard: React.FC<CourseCardProps> & {
   };
 
   return (
-    <article className="group rounded-3xl border border-slate-100 bg-white shadow-sm hover-lift card-animate flex flex-col h-full">
+    <article className="group rounded-3xl border border-slate-100 bg-white shadow-sm hover-lift card-animate flex flex-col h-full" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
       <div className="p-4 pb-0">
         {/* Thumbnail frame with inner padding */}
         <div className="relative rounded-2xl bg-emerald-50/30 p-2">

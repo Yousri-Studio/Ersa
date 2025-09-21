@@ -11,18 +11,18 @@ export function Footer() {
     company: [
       { name: t('about.title'), href: `/${locale}/about` },
       { name: t('common.contact'), href: `/${locale}/contact` },
-      { name: 'Privacy Policy', href: `/${locale}/privacy` },
-      { name: 'Terms of Service', href: `/${locale}/terms` },
+      { name: t('footer.privacy-policy'), href: `/${locale}/privacy` },
+      { name: t('footer.terms-of-service'), href: `/${locale}/terms` },
     ],
     learning: [
       { name: t('navigation.courses'), href: `/${locale}/courses` },
       { name: t('navigation.my-learning'), href: `/${locale}/profile/enrollments` },
-      { name: 'Certificates', href: `/${locale}/profile/certificates` },
+      { name: t('footer.certificates'), href: `/${locale}/profile/certificates` },
     ],
     support: [
-      { name: 'Help Center', href: `/${locale}/help` },
-      { name: 'FAQ', href: `/${locale}/faq` },
-      { name: 'Technical Support', href: `/${locale}/support` },
+      { name: t('footer.help-center'), href: `/${locale}/help` },
+      { name: t('navigation.faq'), href: `/${locale}/faq` },
+      { name: t('footer.technical-support'), href: `/${locale}/support` },
     ],
   };
 
@@ -77,7 +77,7 @@ export function Footer() {
           {/* Company Links */}
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-wider mb-4">
-              Company
+              {t('footer.company')}
             </h3>
             <ul className="space-y-3">
               {footerLinks.company.map((link) => (
@@ -96,7 +96,7 @@ export function Footer() {
           {/* Learning Links */}
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-wider mb-4">
-              Learning
+              {t('footer.learning')}
             </h3>
             <ul className="space-y-3">
               {footerLinks.learning.map((link) => (
@@ -115,7 +115,7 @@ export function Footer() {
           {/* Support Links */}
           <div>
             <h3 className="text-sm font-semibold uppercase tracking-wider mb-4">
-              Support
+              {t('footer.support')}
             </h3>
             <ul className="space-y-3">
               {footerLinks.support.map((link) => (
@@ -135,13 +135,35 @@ export function Footer() {
         {/* Bottom Section */}
         <div className="mt-12 pt-8 border-t border-gray-800">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-gray-400 text-sm">
-              © 2024 {t('hero.company')}. All rights reserved.
-            </p>
-            <div className="mt-4 md:mt-0 flex items-center space-x-6 rtl:space-x-reverse">
+            {/* Left side - Copyright and Made with love */}
+            <div className="flex flex-col items-center md:items-start text-left mb-4 md:mb-0">
+              <p className="text-gray-400 text-sm mb-1">
+                © 2025 إرساء للتدريب. {t('footer.all-rights-reserved')}.
+              </p>
               <span className="text-gray-400 text-sm">
-                Made with ❤️ in Saudi Arabia
+                {t('footer.made-with-love')}
               </span>
+            </div>
+            
+            {/* Right side - Kijoo Agency */}
+            <div className="flex flex-col items-center md:items-end">
+              <div className="flex items-center space-x-2 rtl:space-x-reverse">
+                <span className="text-white text-sm">
+                  {t('admin-login.footer.designed-by')}
+                </span>
+                <a 
+                  href="https://kijoo.agency" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="hover:opacity-80 transition-opacity"
+                >
+                  <img 
+                    src="/Kijoo Logo.svg" 
+                    alt="Kijoo Agency"
+                    className="h-4 w-auto"
+                  />
+                </a>
+              </div>
             </div>
           </div>
         </div>

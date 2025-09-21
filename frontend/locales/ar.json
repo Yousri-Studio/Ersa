@@ -140,7 +140,8 @@
       "email-exists": "البريد الإلكتروني مسجل مسبقاً",
       "weak-password": "كلمة المرور ضعيفة جداً",
       "required-field": "هذا الحقل مطلوب"
-    }
+    },
+    "login-required": "يجب تسجيل الدخول لإضافة العناصر إلى قائمة الأمنيات"
   },
   "consultation": {
     "badge": "استشارة مجانية",
@@ -151,7 +152,10 @@
     },
     "image-alt": "خدمات استشارات احترافية",
     "request-consultation": "اطلب استشارة مجانية",
-    "explore-courses": "استكشف دوراتنا"
+    "explore-courses": "استكشف دوراتنا",
+    "errors": {
+      "load-failed": "فشل في تحميل بيانات الاستشارة"
+    }
   },
   "testimonials": {
     "title": "ما يقوله عملاؤنا",
@@ -629,6 +633,46 @@
       "online": "أونلاين"
     }
   },
+  "wishlist": {
+    "title": "قائمة الأمنيات",
+    "items-count": "{count} عنصر في قائمة الأمنيات",
+    "add-to-cart": "أضف إلى السلة",
+    "continue-shopping": "متابعة التسوق",
+    "empty": {
+      "title": "قائمة الأمنيات فارغة",
+      "description": "لم تقم بإضافة أي دورات إلى قائمة الأمنيات بعد. ابدأ بتصفح دوراتنا واكتشف ما يناسبك.",
+      "login-required": "تسجيل الدخول",
+      "go-to-home": "العودة للرئيسية",
+      "browse-courses": "تصفح الدورات"
+    }
+  },
+  "cart": {
+    "title": "سلة التسوق",
+    "items-count": "{count} عنصر في السلة",
+    "clear-all": "مسح الكل",
+    "items": "العناصر",
+    "session": "الجلسة",
+    "instructor": "المدرب",
+    "each": "لكل عنصر",
+    "remove": "إزالة",
+    "move-to-wishlist": "نقل إلى قائمة الأمنيات",
+    "order-summary": "ملخص الطلب",
+    "subtotal": "المجموع الفرعي",
+    "tax": "الضريبة",
+    "included": "مشمولة",
+    "total": "المجموع",
+    "proceed-to-checkout": "المتابعة للدفع",
+    "continue-shopping": "متابعة التسوق",
+    "promo-code": "كود الخصم",
+    "promo-placeholder": "أدخل كود الخصم",
+    "apply": "تطبيق",
+    "empty": {
+      "title": "سلة التسوق فارغة",
+      "description": "لم تقم بإضافة أي دورات إلى سلة التسوق بعد. ابدأ بتصفح دوراتنا واكتشف ما يناسبك.",
+      "browse-courses": "تصفح الدورات",
+      "go-to-home": "العودة للرئيسية"
+    }
+  },
 
   "admin-login": {
     "welcome": "مرحباً بك عزيزي",
@@ -649,5 +693,22 @@
       "copyright": "جميع الحقوق محفوظة لمنصة إرساء © 2025",
       "designed-by": "تصميم وتطوير"
     }
+  },
+  "errors": {
+    "load-failed": "فشل في تحميل البيانات",
+    "course-not-found": "الدورة غير موجودة",
+    "course-not-found-message": "عذراً، لم نتمكن من العثور على الدورة المطلوبة."
+  },
+  "footer": {
+    "company": "الشركة",
+    "learning": "التعلم",
+    "support": "الدعم",
+    "privacy-policy": "سياسة الخصوصية",
+    "terms-of-service": "شروط الخدمة",
+    "certificates": "الشهادات",
+    "help-center": "مركز المساعدة",
+    "technical-support": "الدعم الفني",
+    "all-rights-reserved": "جميع الحقوق محفوظة",
+    "made-with-love": "صُنع بـ ❤️ في المملكة العربية السعودية"
   }
 }

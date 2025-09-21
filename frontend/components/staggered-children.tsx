@@ -24,35 +24,43 @@ export function StaggeredChildren({
     const container = containerRef.current;
     if (!container) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const children = entry.target.querySelectorAll(`.${animationClass}`);
-            children.forEach((child, index) => {
-              setTimeout(() => {
-                child.classList.add('visible');
-              }, index * staggerDelay);
-            });
-          } else {
-            // Reset animations when out of view
-            const children = entry.target.querySelectorAll(`.${animationClass}`);
-            children.forEach((child) => {
-              child.classList.remove('visible');
-            });
-          }
-        });
-      },
-      {
-        threshold: 0.1,
-        rootMargin: '50px'
-      }
-    );
+    // Wait for hydration to complete before starting intersection observer
+    const timer = setTimeout(() => {
+      const observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const children = entry.target.querySelectorAll(`.${animationClass}`);
+              children.forEach((child, index) => {
+                setTimeout(() => {
+                  child.classList.add('visible');
+                }, index * staggerDelay);
+              });
+            } else {
+              // Reset animations when out of view
+              const children = entry.target.querySelectorAll(`.${animationClass}`);
+              children.forEach((child) => {
+                child.classList.remove('visible');
+              });
+            }
+          });
+        },
+        {
+          threshold: 0.1,
+          rootMargin: '50px'
+        }
+      );
 
-    observer.observe(container);
+      observer.observe(container);
+
+      return () => {
+        observer.unobserve(container);
+        observer.disconnect();
+      };
+    }, 150); // Wait for hydration to complete
 
     return () => {
-      observer.unobserve(container);
+      clearTimeout(timer);
     };
   }, [animationClass, staggerDelay, isClient]);
 
