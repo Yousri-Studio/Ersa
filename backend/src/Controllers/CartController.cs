@@ -62,6 +62,7 @@ public class CartController : ControllerBase
                     .ThenInclude(ci => ci.Course)
                 .Include(c => c.Items)
                     .ThenInclude(ci => ci.Session)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(c => c.Id == request.CartId);
 
             if (cart == null)
@@ -242,6 +243,7 @@ public class CartController : ControllerBase
                 .ThenInclude(ci => ci.Course)
             .Include(c => c.Items)
                 .ThenInclude(ci => ci.Session)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(c => c.Id == cartId);
 
         if (cart == null)

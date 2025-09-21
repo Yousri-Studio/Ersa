@@ -78,6 +78,7 @@ public class EnrollmentService : IEnrollmentService
                 .ThenInclude(sl => sl.Attachment)
             .Where(e => e.UserId == userId)
             .OrderByDescending(e => e.EnrolledAt)
+            .AsSplitQuery()
             .ToListAsync();
     }
 

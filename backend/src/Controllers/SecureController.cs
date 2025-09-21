@@ -32,6 +32,7 @@ public class SecureController : ControllerBase
                 .Include(sl => sl.Attachment)
                 .Include(sl => sl.Enrollment)
                     .ThenInclude(e => e.User)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(sl => sl.Token == token);
 
             if (secureLink == null)
@@ -92,6 +93,7 @@ public class SecureController : ControllerBase
                 .Include(sl => sl.Attachment)
                 .Include(sl => sl.Enrollment)
                     .ThenInclude(e => e.Course)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(sl => sl.Token == token);
 
             if (secureLink == null)

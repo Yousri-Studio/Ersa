@@ -49,6 +49,7 @@ public class OrdersController : ControllerBase
                     .ThenInclude(ci => ci.Course)
                 .Include(c => c.Items)
                     .ThenInclude(ci => ci.Session)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(c => c.Id == request.CartId && 
                     (c.UserId == userId || (c.UserId == null && c.AnonymousId != null)));
 

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using ErsaTraining.API.Data.Entities;
 using ErsaTraining.API.Data.Configurations;
 
@@ -14,9 +15,12 @@ public class ErsaTrainingDbContext : IdentityDbContext<User, IdentityRole<Guid>,
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        // Remove the warning configuration as PendingModelChangesWarning doesn't exist in EF Core 8.x
+        // Configure warnings for better performance monitoring
         optionsBuilder.ConfigureWarnings(warnings =>
-            warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+        {
+            warnings.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning);
+            warnings.Throw(RelationalEventId.MultipleCollectionIncludeWarning);
+        });
     }
 
     // DbSets

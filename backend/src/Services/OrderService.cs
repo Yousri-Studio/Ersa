@@ -31,6 +31,7 @@ public class OrderService : IOrderService
                 .ThenInclude(ci => ci.Course)
             .Include(c => c.Items)
                 .ThenInclude(ci => ci.Session)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(c => c.Id == cartId && c.UserId == userId);
 
         if (cart == null || !cart.Items.Any())

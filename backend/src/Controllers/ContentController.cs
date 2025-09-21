@@ -46,6 +46,7 @@ public class ContentController : ControllerBase
                 .Include(p => p.Sections)
                 .ThenInclude(s => s.Blocks)
                 .OrderBy(p => p.PageName)
+                .AsSplitQuery()
                 .ToListAsync();
 
             var pageDtos = pages.Select(p => new ContentPageDto
@@ -111,6 +112,7 @@ public class ContentController : ControllerBase
             var page = await _context.ContentPages
                 .Include(p => p.Sections)
                 .ThenInclude(s => s.Blocks)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(p => p.PageKey == pageKey && p.IsActive);
 
             if (page == null)
@@ -718,6 +720,7 @@ public class ContentController : ControllerBase
             var page = await _context.ContentPages
                 .Include(p => p.Sections.Where(s => s.IsActive))
                 .ThenInclude(s => s.Blocks.Where(b => b.IsActive))
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(p => p.PageKey == pageKey && p.IsActive);
 
             if (page == null)
@@ -766,6 +769,7 @@ public class ContentController : ControllerBase
                 .Include(p => p.Sections.Where(s => s.IsActive))
                 .ThenInclude(s => s.Blocks.Where(b => b.IsActive))
                 .Where(p => p.IsActive)
+                .AsSplitQuery()
                 .ToListAsync();
 
             foreach (var page in pages)

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using SendGrid.Extensions.DependencyInjection;
@@ -29,7 +30,10 @@ builder.Services.AddControllers();
 
 // Entity Framework
 builder.Services.AddDbContext<ErsaTrainingDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning));
+});
 
 // Identity
 builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
