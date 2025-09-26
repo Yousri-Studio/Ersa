@@ -90,6 +90,7 @@ public class EnrollmentService : IEnrollmentService
                 .Include(e => e.User)
                 .Include(e => e.Course)
                 .Include(e => e.Session)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(e => e.Id == enrollmentId);
 
             if (enrollment == null || enrollment.Course.Type != CourseType.Live)
@@ -124,6 +125,7 @@ public class EnrollmentService : IEnrollmentService
             var enrollment = await _context.Enrollments
                 .Include(e => e.User)
                 .Include(e => e.Course)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(e => e.Id == enrollmentId);
 
             if (enrollment == null) return false;

@@ -654,6 +654,7 @@ public class ContentController : ControllerBase
                 .Where(s => s.IsActive)
                 .OrderBy(s => s.ContentPage.PageName)
                 .ThenBy(s => s.SortOrder)
+                .AsSplitQuery()
                 .ToListAsync();
 
             var sectionDtos = sections.Select(s => new AdminContentSectionDto
@@ -815,6 +816,7 @@ public class ContentController : ControllerBase
             var section = await _context.ContentSections
                 .Include(s => s.Blocks)
                 .Include(s => s.ContentPage)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(s => s.Id == sectionGuid);
             
             if (section == null)

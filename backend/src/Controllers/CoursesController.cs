@@ -100,6 +100,7 @@ public class CoursesController : ControllerBase
             var course = await _context.Courses
                 .Include(c => c.Sessions.Where(s => s.StartAt > DateTime.UtcNow))
                 .Include(c => c.Attachments.Where(a => !a.IsRevoked))
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(c => c.Slug == slug && c.IsActive);
 
             if (course == null)
