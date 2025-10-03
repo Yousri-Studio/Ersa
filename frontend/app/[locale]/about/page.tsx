@@ -5,7 +5,38 @@ import { useLocale } from 'next-intl';
 import { Metadata } from 'next';
 import contentApi from '@/lib/content-api';
 
-export async function generateMetadata({ params }: { params: { locale: string } }) {
+interface TeamMember {
+  name: string;
+  position: string;
+  bio: string;
+  image: string;
+}
+
+interface AboutValue {
+  title: string;
+  description: string;
+}
+
+interface AboutContent {
+  title: string;
+  subtitle: string;
+  vision: {
+    title: string;
+    description: string;
+  };
+  mission: {
+    title: string;
+    description: string;
+  };
+  values: AboutValue[];
+  team: {
+    title: string;
+    members: TeamMember[];
+  };
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const t = await getTranslations('about');
   
   return {
@@ -14,12 +45,12 @@ export async function generateMetadata({ params }: { params: { locale: string } 
   };
 }
 
-export default async function AboutPage({ params }: { params: { locale: string } }) {
-  const { locale } = await Promise.resolve(params);
+export default async function AboutPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const t = await getTranslations('about');
   
   // Fetch about page content from the API
-  let aboutContent;
+  let aboutContent: AboutContent;
   try {
     aboutContent = await contentApi.getAboutContent(locale);
   } catch (error) {

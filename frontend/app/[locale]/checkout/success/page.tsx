@@ -22,7 +22,7 @@ export default function CheckoutSuccessPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const orderId = searchParams.get('orderId');
+  const orderId = searchParams?.get('orderId') || null;
 
   useEffect(() => {
     if (!isAuthenticated) {

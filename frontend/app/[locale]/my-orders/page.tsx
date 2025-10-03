@@ -31,7 +31,7 @@ interface Order {
 
 export default function MyOrdersPage() {
   const t = useTranslations('orders');
-  const { isHydrated } = useHydration();
+  const isHydrated = useHydration();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

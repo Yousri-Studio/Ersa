@@ -18,8 +18,8 @@ export default function AuthSuccessPage() {
       return;
     }
     
-    const token = searchParams.get('token');
-    const error = searchParams.get('error');
+    const token = searchParams?.get('token');
+    const error = searchParams?.get('error');
 
     if (error) {
       if (error === 'google_auth_failed') {

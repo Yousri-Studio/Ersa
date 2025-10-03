@@ -72,7 +72,7 @@ export default function ContentEditor() {
     console.log('✅ Auth checks passed, proceeding with content loading');
     
     if (isHydrated && isAuthenticated && params?.section) {
-      const sectionId = params.section as string;
+      const sectionId = Array.isArray(params.section) ? params.section[0] : params.section;
       const loadSection = async () => {
         try {
           setIsLoading(true);

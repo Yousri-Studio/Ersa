@@ -191,7 +191,7 @@ export default function CourseDetailsPage() {
                           try {
                             console.log('Converting binary array data to base64...');
                             const uint8Array = new Uint8Array(course.photo);
-                            const base64 = btoa(String.fromCharCode.apply(null, uint8Array));
+                            const base64 = btoa(String.fromCharCode(...Array.from(uint8Array)));
                             const imageUrl = `data:image/jpeg;base64,${base64}`;
                             console.log('Successfully converted binary to base64');
                             return imageUrl;

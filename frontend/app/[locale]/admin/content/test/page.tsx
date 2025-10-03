@@ -13,7 +13,7 @@ export default function ContentTestPage() {
   const locale = useLocale();
   const router = useRouter();
   const { user, isAuthenticated, token } = useAuthStore();
-  const { isHydrated } = useHydration();
+  const isHydrated = useHydration();
   const [testResults, setTestResults] = useState<any[]>([]);
   const [isRunning, setIsRunning] = useState(false);
 
