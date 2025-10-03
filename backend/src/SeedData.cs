@@ -16,8 +16,8 @@ public static class SeedData
 
         try
         {
-            // Ensure database is created
-            await context.Database.EnsureCreatedAsync();
+            // Database should already be created by the calling code
+            // Remove the EnsureCreatedAsync call to avoid conflicts
 
             // Seed Default Super Admins
             await CreateSuperAdminUser(serviceProvider);
