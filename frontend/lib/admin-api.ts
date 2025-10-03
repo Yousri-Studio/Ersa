@@ -327,7 +327,7 @@ export interface AdminCreateCourseRequest {
   isFeatured?: boolean;
 }
 
-export interface AdminUpdateCourseRequest extends AdminCreateCourseRequest {}
+export type AdminUpdateCourseRequest = AdminCreateCourseRequest;
 
 // Fallback data for when backend is not available
 const fallbackDashboardStats: DashboardStats = {

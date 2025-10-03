@@ -411,7 +411,7 @@ export default function CoursesPage() {
                     </p>
                     <p className="text-sm text-blue-700">
                       {(() => {
-                        let searchInfo = [];
+                        const searchInfo = [];
                         if (query.trim()) {
                           searchInfo.push(`"${query}"`);
                         }

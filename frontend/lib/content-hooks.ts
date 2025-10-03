@@ -144,7 +144,7 @@ export function useCourses(params?: { type?: 'Live' | 'PDF'; featured?: boolean;
         console.log('Fetching courses with params:', apiParams);
         
         const response = await coursesApi.getCourses(apiParams);
-        let filteredCourses = response.data;
+        const filteredCourses = response.data;
         
         // Transform the courses
         const transformedCourses = filteredCourses.map(course => transformApiCourse(course));

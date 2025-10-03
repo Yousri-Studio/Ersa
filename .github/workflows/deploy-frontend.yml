@@ -1,0 +1,123 @@
+name: Build and Deploy Frontend to Windows Host
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'frontend/**'
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: '18.x'
+  NEXT_PUBLIC_API_BASE_URL: ${{ secrets.NEXT_PUBLIC_API_BASE_URL }}
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+        cache: 'npm'
+        cache-dependency-path: frontend/package-lock.json
+        
+    - name: Install dependencies
+      working-directory: ./frontend
+      run: npm ci
+      
+    - name: Build Next.js application
+      working-directory: ./frontend
+      run: npm run build
+      env:
+        NEXT_PUBLIC_API_BASE_URL: ${{ secrets.NEXT_PUBLIC_API_BASE_URL }}
+        
+    - name: Create deployment package
+      working-directory: ./frontend
+      run: |
+        mkdir deploy
+        xcopy .next deploy\.next /E /I /H /Y
+        xcopy public deploy\public /E /I /H /Y
+        xcopy node_modules deploy\node_modules /E /I /H /Y
+        copy package.json deploy\
+        copy package-lock.json deploy\
+        copy next.config.js deploy\
+        copy i18n.ts deploy\
+        if exist "tsconfig.json" copy tsconfig.json deploy\
+        echo node_modules > deploy\.gitignore
+        echo .next > deploy\.gitignore
+        
+    - name: Create startup script
+      working-directory: ./frontend/deploy
+      run: |
+        echo @echo off > start.bat
+        echo echo Starting Ersa Training Frontend... >> start.bat
+        echo npm start >> start.bat
+        
+    - name: Create web.config for IIS
+      working-directory: ./frontend/deploy
+      run: |
+        echo ^<?xml version="1.0" encoding="utf-8"?^> > web.config
+        echo ^<configuration^> >> web.config
+        echo   ^<system.webServer^> >> web.config
+        echo     ^<handlers^> >> web.config
+        echo       ^<add name="iisnode" path="server.js" verb="*" modules="iisnode" /^> >> web.config
+        echo     ^</handlers^> >> web.config
+        echo     ^<rewrite^> >> web.config
+        echo       ^<rules^> >> web.config
+        echo         ^<rule name="DynamicContent"^> >> web.config
+        echo           ^<match url="/*" /^> >> web.config
+        echo           ^<action type="Rewrite" url="server.js"/^> >> web.config
+        echo         ^</rule^> >> web.config
+        echo       ^</rules^> >> web.config
+        echo     ^</rewrite^> >> web.config
+        echo     ^<iisnode nodeProcessCommandLine="C:\Program Files\nodejs\node.exe" /^> >> web.config
+        echo   ^</system.webServer^> >> web.config
+        echo ^</configuration^> >> web.config
+        
+    - name: Compress deployment package
+      working-directory: ./frontend
+      run: |
+        Compress-Archive -Path deploy\* -DestinationPath frontend-deploy.zip -Force
+      shell: pwsh
+      
+    - name: Upload build artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: frontend-build
+        path: frontend/frontend-deploy.zip
+        retention-days: 30
+        
+  deploy:
+    needs: build
+    runs-on: windows-latest
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    
+    steps:
+    - name: Download build artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: frontend-build
+        
+    - name: Deploy to Windows Server via FTP
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.5
+      with:
+        server: ${{ secrets.FTP_SERVER }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        local-dir: ./
+        server-dir: ${{ secrets.FTP_SERVER_DIR }}
+        
+    # Alternative: Deploy via SMB/Network Share
+    # - name: Deploy to Windows Server via SMB
+    #   run: |
+    #     net use Z: \\${{ secrets.SERVER_ADDRESS }}\${{ secrets.SHARE_NAME }} /user:${{ secrets.DEPLOY_USERNAME }} ${{ secrets.DEPLOY_PASSWORD }}
+    #     xcopy frontend-deploy.zip Z:\ /Y
+    #     powershell -Command "Expand-Archive -Path Z:\frontend-deploy.zip -DestinationPath Z:\frontend -Force"
+    #     net use Z: /delete
+    #   shell: cmd
+
