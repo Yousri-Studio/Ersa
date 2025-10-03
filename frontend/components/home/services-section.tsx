@@ -40,9 +40,6 @@ export function ServicesSection() {
           <h2 className="mb-6 text-center font-cairo font-bold" style={{ color: '#292561', fontSize: '32px' }}>
             {t('title')}
           </h2>
-          <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto font-cairo">
-            {t('subtitle')}
-          </p>
         </div>
 
         {/* Services Grid */}

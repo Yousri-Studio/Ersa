@@ -312,9 +312,9 @@
     }
   },
   "services": {
-    "title": "Our Services",
-    "subtitle": "Comprehensive solutions for your training needs",
-    "badge": "Services",
+    "title": "Why Ersa",
+    "subtitle": "Why Ersa",
+    "badge": "Our Strengths",
     "cards": {
       "quality": {
         "title": "Quality Training",
@@ -335,9 +335,9 @@
     }
   },
   "ai-consultation": {
-    "title": "AI-Powered Consultation",
-    "subtitle": "Get personalized training recommendations using AI",
-    "badge": "AI Consultation",
+    "title": "Our Services",
+    "subtitle": "We provide integrated services and solutions that serve the training sector",
+    "badge": "Our Services",
     "cards": {
       "ai-solutions": {
         "title": "AI Training Solutions",

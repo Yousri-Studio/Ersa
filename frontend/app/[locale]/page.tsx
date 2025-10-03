@@ -20,14 +20,14 @@ export default function HomePage() {
           <HeroSection />
         </div>
         
-        {/* Consultation Section - Fade up animation */}
-        <div className="scroll-item">
-          <ConsultationSection />
-        </div>
-        
         {/* Training Categories Section - Slide from left */}
         <div className="scroll-item-left">
           <TrainingCategoriesSection />
+        </div>
+        
+        {/* Consultation Section - Fade up animation */}
+        <div className="scroll-item">
+          <ConsultationSection />
         </div>
         
         {/* Featured Courses Section - Fade up animation */}
@@ -35,14 +35,14 @@ export default function HomePage() {
           <FeaturedCourses />
         </div>
         
-        {/* Services Section - Slide from right */}
-        <div className="scroll-item-right">
-          <ServicesSection />
-        </div>
-        
         {/* AI Consultation Section - Fade up animation */}
         <div className="scroll-item">
           <AIConsultationSection />
+        </div>
+        
+        {/* Services Section - Slide from right */}
+        <div className="scroll-item-right">
+          <ServicesSection />
         </div>
         
         {/* Testimonials Section - Scale animation */}
