@@ -74,6 +74,12 @@
         "description": "نمارس أعمالنا بصدق وشفافية."
       }
     },
+    "cta": {
+      "title": "مستعد لبدء رحلتك التعليمية؟",
+      "subtitle": "سجل معنا اليوم وابدأ رحلتك نحو التميز",
+      "browseCourses": "تصفح الدورات",
+      "contactUs": "اتصل بنا"
+    },
 "ctaSection": {
       "title": "مستعد لبدء رحلتك التعليمية؟",
       "subtitle": "سجل معنا اليوم وابدأ رحلتك نحو التميز",
@@ -257,6 +263,16 @@
     "drafts": "مسودات",
     "lastUpdated": "آخر تحديث",
     "manageAllContent": "إدارة جميع صفحات الموقع ومحتواها العام",
+    "addNewUser": "إضافة مستخدم جديد",
+    "fullName": "الاسم الكامل",
+    "enterFullName": "أدخل الاسم الكامل",
+    "enterEmailAddress": "أدخل عنوان البريد الإلكتروني",
+    "phoneOptional": "الهاتف (اختياري)",
+    "enterPhoneNumber": "أدخل رقم الهاتف",
+    "language": "اللغة",
+    "english": "الإنجليزية",
+    "arabic": "العربية",
+    "addUser": "إضافة مستخدم",
     "errors": {
       "access-denied": "الوصول مرفوض. مطلوب صلاحيات إدارية."
     },
@@ -409,6 +425,8 @@
       "title": "اكتشف منصتنا التدريبية وارتقِ بمهاراتك لتحقيق أقصى إمكاناتك",
       "subtitle": "منصة شاملة تجمع بين أحدث طرق التدريب والتقنيات المتقدمة لتقديم تجربة تعليمية استثنائية",
       "cta": {
+        "browseCourses": "تصفح دوراتنا",
+        "contactUs": "اتصل بنا",
         "explore": "استكشف الدورات",
         "consult": "اطلب استشارة"
       }
@@ -417,6 +435,12 @@
       "placeholder": "ابحث عن دورة تدريبية؟",
       "categoryAll": "اختر الفئة",
       "button": "بحث"
+    },
+    "ctaSection": {
+      "title": "مستعد لبدء رحلتك التعليمية؟",
+      "subtitle": "سجل معنا اليوم وابدأ رحلتك نحو التميز",
+      "browseCourses": "تصفح الدورات",
+      "contactUs": "اتصل بنا"
     },
     "featured": {
       "title": "اكتشف منصتنا التدريبية واطلق العنان لإمكاناتك",
@@ -432,6 +456,33 @@
       "students": "متدرب",
       "courses": "دورة متاحة",
       "satisfaction": "معدل الرضا"
+    }
+  },
+  "course": {
+    "reviews": "تقييم",
+    "students": "طلاب",
+    "courses": "دورات",
+    "add-to-cart": "أضف إلى السلة",
+    "add-to-wishlist": "أضف إلى قائمة الأمنيات",
+    "remove-from-wishlist": "إزالة من قائمة الأمنيات",
+    "includes": "ما يشمله",
+    "about": "حول الدورة",
+    "requirements": "المتطلبات",
+    "details": "تفاصيل الدورة",
+    "duration": "المدة",
+    "level": "المستوى",
+    "language": "اللغة",
+    "lessons": "الدروس",
+    "last-updated": "آخر تحديث",
+    "student-reviews": "تقييمات الطلاب",
+    "reviews-coming-soon": "ستكون التقييمات متاحة قريباً",
+    "instructor-info": "حول المدرب",
+    "curriculum": "منهج الدورة",
+    "tabs": {
+      "overview": "نظرة عامة",
+      "curriculum": "المنهج",
+      "instructor": "المدرب",
+      "reviews": "التقييمات"
     }
   },
   "courses": {

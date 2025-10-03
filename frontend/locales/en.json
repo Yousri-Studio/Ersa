@@ -79,6 +79,11 @@
       "subtitle": "Join us today and start your journey to excellence",
       "browseCourses": "Browse Courses",
       "contactUs": "Contact Us"
+    },
+    "ctaSection": {
+      "title": "Ready to start your learning journey?",
+      "subtitle": "Join us today and start your journey to excellence",
+      "browseCourses": "Browse Courses"
     }
   },
   "navigation": {
@@ -280,6 +285,12 @@
     "errors": {
       "access-denied": "Access denied. Admin privileges required."
     },
+    "active-users": "Active Users",
+    "roles": {
+      "admin": "Admin",
+      "operation": "Operations",
+      "super_admin": "Super Admin"
+    },
     "contentManagement": "Content Management",
     "addNewUser": "Add New User",
     "fullName": "Full Name",
@@ -290,7 +301,124 @@
     "language": "Language",
     "english": "English",
     "arabic": "Arabic",
-    "addUser": "Add User"
+    "addUser": "Add User",
+    "achievements": {
+      "badge": "Our Numbers",
+      "title": "Our Achievements Since Establishment",
+      "subtitle": "We make it easy for trainees to choose what suits their needs, helping these categories organize training content and present it clearly and distinctly for each category separately.",
+      "stats": {
+        "trainees": "Trainees",
+        "government_courses": "Government Courses",
+        "clients": "Clients",
+        "satisfaction": "Client Satisfaction"
+      }
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Find answers to common questions about our services",
+      "view-all": "See Full FAQs",
+      "items": [
+        {
+          "question": "How do I enroll in a course?",
+          "answer": "You can enroll in a course by browsing our catalog and clicking the 'Enroll' button on your chosen course."
+        },
+        {
+          "question": "What payment methods do you accept?",
+          "answer": "We accept various payment methods including credit cards, bank transfers, and online payment gateways."
+        },
+        {
+          "question": "Can I get a certificate after completing a course?",
+          "answer": "Yes, you will receive a certificate upon successful completion of any course."
+        },
+        {
+          "question": "Do you offer corporate training?",
+          "answer": "Yes, we provide customized corporate training solutions for businesses of all sizes."
+        },
+        {
+          "question": "How can I contact support?",
+          "answer": "You can reach our support team through the contact form on our website or by emailing support@ersatraining.com."
+        }
+      ]
+    },
+    "services": {
+      "title": "Our Services",
+      "subtitle": "Comprehensive solutions for your training needs",
+      "badge": "Services",
+      "cards": {
+        "quality": {
+          "title": "Quality Training",
+          "description": "High-quality training programs designed by industry experts"
+        },
+        "partnership": {
+          "title": "Strategic Partnerships",
+          "description": "Collaborate with leading organizations for better outcomes"
+        },
+        "innovation": {
+          "title": "Innovative Solutions",
+          "description": "Cutting-edge training methodologies and technologies"
+        },
+        "sustainability": {
+          "title": "Sustainable Growth",
+          "description": "Long-term training solutions for continuous improvement"
+        }
+      }
+    },
+    "ai-consultation": {
+      "title": "AI-Powered Consultation",
+      "subtitle": "Get personalized training recommendations using AI",
+      "badge": "AI Consultation",
+      "cards": {
+        "ai-solutions": {
+          "title": "AI Training Solutions",
+          "description": "Discover how AI can transform your training programs",
+          "cta": "Learn More"
+        },
+        "admin-consultation": {
+          "title": "Admin Consultation",
+          "description": "Expert advice for your training administration needs",
+          "cta": "Get Started"
+        }
+      }
+    },
+    "training-categories": {
+      "title": "Training Categories",
+      "subtitle": "Browse our training categories to find the perfect course for you",
+      "badge": "Categories",
+      "categories": {
+        "general": {
+          "title": "General Training",
+          "description": "Comprehensive training programs covering essential skills"
+        },
+        "specialized": {
+          "title": "Specialized Training",
+          "description": "Advanced training in specialized fields and industries"
+        },
+        "professional": {
+          "title": "Professional Development",
+          "description": "Enhance your professional skills and career growth"
+        }
+      }
+    },
+    "admin-login": {
+      "welcome": "Welcome dear",
+      "title": "Login",
+      "subtitle": "Sign in to access the full system management",
+      "email": "Email Address",
+      "password": "Password",
+      "remember-me": "Remember me",
+      "logging-in": "Logging in...",
+      "login-button": "Login",
+      "roles": {
+        "system-manager": "System Manager",
+        "system-manager-desc": "Full system management permissions",
+        "operations-manager": "Operations Manager",
+        "operations-manager-desc": "Limited permissions for operations management"
+      },
+      "footer": {
+        "copyright": "All rights reserved to Ersa Platform © 2025",
+        "designed-by": "Designed and developed by"
+      }
+    }
   },
   "training-categories": {
     "title": "Training Categories",
@@ -415,7 +543,9 @@
       "subtitle": "A comprehensive platform combining the latest training methods and advanced technologies to deliver an exceptional learning experience",
       "cta": {
         "browseCourses": "Browse Our Courses",
-        "contactUs": "Contact Us"
+        "contactUs": "Contact Us",
+        "explore": "Explore Courses",
+        "consult": "Request Consultation"
       }
     },
     "search": {
@@ -428,6 +558,10 @@
       "subtitle": "Join us today and start your journey to excellence",
       "browseCourses": "Browse Courses",
       "contactUs": "Contact Us"
+    },
+    "featured": {
+      "title": "Discover our training platform and unleash your potential",
+      "subtitle": "Achieve maximum benefit through the best training courses"
     }
   },
   "hero": {
@@ -439,6 +573,33 @@
       "students": "Students Trained",
       "courses": "Courses Available",
       "satisfaction": "Satisfaction Rate"
+    }
+  },
+  "course": {
+    "reviews": "reviews",
+    "students": "students",
+    "courses": "courses",
+    "add-to-cart": "Add to Cart",
+    "add-to-wishlist": "Add to Wishlist",
+    "remove-from-wishlist": "Remove from Wishlist",
+    "includes": "What's Included",
+    "about": "About This Course",
+    "requirements": "Requirements",
+    "details": "Course Details",
+    "duration": "Duration",
+    "level": "Level",
+    "language": "Language",
+    "lessons": "Lessons",
+    "last-updated": "Last Updated",
+    "student-reviews": "Student Reviews",
+    "reviews-coming-soon": "Reviews will be available soon",
+    "instructor-info": "About the Instructor",
+    "curriculum": "Course Curriculum",
+    "tabs": {
+      "overview": "Overview",
+      "curriculum": "Curriculum",
+      "instructor": "Instructor",
+      "reviews": "Reviews"
     }
   },
   "courses": {
