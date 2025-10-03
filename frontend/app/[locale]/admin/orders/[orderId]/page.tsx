@@ -11,7 +11,7 @@ import toast from 'react-hot-toast';
 export default function AdminOrderDetail() {
   const params = useParams();
   const router = useRouter();
-  const orderId = params.orderId as string;
+  const orderId = params?.orderId as string | undefined;
   const [orderDetail, setOrderDetail] = useState<AdminOrderDetail | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const isHydrated = useHydration();
@@ -31,6 +31,11 @@ export default function AdminOrderDetail() {
   }
 
   const fetchOrderDetail = async () => {
+    if (!orderId) {
+      setIsLoading(false);
+      return;
+    }
+    
     try {
       setIsLoading(true);
       const response = await adminApi.getOrderDetail(orderId);
