@@ -12,7 +12,6 @@ using ErsaTraining.API.Data.Entities;
 using ErsaTraining.API.Services;
 using ErsaTraining.API.Middleware;
 using Serilog;
-using Microsoft.EntityFrameworkCore.Sqlite;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -31,7 +30,7 @@ builder.Services.AddControllers();
 // Entity Framework
 builder.Services.AddDbContext<ErsaTrainingDbContext>(options =>
 {
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
     options.ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning));
 });
 
@@ -191,10 +190,10 @@ using (var scope = app.Services.CreateScope())
     {
         var context = scope.ServiceProvider.GetRequiredService<ErsaTrainingDbContext>();
         
-        // For development, always use EnsureCreatedAsync to avoid migration issues
-        await context.Database.EnsureCreatedAsync();
+        // Apply any pending migrations for SQL Server
+        await context.Database.MigrateAsync();
         
-        Log.Information("Database initialized successfully");
+        Log.Information("Database migrated successfully");
         
         // Fix existing users with missing Identity fields
         await ErsaTraining.API.Utilities.FixUserIdentityFields.FixExistingUsersAsync(app.Services);
@@ -204,7 +203,7 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
-        Log.Fatal(ex, "An error occurred while initializing the database");
+        Log.Fatal(ex, "An error occurred while migrating the database");
         throw;
     }
 }
