@@ -19,7 +19,7 @@ import { toast } from 'react-hot-toast';
 import { usePageLoad, useStaggeredAnimation } from '@/lib/use-animations';
 import { ScrollAnimations } from '@/components/scroll-animations';
 import { useCourses } from '@/lib/content-hooks';
-const mockCourses: Course[] = [
+const mockCourses: ApiCourse[] = [
   {
     id: '1',
     slug: 'advanced-graphic-design',
@@ -32,7 +32,6 @@ const mockCourses: Course[] = [
       en: 'Learn fundamentals and modern graphic design techniques using professional tools'
     },
     imageUrl: '/images/Course Place Holder Small.png',
-    thumbnailUrl: '/images/Course Place Holder Small.png',
     type: 'Live',
     price: 1200,
     currency: 'SAR',
