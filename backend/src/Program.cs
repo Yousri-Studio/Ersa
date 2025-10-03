@@ -190,21 +190,41 @@ using (var scope = app.Services.CreateScope())
     {
         var context = scope.ServiceProvider.GetRequiredService<ErsaTrainingDbContext>();
         
-        // Apply any pending migrations for SQL Server
-        await context.Database.MigrateAsync();
+        // Check if database connection is working
+        var canConnect = await context.Database.CanConnectAsync();
+        Log.Information($"Database connection test: {canConnect}");
         
-        Log.Information("Database migrated successfully");
-        
-        // Fix existing users with missing Identity fields
-        await ErsaTraining.API.Utilities.FixUserIdentityFields.FixExistingUsersAsync(app.Services);
-        
-        // Seed database with initial data
-        await ErsaTraining.API.SeedData.SeedAsync(app.Services);
+        if (canConnect)
+        {
+            Log.Information("Database connected successfully!");
+            
+            // Apply any pending migrations
+            var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
+            if (pendingMigrations.Any())
+            {
+                Log.Information("Applying pending migrations...");
+                await context.Database.MigrateAsync();
+                Log.Information("Migrations applied successfully");
+            }
+            else
+            {
+                Log.Information("No pending migrations");
+            }
+            
+            // Run data seeding
+            Log.Information("Running data seeding...");
+            await ErsaTraining.API.SeedData.SeedAsync(app.Services);
+            Log.Information("Data seeding completed");
+        }
+        else
+        {
+            Log.Error("Cannot connect to database. Please check connection string and database availability.");
+        }
     }
     catch (Exception ex)
     {
-        Log.Fatal(ex, "An error occurred while migrating the database");
-        throw;
+        Log.Error(ex, "An error occurred during database initialization");
+        // Don't throw here - let the app start even if database has issues
     }
 }
 
