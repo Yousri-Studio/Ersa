@@ -29,8 +29,8 @@ const convertPhotoToDataUrl = (photo?: string | number[]): string | undefined =>
       // Convert number array to Uint8Array
       const uint8Array = new Uint8Array(photo);
       
-      // Convert to base64
-      const base64 = btoa(String.fromCharCode.apply(null, Array.from(uint8Array)));
+      // Convert to base64 using spread operator for TypeScript compatibility
+      const base64 = btoa(String.fromCharCode(...Array.from(uint8Array)));
       
       // Return as data URL
       const dataUrl = `data:image/jpeg;base64,${base64}`;
