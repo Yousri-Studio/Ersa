@@ -736,3 +736,18 @@ export const adminApi = {
   publishContentVersion: (pageId: string, versionId: string) =>
     api.post(`/content/pages/${pageId}/versions/${versionId}/publish`),
 };
+
+// Explicit type exports for better TypeScript resolution
+export type {
+  AdminOrderDetail,
+  AdminOrderCustomer,
+  AdminOrderItem,
+  AdminOrderPayment,
+  AdminOrder,
+  AdminUser,
+  AdminCourse,
+  DashboardStats,
+  OrderSummary,
+  UserSummary,
+  PagedResult,
+};

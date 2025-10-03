@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Icon } from '@/components/ui/icon';
-import { adminApi, AdminOrderDetail } from '@/lib/admin-api';
+import { adminApi } from '@/lib/admin-api';
+import type { AdminOrderDetail } from '@/lib/admin-api';
 import { useHydration } from '@/hooks/useHydration';
 import toast from 'react-hot-toast';
 
