@@ -5,7 +5,8 @@ import { useLocale } from 'next-intl';
 import { Metadata } from 'next';
 import contentApi from '@/lib/content-api';
 
-export async function generateMetadata({ params }: { params: { locale: string } }) {
+export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const t = await getTranslations('about');
   
   return {
@@ -14,8 +15,8 @@ export async function generateMetadata({ params }: { params: { locale: string } 
   };
 }
 
-export default async function AboutPage({ params }: { params: { locale: string } }) {
-  const { locale } = await Promise.resolve(params);
+export default async function AboutPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   const t = await getTranslations('about');
   
   // Fetch about page content from the API
