@@ -28,7 +28,7 @@ export default function VerifyEmailPage() {
       return;
     }
     
-    const emailParam = searchParams.get('email');
+    const emailParam = searchParams?.get('email');
     if (emailParam) {
       setEmail(emailParam);
     } else {
