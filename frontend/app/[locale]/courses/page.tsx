@@ -33,16 +33,15 @@ const mockCourses: Course[] = [
     },
     imageUrl: '/images/Course Place Holder Small.png',
     thumbnailUrl: '/images/Course Place Holder Small.png',
-    type: 'Live' as const,
+    type: 'Live',
     price: 1200,
     currency: 'SAR',
     rating: 4.8,
-
     isActive: true,
     isFeatured: true,
-    badge: 'Bestseller' as const,
-    level: 1, // 1: Beginner, 2: Intermediate, 3: Advanced
-    category: 'Programming' as const,
+    badge: 'Bestseller',
+    level: 'Biginner',
+    category: 'Programming',
     instructorName: '',
     createdAt: '',
     updatedAt: ''
@@ -59,16 +58,15 @@ const mockCourses: Course[] = [
       en: 'Comprehensive course in digital marketing fundamentals and social media'
     },
     imageUrl: '/images/Course Place Holder Small.png',
-    type: 'PDF' as const,
+    type: 'PDF',
     price: 899,
     currency: 'SAR',
     rating: 4.6,
-
     isActive: true,
     isFeatured: true,
-    badge: 'Bestseller' as const,
-    level: 1, // 1: Beginner, 2: Intermediate, 3: Advanced
-    category: 'Programming' as const,
+    badge: 'Bestseller',
+    level: 'Biginner',
+    category: 'Business',
     instructorName: '',
     createdAt: '',
     updatedAt: ''
@@ -85,16 +83,15 @@ const mockCourses: Course[] = [
       en: 'Learn the latest techniques and professional project management methods'
     },
     imageUrl: '/images/Course Place Holder Small.png',
-    type: 'Live' as const,
+    type: 'Live',
     price: 1599,
     currency: 'SAR',
     rating: 4.9,
-
     isActive: true,
     isFeatured: false,
-    badge: 'Bestseller' as const,
-    level: 1, // 1: Beginner, 2: Intermediate, 3: Advanced
-    category: 'Programming' as const,
+    badge: 'Bestseller',
+    level: 'Intermediate',
+    category: 'Business',
     instructorName: '',
     createdAt: '',
     updatedAt: ''
@@ -111,16 +108,15 @@ const mockCourses: Course[] = [
       en: 'Specialized course in data analysis and statistics using Microsoft Excel'
     },
     imageUrl: '/images/Course Place Holder Small.png',
-    type: 'PDF' as const,
+    type: 'PDF',
     price: 699,
     currency: 'SAR',
     rating: 4.4,
-
     isActive: true,
     isFeatured: false,
-    badge: 'Bestseller' as const,
-    level: 1, // 1: Beginner, 2: Intermediate, 3: Advanced
-    category: 'Programming' as const,
+    badge: 'Bestseller',
+    level: 'Biginner',
+    category: 'Business',
     instructorName: '',
     createdAt: '',
     updatedAt: ''
@@ -137,16 +133,15 @@ const mockCourses: Course[] = [
       en: 'Develop effective leadership skills and team management in workplace'
     },
     imageUrl: '/images/Course Place Holder Small.png',
-    type: 'Live' as const,
+    type: 'Live',
     price: 1399,
     currency: 'SAR',
     rating: 4.7,
-
     isActive: true,
     isFeatured: true,
-    badge: 'Bestseller' as const,
-    level: 1, // 1: Beginner, 2: Intermediate, 3: Advanced
-    category: 'Programming' as const,
+    badge: 'Bestseller',
+    level: 'Intermediate',
+    category: 'Business',
     instructorName: '',
     createdAt: '',
     updatedAt: ''
@@ -163,16 +158,15 @@ const mockCourses: Course[] = [
       en: 'Learn web development basics using HTML, CSS, and JavaScript'
     },
     imageUrl: '/images/Course Place Holder Small.png',
-    type: 'PDF' as const,
+    type: 'PDF',
     price: 999,
     currency: 'SAR',
     rating: 4.5,
-
     isActive: true,
     isFeatured: false,
-    badge: 'Bestseller' as const,
-    level: 1, // 1: Beginner, 2: Intermediate, 3: Advanced
-    category: 'Programming' as const,
+    badge: 'Bestseller',
+    level: 'Biginner',
+    category: 'Programming',
     instructorName: '',
     createdAt: '',
     updatedAt: ''
