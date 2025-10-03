@@ -19,7 +19,7 @@ import { toast } from 'react-hot-toast';
 import { usePageLoad, useStaggeredAnimation } from '@/lib/use-animations';
 import { ScrollAnimations } from '@/components/scroll-animations';
 import { useCourses } from '@/lib/content-hooks';
-const mockCourses: ApiCourse[] = [
+const mockCourses: Partial<Course>[] = [
   {
     id: '1',
     slug: 'advanced-graphic-design',
@@ -235,7 +235,7 @@ export default function CoursesPage() {
     } else if (!isLoading && (coursesError || !apiCourses)) {
       // Use mock courses as fallback when API fails
       console.log('Using mock courses as fallback');
-      setFilteredCourses(mockCourses);
+      setFilteredCourses(mockCourses as Course[]);
     }
   }, [sortBy, apiCourses, isLoading, coursesError]);
 
