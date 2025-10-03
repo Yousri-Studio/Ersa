@@ -8,7 +8,7 @@ export function AIConsultationSection() {
   const t = useTranslations('ai-consultation');
 
   return (
-    <section className="py-16 bg-white">
+    <section id="ai-consultation" className="py-16 bg-white">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Section Header */}
         <div className="text-center mb-12">

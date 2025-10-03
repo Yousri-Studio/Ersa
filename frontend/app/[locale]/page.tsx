@@ -25,14 +25,14 @@ export default function HomePage() {
           <TrainingCategoriesSection />
         </div>
         
-        {/* Consultation Section - Fade up animation */}
-        <div className="scroll-item">
-          <ConsultationSection />
-        </div>
-        
         {/* Featured Courses Section - Fade up animation */}
         <div className="scroll-item">
           <FeaturedCourses />
+        </div>
+        
+        {/* Consultation Section - Fade up animation */}
+        <div className="scroll-item">
+          <ConsultationSection />
         </div>
         
         {/* AI Consultation Section - Fade up animation */}

@@ -70,7 +70,7 @@ export function Header() {
   const navigation: Array<{ name: string; href: string; sectionId?: string }> = [
     { name: t('navigation.home'), href: `/${locale}` },
     { name: t('navigation.courses'), href: `/${locale}/courses` },
-    { name: t('navigation.services'), href: isHomePage ? '#services' : `/${locale}/#services`, sectionId: 'services' },
+    { name: t('navigation.services'), href: isHomePage ? '#ai-consultation' : `/${locale}/#ai-consultation`, sectionId: 'ai-consultation' },
     { name: t('navigation.faq'), href: `/${locale}/faq` },
     { name: t('navigation.contact'), href: `/${locale}/contact` },
   ];
