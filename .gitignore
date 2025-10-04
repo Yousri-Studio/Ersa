@@ -590,6 +590,11 @@ Thumbs.db
 *.pem
 *.pfx
 
+
+# Deployment folder
+/frontend/deployment
+/frontend/deployment/
+
 # Configuration files with sensitive data
 appsettings.Development.json
 appsettings.Production.json

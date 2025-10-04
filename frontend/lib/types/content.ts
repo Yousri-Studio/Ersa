@@ -1,3 +1,5 @@
+import { LocaleString } from '../common-types';
+
 export interface PageContent {
   key: string;
   title: LocaleString;

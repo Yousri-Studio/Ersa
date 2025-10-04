@@ -89,7 +89,7 @@ export function CourseCard({ course }: CourseCardProps) {
               
               {/* Course Type Badge */}
               <span className="inline-block px-3 py-1 bg-white/20 text-white text-sm font-medium rounded-full mb-4">
-                {isHydrated ? (course.type === 'Live' ? t('courses.live') : t('courses.pdf')) : course.type}
+                {isHydrated ? (course.type === 1 ? t('courses.live') : t('courses.pdf')) : (course.type === 1 ? 'Live' : 'PDF')}
               </span>
 
               {/* Course Title */}
@@ -104,7 +104,7 @@ export function CourseCard({ course }: CourseCardProps) {
 
               {/* Course Meta */}
               <div className="flex items-center justify-center gap-4 mb-6 text-blue-100 text-sm">
-                {course.type === 'Live' && course.sessions && course.sessions.length > 0 && (
+                {course.type === 1 && course.sessions && course.sessions.length > 0 && (
                   <div className="flex items-center gap-1">
                     <Icon name="clock" className="h-4 w-4" />
                     <span>

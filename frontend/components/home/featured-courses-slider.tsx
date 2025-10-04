@@ -57,8 +57,8 @@ export function FeaturedCoursesSlider() {
       },
       price: 1200,
       currency: 'SAR',
-      type: 'Live',
-      category: 'Business',
+      type: 1, // 1 = Live
+      category: 1, // 1 = Business
       isActive: true,
       isFeatured: true,
       rating: 4.8,
@@ -78,8 +78,8 @@ export function FeaturedCoursesSlider() {
       },
       price: 950,
       currency: 'SAR',
-      type: 'PDF',
-      category: 'Business',
+      type: 0, // 0 = PDF
+      category: 1, // 1 = Business
       isActive: true,
       isFeatured: true,
       rating: 4.6,
@@ -99,8 +99,8 @@ export function FeaturedCoursesSlider() {
       },
       price: 1500,
       currency: 'SAR',
-      type: 'Live',
-      category: 'Business',
+      type: 1, // 1 = Live
+      category: 1, // 1 = Business
       isActive: true,
       isFeatured: true,
       rating: 4.9,
@@ -120,8 +120,8 @@ export function FeaturedCoursesSlider() {
       },
       price: 800,
       currency: 'SAR',
-      type: 'PDF',
-      category: 'Programming',
+      type: 0, // 0 = PDF
+      category: 2, // 2 = Programming
       isActive: true,
       isFeatured: true,
       rating: 4.5,
@@ -141,8 +141,8 @@ export function FeaturedCoursesSlider() {
       },
       price: 700,
       currency: 'SAR',
-      type: 'Live',
-      category: 'Business',
+      type: 1, // 1 = Live
+      category: 1, // 1 = Business
       isActive: true,
       isFeatured: true,
       rating: 4.7,
@@ -162,8 +162,8 @@ export function FeaturedCoursesSlider() {
       },
       price: 900,
       currency: 'SAR',
-      type: 'PDF',
-      category: 'Business',
+      type: 0, // 0 = PDF
+      category: 1, // 1 = Business
       isActive: true,
       isFeatured: true,
       rating: 4.4,

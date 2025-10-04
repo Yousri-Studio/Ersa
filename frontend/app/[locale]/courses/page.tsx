@@ -11,7 +11,7 @@ import { SearchBar } from '@/components/home/search-bar';
 import { FilterDropdown } from '@/components/ui/filter-dropdown';
 import { NoSearchResults } from '@/components/ui/no-search-results';
 import { courseToCardProps } from '@/lib/course-adapter';
-import type { Course as ApiCourse } from '@/lib/types/api';
+import type { Course as ApiCourse } from '@/lib/api';
 import type { Course } from '@/lib/types';
 import { useCartStore } from '@/lib/cart-store';
 import { useAuthStore } from '@/lib/auth-store';
@@ -19,7 +19,7 @@ import { toast } from 'react-hot-toast';
 import { usePageLoad, useStaggeredAnimation } from '@/lib/use-animations';
 import { ScrollAnimations } from '@/components/scroll-animations';
 import { useCourses } from '@/lib/content-hooks';
-const mockCourses: Partial<Course>[] = [
+const mockCourses: Partial<ApiCourse>[] = [
   {
     id: '1',
     slug: 'advanced-graphic-design',
@@ -32,18 +32,17 @@ const mockCourses: Partial<Course>[] = [
       en: 'Learn fundamentals and modern graphic design techniques using professional tools'
     },
     imageUrl: '/images/Course Place Holder Small.png',
-    type: 'Live',
+    type: 1, // 1 = Live
     price: 1200,
     currency: 'SAR',
     rating: 4.8,
     isActive: true,
     isFeatured: true,
     badge: 'Bestseller',
-    level: 'Biginner',
-    category: 'Programming',
+    level: 0, // 0 = Beginner
+    category: 0, // 0 = Programming
     instructorName: '',
-    createdAt: '',
-    updatedAt: ''
+    createdAt: ''
   },
   {
     id: '2',
@@ -57,18 +56,17 @@ const mockCourses: Partial<Course>[] = [
       en: 'Comprehensive course in digital marketing fundamentals and social media'
     },
     imageUrl: '/images/Course Place Holder Small.png',
-    type: 'PDF',
+    type: 0, // 0 = PDF
     price: 899,
     currency: 'SAR',
     rating: 4.6,
     isActive: true,
     isFeatured: true,
     badge: 'Bestseller',
-    level: 'Biginner',
-    category: 'Business',
+    level: 0, // 0 = Beginner
+    category: 1, // 1 = Business
     instructorName: '',
-    createdAt: '',
-    updatedAt: ''
+    createdAt: ''
   },
   {
     id: '3',
@@ -82,18 +80,17 @@ const mockCourses: Partial<Course>[] = [
       en: 'Learn the latest techniques and professional project management methods'
     },
     imageUrl: '/images/Course Place Holder Small.png',
-    type: 'Live',
+    type: 1, // 1 = Live
     price: 1599,
     currency: 'SAR',
     rating: 4.9,
     isActive: true,
     isFeatured: false,
     badge: 'Bestseller',
-    level: 'Intermediate',
-    category: 'Business',
+    level: 1, // 1 = Intermediate
+    category: 1, // 1 = Business
     instructorName: '',
-    createdAt: '',
-    updatedAt: ''
+    createdAt: ''
   },
   {
     id: '4',
@@ -107,18 +104,17 @@ const mockCourses: Partial<Course>[] = [
       en: 'Specialized course in data analysis and statistics using Microsoft Excel'
     },
     imageUrl: '/images/Course Place Holder Small.png',
-    type: 'PDF',
+    type: 0, // 0 = PDF
     price: 699,
     currency: 'SAR',
     rating: 4.4,
     isActive: true,
     isFeatured: false,
     badge: 'Bestseller',
-    level: 'Biginner',
-    category: 'Business',
+    level: 0, // 0 = Beginner
+    category: 1, // 1 = Business
     instructorName: '',
-    createdAt: '',
-    updatedAt: ''
+    createdAt: ''
   },
   {
     id: '5',
@@ -132,18 +128,17 @@ const mockCourses: Partial<Course>[] = [
       en: 'Develop effective leadership skills and team management in workplace'
     },
     imageUrl: '/images/Course Place Holder Small.png',
-    type: 'Live',
+    type: 1, // 1 = Live
     price: 1399,
     currency: 'SAR',
     rating: 4.7,
     isActive: true,
     isFeatured: true,
     badge: 'Bestseller',
-    level: 'Intermediate',
-    category: 'Business',
+    level: 1, // 1 = Intermediate
+    category: 1, // 1 = Business
     instructorName: '',
-    createdAt: '',
-    updatedAt: ''
+    createdAt: ''
   },
   {
     id: '6',
@@ -157,18 +152,17 @@ const mockCourses: Partial<Course>[] = [
       en: 'Learn web development basics using HTML, CSS, and JavaScript'
     },
     imageUrl: '/images/Course Place Holder Small.png',
-    type: 'PDF',
+    type: 0, // 0 = PDF
     price: 999,
     currency: 'SAR',
     rating: 4.5,
     isActive: true,
     isFeatured: false,
     badge: 'Bestseller',
-    level: 'Biginner',
-    category: 'Programming',
+    level: 0, // 0 = Beginner
+    category: 0, // 0 = Programming
     instructorName: '',
-    createdAt: '',
-    updatedAt: ''
+    createdAt: ''
   }
 ];
 
@@ -340,7 +334,7 @@ export default function CoursesPage() {
                 featuredCourses = apiFeatured.length > 0 ? apiFeatured.slice(-2) : apiCourses.slice(-2);
               } else {
                 // Use mock courses as fallback
-                featuredCourses = mockCourses.filter(course => course.isFeatured).slice(-2);
+                featuredCourses = (mockCourses as Course[]).filter(course => course.isFeatured).slice(-2);
               }
               
               console.log('API courses:', !!apiCourses, 'Count:', apiCourses?.length, 'Error:', !!coursesError, 'Loading:', isLoading, 'Displaying:', featuredCourses.length, 'featured courses');

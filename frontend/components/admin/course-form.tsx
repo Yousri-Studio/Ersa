@@ -309,7 +309,7 @@ export function CourseForm({ initialData, onSubmit, onCancel, isEdit = false, is
             {locale === 'ar' ? 'صورة الدورة' : 'Course Photo'}
           </label>
           <FileUpload
-            value={formData.photo}
+            value={formData.photo || []}
             onChange={handleFileUpload}
             accept="image/*"
             maxSize={5}

@@ -9,7 +9,7 @@ import { ordersApi, paymentsApi } from '@/lib/api';
 export default function CheckoutPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { cart, clearCart } = useCartStore();
+  const { items, total, currency, cartId, clearCart } = useCartStore();
   const { user, isAuthenticated } = useAuthStore();
   const router = useRouter();
 
@@ -21,8 +21,13 @@ export default function CheckoutPage() {
   }, [isAuthenticated, router]);
 
   const handleCheckout = async () => {
-    if (!cart || cart.items.length === 0) {
+    if (!items || items.length === 0) {
       setError('Your cart is empty.');
+      return;
+    }
+
+    if (!cartId) {
+      setError('Cart ID is missing.');
       return;
     }
 
@@ -31,7 +36,7 @@ export default function CheckoutPage() {
 
     try {
       // 1. Create the order
-      const orderResponse = await ordersApi.createOrder(cart.cartId);
+      const orderResponse = await ordersApi.createOrder(cartId);
       const { orderId } = orderResponse.data;
 
       // 2. Create the checkout session for payment
@@ -62,9 +67,9 @@ export default function CheckoutPage() {
         <div className="bg-white border border-gray-200 rounded-lg shadow-sm p-6">
           <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
           
-          {cart && cart.items.length > 0 ? (
+          {items && items.length > 0 ? (
             <div className="space-y-4">
-              {cart.items.map(item => (
+              {items.map(item => (
                 <div key={item.id} className="flex justify-between">
                   <span>{item.title.en} x{item.qty}</span>
                   <span>{item.price.toFixed(2)} {item.currency}</span>
@@ -73,7 +78,7 @@ export default function CheckoutPage() {
               <hr />
               <div className="flex justify-between font-bold text-lg">
                 <span>Total</span>
-                <span>{cart.total.toFixed(2)} {cart.currency}</span>
+                <span>{total.toFixed(2)} {currency}</span>
               </div>
             </div>
           ) : (
@@ -94,7 +99,7 @@ export default function CheckoutPage() {
 
           <button 
             onClick={handleCheckout} 
-            disabled={isLoading || !cart || cart.items.length === 0}
+            disabled={isLoading || !items || items.length === 0}
             className="mt-6 w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
           >
             {isLoading ? 'Processing...' : 'Proceed to Payment'}

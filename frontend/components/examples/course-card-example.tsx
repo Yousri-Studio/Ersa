@@ -19,6 +19,10 @@ const sampleCourses: CourseCardProps[] = [
       ar: 'وصف شامل للدورة التدريبية المهنية التي تهدف إلى تطوير المهارات الأساسية في بيئة العمل الحديثة', 
       en: 'A comprehensive description of the professional training course aimed at developing essential skills in the modern workplace' 
     },
+    category: {
+      ar: 'التدريب المهني',
+      en: 'Professional Training'
+    },
     thumbnailUrl: '/images/Course Place Holder Small.png',
     mode: 'onsite',
     badge: 'bestseller',
@@ -45,6 +49,10 @@ const sampleCourses: CourseCardProps[] = [
       ar: 'تعلم أحدث استراتيجيات التسويق الرقمي وكيفية تطبيقها بفعالية في السوق الحالي', 
       en: 'Learn the latest digital marketing strategies and how to apply them effectively in today\'s market' 
     },
+    category: {
+      ar: 'التسويق الرقمي',
+      en: 'Digital Marketing'
+    },
     mode: 'online',
     badge: 'new',
     durationLabel: { 
@@ -70,6 +78,10 @@ const sampleCourses: CourseCardProps[] = [
       ar: 'احصل على شهادة معتمدة في إدارة المشاريع واكتسب المهارات اللازمة لقيادة المشاريع بنجاح', 
       en: 'Get certified in project management and acquire the skills needed to lead projects successfully' 
     },
+    category: {
+      ar: 'إدارة المشاريع',
+      en: 'Project Management'
+    },
     mode: 'onsite',
     badge: null,
     durationLabel: { 
@@ -94,6 +106,10 @@ const sampleCourses: CourseCardProps[] = [
     summary: { 
       ar: 'مثال على دورة تستخدم الدولار الأمريكي كعملة', 
       en: 'Example of a course that uses USD as currency' 
+    },
+    category: {
+      ar: 'مثال',
+      en: 'Example'
     },
     mode: 'online',
     badge: null,

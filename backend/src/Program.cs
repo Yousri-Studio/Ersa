@@ -125,11 +125,13 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
+    var swaggerSettings = builder.Configuration.GetSection("Swagger");
+    
     c.SwaggerDoc("v1", new OpenApiInfo 
     { 
-        Title = "Ersa Training API", 
-        Version = "v1",
-        Description = "Bilingual e-learning platform API for Ersa Training"
+        Title = swaggerSettings["Title"] ?? "Ersa Training API", 
+        Version = swaggerSettings["Version"] ?? "v1",
+        Description = swaggerSettings["Description"] ?? "Bilingual e-learning platform API for Ersa Training"
     });
     
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -160,7 +162,8 @@ builder.Services.AddSwaggerGen(c =>
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+var swaggerEnabled = builder.Configuration.GetValue<bool>("Swagger:Enabled");
+if (swaggerEnabled)
 {
     app.UseSwagger();
     app.UseSwaggerUI(c =>

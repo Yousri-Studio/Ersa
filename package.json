@@ -6,17 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/alyhassan/Ersa.git"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/alyhassan/Ersa/issues"
-  },
-  "homepage": "https://github.com/alyhassan/Ersa#readme",
   "dependencies": {
     "framer-motion": "^12.23.12"
   }
