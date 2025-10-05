@@ -1,0 +1,138 @@
+╔═══════════════════════════════════════════════════════════════╗
+║                                                               ║
+║          🚨 SERVER FILE REPLACEMENT CHECKLIST 🚨              ║
+║                                                               ║
+║  Your local file is CORRECT ✅                                ║
+║  Your server file is CORRUPTED ❌                             ║
+║                                                               ║
+║  You MUST upload the fixed file to your server!              ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝
+
+┌───────────────────────────────────────────────────────────────┐
+│ STEP 1: LOGIN TO SMARTERASP.NET                               │
+└───────────────────────────────────────────────────────────────┘
+  [ ] Go to: https://www.smarterasp.net/
+  [ ] Login with your credentials
+  [ ] Open Control Panel
+
+┌───────────────────────────────────────────────────────────────┐
+│ STEP 2: OPEN FILE MANAGER                                     │
+└───────────────────────────────────────────────────────────────┘
+  [ ] Click "File Manager" in control panel
+  [ ] Navigate to: h:\root\home\ersatc-001\www\ersatraining\
+  [ ] You should see: next.config.js (the corrupted file)
+
+┌───────────────────────────────────────────────────────────────┐
+│ STEP 3: DELETE CORRUPTED FILE                                 │
+└───────────────────────────────────────────────────────────────┘
+  [ ] Find: next.config.js
+  [ ] Right-click → Delete (or use Delete button)
+  [ ] Confirm deletion
+  [ ] Verify it's gone
+
+┌───────────────────────────────────────────────────────────────┐
+│ STEP 4: UPLOAD CORRECT FILE                                   │
+└───────────────────────────────────────────────────────────────┘
+
+  OPTION A - Upload ZIP (Recommended):
+  [ ] Click "Upload" button
+  [ ] Browse to: d:\Data\work\Ersa\frontend\next-config-fix.zip
+  [ ] Upload the ZIP file
+  [ ] Right-click ZIP → Extract
+  [ ] Delete the ZIP file after extraction
+  
+  OR
+  
+  OPTION B - Direct File Upload:
+  [ ] Click "Upload" button
+  [ ] Browse to: d:\Data\work\Ersa\frontend\deployment\next.config.js
+  [ ] Upload the file
+  [ ] Verify upload completed
+
+┌───────────────────────────────────────────────────────────────┐
+│ STEP 5: VERIFY FILE ON SERVER                                 │
+└───────────────────────────────────────────────────────────────┘
+  [ ] Find: next.config.js in File Manager
+  [ ] Check file size: Should be approximately 1.3 KB (1,297 bytes)
+  [ ] (Optional) Open file and check first line:
+      Should be: const createNextIntlPlugin = require('next-intl/plugin');
+      NOT: const createNextIntlPlugin = require('next-intl/plugin');const createNextIntlPlugin = require('next-intl/plugin');
+
+┌───────────────────────────────────────────────────────────────┐
+│ STEP 6: RESTART NODE.JS APPLICATION                           │
+└───────────────────────────────────────────────────────────────┘
+  [ ] Go back to Control Panel
+  [ ] Find "Node.js" or "Node.js Manager" section
+  [ ] Click "Restart" button (or "Stop" then "Start")
+  [ ] Wait for restart confirmation
+  [ ] Wait additional 30-60 seconds for app to fully start
+
+┌───────────────────────────────────────────────────────────────┐
+│ STEP 7: TEST YOUR SITE                                        │
+└───────────────────────────────────────────────────────────────┘
+  [ ] Open browser
+  [ ] Visit: https://ersatraining.smarterasp.net/en
+  [ ] Site should load WITHOUT errors
+  [ ] Test: https://ersatraining.smarterasp.net/ar
+  [ ] Arabic version should also work
+
+┌───────────────────────────────────────────────────────────────┐
+│ ✅ SUCCESS INDICATORS                                          │
+└───────────────────────────────────────────────────────────────┘
+  ✓ No "SyntaxError" messages
+  ✓ No "createNextIntlPlugin has already been declared" error
+  ✓ Homepage loads correctly
+  ✓ Can switch between English and Arabic
+  ✓ Navigation works
+
+┌───────────────────────────────────────────────────────────────┐
+│ ❌ IF STILL NOT WORKING                                        │
+└───────────────────────────────────────────────────────────────┘
+  1. Check iisnode logs on server:
+     Location: h:\root\home\ersatc-001\www\ersatraining\iisnode\
+     Look for new error messages
+     
+  2. Verify all critical files exist on server:
+     [ ] start.js
+     [ ] web.config
+     [ ] next.config.js (the NEW one)
+     [ ] .next/ folder
+     [ ] package.json
+     
+  3. Try clearing cache:
+     [ ] Delete node_modules/.cache folder
+     [ ] Restart Node.js again
+     
+  4. Last resort - Re-deploy everything:
+     [ ] Delete all files from server
+     [ ] Upload entire deployment folder
+     [ ] Configure Node.js settings
+     [ ] Restart and test
+
+╔═══════════════════════════════════════════════════════════════╗
+║                                                               ║
+║  📁 FILES READY FOR UPLOAD:                                   ║
+║                                                               ║
+║  1. ZIP: d:\Data\work\Ersa\frontend\next-config-fix.zip      ║
+║     Size: 0.51 KB - Contains corrected next.config.js        ║
+║                                                               ║
+║  2. Direct: d:\Data\work\Ersa\frontend\deployment\           ║
+║            next.config.js                                     ║
+║     Size: 1.3 KB - The corrected file itself                 ║
+║                                                               ║
+╚═══════════════════════════════════════════════════════════════╝
+
+⏱️  ESTIMATED TIME: 3-5 minutes
+
+🎯  PRIORITY: CRITICAL - Site is currently down
+
+💡  TIP: Use Option A (ZIP upload) - it's the safest method
+
+📞  SUPPORT: If stuck, contact SmarterASP.NET support for help
+            with file upload/replacement
+
+═══════════════════════════════════════════════════════════════
+           Your local files are perfect! ✅
+           Just need to update the server! 🚀
+═══════════════════════════════════════════════════════════════
