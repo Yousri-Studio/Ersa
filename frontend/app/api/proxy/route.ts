@@ -7,14 +7,28 @@ export async function GET(request: NextRequest) {
   const endpoint = searchParams.get('endpoint') || '';
   
   console.log(`[API Proxy GET] ${endpoint}`);
+  console.log(`[API Proxy] BACKEND_API_URL: ${API_BASE_URL}`);
   
   try {
-    const apiUrl = `${API_BASE_URL}/${endpoint}`;
+    // Remove leading slash from endpoint if present to avoid double slashes
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
+    const apiUrl = `${API_BASE_URL}/${cleanEndpoint}`;
+    console.log(`[API Proxy] Forwarding to: ${apiUrl}`);
+    
+    // Forward authorization header if present
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    const authHeader = request.headers.get('authorization');
+    if (authHeader) {
+      headers['Authorization'] = authHeader;
+      console.log(`[API Proxy] Forwarding Authorization header`);
+    }
+    
     const response = await fetch(apiUrl, {
       method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       cache: 'no-store',
     });
     
@@ -45,13 +59,25 @@ export async function POST(request: NextRequest) {
   
   try {
     const body = await request.json();
-    const apiUrl = `${API_BASE_URL}/${endpoint}`;
+    // Remove leading slash from endpoint if present to avoid double slashes
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
+    const apiUrl = `${API_BASE_URL}/${cleanEndpoint}`;
+    console.log(`[API Proxy] Forwarding to: ${apiUrl}`);
+    
+    // Forward authorization header if present
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    const authHeader = request.headers.get('authorization');
+    if (authHeader) {
+      headers['Authorization'] = authHeader;
+      console.log(`[API Proxy] Forwarding Authorization header`);
+    }
     
     const response = await fetch(apiUrl, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify(body),
       cache: 'no-store',
     });
@@ -83,13 +109,25 @@ export async function PUT(request: NextRequest) {
   
   try {
     const body = await request.json();
-    const apiUrl = `${API_BASE_URL}/${endpoint}`;
+    // Remove leading slash from endpoint if present to avoid double slashes
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
+    const apiUrl = `${API_BASE_URL}/${cleanEndpoint}`;
+    console.log(`[API Proxy] Forwarding to: ${apiUrl}`);
+    
+    // Forward authorization header if present
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    const authHeader = request.headers.get('authorization');
+    if (authHeader) {
+      headers['Authorization'] = authHeader;
+      console.log(`[API Proxy] Forwarding Authorization header`);
+    }
     
     const response = await fetch(apiUrl, {
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify(body),
       cache: 'no-store',
     });
@@ -120,13 +158,25 @@ export async function DELETE(request: NextRequest) {
   console.log(`[API Proxy DELETE] ${endpoint}`);
   
   try {
-    const apiUrl = `${API_BASE_URL}/${endpoint}`;
+    // Remove leading slash from endpoint if present to avoid double slashes
+    const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
+    const apiUrl = `${API_BASE_URL}/${cleanEndpoint}`;
+    console.log(`[API Proxy] Forwarding to: ${apiUrl}`);
+    
+    // Forward authorization header if present
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json',
+    };
+    
+    const authHeader = request.headers.get('authorization');
+    if (authHeader) {
+      headers['Authorization'] = authHeader;
+      console.log(`[API Proxy] Forwarding Authorization header`);
+    }
     
     const response = await fetch(apiUrl, {
       method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      headers,
       cache: 'no-store',
     });
     
