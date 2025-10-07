@@ -292,3 +292,4 @@ Before going live:
 **Node.js Required:** 18.x or later  
 **Configuration:** Proxy-based backend connection ✅
 
+
