@@ -26,10 +26,10 @@ public class ContentBlockConfiguration : IEntityTypeConfiguration<ContentBlock>
             .HasMaxLength(50);
             
         builder.Property(x => x.ContentEn)
-            .HasColumnType("TEXT");
+            .HasColumnType("NVARCHAR(MAX)");
             
         builder.Property(x => x.ContentAr)
-            .HasColumnType("TEXT");
+            .HasColumnType("NVARCHAR(MAX)");
             
         builder.Property(x => x.ImageUrl)
             .HasMaxLength(500);
