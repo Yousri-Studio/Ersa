@@ -16,7 +16,8 @@ export function ConditionalLayout({ children }: ConditionalLayoutProps) {
   
   // Check if current page is an auth page or admin page
   const isAuthPage = pathname?.includes('/auth/login') || pathname?.includes('/auth/register') || pathname?.includes('/admin-login') || false;
-  const isAdminPage = pathname?.includes('/admin') || false;
+  // Admin dashboard pages (but not admin-consulting or admin-login which are public pages)
+  const isAdminPage = (pathname?.startsWith(`/${locale}/admin/`) || pathname === `/${locale}/admin`) || false;
 
   if (isAuthPage || isAdminPage) {
     // Auth pages and admin pages without header and footer

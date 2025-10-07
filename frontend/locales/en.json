@@ -159,6 +159,9 @@
     "image-alt": "Professional consultation services",
     "request-consultation": "Request a Free Consultation",
     "explore-courses": "Explore Our Courses",
+    "cart": {
+      "item-added": "Added to Cart"
+    },
     "errors": {
       "load-failed": "Failed to load consultation data"
     }
@@ -475,7 +478,7 @@
       "admin-consultation": {
         "title": "Admin Consultation",
         "description": "Expert advice for your training administration needs",
-        "cta": "Get Started"
+        "cta": "Learn More"
       }
     }
   },
@@ -737,6 +740,7 @@
     "promo-code": "Promo Code",
     "promo-placeholder": "Enter promo code",
     "apply": "Apply",
+    "item-added": "Added to Cart",
     "empty": {
       "title": "Your cart is empty",
       "description": "You haven't added any courses to your cart yet. Start browsing our courses and discover what suits you.",

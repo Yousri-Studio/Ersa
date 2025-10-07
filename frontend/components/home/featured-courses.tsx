@@ -129,7 +129,13 @@ export function FeaturedCourses() {
                 className="group inline-flex items-center gap-2 text-primary-600 hover:text-primary-700 font-semibold transition-colors duration-200"
               >
                 {t('courses.view-all')}
-                <Icon name="arrow-right" className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-200" />
+                <Icon 
+                  name={locale === 'ar' ? 'arrow-left' : 'arrow-right'} 
+                  className={`transition-transform duration-200 ${
+                    locale === 'ar' ? 'group-hover:-translate-x-1' : 'group-hover:translate-x-1'
+                  }`}
+                  style={{ height: '1.0rem', width: '1.0rem' }}
+                />
               </Link>
             </div>
           </>

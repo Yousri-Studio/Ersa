@@ -336,11 +336,11 @@ export const InvoiceTemplate: React.FC<InvoiceTemplateProps> = ({
           </div>
           <div>
             <h4 className="font-semibold text-[#292561] mb-2">
-              {locale === 'ar' ? 'شكراً لاختيارك إرسا' : 'Thank you for choosing Ersa'}
+              {locale === 'ar' ? 'شكراً لاختيارك إرساء' : 'Thank you for choosing Ersa'}
             </h4>
             <p className="text-xs leading-relaxed">
               {locale === 'ar' 
-                ? 'هذه فاتورة إلكترونية صادرة من إرسا للتدريب والاستشارات. للاستفسارات، يرجى التواصل معنا عبر البريد الإلكتروني أو الهاتف.'
+                ? 'هذه فاتورة إلكترونية صادرة من إرساء للتدريب والاستشارات. للاستفسارات، يرجى التواصل معنا عبر البريد الإلكتروني أو الهاتف.'
                 : 'This is an electronic invoice issued by Ersa Training & Consultancy. For inquiries, please contact us via email or phone.'
               }
             </p>

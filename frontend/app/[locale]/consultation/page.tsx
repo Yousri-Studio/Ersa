@@ -126,14 +126,19 @@ export default function ConsultationPage() {
                   })}
                   type="text"
                   autoComplete="name"
-                  className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo"
+                  className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo ${
+                    locale === 'ar' ? 'pr-10' : 'pl-10'
+                  }`}
                   placeholder={locale === 'ar' ? 'عنوان الرسالة' : 'Message Title'}
                   style={{ fontSize: '14px' }}
                 />
                 <Icon 
                   name="pen" 
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4"
+                  className={`absolute top-1/2 transform -translate-y-1/2 ${
+                    locale === 'ar' ? 'right-3' : 'left-3'
+                  }`}
                   color="#00AC96"
+                  style={{ height: '1.2rem', width: '1.2rem' }}
                 />
               </div>
               {errors.fullName && (
@@ -162,15 +167,20 @@ export default function ConsultationPage() {
                       },
                     })}
                     type="text"
-                    className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo"
+                    className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo ${
+                      locale === 'ar' ? 'pr-10' : 'pl-10'
+                    }`}
                     placeholder={locale === 'ar' ? 'اسم المستخدم' : 'User Name'}
                     style={{ fontSize: '14px' }}
                   />
-                                  <Icon 
-                  name="pen" 
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4"
-                  color="#00AC96"
-                />
+                  <Icon 
+                    name="pen" 
+                    className={`absolute top-1/2 transform -translate-y-1/2 ${
+                      locale === 'ar' ? 'right-3' : 'left-3'
+                    }`}
+                    color="#00AC96"
+                    style={{ height: '1.2rem', width: '1.2rem' }}
+                  />
                 </div>
                 {errors.userName && (
                   <p className="mt-2 text-sm text-red-600 font-cairo">{errors.userName.message}</p>
@@ -197,14 +207,19 @@ export default function ConsultationPage() {
                     })}
                     type="email"
                     autoComplete="email"
-                    className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo"
+                    className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo ${
+                      locale === 'ar' ? 'pr-10' : 'pl-10'
+                    }`}
                     placeholder={locale === 'ar' ? 'example@domain.com' : 'example@domain.com'}
                     style={{ fontSize: '14px' }}
                   />
                   <Icon 
                     name="envelope" 
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4"
+                    className={`absolute top-1/2 transform -translate-y-1/2 ${
+                      locale === 'ar' ? 'right-3' : 'left-3'
+                    }`}
                     color="#00AC96"
+                    style={{ height: '1.2rem', width: '1.2rem' }}
                   />
                 </div>
                 {errors.email && (
@@ -229,11 +244,15 @@ export default function ConsultationPage() {
                     {...register('mobileNumber')}
                     type="tel"
                     autoComplete="tel"
-                    className="w-full px-4 py-3 pr-10 pl-20 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo text-right"
+                    className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo ${
+                      locale === 'ar' ? 'text-right pr-10 pl-20' : 'text-left pl-10 pr-20'
+                    }`}
                     placeholder={locale === 'ar' ? 'أدخل رقم هاتفك' : 'Enter your phone number'}
                     style={{ fontSize: '14px' }}
                   />
-                  <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center">
+                  <div className={`absolute top-1/2 transform -translate-y-1/2 flex items-center ${
+                    locale === 'ar' ? 'left-3' : 'right-3'
+                  }`}>
                     <select 
                       className="border-0 bg-transparent focus:outline-none font-cairo text-gray-600"
                       style={{ fontSize: '14px' }}
@@ -260,8 +279,11 @@ export default function ConsultationPage() {
                   </div>
                   <Icon 
                     name="phone" 
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4"
+                    className={`absolute top-1/2 transform -translate-y-1/2 ${
+                      locale === 'ar' ? 'right-3' : 'left-3'
+                    }`}
                     color="#00AC96"
+                    style={{ height: '1.2rem', width: '1.2rem' }}
                   />
                 </div>
                 {errors.mobileNumber && (
@@ -283,8 +305,17 @@ export default function ConsultationPage() {
                     {...register('country', {
                       required: locale === 'ar' ? 'الدولة مطلوبة' : 'Country is required',
                     })}
-                    className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo appearance-none"
-                    style={{ fontSize: '14px' }}
+                    className={`w-full border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo`}
+                    style={{ 
+                      fontSize: '14px',
+                      appearance: 'none',
+                      WebkitAppearance: 'none',
+                      MozAppearance: 'none',
+                      paddingTop: '0.75rem',
+                      paddingBottom: '0.75rem',
+                      paddingRight: locale === 'ar' ? '2.75rem' : '1rem',
+                      paddingLeft: locale === 'ar' ? '1rem' : '2.5rem'
+                    }}
                   >
                     <option value="">
                       {locale === 'ar' ? 'اختر الدولة' : 'Select Country'}
@@ -306,14 +337,12 @@ export default function ConsultationPage() {
                     ))}
                   </select>
                   <Icon 
-                    name="chevron-down" 
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4"
-                    color="#9CA3AF"
-                  />
-                  <Icon 
                     name="globe" 
-                    className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4"
+                    className={`absolute top-1/2 transform -translate-y-1/2 ${
+                      locale === 'ar' ? 'right-3' : 'left-3'
+                    }`}
                     color="#00AC96"
+                    style={{ height: '1.2rem', width: '1.2rem' }}
                   />
                 </div>
                 {errors.country && (
@@ -341,14 +370,19 @@ export default function ConsultationPage() {
                     },
                   })}
                   rows={6}
-                  className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo resize-none"
+                  className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo resize-none ${
+                    locale === 'ar' ? 'pr-10' : 'pl-10'
+                  }`}
                   placeholder={locale === 'ar' ? 'اكتب رسالتك هنا...' : 'Write your message here...'}
                   style={{ fontSize: '14px' }}
                 />
                 <Icon 
                   name="message" 
-                  className="absolute right-3 top-4 h-4 w-4"
+                  className={`absolute top-4 ${
+                    locale === 'ar' ? 'right-3' : 'left-3'
+                  }`}
                   color="#00AC96"
+                  style={{ height: '1.2rem', width: '1.2rem' }}
                 />
               </div>
               {errors.message && (

@@ -110,7 +110,7 @@ export default function CourseDetailsPage() {
             <div className="lg:col-span-2">
               <div className="mb-4">
                 <div className={`flex items-center space-x-2 rtl:space-x-reverse text-sm text-gray-500 mb-2 font-cairo ${isLoaded ? 'animate-fade-in-down' : 'opacity-0'}`}>
-                  <Link href="/courses" className="hover:text-primary-600">
+                  <Link href={`/${locale}/courses`} className="hover:text-primary-600">
                     {t('courses.title')}
                   </Link>
                   <span>›</span>
@@ -298,20 +298,22 @@ export default function CourseDetailsPage() {
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-4">
                     <div>
-                      {course.originalPrice > course.price && (
+                      {/* Discount hidden - Original Price */}
+                      {/* {course.originalPrice > course.price && (
                         <span className="text-lg text-gray-400 line-through font-cairo">
                           {course.originalPrice} {course.currency}
                         </span>
-                      )}
+                      )} */}
                       <div className="text-3xl font-bold text-gray-900 font-cairo">
                         {course.price} {course.currency}
                       </div>
                     </div>
-                    {course.originalPrice > course.price && (
+                    {/* Discount Badge Hidden */}
+                    {/* {course.originalPrice > course.price && (
                       <div className="bg-red-500 text-white px-3 py-1 rounded text-sm font-semibold font-cairo">
                         {Math.round(((course.originalPrice - course.price) / course.originalPrice) * 100)}% {t('common.off')}
                       </div>
-                    )}
+                    )} */}
                   </div>
                   
                   {/* Action Buttons */}
@@ -508,7 +510,8 @@ export default function CourseDetailsPage() {
                               </span>
                                                              <Icon 
                                  name={expandedSection === section.id ? 'chevron-up' : 'chevron-down'} 
-                                 className="h-4 w-4 text-gray-400" 
+                                 className="text-gray-400" 
+                                 style={{ height: '1.0rem', width: '1.0rem' }}
                                />
                             </div>
                           </button>

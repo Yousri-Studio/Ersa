@@ -138,10 +138,10 @@ export default function ContactPage() {
                 />
                 <Icon 
                   name="pen" 
-                  className={`absolute top-1/2 transform -translate-y-1/2 h-4 w-4 ${
+                  className={`absolute top-1/2 transform -translate-y-1/2 ${
                     locale === 'ar' ? 'right-3' : 'left-3'
                   }`}
-                  style={{ color: '#00AC96' }}
+                  style={{ color: '#00AC96', height: '1.2rem', width: '1.2rem' }}
                 />
               </div>
               {errors.subject && (
@@ -178,10 +178,11 @@ export default function ContactPage() {
                   />
                   <Icon 
                     name="user" 
-                    className={`absolute top-1/2 transform -translate-y-1/2 h-4 w-4 ${
+                    className={`absolute top-1/2 transform -translate-y-1/2 ${
                       locale === 'ar' ? 'right-3' : 'left-3'
                     }`}
                     color="#00AC96"
+                    style={{ height: '1.2rem', width: '1.2rem' }}
                   />
                 </div>
                 {errors.firstName && (
@@ -216,10 +217,11 @@ export default function ContactPage() {
                   />
                   <Icon 
                     name="user" 
-                    className={`absolute top-1/2 transform -translate-y-1/2 h-4 w-4 ${
+                    className={`absolute top-1/2 transform -translate-y-1/2 ${
                       locale === 'ar' ? 'right-3' : 'left-3'
                     }`}
                     color="#00AC96"
+                    style={{ height: '1.2rem', width: '1.2rem' }}
                   />
                 </div>
                 {errors.lastName && (
@@ -256,10 +258,11 @@ export default function ContactPage() {
                 />
                 <Icon 
                   name="envelope" 
-                  className={`absolute top-1/2 transform -translate-y-1/2 h-4 w-4 ${
+                  className={`absolute top-1/2 transform -translate-y-1/2 ${
                     locale === 'ar' ? 'right-3' : 'left-3'
                   }`}
                   color="#00AC96"
+                  style={{ height: '1.2rem', width: '1.2rem' }}
                 />
               </div>
               {errors.email && (
@@ -294,10 +297,10 @@ export default function ContactPage() {
                 />
                 <Icon 
                   name="message" 
-                  className={`absolute top-4 h-4 w-4 ${
+                  className={`absolute top-4 ${
                     locale === 'ar' ? 'right-3' : 'left-3'
                   }`}
-                  style={{ color: '#00AC96' }}
+                  style={{ color: '#00AC96', height: '1.2rem', width: '1.2rem' }}
                 />
               </div>
               {errors.message && (

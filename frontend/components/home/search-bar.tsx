@@ -128,9 +128,9 @@ export function SearchBar({ categories = [], compact = false, enableLiveSearch =
 
   return (
     <form onSubmit={handleSubmit} className={`w-full ${!compact ? 'max-w-4xl mx-auto' : ''}`}>
-      <div className="flex items-center search-container">
+      <div className="flex flex-col md:flex-row md:items-center search-container gap-3">
         {/* Search Input */}
-        <div className="flex-1 relative">
+        <div className="flex-1 relative mb-3 md:mb-0">
           <Icon 
             name="search" 
             className={`absolute top-1/2 transform -translate-y-1/2 h-5 w-5 text-teal-500 ${
@@ -158,17 +158,18 @@ export function SearchBar({ categories = [], compact = false, enableLiveSearch =
         </div>
 
         {/* Category Dropdown */}
-        <div className="flex-shrink-0 relative">
+        <div className="flex-shrink-0 relative mb-3 md:mb-0">
           <Icon 
             name="chevron-down" 
-            className={`absolute top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-500 pointer-events-none ${
+            className={`absolute top-1/2 transform -translate-y-1/2 text-gray-500 pointer-events-none ${
               locale === 'ar' ? 'left-4' : 'right-4'
             }`}
+            style={{ height: '1.0rem', width: '1.0rem' }}
           />
           <select
             value={selectedCategory}
             onChange={handleCategoryChange}
-            className={`w-48 py-3 text-gray-700 focus:outline-none focus:ring-0 appearance-none cursor-pointer font-cairo search-select ${
+            className={`w-full md:w-48 py-3 text-gray-700 focus:outline-none focus:ring-0 appearance-none cursor-pointer font-cairo search-select ${
               locale === 'ar' ? 'pl-12 pr-4' : 'pr-12 pl-4'
             }`}
             dir={locale === 'ar' ? 'rtl' : 'ltr'}
@@ -185,7 +186,7 @@ export function SearchBar({ categories = [], compact = false, enableLiveSearch =
         {/* Search Button */}
         <button
           type="submit"
-          className="flex-shrink-0 inline-flex items-center justify-center px-8 py-3 text-white font-semibold focus:outline-none transition-colors duration-200 font-cairo search-button"
+          className="w-full md:w-auto flex-shrink-0 inline-flex items-center justify-center px-8 py-3 text-white font-semibold focus:outline-none transition-colors duration-200 font-cairo search-button"
         >
           {t('home.search.button')}
         </button>

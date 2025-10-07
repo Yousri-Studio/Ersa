@@ -474,11 +474,42 @@ export default function CoursesPage() {
               </div>
             </div>
 
-            {/* Filter Options - Match search width */}
+            {/* Filter Options - Mobile stacked, desktop 3 columns */}
             <div className={`w-full max-w-4xl mx-auto ${isLoaded ? 'animate-fade-in-up stagger-4' : 'opacity-0'}`} style={{ position: 'relative', zIndex: 99999 }}>
-              <div className="flex gap-4 justify-end items-start">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Display Type */}
+                <div className="w-full">
+                  <FilterDropdown
+                    label={locale === 'ar' ? "عرض ك" : "Display As"}
+                    options={[
+                      { value: 'grid', label: locale === 'ar' ? 'شبكة' : 'Grid' },
+                      { value: 'list', label: locale === 'ar' ? 'قائمة' : 'List' }
+                    ]}
+                    value={displayType}
+                    onChange={setDisplayType}
+                    placeholder={locale === 'ar' ? "اسم الاختيار" : "Choose display"}
+                    icon="th-large"
+                  />
+                </div>
+
+                {/* Category Filter */}
+                <div className="w-full">
+                  <FilterDropdown
+                    label={locale === 'ar' ? "التصفية حسب" : "Filter By"}
+                    options={[
+                      { value: 'Programming', label: locale === 'ar' ? 'البرمجة' : 'Programming' },
+                      { value: 'Business', label: locale === 'ar' ? 'الأعمال' : 'Business' },
+                      { value: 'Design', label: locale === 'ar' ? 'التصميم' : 'Design' }
+                    ]}
+                    value={categoryFilter}
+                    onChange={setCategoryFilter}
+                    placeholder={locale === 'ar' ? "التصنيف حسب" : "Choose category"}
+                    icon="sliders"
+                  />
+                </div>
+
                 {/* Sort By */}
-                <div className="flex-1">
+                <div className="w-full">
                   <FilterDropdown
                     label={locale === 'ar' ? "الترتيب حسب" : "Sort By"}
                     options={[
@@ -490,39 +521,8 @@ export default function CoursesPage() {
                     ]}
                     value={sortBy}
                     onChange={setSortBy}
-                    placeholder={locale === 'ar' ? "اختر الترتيب" : "Choose Order"}
-
-                  />
-                </div>
-
-                {/* Category Filter */}
-                <div className="flex-1">
-                  <FilterDropdown
-                    label={locale === 'ar' ? "التصنيف" : "Category"}
-                    options={[
-                      { value: 'Programming', label: locale === 'ar' ? 'البرمجة' : 'Programming' },
-                      { value: 'Business', label: locale === 'ar' ? 'الأعمال' : 'Business' },
-                      { value: 'Design', label: locale === 'ar' ? 'التصميم' : 'Design' }
-                    ]}
-                    value={categoryFilter}
-                    onChange={setCategoryFilter}
-                    placeholder={locale === 'ar' ? "اختر التصنيف" : "Choose Category"}
-
-                  />
-                </div>
-
-                {/* Display Type */}
-                <div className="flex-1">
-                  <FilterDropdown
-                    label={locale === 'ar' ? "نوع العرض" : "Display Type"}
-                    options={[
-                      { value: 'grid', label: locale === 'ar' ? 'شبكة' : 'Grid' },
-                      { value: 'list', label: locale === 'ar' ? 'قائمة' : 'List' }
-                    ]}
-                    value={displayType}
-                    onChange={setDisplayType}
-                    placeholder={locale === 'ar' ? "اختر العرض" : "Choose Display"}
-
+                    placeholder={locale === 'ar' ? "الترتيب حسب" : "Choose order"}
+                    icon="up-down"
                   />
                 </div>
               </div>

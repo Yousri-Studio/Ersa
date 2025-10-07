@@ -142,7 +142,7 @@ export default function CartPage() {
                           onClick={() => updateItemQuantity(item.id, Math.max(1, item.qty - 1))}
                           className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
                         >
-                          <Icon name="minus" className="h-3 w-3 text-gray-600" />
+                          <Icon name="minus" className="text-gray-600" style={{ height: '1.0rem', width: '1.0rem' }} />
                         </button>
                         <span className="text-lg font-semibold text-gray-900 w-8 text-center font-cairo">
                           {item.qty}
@@ -151,7 +151,7 @@ export default function CartPage() {
                           onClick={() => updateItemQuantity(item.id, item.qty + 1)}
                           className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors"
                         >
-                          <Icon name="plus" className="h-3 w-3 text-gray-600" />
+                          <Icon name="plus" className="text-gray-600" style={{ height: '1.0rem', width: '1.0rem' }} />
                         </button>
                       </div>
                       
@@ -168,19 +168,19 @@ export default function CartPage() {
                       </div>
                       
                       {/* Actions */}
-                      <div className="flex flex-col space-y-2">
+                      <div className="flex items-center space-x-2 rtl:space-x-reverse">
                         <button
                           onClick={() => removeItem(item.id)}
                           className="text-red-600 hover:text-red-700 p-2"
                           title={t('cart.remove')}
                         >
-                          <Icon name="trash" className="h-4 w-4" />
+                          <Icon name="trash" style={{ height: '1.0rem', width: '1.0rem' }} />
                         </button>
                         <button
                           className="text-gray-400 hover:text-red-500 p-2"
                           title={t('cart.move-to-wishlist')}
                         >
-                          <Icon name="heart" className="h-4 w-4" />
+                          <Icon name="heart" style={{ height: '1.0rem', width: '1.0rem' }} />
                         </button>
                       </div>
                     </div>

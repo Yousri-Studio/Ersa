@@ -42,8 +42,9 @@ export function FilterDropdown({
       {/* Label */}
       {label && (
         <label 
-          className="block text-gray-700 mb-2 font-cairo"
+          className={`block text-gray-700 mb-2 font-cairo ${locale === 'ar' ? 'text-right' : 'text-left'}`}
           style={{ fontSize: '12px', fontWeight: 700 }}
+          dir={locale === 'ar' ? 'rtl' : 'ltr'}
         >
           {label}
         </label>
@@ -58,16 +59,22 @@ export function FilterDropdown({
           ${selectedOption ? 'filter-dropdown-selected' : 'filter-dropdown-button'}
         `}
         style={{
-          minWidth: '160px',
+          borderRadius: '6px',
           height: '52px',
-          borderRadius: '6px'
+          width: '100%'
         }}
+        dir={locale === 'ar' ? 'rtl' : 'ltr'}
       >
+        {/* Icon and Text Group */}
         <div className="flex items-center gap-3">
           <Icon 
-            icon={[iconStyle === 'regular' ? 'far' : 'fas', icon] as any} 
-            className="h-4 w-4 flex-shrink-0"
-            style={{ color: selectedOption ? '#00AC96' : '#292561' }}
+          	icon={[iconStyle === 'regular' ? 'far' : 'fas', icon] as any} 
+            className="flex-shrink-0"
+            style={{ 
+              color: selectedOption ? '#00AC96' : '#292561',
+              height: '1.0rem',
+              width: '1.0rem'
+            }}
           />
           <span 
             className="font-cairo"
@@ -81,11 +88,13 @@ export function FilterDropdown({
           </span>
         </div>
         
+        {/* Chevron Arrow */}
         <Icon 
           name="chevron-down" 
-          className={`h-3 w-3 text-gray-500 transition-transform duration-200 flex-shrink-0 ${
+          className={`text-gray-500 transition-transform duration-200 flex-shrink-0 ${
             isOpen ? 'rotate-180' : ''
           }`}
+          style={{ height: '1.0rem', width: '1.0rem' }}
         />
       </button>
 
@@ -115,6 +124,7 @@ export function FilterDropdown({
               left: locale === 'ar' ? 'auto' : '0',
               right: locale === 'ar' ? '0' : 'auto'
             }}
+            dir={locale === 'ar' ? 'rtl' : 'ltr'}
           >
             {options.map((option) => (
               <button

@@ -175,7 +175,7 @@ export function FeaturedCoursesSlider() {
   // Use mock data if API fails, returns empty, or is loading
   // Always show mock courses to ensure featured section displays properly
   const courses: Course[] = (apiCourses && Array.isArray(apiCourses) && apiCourses.length > 0 && !error && !isLoading) ? 
-    apiCourses : mockCourses.slice(0, 3);
+    apiCourses : mockCourses;
 
   // Handler functions
   const handleToggleWishlist = (courseId: string) => {
@@ -239,7 +239,33 @@ export function FeaturedCoursesSlider() {
     desktop: 3,
   };
 
-  const totalSlides = courses ? Math.ceil(courses.length / itemsPerView.desktop) : 0;
+  // Calculate total slides based on screen size
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+      setIsTablet(window.innerWidth >= 768 && window.innerWidth < 1024);
+    };
+    
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  const getItemsPerView = () => {
+    if (isMobile) return itemsPerView.mobile;
+    if (isTablet) return itemsPerView.tablet;
+    return itemsPerView.desktop;
+  };
+
+  // Ensure multiple slides exist on mobile even if API returns few courses
+  const sliderCourses: Course[] = (isMobile && courses && courses.length > 0 && courses.length < 4)
+    ? Array.from({ length: Math.max(4, courses.length * 2) }, (_, i) => courses[i % courses.length])
+    : courses;
+
+  const totalSlides = sliderCourses ? Math.ceil(sliderCourses.length / getItemsPerView()) : 0;
 
   // Auto-scroll functionality
   useEffect(() => {
@@ -270,9 +296,39 @@ export function FeaturedCoursesSlider() {
     goToSlide(newIndex);
   };
 
-  // Handle drag/swipe (basic implementation)
+  // Handle drag/swipe
   const handleMouseEnter = () => setIsAutoPlaying(false);
   const handleMouseLeave = () => setIsAutoPlaying(true);
+
+  // Touch/swipe functionality for mobile
+  const [touchStart, setTouchStart] = useState(0);
+  const [touchEnd, setTouchEnd] = useState(0);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+    
+    if (isLeftSwipe) {
+      goToNext();
+    }
+    if (isRightSwipe) {
+      goToPrevious();
+    }
+    
+    setTouchStart(0);
+    setTouchEnd(0);
+  };
 
   // Show mock data immediately instead of loading skeleton
   // if (isLoading) {
@@ -307,8 +363,9 @@ export function FeaturedCoursesSlider() {
   // Apply grid/slider logic based on course count
   // console.log('Featured courses count:', courses.length, 'Showing:', courses.length <= 3 ? 'Grid' : 'Slider');
   
-  if (courses.length <= 3) {
-    // Static Grid for 3 or fewer courses
+  // Always use slider for mobile, grid for desktop when 3 or fewer courses
+  if (courses.length <= 3 && !isMobile) {
+    // Static Grid for 3 or fewer courses on tablet/desktop
     return (
       <div className="w-full">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -331,60 +388,71 @@ export function FeaturedCoursesSlider() {
   }
 
   return (
-    <div className="relative w-full overflow-hidden">
-      {/* Navigation Arrows - RTL Positioned */}
-      <div className="absolute top-1/2 -translate-y-1/2 w-full flex justify-between pointer-events-none z-10">
-        {/* Next Button (Right Arrow on Left Side for RTL) */}
+    <div className="relative w-full md:px-16">
+      {/* Navigation Arrows - Locale-aware positioning - Hide on mobile */}
+      <div className="hidden md:flex absolute top-1/2 -translate-y-1/2 left-0 right-0 justify-between pointer-events-none z-10">
+        {/* Left Button */}
         <button
-          onClick={goToNext}
+          onClick={locale === 'ar' ? goToNext : goToPrevious}
           className="flex items-center justify-center w-12 h-12 rounded-full bg-white shadow-lg text-gray-600 hover:text-gray-900 hover:shadow-xl transition-all duration-200 pointer-events-auto -ml-6"
-          aria-label="Next courses"
+          aria-label={locale === 'ar' ? 'Next courses' : 'Previous courses'}
         >
-          <Icon name="chevron-right" className="h-5 w-5" />
+          <Icon name={locale === 'ar' ? 'chevron-right' : 'chevron-left'} className="h-5 w-5" />
         </button>
 
-        {/* Previous Button (Left Arrow on Right Side for RTL) */}
+        {/* Right Button */}
         <button
-          onClick={goToPrevious}
+          onClick={locale === 'ar' ? goToPrevious : goToNext}
           className="flex items-center justify-center w-12 h-12 rounded-full bg-white shadow-lg text-gray-600 hover:text-gray-900 hover:shadow-xl transition-all duration-200 pointer-events-auto -mr-6"
-          aria-label="Previous courses"
+          aria-label={locale === 'ar' ? 'Previous courses' : 'Next courses'}
         >
-          <Icon name="chevron-left" className="h-5 w-5" />
+          <Icon name={locale === 'ar' ? 'chevron-left' : 'chevron-right'} className="h-5 w-5" />
         </button>
       </div>
 
-      {/* Slider Container */}
+      {/* Slider Container - Using shadcn carousel approach */}
       <div 
-        className="relative overflow-hidden px-16"
+        className="relative overflow-hidden"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
         <div
           ref={sliderRef}
           className="flex transition-transform duration-500 ease-in-out"
-          style={{ transform: `translateX(-${currentIndex * 100}%)` }}
+          style={{ 
+            transform: `translateX(-${currentIndex * 100}%)`
+          }}
         >
-          {[...Array(totalSlides)].map((_, slideIndex) => (
-            <div key={slideIndex} className="w-full flex-shrink-0">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-1">
-                {courses
-                  .slice(slideIndex * itemsPerView.desktop, (slideIndex + 1) * itemsPerView.desktop)
-                  .map((course) => {
-                    const cardProps = courseToCardProps(course, locale as 'ar' | 'en', {
-                      inWishlist: hasWishlistItem(course.id),
-                      inCart: hasItem(course.id),
-                      onToggleWishlist: handleToggleWishlist,
-                      onAddToCart: handleAddToCart,
-                      onClick: handleCourseClick
-                    });
-                    
-                    return (
-                      <CourseCard key={course.id} {...cardProps} />
-                    );
-                  })}
+          {[...Array(totalSlides)].map((_, slideIndex) => {
+            const currentItemsPerView = getItemsPerView();
+            return (
+              <div 
+                key={slideIndex} 
+                className="w-full flex-shrink-0 px-4 md:px-6"
+              >
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {sliderCourses
+                    .slice(slideIndex * currentItemsPerView, (slideIndex + 1) * currentItemsPerView)
+                    .map((course, idx) => {
+                      const cardProps = courseToCardProps(course, locale as 'ar' | 'en', {
+                        inWishlist: hasWishlistItem(course.id),
+                        inCart: hasItem(course.id),
+                        onToggleWishlist: handleToggleWishlist,
+                        onAddToCart: handleAddToCart,
+                        onClick: handleCourseClick
+                      });
+                      
+                      return (
+                        <CourseCard key={`${course.id}-${slideIndex}-${idx}`} {...cardProps} />
+                      );
+                    })}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

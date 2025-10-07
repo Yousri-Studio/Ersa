@@ -76,7 +76,7 @@ export function AIConsultationSection() {
               {/* CTA Button */}
               <div className={locale === 'en' ? 'text-left' : 'text-right'}>
                 <Link
-                  href={`/${locale}/consultation`}
+                  href={`/${locale}/ai-solutions`}
                   className="inline-flex items-center justify-center font-cairo font-semibold text-white transition-colors duration-300"
                   style={{
                     width: '150px',
@@ -143,7 +143,7 @@ export function AIConsultationSection() {
               {/* CTA Button */}
               <div className={locale === 'en' ? 'text-left' : 'text-right'}>
                 <Link
-                  href={`/${locale}/consultation`}
+                  href={`/${locale}/admin-consulting`}
                   className="inline-flex items-center justify-center font-cairo font-semibold text-white transition-colors duration-300"
                   style={{
                     width: '150px',

@@ -1070,3 +1070,13 @@ a {
   padding-left: 2.5rem;
   padding-right: 0.75rem;
 }
+
+/* Hide scrollbar for mobile slider */
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari and Opera */
+}

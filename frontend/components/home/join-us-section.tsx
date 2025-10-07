@@ -55,8 +55,8 @@ export function JoinUsSection() {
                   >
                     <Icon 
                       name="check" 
-                      className="w-3 h-3 md:w-4 md:h-4" 
-                      style={{ color: '#FFFFFF' }}
+                      className="" 
+                      style={{ color: '#FFFFFF', height: '1.0rem', width: '1.0rem' }}
                     />
                   </div>
                   {/* Benefit Text - positioned on the left for Arabic */}
