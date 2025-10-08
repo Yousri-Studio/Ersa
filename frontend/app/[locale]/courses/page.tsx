@@ -19,6 +19,8 @@ import { toast } from 'react-hot-toast';
 import { usePageLoad, useStaggeredAnimation } from '@/lib/use-animations';
 import { ScrollAnimations } from '@/components/scroll-animations';
 import { useCourses } from '@/lib/content-hooks';
+import { categoriesApi, CourseCategoryData } from '@/lib/api';
+
 const mockCourses: Partial<ApiCourse>[] = [
   {
     id: '1',
@@ -40,7 +42,7 @@ const mockCourses: Partial<ApiCourse>[] = [
     isFeatured: true,
     badge: 'Bestseller',
     level: 0, // 0 = Beginner
-    category: 0, // 0 = Programming
+    category: null,
     instructorName: '',
     createdAt: ''
   },
@@ -64,7 +66,7 @@ const mockCourses: Partial<ApiCourse>[] = [
     isFeatured: true,
     badge: 'Bestseller',
     level: 0, // 0 = Beginner
-    category: 1, // 1 = Business
+    category: null,
     instructorName: '',
     createdAt: ''
   },
@@ -88,7 +90,7 @@ const mockCourses: Partial<ApiCourse>[] = [
     isFeatured: false,
     badge: 'Bestseller',
     level: 1, // 1 = Intermediate
-    category: 1, // 1 = Business
+    category: null,
     instructorName: '',
     createdAt: ''
   },
@@ -112,7 +114,7 @@ const mockCourses: Partial<ApiCourse>[] = [
     isFeatured: false,
     badge: 'Bestseller',
     level: 0, // 0 = Beginner
-    category: 1, // 1 = Business
+    category: null,
     instructorName: '',
     createdAt: ''
   },
@@ -136,7 +138,7 @@ const mockCourses: Partial<ApiCourse>[] = [
     isFeatured: true,
     badge: 'Bestseller',
     level: 1, // 1 = Intermediate
-    category: 1, // 1 = Business
+    category: null,
     instructorName: '',
     createdAt: ''
   },
@@ -160,7 +162,7 @@ const mockCourses: Partial<ApiCourse>[] = [
     isFeatured: false,
     badge: 'Bestseller',
     level: 0, // 0 = Beginner
-    category: 0, // 0 = Programming
+    category: null,
     instructorName: '',
     createdAt: ''
   }
@@ -188,6 +190,7 @@ export default function CoursesPage() {
   const [sortBy, setSortBy] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
   const [displayType, setDisplayType] = useState('grid');
+  const [categories, setCategories] = useState<CourseCategoryData[]>([]);
 
   // Animation hooks
   const isLoaded = usePageLoad(100);
@@ -273,6 +276,52 @@ export default function CoursesPage() {
   const hasSearchQuery = query.trim().length > 0;
   const hasResults = filteredCourses.length > 0;
   
+  // Fetch categories on component mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await categoriesApi.getCategories(true);
+        setCategories(response.data || []);
+      } catch (error: any) {
+        console.error('Error fetching categories:', error);
+        console.error('Error details:', error.response?.data || error.message);
+        
+        // Use fallback categories if API fails
+        setCategories([
+          {
+            id: 'general',
+            titleAr: 'عام',
+            titleEn: 'General',
+            displayOrder: 1,
+            isActive: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: 'business',
+            titleAr: 'الأعمال',
+            titleEn: 'Business',
+            displayOrder: 2,
+            isActive: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          },
+          {
+            id: 'technology',
+            titleAr: 'التكنولوجيا',
+            titleEn: 'Technology',
+            displayOrder: 3,
+            isActive: true,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          }
+        ]);
+      }
+    };
+    
+    fetchCategories();
+  }, []);
+
   // Update loading state based on API status
   useEffect(() => {
     setIsLoading(coursesLoading);
@@ -403,9 +452,11 @@ export default function CoursesPage() {
                           searchInfo.push(`"${query}"`);
                         }
                         if (category) {
-                          const categoryName = category === 'Programming' ? (locale === 'ar' ? 'البرمجة' : 'Programming') :
-                                             category === 'Business' ? (locale === 'ar' ? 'الأعمال' : 'Business') :
-                                             category === 'Design' ? (locale === 'ar' ? 'التصميم' : 'Design') : category;
+                          // Find category name from fetched categories
+                          const categoryData = categories.find(cat => cat.id === category);
+                          const categoryName = categoryData 
+                            ? (locale === 'ar' ? categoryData.titleAr : categoryData.titleEn)
+                            : category;
                           searchInfo.push(categoryName);
                         }
                         const searchText = searchInfo.join(' • ');
@@ -451,23 +502,11 @@ export default function CoursesPage() {
             <div className={`mb-6 scroll-item max-w-5xl mx-auto ${isLoaded ? 'animate-slide-in-right stagger-3' : 'opacity-0'}`}>
               <div className="shadow-lg rounded-lg bg-white p-4">
                 <SearchBar 
-                  categories={[
-                    {
-                      id: 'Programming',
-                      name: { ar: 'البرمجة', en: 'Programming' },
-                      slug: 'Programming'
-                    },
-                    {
-                      id: 'Business',
-                      name: { ar: 'الأعمال', en: 'Business' },
-                      slug: 'Business'
-                    },
-                    {
-                      id: 'Design',
-                      name: { ar: 'التصميم', en: 'Design' },
-                      slug: 'Design'
-                    }
-                  ]} 
+                  categories={categories.map(cat => ({
+                    id: cat.id,
+                    name: { ar: cat.titleAr, en: cat.titleEn },
+                    slug: cat.id // Use ID as slug for now
+                  }))} 
                   compact={true}
                   enableLiveSearch={true}
                 />
@@ -496,11 +535,10 @@ export default function CoursesPage() {
                 <div className="w-full">
                   <FilterDropdown
                     label={locale === 'ar' ? "التصفية حسب" : "Filter By"}
-                    options={[
-                      { value: 'Programming', label: locale === 'ar' ? 'البرمجة' : 'Programming' },
-                      { value: 'Business', label: locale === 'ar' ? 'الأعمال' : 'Business' },
-                      { value: 'Design', label: locale === 'ar' ? 'التصميم' : 'Design' }
-                    ]}
+                    options={categories.map(cat => ({
+                      value: cat.id,
+                      label: locale === 'ar' ? cat.titleAr : cat.titleEn
+                    }))}
                     value={categoryFilter}
                     onChange={setCategoryFilter}
                     placeholder={locale === 'ar' ? "التصنيف حسب" : "Choose category"}

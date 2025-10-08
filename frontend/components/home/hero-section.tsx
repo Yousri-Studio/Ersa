@@ -1,34 +1,51 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { SearchBar } from './search-bar';
 import { FeaturedCoursesSlider } from './featured-courses-slider';
 import { usePageLoad } from '@/lib/use-animations';
+import { categoriesApi, CourseCategoryData } from '@/lib/api';
 
 export function HeroSection() {
   const locale = useLocale();
   const t = useTranslations();
   const isLoaded = usePageLoad(100);
+  const [categories, setCategories] = useState<Array<{
+    id: string;
+    name: { ar: string; en: string };
+    slug: string;
+  }>>([]);
 
-  // Define localized course categories matching backend enum
-  const categories = [
-    {
-      id: 'Programming',
-      name: { ar: 'البرمجة', en: 'Programming' },
-      slug: 'Programming'
-    },
-    {
-      id: 'Business',
-      name: { ar: 'الأعمال', en: 'Business' },
-      slug: 'Business'
-    },
-    {
-      id: 'Design',
-      name: { ar: 'التصميم', en: 'Design' },
-      slug: 'Design'
-    }
-  ];
+  // Fetch categories from API on component mount
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await categoriesApi.getCategories(true);
+        const fetchedCategories = response.data || [];
+        
+        // Transform to SearchBar format
+        setCategories(fetchedCategories.map(cat => ({
+          id: cat.id,
+          name: { ar: cat.titleAr, en: cat.titleEn },
+          slug: cat.id // Use ID as slug
+        })));
+      } catch (error: any) {
+        console.error('Error fetching categories in hero section:', error);
+        console.error('Error details:', error.response?.data || error.message);
+        
+        // Use fallback categories if API fails
+        setCategories([
+          { id: 'general', name: { ar: 'عام', en: 'General' }, slug: 'general' },
+          { id: 'business', name: { ar: 'الأعمال', en: 'Business' }, slug: 'business' },
+          { id: 'technology', name: { ar: 'التكنولوجيا', en: 'Technology' }, slug: 'technology' }
+        ]);
+      }
+    };
+    
+    fetchCategories();
+  }, []);
 
   return (
     <section className="relative pt-20 pb-20">

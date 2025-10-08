@@ -90,7 +90,25 @@ export interface RegisterResponse {
   message: string;
 }
 
-export type CourseCategory = 'Programming' | 'Business' | 'Design';
+export interface CourseCategoryData {
+  id: string;
+  titleAr: string;
+  titleEn: string;
+  displayOrder: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CourseSubCategoryData {
+  id: string;
+  titleAr: string;
+  titleEn: string;
+  displayOrder: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
 
 export interface Course {
   id: string;
@@ -111,13 +129,18 @@ export interface Course {
   currency: string;
   type: number; // 0 = PDF, 1 = Live (from backend enum)
   level?: number; // Course level (from backend enum)
-  category: number; // Course category (from backend enum)
+  categoryId?: string | null; // Category ID from database
+  category?: CourseCategoryData | null; // Category object with titleAr/titleEn
+  subCategories?: CourseSubCategoryData[]; // Array of subcategories
   isActive: boolean;
   isFeatured?: boolean;
   rating?: number;
   createdAt?: string;
   imageUrl?: string;
-  instructorName?: string;
+  instructorName?: {
+    ar: string;
+    en: string;
+  } | string; // Can be localized object or string for backward compatibility
   photo?: string; // Base64 encoded photo data from backend
   tags?: string;
   instructorsBio?: {
@@ -201,19 +224,19 @@ export interface OrderItem {
 // Auth API
 export const authApi = {
   login: (data: LoginRequest): Promise<AxiosResponse<LoginResponse>> =>
-    api.post('/auth/login', data),
+    api.post('/api/auth/login', data),
 
   register: (data: RegisterRequest): Promise<AxiosResponse<RegisterResponse>> =>
-    api.post('/auth/register', data),
+    api.post('/api/auth/register', data),
 
   verifyEmail: (data: VerifyEmailRequest): Promise<AxiosResponse<LoginResponse>> =>
-    api.post('/auth/verify-email', data),
+    api.post('/api/auth/verify-email', data),
 
   resendVerificationCode: (data: ResendVerificationRequest): Promise<AxiosResponse<{ message: string }>> =>
-    api.post('/auth/resend-verification', data),
+    api.post('/api/auth/resend-verification', data),
 
   refreshToken: (): Promise<AxiosResponse<LoginResponse>> =>
-    api.post('/auth/refresh-token'),
+    api.post('/api/auth/refresh-token'),
 };
 
 // Courses API
@@ -323,4 +346,13 @@ export interface ContactFormResponse {
 export const contactApi = {
   submitContactForm: (data: ContactFormRequest): Promise<AxiosResponse<ContactFormResponse>> =>
     api.post('/contact', data),
+};
+
+// Categories API (for public use)
+export const categoriesApi = {
+  getCategories: (activeOnly: boolean = true): Promise<AxiosResponse<CourseCategoryData[]>> =>
+    api.get('/CourseCategories', { params: { activeOnly } }),
+    
+  getSubCategories: (activeOnly: boolean = true): Promise<AxiosResponse<CourseSubCategoryData[]>> =>
+    api.get('/CourseSubCategories', { params: { activeOnly } }),
 };

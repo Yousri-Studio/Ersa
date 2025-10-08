@@ -82,6 +82,13 @@ export default function CourseDetailsPage() {
     : course.summary;
 
   const addToCart = () => {
+    // Extract instructor name as string
+    const instructorName = course.instructorName 
+      ? (typeof course.instructorName === 'string' 
+          ? course.instructorName 
+          : course.instructorName[locale as 'ar' | 'en'] || course.instructorName.en || course.instructorName.ar)
+      : undefined;
+    
     addItem({
       id: `cart-${course.id}`,
       courseId: course.id,
@@ -89,7 +96,7 @@ export default function CourseDetailsPage() {
       price: course.price,
       currency: course.currency,
       imageUrl: course.imageUrl,
-      instructor: course.instructorName,
+      instructor: instructorName,
       qty: 1
     });
   };
@@ -146,6 +153,27 @@ export default function CourseDetailsPage() {
                   </div>
                 </div>
                 
+                {/* Category & Subcategories */}
+                {(course.category || (course.subCategories && course.subCategories.length > 0)) && (
+                  <div className="mt-6">
+                    <h4 className="font-semibold text-gray-900 mb-2 font-cairo">
+                      {locale === 'ar' ? 'التصنيفات' : 'Categories'}
+                    </h4>
+                    <div className="flex flex-wrap gap-2">
+                      {course.category && (
+                        <span className="px-3 py-1 bg-purple-100 text-purple-800 text-sm rounded-full font-cairo font-semibold">
+                          {locale === 'ar' ? course.category.titleAr : course.category.titleEn}
+                        </span>
+                      )}
+                      {course.subCategories && course.subCategories.map((subCat) => (
+                        <span key={subCat.id} className="px-3 py-1 bg-indigo-100 text-indigo-800 text-sm rounded-full font-cairo">
+                          {locale === 'ar' ? subCat.titleAr : subCat.titleEn}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 {/* Tags */}
                 {course.tags && (
                   <div className="mt-6">

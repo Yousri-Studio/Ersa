@@ -8,6 +8,7 @@ import { Course } from '@/lib/api';
 import { useCartStore } from '@/lib/cart-store';
 import { useAuthStore } from '@/lib/auth-store';
 import { useHydration } from '@/lib/use-hydration';
+import { getLocalizedText } from '@/lib/localized-text';
 import toast from 'react-hot-toast';
 
 interface CourseCardCompactProps {
@@ -23,8 +24,8 @@ export function CourseCardCompact({ course, onAddToWishlist, onAddToCart }: Cour
   const { hasItem, addItem } = useCartStore();
   const isHydrated = useHydration();
 
-  const title = locale === 'ar' ? course.title.ar : course.title.en;
-  const summary = locale === 'ar' ? course.summary.ar : course.summary.en;
+  const title = getLocalizedText(course.title, locale as 'ar' | 'en', 'Course Title');
+  const summary = getLocalizedText(course.summary, locale as 'ar' | 'en', 'Course Summary');
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -93,12 +94,12 @@ export function CourseCardCompact({ course, onAddToWishlist, onAddToCart }: Cour
         <div className="p-4">
           {/* Title */}
           <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-1 group-hover:text-brand transition-colors duration-200 font-cairo">
-            {isHydrated ? title : (course.title.en || course.title.ar)}
+            {title}
           </h3>
 
           {/* Description */}
           <p className="text-gray-600 text-sm mb-3 line-clamp-2 leading-relaxed">
-            {isHydrated ? summary : (course.summary.en || course.summary.ar)}
+            {summary}
           </p>
 
           {/* Meta Row */}

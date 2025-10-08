@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { useAuthStore } from '@/lib/auth-store';
@@ -25,8 +25,10 @@ export default function AdminLayout({
   const [isLoading, setIsLoading] = useState(true);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [courseSettingsOpen, setCourseSettingsOpen] = useState(false);
   const isHydrated = useHydration();
   const router = useRouter();
+  const pathname = usePathname();
   const locale = useLocale();
   const t = useTranslations('admin');
   const tCommon = useTranslations('common');
@@ -75,6 +77,13 @@ export default function AdminLayout({
     checkAdminAccess();
   }, [isHydrated, locale, router, initFromCookie]);
 
+  // Auto-expand Course Settings if on categories or subcategories page
+  useEffect(() => {
+    if (pathname?.includes('/course-categories') || pathname?.includes('/course-subcategories')) {
+      setCourseSettingsOpen(true);
+    }
+  }, [pathname]);
+
   const handleLogout = () => {
     logout();
     router.push(`/${locale}/admin-login`);
@@ -97,6 +106,11 @@ export default function AdminLayout({
     { id: 'users', label: t('sidebar.manageUsers'), icon: 'users', href: `/${locale}/admin/users` },
     { id: 'courses', label: t('sidebar.manageCourses'), icon: 'graduation-cap', href: `/${locale}/admin/courses` },
     { id: 'orders', label: t('sidebar.orders'), icon: 'shopping-cart', href: `/${locale}/admin/orders` },
+  ];
+
+  const courseSettingsItems = [
+    { id: 'categories', label: t('sidebar.courseCategories'), href: `/${locale}/admin/course-categories` },
+    { id: 'subcategories', label: t('sidebar.courseSubCategories'), href: `/${locale}/admin/course-subcategories` },
   ];
 
   // Super admin items can be added here if needed in the future
@@ -167,6 +181,46 @@ export default function AdminLayout({
                   <span className="truncate">{item.label}</span>
                 </Link>
               ))}
+
+              {/* Course Settings Collapsible Menu */}
+              <div className="space-y-1">
+                <button
+                  onClick={() => setCourseSettingsOpen(!courseSettingsOpen)}
+                  className="w-full group flex items-center justify-between px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm font-medium rounded-lg transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                  style={{fontWeight: 700}}
+                >
+                  <div className="flex items-center">
+                    <Icon
+                      name="cog"
+                      className={`${isRTL ? 'ml-2 sm:ml-3' : 'mr-2 sm:mr-3'} h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 text-gray-400 group-hover:text-gray-500`}
+                    />
+                    <span className="truncate">{t('sidebar.courseSettings')}</span>
+                  </div>
+                  <Icon
+                    name={courseSettingsOpen ? 'chevron-down' : (isRTL ? 'chevron-left' : 'chevron-right')}
+                    className="h-4 w-4 text-gray-400"
+                  />
+                </button>
+                
+                {courseSettingsOpen && (
+                  <div className={`${isRTL ? 'pr-6' : 'pl-6'} space-y-1`}>
+                    {courseSettingsItems.map((subItem) => (
+                      <Link
+                        key={subItem.id}
+                        href={subItem.href}
+                        onClick={() => setIsMenuOpen(false)}
+                        className={`block px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors ${
+                          pathname === subItem.href
+                            ? 'bg-opacity-10 bg-[#00AC96] text-[#00AC96]'
+                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                        }`}
+                      >
+                        {subItem.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
             </nav>
 
             {/* Language Switcher */}

@@ -190,6 +190,26 @@ export interface AdminUser {
   status?: string;
 }
 
+export interface CourseCategory {
+  id: string;
+  titleAr: string;
+  titleEn: string;
+  displayOrder: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CourseSubCategory {
+  id: string;
+  titleAr: string;
+  titleEn: string;
+  displayOrder: number;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface AdminCourse {
   id: string;
   slug?: string;
@@ -203,14 +223,19 @@ export interface AdminCourse {
   currency?: string;
   type?: number;
   level?: number;
-  category?: number;
+  categoryId?: string | null;
+  category?: CourseCategory | null;
+  subCategories?: CourseSubCategory[];
   videoUrl?: string;
   duration?: string;
-  instructorName?: string;
+  instructorNameAr?: string;
+  instructorNameEn?: string;
   photo?: number[] | string;
   tags?: string;
   instructorsBioAr?: string;
   instructorsBioEn?: string;
+  courseTopicsAr?: string;
+  courseTopicsEn?: string;
   isActive: boolean;
   isFeatured?: boolean;
   createdAt: string;
@@ -315,19 +340,41 @@ export interface AdminCreateCourseRequest {
   currency: string;
   type: number; // CourseType enum
   level?: number; // CourseLevel enum
-  category?: number; // CourseCategory enum
+  categoryId?: string | null;
+  subCategoryIds?: string[];
   videoUrl?: string;
   duration?: string;
-  instructorName: string;
+  instructorNameAr: string;
+  instructorNameEn: string;
   photo?: number[] | string | null;
   tags?: string;
   instructorsBioAr?: string;
   instructorsBioEn?: string;
+  courseTopicsAr?: string;
+  courseTopicsEn?: string;
   isActive: boolean;
   isFeatured?: boolean;
 }
 
 export type AdminUpdateCourseRequest = AdminCreateCourseRequest;
+
+export interface CreateCourseCategoryRequest {
+  titleAr: string;
+  titleEn: string;
+  displayOrder: number;
+  isActive: boolean;
+}
+
+export type UpdateCourseCategoryRequest = CreateCourseCategoryRequest;
+
+export interface CreateCourseSubCategoryRequest {
+  titleAr: string;
+  titleEn: string;
+  displayOrder: number;
+  isActive: boolean;
+}
+
+export type UpdateCourseSubCategoryRequest = CreateCourseSubCategoryRequest;
 
 // Fallback data for when backend is not available
 const fallbackDashboardStats: DashboardStats = {
@@ -468,8 +515,9 @@ const fallbackCourses: PagedResult<AdminCourse> = {
       currency: 'SAR',
       type: 1,
       level: 2,
-      category: 2,
-      instructorName: 'أحمد المصمم',
+      category: null,
+      instructorNameAr: 'أحمد المصمم',
+      instructorNameEn: 'Ahmed Al-Musamim',
       isActive: true,
       isFeatured: true,
       createdAt: '2025-01-10T10:00:00Z',
@@ -486,8 +534,9 @@ const fallbackCourses: PagedResult<AdminCourse> = {
       currency: 'SAR',
       type: 0,
       level: 1,
-      category: 0,
-      instructorName: 'محمد المطور',
+      category: null,
+      instructorNameAr: 'محمد المطور',
+      instructorNameEn: 'Mohammed Al-Mutawir',
       isActive: true,
       isFeatured: false,
       createdAt: '2025-01-08T09:00:00Z',
@@ -540,7 +589,7 @@ export const adminApi = {
   // Dashboard - with fallback support
   getDashboardStats: async () => {
     const result = await apiCallWithFallback(
-      () => api.get<DashboardStats>('/admin/dashboard-stats'),
+      () => api.get<DashboardStats>('/api/admin/dashboard-stats'),
       fallbackDashboardStats,
       { fallbackMessage: 'Backend not available, using demo dashboard data' }
     );
@@ -555,7 +604,7 @@ export const adminApi = {
     status?: string;
   }) => {
     const result = await apiCallWithFallback(
-      () => api.get<PagedResult<AdminUser>>('/admin/users', { params: { ...params } }),
+      () => api.get<PagedResult<AdminUser>>('/api/admin/users', { params: { ...params } }),
       fallbackUsers,
       { fallbackMessage: 'Backend not available, using demo user data' }
     );
@@ -563,13 +612,13 @@ export const adminApi = {
   },
 
   updateUserStatus: (userId: string, data: UpdateUserStatusRequest) =>
-    api.put(`/admin/users/${userId}/status`, data),
+    api.put(`/api/admin/users/${userId}/status`, data),
 
   updateAdminRole: (userId: string, data: UpdateAdminRoleRequest) =>
-    api.put(`/admin/users/${userId}/admin-role`, data),
+    api.put(`/api/admin/users/${userId}/admin-role`, data),
 
   createUser: (data: CreateUserRequest) =>
-    api.post<AdminUser>('/admin/users', data),
+    api.post<AdminUser>('/api/admin/users', data),
 
   // Courses - with fallback support
   getCourses: async (params: {
@@ -579,7 +628,7 @@ export const adminApi = {
     isActive?: boolean;
   }) => {
     const result = await apiCallWithFallback(
-      () => api.get<PagedResult<AdminCourse>>('/admin/courses', { params: { ...params } }),
+      () => api.get<PagedResult<AdminCourse>>('/api/admin/courses', { params: { ...params } }),
       fallbackCourses,
       { fallbackMessage: 'Backend not available, using demo course data' }
     );
@@ -594,7 +643,7 @@ export const adminApi = {
         ? btoa(new Uint8Array(data.photo).reduce((acc, byte) => acc + String.fromCharCode(byte), ''))
         : null
     };
-    return api.post<AdminCourse>('/admin/courses', requestData);
+    return api.post<AdminCourse>('/api/admin/courses', requestData);
   },
 
   updateCourse: (courseId: string, data: AdminUpdateCourseRequest) => {
@@ -605,11 +654,49 @@ export const adminApi = {
         ? btoa(new Uint8Array(data.photo).reduce((acc, byte) => acc + String.fromCharCode(byte), ''))
         : null
     };
-    return api.put<AdminCourse>(`/admin/courses/${courseId}`, requestData);
+    return api.put<AdminCourse>(`/api/admin/courses/${courseId}`, requestData);
   },
 
   deleteCourse: (courseId: string) =>
-    api.delete(`/admin/courses/${courseId}`),
+    api.delete(`/api/admin/courses/${courseId}`),
+
+  // Course Categories
+  getCourseCategories: async (params?: {
+    activeOnly?: boolean;
+  }) => {
+    return api.get<CourseCategory[]>('/api/admin/course-categories', { params: { ...params } });
+  },
+
+  getCourseCategory: (categoryId: string) =>
+    api.get<CourseCategory>(`/api/admin/course-categories/${categoryId}`),
+
+  createCourseCategory: (data: CreateCourseCategoryRequest) =>
+    api.post<CourseCategory>('/api/admin/course-categories', data),
+
+  updateCourseCategory: (categoryId: string, data: UpdateCourseCategoryRequest) =>
+    api.put<CourseCategory>(`/api/admin/course-categories/${categoryId}`, data),
+
+  deleteCourseCategory: (categoryId: string) =>
+    api.delete(`/api/admin/course-categories/${categoryId}`),
+
+  // Course SubCategories
+  getCourseSubCategories: async (params?: {
+    activeOnly?: boolean;
+  }) => {
+    return api.get<CourseSubCategory[]>('/api/admin/course-subcategories', { params: { ...params } });
+  },
+
+  getCourseSubCategory: (subCategoryId: string) =>
+    api.get<CourseSubCategory>(`/api/admin/course-subcategories/${subCategoryId}`),
+
+  createCourseSubCategory: (data: CreateCourseSubCategoryRequest) =>
+    api.post<CourseSubCategory>('/api/admin/course-subcategories', data),
+
+  updateCourseSubCategory: (subCategoryId: string, data: UpdateCourseSubCategoryRequest) =>
+    api.put<CourseSubCategory>(`/api/admin/course-subcategories/${subCategoryId}`, data),
+
+  deleteCourseSubCategory: (subCategoryId: string) =>
+    api.delete(`/api/admin/course-subcategories/${subCategoryId}`),
 
   // Orders - with fallback support
   getOrders: async (params: {
@@ -628,7 +715,7 @@ export const adminApi = {
   },
 
   updateOrderStatus: (orderId: string, data: UpdateOrderStatusRequest) =>
-    api.put(`/admin/orders/${orderId}/status`, data),
+    api.put(`/api/admin/orders/${orderId}/status`, data),
 
   getOrderDetail: async (orderId: string) => {
     const fallbackOrderDetail: AdminOrderDetail = {
@@ -682,42 +769,42 @@ export const adminApi = {
   },
     
   // Content Management
-  getContentPages: () => api.get<ContentPage[]>('/content/pages'),
+  getContentPages: () => api.get<ContentPage[]>('/api/content/pages'),
 
   getContentPage: (id: string) =>
-    api.get<ContentPage>(`/content/pages/${id}`),
+    api.get<ContentPage>(`/api/content/pages/${id}`),
 
   createContentPage: (data: CreateContentPage) =>
-    api.post<ContentPage>('/content/pages', data),
+    api.post<ContentPage>('/api/content/pages', data),
 
   updateContentPage: (id: string, data: UpdateContentPage) =>
-    api.put<ContentPage>(`/content/pages/${id}`, data),
+    api.put<ContentPage>(`/api/content/pages/${id}`, data),
 
   deleteContentPage: (id: string) =>
-    api.delete(`/content/pages/${id}`),
+    api.delete(`/api/content/pages/${id}`),
 
   createContentSection: (pageId: string, data: CreateContentSection) =>
-    api.post<ContentSection>(`/content/pages/${pageId}/sections`, data),
+    api.post<ContentSection>(`/api/content/pages/${pageId}/sections`, data),
 
   updateContentSection: (pageId: string, sectionId: string, data: UpdateContentSection) =>
-    api.put<ContentSection>(`/content/pages/${pageId}/sections/${sectionId}`, data),
+    api.put<ContentSection>(`/api/content/pages/${pageId}/sections/${sectionId}`, data),
 
   deleteContentSection: (pageId: string, sectionId: string) =>
-    api.delete(`/content/pages/${pageId}/sections/${sectionId}`),
+    api.delete(`/api/content/pages/${pageId}/sections/${sectionId}`),
 
   createContentBlock: (pageId: string, sectionId: string, data: CreateContentBlock) =>
-    api.post<ContentBlock>(`/content/pages/${pageId}/sections/${sectionId}/blocks`, data),
+    api.post<ContentBlock>(`/api/content/pages/${pageId}/sections/${sectionId}/blocks`, data),
 
   updateContentBlock: (pageId: string, sectionId: string, blockId: string, data: UpdateContentBlock) =>
-    api.put<ContentBlock>(`/content/pages/${pageId}/sections/${sectionId}/blocks/${blockId}`, data),
+    api.put<ContentBlock>(`/api/content/pages/${pageId}/sections/${sectionId}/blocks/${blockId}`, data),
 
   deleteContentBlock: (pageId: string, sectionId: string, blockId: string) =>
-    api.delete(`/content/pages/${pageId}/sections/${sectionId}/blocks/${blockId}`),
+    api.delete(`/api/content/pages/${pageId}/sections/${sectionId}/blocks/${blockId}`),
 
   uploadFile: (file: File) => {
     const formData = new FormData();
     formData.append('file', file);
-    return api.post<FileUploadResponse>('/content/upload', formData, {
+    return api.post<FileUploadResponse>('/api/content/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -725,16 +812,16 @@ export const adminApi = {
   },
 
   getPageContent: (pageKey: string) =>
-    api.get<PageContent>(`/content/pages/key/${pageKey}`),
+    api.get<PageContent>(`/api/content/pages/key/${pageKey}`),
 
   getContentVersions: (pageId: string) =>
-    api.get<ContentVersion[]>(`/content/pages/${pageId}/versions`),
+    api.get<ContentVersion[]>(`/api/content/pages/${pageId}/versions`),
 
   createContentVersion: (pageId: string, data: CreateContentVersion) =>
-    api.post<ContentVersion>(`/content/pages/${pageId}/versions`, data),
+    api.post<ContentVersion>(`/api/content/pages/${pageId}/versions`, data),
 
   publishContentVersion: (pageId: string, versionId: string) =>
-    api.post(`/content/pages/${pageId}/versions/${versionId}/publish`),
+    api.post(`/api/content/pages/${pageId}/versions/${versionId}/publish`),
 };
 
 

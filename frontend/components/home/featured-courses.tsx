@@ -54,7 +54,7 @@ export function FeaturedCourses() {
       id: `${courseId}-${crypto.randomUUID()}`,
       courseId: courseId,
       sessionId: undefined,
-      title: course.title,
+      title: course.title, // This is already the correct format {ar, en}
       price: course.price,
       currency: course.currency,
       qty: 1,

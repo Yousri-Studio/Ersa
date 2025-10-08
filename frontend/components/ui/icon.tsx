@@ -10,7 +10,8 @@ import {
   faTimesCircle, faChartLine, faTable, faFileText, faCog, faDatabase, faUpload, faFolder, faFile,
   faHome, faDesktop, faTshirt, faDollarSign, faUserShield, faLayerGroup, faCube, faExternalLinkAlt,
   faSave, faQuestionCircle, faCogs, faBriefcase, faRobot, faFileAlt, faPen, faMessage, faGlobe,
-  faMagnifyingGlass, faCloudArrowUp, faPrint, faBuilding, faFileContract, faNewspaper, faCopy
+  faMagnifyingGlass, faCloudArrowUp, faPrint, faBuilding, faFileContract, faNewspaper, faCopy,
+  faInfinity, faSignal, faDesktop as faMonitor, faCircleCheck, faCircleExclamation
 } from '@fortawesome/free-solid-svg-icons';
 import { 
   faHeart as faHeartRegular, faStar as faStarRegular, faBookmark as faBookmarkRegular,
@@ -151,6 +152,18 @@ const iconMap: Record<string, any> = {
   'file-contract': faFileContract,
   'newspaper': faNewspaper,
   'copy': faCopy,
+  
+  // Additional missing icons
+  'infinity': faInfinity,
+  'signal': faSignal,
+  'monitor': faMonitor,
+  'circle-check': faCircleCheck,
+  'alert-circle': faCircleExclamation,
+  
+  // Aliases for common icon names
+  'faStar': faStar,
+  'faUsers': faUsers,
+  'faGraduationCap': faGraduationCap,
 };
 
 export function Icon({ name, icon, className = '', variant = 'solid', style, color, width }: IconProps) {

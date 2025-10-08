@@ -7,6 +7,7 @@ import { Course } from '@/lib/api';
 import { useCartStore } from '@/lib/cart-store';
 import { useAuthStore } from '@/lib/auth-store';
 import { useHydration } from '@/lib/use-hydration';
+import { getLocalizedText } from '@/lib/localized-text';
 import toast from 'react-hot-toast';
 
 interface CourseCardProps {
@@ -20,8 +21,8 @@ export function CourseCard({ course }: CourseCardProps) {
   const { hasItem, addItem } = useCartStore();
   const isHydrated = useHydration();
 
-  const title = locale === 'ar' ? course.title.ar : course.title.en;
-  const summary = locale === 'ar' ? course.summary.ar : course.summary.en;
+  const title = getLocalizedText(course.title, locale as 'ar' | 'en', 'Course Title');
+  const summary = getLocalizedText(course.summary, locale as 'ar' | 'en', 'Course Summary');
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -94,12 +95,12 @@ export function CourseCard({ course }: CourseCardProps) {
 
               {/* Course Title */}
               <h3 className="text-xl font-bold text-white mb-3 leading-tight">
-                {isHydrated ? title : (course.title.en || course.title.ar)}
+                {title}
               </h3>
 
               {/* Course Summary */}
               <p className="text-blue-100 text-sm mb-6 line-clamp-2 leading-relaxed">
-                {isHydrated ? summary : (course.summary.en || course.summary.ar)}
+                {summary}
               </p>
 
               {/* Course Meta */}

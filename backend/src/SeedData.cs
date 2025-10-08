@@ -25,6 +25,12 @@ public static class SeedData
             // Seed Super Admin User
             await SeedSuperAdminAsync(userManager, logger);
 
+            // Seed Course Categories
+            await SeedCourseCategoriesAsync(context, logger);
+
+            // Seed Course Sub-Categories
+            await SeedCourseSubCategoriesAsync(context, logger);
+
             // Seed Test Courses
             await SeedCoursesAsync(context, logger);
 
@@ -164,6 +170,150 @@ public static class SeedData
         }
     }
 
+    private static async Task SeedCourseCategoriesAsync(ErsaTrainingDbContext context, ILogger logger)
+    {
+        if (await context.CourseCategories.AnyAsync())
+        {
+            logger.LogInformation("Course categories already exist, skipping seed");
+            return;
+        }
+
+        var categories = new List<CourseCategory>
+        {
+            new CourseCategory
+            {
+                Id = new Guid("11111111-1111-1111-1111-111111111111"),
+                TitleAr = "الشهادات المهنية",
+                TitleEn = "Professional Certificates",
+                DisplayOrder = 1,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new CourseCategory
+            {
+                Id = new Guid("22222222-2222-2222-2222-222222222222"),
+                TitleAr = "البرامج المخصصة",
+                TitleEn = "Custom Programs",
+                DisplayOrder = 2,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new CourseCategory
+            {
+                Id = new Guid("33333333-3333-3333-3333-333333333333"),
+                TitleAr = "الدورات العامة",
+                TitleEn = "General Courses",
+                DisplayOrder = 3,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            }
+        };
+
+        context.CourseCategories.AddRange(categories);
+        await context.SaveChangesAsync();
+        logger.LogInformation("Added {Count} course categories", categories.Count);
+    }
+
+    private static async Task SeedCourseSubCategoriesAsync(ErsaTrainingDbContext context, ILogger logger)
+    {
+        if (await context.CourseSubCategories.AnyAsync())
+        {
+            logger.LogInformation("Course sub-categories already exist, skipping seed");
+            return;
+        }
+
+        var subCategories = new List<CourseSubCategory>
+        {
+            new CourseSubCategory
+            {
+                Id = new Guid("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+                TitleAr = "التأمين",
+                TitleEn = "Insurance",
+                DisplayOrder = 1,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new CourseSubCategory
+            {
+                Id = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+                TitleAr = "إدارة المشاريع",
+                TitleEn = "Project Management",
+                DisplayOrder = 2,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new CourseSubCategory
+            {
+                Id = new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc"),
+                TitleAr = "المهارات الناعمة",
+                TitleEn = "Soft Skills",
+                DisplayOrder = 3,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new CourseSubCategory
+            {
+                Id = new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd"),
+                TitleAr = "الموارد البشرية",
+                TitleEn = "Human Resources",
+                DisplayOrder = 4,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new CourseSubCategory
+            {
+                Id = new Guid("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee"),
+                TitleAr = "البرمجة وتطوير البرمجيات",
+                TitleEn = "Programming & Software Development",
+                DisplayOrder = 5,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new CourseSubCategory
+            {
+                Id = new Guid("ffffffff-ffff-ffff-ffff-ffffffffffff"),
+                TitleAr = "التسويق الرقمي",
+                TitleEn = "Digital Marketing",
+                DisplayOrder = 6,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new CourseSubCategory
+            {
+                Id = new Guid("10101010-1010-1010-1010-101010101010"),
+                TitleAr = "علم البيانات والذكاء الاصطناعي",
+                TitleEn = "Data Science & AI",
+                DisplayOrder = 7,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            new CourseSubCategory
+            {
+                Id = new Guid("20202020-2020-2020-2020-202020202020"),
+                TitleAr = "التصميم",
+                TitleEn = "Design",
+                DisplayOrder = 8,
+                IsActive = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            }
+        };
+
+        context.CourseSubCategories.AddRange(subCategories);
+        await context.SaveChangesAsync();
+        logger.LogInformation("Added {Count} course sub-categories", subCategories.Count);
+    }
+
     private static async Task SeedCoursesAsync(ErsaTrainingDbContext context, ILogger logger)
     {
         if (await context.Courses.AnyAsync())
@@ -172,11 +322,37 @@ public static class SeedData
             return;
         }
 
+        // Get seeded categories and sub-categories
+        var professionalCertCategory = new Guid("11111111-1111-1111-1111-111111111111");
+        var customProgramsCategory = new Guid("22222222-2222-2222-2222-222222222222");
+        var generalCoursesCategory = new Guid("33333333-3333-3333-3333-333333333333");
+
+        var projectMgmtSubCat = new Guid("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb");
+        var softSkillsSubCat = new Guid("cccccccc-cccc-cccc-cccc-cccccccccccc");
+        var programmingSubCat = new Guid("eeeeeeee-eeee-eeee-eeee-eeeeeeeeeeee");
+        var digitalMarketingSubCat = new Guid("ffffffff-ffff-ffff-ffff-ffffffffffff");
+        var dataScienceSubCat = new Guid("10101010-1010-1010-1010-101010101010");
+        var designSubCat = new Guid("20202020-2020-2020-2020-202020202020");
+        var hrSubCat = new Guid("dddddddd-dddd-dddd-dddd-dddddddddddd");
+
+        var course1Id = Guid.NewGuid();
+        var course2Id = Guid.NewGuid();
+        var course3Id = Guid.NewGuid();
+        var course4Id = Guid.NewGuid();
+        var course5Id = Guid.NewGuid();
+        var course6Id = Guid.NewGuid();
+        var course7Id = Guid.NewGuid();
+        var course8Id = Guid.NewGuid();
+        var course9Id = Guid.NewGuid();
+        var course10Id = Guid.NewGuid();
+        var course11Id = Guid.NewGuid();
+        var course12Id = Guid.NewGuid();
+
         var courses = new List<Course>
         {
             new Course
             {
-                Id = Guid.NewGuid(),
+                Id = course1Id,
                 Slug = "advanced-project-management",
                 TitleEn = "Advanced Project Management",
                 TitleAr = "إدارة المشاريع المتقدمة",
@@ -184,11 +360,20 @@ public static class SeedData
                 SummaryAr = "أتقن فن إدارة المشاريع بتقنيات ومنهجيات متقدمة.",
                 DescriptionEn = "Master the art of project management with advanced techniques and methodologies. Learn to lead complex projects from initiation to closure.",
                 DescriptionAr = "أتقن فن إدارة المشاريع بتقنيات ومنهجيات متقدمة. تعلم قيادة المشاريع المعقدة من البداية إلى النهاية.",
+                CourseTopicsEn = "Project Planning, Risk Management, Stakeholder Communication, Agile Methodologies, Budget Control",
+                CourseTopicsAr = "تخطيط المشاريع، إدارة المخاطر، التواصل مع أصحاب المصلحة، منهجيات أجايل، التحكم في الميزانية",
                 Price = 299.99m,
+                Currency = "SAR",
                 Type = CourseType.Live,
                 Level = CourseLevel.Biginner,
-                Category = CourseCategory.Business,
-                InstructorName = "محمد أحمد",
+                CategoryId = professionalCertCategory,
+                InstructorNameAr = "محمد أحمد",
+                InstructorNameEn = "Mohammed Ahmed",
+                InstructorsBioAr = "خبير في إدارة المشاريع مع أكثر من 15 عامًا من الخبرة",
+                InstructorsBioEn = "Project management expert with over 15 years of experience",
+                Duration = "40 hours",
+                VideoUrl = "https://example.com/video1.mp4",
+                Tags = "project-management,pmp,agile,leadership",
                 IsFeatured = true,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
@@ -196,7 +381,7 @@ public static class SeedData
             },
             new Course
             {
-                Id = Guid.NewGuid(),
+                Id = course2Id,
                 Slug = "digital-marketing-fundamentals",
                 TitleEn = "Digital Marketing Fundamentals",
                 TitleAr = "أساسيات التسويق الرقمي",
@@ -204,11 +389,19 @@ public static class SeedData
                 SummaryAr = "تعلم أساسيات التسويق الرقمي بما في ذلك تحسين محركات البحث والتسويق عبر وسائل التواصل الاجتماعي.",
                 DescriptionEn = "Learn the fundamentals of digital marketing including SEO, social media marketing, content marketing, and analytics.",
                 DescriptionAr = "تعلم أساسيات التسويق الرقمي بما في ذلك تحسين محركات البحث والتسويق عبر وسائل التواصل الاجتماعي وتسويق المحتوى والتحليلات.",
+                CourseTopicsEn = "SEO Basics, Social Media Strategy, Content Marketing, Email Campaigns, Analytics & Reporting",
+                CourseTopicsAr = "أساسيات تحسين محركات البحث، استراتيجية وسائل التواصل الاجتماعي، تسويق المحتوى، حملات البريد الإلكتروني، التحليلات والتقارير",
                 Price = 199.99m,
+                Currency = "SAR",
                 Type = CourseType.PDF,
                 Level = CourseLevel.Biginner,
-                Category = CourseCategory.Business,
-                InstructorName = "سارة محمود",
+                CategoryId = generalCoursesCategory,
+                InstructorNameAr = "سارة محمود",
+                InstructorNameEn = "Sarah Mahmoud",
+                InstructorsBioAr = "خبيرة تسويق رقمي معتمدة مع 10 سنوات خبرة",
+                InstructorsBioEn = "Certified digital marketing expert with 10 years experience",
+                Duration = "30 hours",
+                Tags = "digital-marketing,seo,social-media,content-marketing",
                 IsFeatured = true,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
@@ -216,7 +409,7 @@ public static class SeedData
             },
             new Course
             {
-                Id = Guid.NewGuid(),
+                Id = course3Id,
                 Slug = "data-science-with-python",
                 TitleEn = "Data Science with Python",
                 TitleAr = "علم البيانات باستخدام بايثون",
@@ -224,11 +417,20 @@ public static class SeedData
                 SummaryAr = "دورة شاملة تغطي تحليل البيانات والتعلم الآلي والتصور باستخدام بايثون.",
                 DescriptionEn = "Comprehensive course covering data analysis, machine learning, and visualization using Python and popular libraries.",
                 DescriptionAr = "دورة شاملة تغطي تحليل البيانات والتعلم الآلي والتصور باستخدام بايثون والمكتبات الشائعة.",
+                CourseTopicsEn = "Python Fundamentals, Pandas & NumPy, Machine Learning Algorithms, Data Visualization, Deep Learning Basics",
+                CourseTopicsAr = "أساسيات بايثون، باندز ونامباي، خوارزميات التعلم الآلي، تصور البيانات، أساسيات التعلم العميق",
                 Price = 399.99m,
+                Currency = "SAR",
                 Type = CourseType.Live,
                 Level = CourseLevel.Advanced,
-                Category = CourseCategory.Programming,
-                InstructorName = "أحمد عبدالله",
+                CategoryId = professionalCertCategory,
+                InstructorNameAr = "أحمد عبدالله",
+                InstructorNameEn = "Ahmed Abdullah",
+                InstructorsBioAr = "عالم بيانات معتمد ومدرب في الذكاء الاصطناعي",
+                InstructorsBioEn = "Certified data scientist and AI trainer",
+                Duration = "60 hours",
+                VideoUrl = "https://example.com/video3.mp4",
+                Tags = "data-science,python,machine-learning,ai",
                 IsFeatured = false,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
@@ -236,7 +438,7 @@ public static class SeedData
             },
             new Course
             {
-                Id = Guid.NewGuid(),
+                Id = course4Id,
                 Slug = "leadership-and-team-management",
                 TitleEn = "Leadership and Team Management",
                 TitleAr = "القيادة وإدارة الفريق",
@@ -244,11 +446,19 @@ public static class SeedData
                 SummaryAr = "طور مهارات القيادة الأساسية وتعلم استراتيجيات إدارة الفريق الفعالة.",
                 DescriptionEn = "Develop essential leadership skills and learn effective team management strategies for modern workplaces.",
                 DescriptionAr = "طور مهارات القيادة الأساسية وتعلم استراتيجيات إدارة الفريق الفعالة لأماكن العمل الحديثة.",
+                CourseTopicsEn = "Leadership Styles, Team Building, Conflict Resolution, Motivation Techniques, Performance Management",
+                CourseTopicsAr = "أنماط القيادة، بناء الفريق، حل النزاعات، تقنيات التحفيز، إدارة الأداء",
                 Price = 249.99m,
+                Currency = "SAR",
                 Type = CourseType.Live,
                 Level = CourseLevel.Advanced,
-                Category = CourseCategory.Business,
-                InstructorName = "فاطمة العلي",
+                CategoryId = customProgramsCategory,
+                InstructorNameAr = "فاطمة العلي",
+                InstructorNameEn = "Fatima Al-Ali",
+                InstructorsBioAr = "مستشارة قيادة تنظيمية ومدربة معتمدة",
+                InstructorsBioEn = "Organizational leadership consultant and certified trainer",
+                Duration = "35 hours",
+                Tags = "leadership,management,team-building,soft-skills",
                 IsFeatured = false,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
@@ -256,7 +466,7 @@ public static class SeedData
             },
             new Course
             {
-                Id = Guid.NewGuid(),
+                Id = course5Id,
                 Slug = "financial-planning-and-analysis",
                 TitleEn = "Financial Planning and Analysis",
                 TitleAr = "التخطيط والتحليل المالي",
@@ -264,11 +474,19 @@ public static class SeedData
                 SummaryAr = "أتقن التخطيط المالي وتقنيات الميزانية والتنبؤ والتحليل لنجاح الأعمال.",
                 DescriptionEn = "Master financial planning, budgeting, forecasting, and analysis techniques for business success.",
                 DescriptionAr = "أتقن التخطيط المالي وتقنيات الميزانية والتنبؤ والتحليل لنجاح الأعمال.",
+                CourseTopicsEn = "Financial Statements Analysis, Budgeting Techniques, Forecasting Models, KPI Development, Investment Analysis",
+                CourseTopicsAr = "تحليل القوائم المالية، تقنيات الميزانية، نماذج التنبؤ، تطوير مؤشرات الأداء، تحليل الاستثمار",
                 Price = 329.99m,
+                Currency = "SAR",
                 Type = CourseType.PDF,
                 Level = CourseLevel.Biginner,
-                Category = CourseCategory.Business,
-                InstructorName = "خالد السعد",
+                CategoryId = generalCoursesCategory,
+                InstructorNameAr = "خالد السعد",
+                InstructorNameEn = "Khalid Al-Saad",
+                InstructorsBioAr = "محلل مالي معتمد مع خبرة 12 عامًا",
+                InstructorsBioEn = "Certified financial analyst with 12 years experience",
+                Duration = "25 hours",
+                Tags = "finance,planning,budgeting,analysis",
                 IsFeatured = false,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
@@ -276,7 +494,7 @@ public static class SeedData
             },
             new Course
             {
-                Id = Guid.NewGuid(),
+                Id = course6Id,
                 Slug = "web-development-bootcamp",
                 TitleEn = "Web Development Bootcamp",
                 TitleAr = "معسكر تطوير الويب",
@@ -284,11 +502,20 @@ public static class SeedData
                 SummaryAr = "دورة تطوير الويب الشاملة تغطي HTML و CSS و JavaScript و React و Node.js.",
                 DescriptionEn = "Full-stack web development course covering HTML, CSS, JavaScript, React, Node.js, and database management.",
                 DescriptionAr = "دورة تطوير الويب الشاملة تغطي HTML و CSS و JavaScript و React و Node.js وإدارة قواعد البيانات.",
+                CourseTopicsEn = "HTML5 & CSS3, JavaScript ES6+, React & Redux, Node.js & Express, MongoDB & SQL",
+                CourseTopicsAr = "HTML5 و CSS3، جافا سكريبت ES6+، رياكت وريداكس، نود جي إس وإكسبريس، مونجو دي بي وSQL",
                 Price = 499.99m,
+                Currency = "SAR",
                 Type = CourseType.Live,
                 Level = CourseLevel.Advanced,
-                Category = CourseCategory.Programming,
-                InstructorName = "عمر حسن",
+                CategoryId = professionalCertCategory,
+                InstructorNameAr = "عمر حسن",
+                InstructorNameEn = "Omar Hassan",
+                InstructorsBioAr = "مطور ويب متخصص وأستاذ جامعي",
+                InstructorsBioEn = "Full-stack web developer and university lecturer",
+                Duration = "80 hours",
+                VideoUrl = "https://example.com/video6.mp4",
+                Tags = "web-development,react,nodejs,javascript,fullstack",
                 IsFeatured = true,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
@@ -296,7 +523,7 @@ public static class SeedData
             },
             new Course
             {
-                Id = Guid.NewGuid(),
+                Id = course7Id,
                 Slug = "cloud-computing-with-aws",
                 TitleEn = "Cloud Computing with AWS",
                 TitleAr = "الحوسبة السحابية مع أمازون ويب سيرفيسز",
@@ -304,11 +531,20 @@ public static class SeedData
                 SummaryAr = "تعلم مفاهيم الحوسبة السحابية وخدمات AWS العملية بما في ذلك EC2 و S3 و Lambda.",
                 DescriptionEn = "Learn cloud computing concepts and hands-on AWS services including EC2, S3, Lambda, and more.",
                 DescriptionAr = "تعلم مفاهيم الحوسبة السحابية وخدمات AWS العملية بما في ذلك EC2 و S3 و Lambda والمزيد.",
+                CourseTopicsEn = "AWS EC2 & S3, Lambda Functions, VPC & Networking, IAM Security, CloudFormation",
+                CourseTopicsAr = "AWS EC2 و S3، دوال لامبدا، VPC والشبكات، أمان IAM، CloudFormation",
                 Price = 379.99m,
+                Currency = "SAR",
                 Type = CourseType.Live,
                 Level = CourseLevel.Intermediate,
-                Category = CourseCategory.Programming,
-                InstructorName = "ياسر قاسم",
+                CategoryId = professionalCertCategory,
+                InstructorNameAr = "ياسر قاسم",
+                InstructorNameEn = "Yasser Qasim",
+                InstructorsBioAr = "مهندس سحابة معتمد من AWS",
+                InstructorsBioEn = "AWS Certified Cloud Engineer",
+                Duration = "45 hours",
+                VideoUrl = "https://example.com/video7.mp4",
+                Tags = "aws,cloud-computing,devops,infrastructure",
                 IsFeatured = false,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
@@ -316,7 +552,7 @@ public static class SeedData
             },
             new Course
             {
-                Id = Guid.NewGuid(),
+                Id = course8Id,
                 Slug = "ux-ui-design-principles",
                 TitleEn = "UX/UI Design Principles",
                 TitleAr = "مبادئ تصميم تجربة وواجهة المستخدم",
@@ -324,11 +560,19 @@ public static class SeedData
                 SummaryAr = "أتقن مبادئ تصميم تجربة المستخدم وواجهة المستخدم والأدوات للمنتجات الرقمية.",
                 DescriptionEn = "Master user experience and user interface design principles, tools, and best practices for digital products.",
                 DescriptionAr = "أتقن مبادئ تصميم تجربة المستخدم وواجهة المستخدم والأدوات وأفضل الممارسات للمنتجات الرقمية.",
+                CourseTopicsEn = "User Research, Wireframing & Prototyping, Figma & Adobe XD, Design Systems, Usability Testing",
+                CourseTopicsAr = "بحث المستخدم، الإطارات الشبكية والنماذج الأولية، فيجما وأدوبي XD، أنظمة التصميم، اختبار قابلية الاستخدام",
                 Price = 279.99m,
+                Currency = "SAR",
                 Type = CourseType.PDF,
                 Level = CourseLevel.Biginner,
-                Category = CourseCategory.Design,
-                InstructorName = "مريم الزهراني",
+                CategoryId = generalCoursesCategory,
+                InstructorNameAr = "مريم الزهراني",
+                InstructorNameEn = "Maryam Al-Zahrani",
+                InstructorsBioAr = "مصممة UX/UI حائزة على جوائز",
+                InstructorsBioEn = "Award-winning UX/UI designer",
+                Duration = "30 hours",
+                Tags = "ux,ui,design,figma,user-experience",
                 IsFeatured = true,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
@@ -336,7 +580,7 @@ public static class SeedData
             },
             new Course
             {
-                Id = Guid.NewGuid(),
+                Id = course9Id,
                 Slug = "cybersecurity-fundamentals2",
                 TitleEn = "Cybersecurity Fundamentals",
                 TitleAr = "أساسيات الأمن السيبراني",
@@ -344,11 +588,20 @@ public static class SeedData
                 SummaryAr = "مقدمة شاملة لمفاهيم الأمن السيبراني والتهديدات واستراتيجيات الحماية.",
                 DescriptionEn = "Comprehensive introduction to cybersecurity concepts, threats, and protection strategies for organizations.",
                 DescriptionAr = "مقدمة شاملة لمفاهيم الأمن السيبراني والتهديدات واستراتيجيات الحماية للمؤسسات.",
+                CourseTopicsEn = "Network Security, Cryptography Basics, Penetration Testing, Security Policies, Incident Response",
+                CourseTopicsAr = "أمن الشبكات، أساسيات التشفير، اختبار الاختراق، سياسات الأمان، الاستجابة للحوادث",
                 Price = 349.99m,
+                Currency = "SAR",
                 Type = CourseType.Live,
                 Level = CourseLevel.Intermediate,
-                Category = CourseCategory.Programming,
-                InstructorName = "أحمد الشمري",
+                CategoryId = professionalCertCategory,
+                InstructorNameAr = "أحمد الشمري",
+                InstructorNameEn = "Ahmed Al-Shammari",
+                InstructorsBioAr = "خبير أمن سيبراني معتمد CISSP",
+                InstructorsBioEn = "CISSP Certified Cybersecurity Expert",
+                Duration = "50 hours",
+                VideoUrl = "https://example.com/video9.mp4",
+                Tags = "cybersecurity,security,penetration-testing,network-security",
                 IsFeatured = false,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
@@ -356,7 +609,7 @@ public static class SeedData
             },
             new Course
             {
-                Id = Guid.NewGuid(),
+                Id = course10Id,
                 Slug = "business-intelligence-and-analytics2",
                 TitleEn = "Business Intelligence and Analytics",
                 TitleAr = "ذكاء الأعمال والتحليلات",
@@ -364,11 +617,19 @@ public static class SeedData
                 SummaryAr = "تعلم تحويل البيانات إلى رؤى عملية للأعمال باستخدام أدوات ذكاء الأعمال الحديثة.",
                 DescriptionEn = "Learn to transform data into actionable business insights using modern BI tools and analytical techniques.",
                 DescriptionAr = "تعلم تحويل البيانات إلى رؤى عملية للأعمال باستخدام أدوات ذكاء الأعمال الحديثة والتقنيات التحليلية.",
+                CourseTopicsEn = "Power BI & Tableau, Data Warehousing, ETL Processes, Dashboard Design, Predictive Analytics",
+                CourseTopicsAr = "باور بي آي وتابلو، مستودعات البيانات، عمليات ETL، تصميم لوحات المعلومات، التحليلات التنبؤية",
                 Price = 389.99m,
+                Currency = "SAR",
                 Type = CourseType.PDF,
                 Level = CourseLevel.Biginner,
-                Category = CourseCategory.Business,
-                InstructorName = "نورا الخالد",
+                CategoryId = customProgramsCategory,
+                InstructorNameAr = "نورا الخالد",
+                InstructorNameEn = "Nora Al-Khalid",
+                InstructorsBioAr = "محللة ذكاء أعمال معتمدة",
+                InstructorsBioEn = "Certified Business Intelligence Analyst",
+                Duration = "40 hours",
+                Tags = "business-intelligence,powerbi,tableau,analytics,data",
                 IsFeatured = false,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
@@ -376,7 +637,7 @@ public static class SeedData
             },
             new Course
             {
-                Id = Guid.NewGuid(),
+                Id = course11Id,
                 Slug = "Agileand-scrum-Methodology",
                 TitleEn = "Agile and Scrum Methodology",
                 TitleAr = "منهجية أجايل وسكرم",
@@ -384,11 +645,20 @@ public static class SeedData
                 SummaryAr = "أتقن مبادئ أجايل وإطار عمل سكرم لإدارة المشاريع الفعالة.",
                 DescriptionEn = "Master Agile principles and Scrum framework for effective project management and team collaboration.",
                 DescriptionAr = "أتقن مبادئ أجايل وإطار عمل سكرم لإدارة المشاريع الفعالة والتعاون الجماعي.",
+                CourseTopicsEn = "Agile Manifesto, Scrum Framework, Sprint Planning, User Stories, Retrospectives",
+                CourseTopicsAr = "بيان أجايل، إطار سكرم، تخطيط السبرينت، قصص المستخدم، الاستعراض الرجعي",
                 Price = 229.99m,
+                Currency = "SAR",
                 Type = CourseType.Live,
                 Level = CourseLevel.Biginner,
-                Category = CourseCategory.Business,
-                InstructorName = "علي المطيري",
+                CategoryId = customProgramsCategory,
+                InstructorNameAr = "علي المطيري",
+                InstructorNameEn = "Ali Al-Mutairi",
+                InstructorsBioAr = "Scrum Master معتمد ومدرب أجايل",
+                InstructorsBioEn = "Certified Scrum Master and Agile Coach",
+                Duration = "28 hours",
+                VideoUrl = "https://example.com/video11.mp4",
+                Tags = "agile,scrum,project-management,sprint",
                 IsFeatured = false,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
@@ -396,7 +666,7 @@ public static class SeedData
             },
             new Course
             {
-                Id = Guid.NewGuid(),
+                Id = course12Id,
                 Slug = "mobile-app-development2",
                 TitleEn = "Mobile App Development",
                 TitleAr = "تطوير تطبيقات الهاتف المحمول",
@@ -404,11 +674,20 @@ public static class SeedData
                 SummaryAr = "بناء تطبيقات الهاتف المحمول الأصلية ومتعددة المنصات باستخدام React Native و Flutter.",
                 DescriptionEn = "Build native and cross-platform mobile applications using React Native, Flutter, and native development tools.",
                 DescriptionAr = "بناء تطبيقات الهاتف المحمول الأصلية ومتعددة المنصات باستخدام React Native و Flutter وأدوات التطوير الأصلية.",
+                CourseTopicsEn = "React Native, Flutter & Dart, iOS Development, Android Development, App Store Deployment",
+                CourseTopicsAr = "رياكت نيتيف، فلاتر ودارت، تطوير iOS، تطوير أندرويد، نشر على متاجر التطبيقات",
                 Price = 449.99m,
+                Currency = "SAR",
                 Type = CourseType.Live,
                 Level = CourseLevel.Advanced,
-                Category = CourseCategory.Programming,
-                InstructorName = "سلمان الدوسري",
+                CategoryId = professionalCertCategory,
+                InstructorNameAr = "سلمان الدوسري",
+                InstructorNameEn = "Salman Al-Dosari",
+                InstructorsBioAr = "مطور تطبيقات محمول محترف",
+                InstructorsBioEn = "Professional mobile app developer",
+                Duration = "70 hours",
+                VideoUrl = "https://example.com/video12.mp4",
+                Tags = "mobile,react-native,flutter,ios,android",
                 IsFeatured = false,
                 IsActive = true,
                 CreatedAt = DateTime.UtcNow,
@@ -417,7 +696,55 @@ public static class SeedData
         };
 
         context.Courses.AddRange(courses);
-        logger.LogInformation("Added {Count} test courses", courses.Count);
+        await context.SaveChangesAsync();
+
+        // Now add course-subcategory mappings
+        var courseSubCategoryMappings = new List<CourseSubCategoryMapping>
+        {
+            // Course 1 - Project Management -> Project Management & Soft Skills
+            new CourseSubCategoryMapping { CourseId = course1Id, SubCategoryId = projectMgmtSubCat, CreatedAt = DateTime.UtcNow },
+            new CourseSubCategoryMapping { CourseId = course1Id, SubCategoryId = softSkillsSubCat, CreatedAt = DateTime.UtcNow },
+            
+            // Course 2 - Digital Marketing -> Digital Marketing
+            new CourseSubCategoryMapping { CourseId = course2Id, SubCategoryId = digitalMarketingSubCat, CreatedAt = DateTime.UtcNow },
+            
+            // Course 3 - Data Science -> Data Science & AI & Programming
+            new CourseSubCategoryMapping { CourseId = course3Id, SubCategoryId = dataScienceSubCat, CreatedAt = DateTime.UtcNow },
+            new CourseSubCategoryMapping { CourseId = course3Id, SubCategoryId = programmingSubCat, CreatedAt = DateTime.UtcNow },
+            
+            // Course 4 - Leadership -> HR & Soft Skills
+            new CourseSubCategoryMapping { CourseId = course4Id, SubCategoryId = hrSubCat, CreatedAt = DateTime.UtcNow },
+            new CourseSubCategoryMapping { CourseId = course4Id, SubCategoryId = softSkillsSubCat, CreatedAt = DateTime.UtcNow },
+            
+            // Course 5 - Financial Planning (no subcategories - general)
+            
+            // Course 6 - Web Development -> Programming
+            new CourseSubCategoryMapping { CourseId = course6Id, SubCategoryId = programmingSubCat, CreatedAt = DateTime.UtcNow },
+            
+            // Course 7 - Cloud Computing -> Programming
+            new CourseSubCategoryMapping { CourseId = course7Id, SubCategoryId = programmingSubCat, CreatedAt = DateTime.UtcNow },
+            
+            // Course 8 - UX/UI Design -> Design
+            new CourseSubCategoryMapping { CourseId = course8Id, SubCategoryId = designSubCat, CreatedAt = DateTime.UtcNow },
+            
+            // Course 9 - Cybersecurity -> Programming
+            new CourseSubCategoryMapping { CourseId = course9Id, SubCategoryId = programmingSubCat, CreatedAt = DateTime.UtcNow },
+            
+            // Course 10 - Business Intelligence -> Data Science
+            new CourseSubCategoryMapping { CourseId = course10Id, SubCategoryId = dataScienceSubCat, CreatedAt = DateTime.UtcNow },
+            
+            // Course 11 - Agile & Scrum -> Project Management & Soft Skills
+            new CourseSubCategoryMapping { CourseId = course11Id, SubCategoryId = projectMgmtSubCat, CreatedAt = DateTime.UtcNow },
+            new CourseSubCategoryMapping { CourseId = course11Id, SubCategoryId = softSkillsSubCat, CreatedAt = DateTime.UtcNow },
+            
+            // Course 12 - Mobile Development -> Programming
+            new CourseSubCategoryMapping { CourseId = course12Id, SubCategoryId = programmingSubCat, CreatedAt = DateTime.UtcNow },
+        };
+
+        context.CourseSubCategoryMappings.AddRange(courseSubCategoryMappings);
+        await context.SaveChangesAsync();
+        
+        logger.LogInformation("Added {Count} test courses with subcategory mappings", courses.Count);
     }
 
     private static async Task SeedContentPagesAsync(ErsaTrainingDbContext context, ILogger logger)

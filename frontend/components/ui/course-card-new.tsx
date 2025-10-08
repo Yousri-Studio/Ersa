@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Icon } from '@/components/ui/icon';
 import { useTranslations, useLocale } from 'next-intl';
 import { useHydration } from '@/lib/use-hydration';
+import { getLocalizedText } from '@/lib/localized-text';
 
 // Types
 type Localized = { ar: string; en: string };
@@ -210,7 +211,7 @@ export const CourseCard: React.FC<CourseCardProps> & {
           <div className="relative h-48 w-full rounded-xl overflow-hidden">
             <Image
               src={thumbnailUrl || "/images/Course Place Holder Small.png"}
-              alt={isHydrated ? title[locale] : (title.ar || title.en)}
+              alt={getLocalizedText(title, locale as 'ar' | 'en', 'Course')}
               fill
               className="object-cover"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -251,19 +252,19 @@ export const CourseCard: React.FC<CourseCardProps> & {
                   category.en === 'Business' ? '#D40000' : 
                   '#00D439'
           }}>
-            {isHydrated ? category[locale as keyof Localized] : (category[currentLocale as keyof Localized] || category.ar || category.en)}
+            {getLocalizedText(category, locale as 'ar' | 'en', 'Category')}
           </div>
         </div>
 
         {/* Title */}
         <h3 className="text-slate-900 line-clamp-1 font-cairo" style={{ fontWeight: 700, fontSize: '1.2rem' }}>
-          {isHydrated ? title[locale as keyof Localized] : (title[currentLocale as keyof Localized] || title.ar || title.en)}
+          {getLocalizedText(title, locale as 'ar' | 'en', 'Course Title')}
         </h3>
 
         {/* Summary and instructor */}
         <div className="flex-grow space-y-3">
           <p className="text-slate-500 line-clamp-2 leading-relaxed">
-            {isHydrated ? summary[locale as keyof Localized] : (summary[currentLocale as keyof Localized] || summary.ar || summary.en)}
+            {getLocalizedText(summary, locale as 'ar' | 'en', 'Course Summary')}
           </p>
           {instructorName && (
             <div className="flex items-center text-sm text-slate-600">

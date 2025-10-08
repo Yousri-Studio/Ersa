@@ -20,7 +20,8 @@ public class Course
 
     public CourseLevel Level { get; set; }
 
-    public CourseCategory Category { get; set; }
+    // Foreign key to CourseCategory table
+    public Guid? CategoryId { get; set; }
     
     [MaxLength(1000)]
     public string? VideoUrl { get; set; }
@@ -30,7 +31,10 @@ public class Course
     
     [Required]
     [MaxLength(255)]
-    public string InstructorName { get; set; } = string.Empty;
+    public string InstructorNameAr { get; set; } = string.Empty;
+
+    [MaxLength(255)]
+    public string InstructorNameEn { get; set; } = string.Empty;
     
     public bool IsActive { get; set; } = true;
     
@@ -68,10 +72,16 @@ public class Course
     [MaxLength(2500)]
     public string? InstructorsBioEn { get; set; }
     
+    public string? CourseTopicsAr { get; set; }
+    
+    public string? CourseTopicsEn { get; set; }
+    
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
     // Navigation properties
+    public virtual CourseCategory? Category { get; set; }
+    public virtual ICollection<CourseSubCategoryMapping> CourseSubCategoryMappings { get; set; } = new List<CourseSubCategoryMapping>();
     public virtual ICollection<Session> Sessions { get; set; } = new List<Session>();
     public virtual ICollection<Attachment> Attachments { get; set; } = new List<Attachment>();
     public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
@@ -92,9 +102,4 @@ public enum CourseLevel:int
     Advanced=3
 }
 
-public enum CourseCategory:int
-{
-    Programming = 1,
-    Business = 2,
-    Design = 3
-}
+// Removed CourseCategory and CourseSubCategory enums - now using database tables instead

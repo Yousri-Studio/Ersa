@@ -4,17 +4,17 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { Icon } from '@/components/ui/icon';
-import type { CourseCategory } from '@/lib/api';
+import type { CourseCategoryData } from '@/lib/api';
 import styles from './search-bar-new.module.css';
 
 interface SearchBarProps {
-  onSearch?: (query: string, category?: CourseCategory) => void;
+  onSearch?: (query: string, category?: CourseCategoryData) => void;
   className?: string;
 }
 
 export function SearchBar({ onSearch, className = '' }: SearchBarProps) {
   const [query, setQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState<CourseCategory | ''>('');
+  const [selectedCategory, setSelectedCategory] = useState<CourseCategoryData | ''>('');
   const router = useRouter();
   const searchParams = useSearchParams();
   const locale = useLocale();
@@ -23,7 +23,7 @@ export function SearchBar({ onSearch, className = '' }: SearchBarProps) {
   // Sync with URL parameters
   useEffect(() => {
     const urlQuery = searchParams?.get('query') || '';
-    const urlCategory = searchParams?.get('category') as CourseCategory || '';
+    const urlCategory = (searchParams?.get('category') as unknown) as CourseCategoryData || '';
     setQuery(urlQuery);
     setSelectedCategory(urlCategory);
   }, [searchParams]);
@@ -41,7 +41,7 @@ export function SearchBar({ onSearch, className = '' }: SearchBarProps) {
       searchParams.set('query', query.trim());
     }
     if (selectedCategory) {
-      searchParams.set('category', selectedCategory);
+      searchParams.set('category', selectedCategory as unknown as string);
     }
 
     const searchString = searchParams.toString();
@@ -69,8 +69,8 @@ export function SearchBar({ onSearch, className = '' }: SearchBarProps) {
 
         {/* Category Dropdown */}
         <select
-          value={selectedCategory}
-          onChange={(e) => setSelectedCategory(e.target.value as CourseCategory)}
+          value={selectedCategory as string}
+          onChange={(e) => setSelectedCategory(e.target.value as unknown as CourseCategoryData)}
           className={styles.categorySelect}
         >
           <option value="">{t('Choose Category')}</option>

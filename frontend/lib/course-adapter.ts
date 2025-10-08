@@ -62,13 +62,25 @@ const getCourseBadge = (course: Course): 'bestseller' | 'new' | null => {
 };
 
 /**
- * Converts a CourseCategory enum to localized category
+ * Converts a CourseCategory to localized category
+ * Handles both old enum format and new database category object
  */
-const getCourseCategory = (category: any, locale: 'ar' | 'en'): { ar: string; en: string } => {
-  // Handle both string and number category values
-  if (typeof category === 'string') {
+const getCourseCategory = (course: Course, locale: 'ar' | 'en'): { ar: string; en: string } => {
+  // Handle new category object structure from database
+  if (course.category && typeof course.category === 'object' && 'titleAr' in course.category) {
+    return {
+      ar: course.category.titleAr,
+      en: course.category.titleEn
+    };
+  }
+  
+  // Fallback for legacy data or missing category
+  // Check if category field exists as enum (old format)
+  const categoryValue = (course as any).category;
+  
+  if (typeof categoryValue === 'string') {
     // If it's already a string, map to localized versions
-    switch (category.toLowerCase()) {
+    switch (categoryValue.toLowerCase()) {
       case 'programming':
         return { ar: 'البرمجة', en: 'Programming' };
       case 'business':
@@ -76,17 +88,22 @@ const getCourseCategory = (category: any, locale: 'ar' | 'en'): { ar: string; en
       case 'design':
         return { ar: 'التصميم', en: 'Design' };
       default:
-        return { ar: 'الأعمال', en: 'Business' };
+        return { ar: 'عام', en: 'General' };
     }
   }
   
-  // Handle numeric enum values from API
-  switch (category) {
-    case 1: return { ar: 'البرمجة', en: 'Programming' };
-    case 2: return { ar: 'الأعمال', en: 'Business' }; 
-    case 3: return { ar: 'التصميم', en: 'Design' };
-    default: return { ar: 'الأعمال', en: 'Business' }; // Default to Business as most courses seem to be business-related
+  // Handle numeric enum values from old API format
+  if (typeof categoryValue === 'number') {
+    switch (categoryValue) {
+      case 1: return { ar: 'البرمجة', en: 'Programming' };
+      case 2: return { ar: 'الأعمال', en: 'Business' }; 
+      case 3: return { ar: 'التصميم', en: 'Design' };
+      default: return { ar: 'عام', en: 'General' };
+    }
   }
+  
+  // Default fallback
+  return { ar: 'عام', en: 'General' };
 };
 
 /**
@@ -129,8 +146,8 @@ export const courseToCardProps = (
   
   console.log('courseToCardProps - Generated thumbnailUrl:', thumbnailUrl ? 'Generated from photo' : 'Using placeholder');
 
-  // Get category
-  const category = getCourseCategory(course.category, locale);
+  // Get category - now handles new database structure
+  const category = getCourseCategory(course, locale);
 
   // Generate duration label based on course type
   const getDurationLabel = (): { ar: string; en: string } => {
@@ -154,6 +171,23 @@ export const courseToCardProps = (
     };
   };
 
+  // Extract instructor name based on locale
+  const getInstructorName = (): string | undefined => {
+    if (!course.instructorName) return undefined;
+    
+    // If it's already a string, return it
+    if (typeof course.instructorName === 'string') {
+      return course.instructorName;
+    }
+    
+    // If it's a localized object, extract the correct locale
+    if (typeof course.instructorName === 'object' && 'ar' in course.instructorName) {
+      return course.instructorName[locale] || course.instructorName.en || course.instructorName.ar;
+    }
+    
+    return undefined;
+  };
+
   return {
     id: course.id,
     slug: course.slug,
@@ -165,7 +199,7 @@ export const courseToCardProps = (
     category,
     durationLabel: getDurationLabel(),
     rating: course.rating,
-    instructorName: course.instructorName,
+    instructorName: getInstructorName(),
 
     price: course.price,
     currency: course.currency === 'SAR' ? 'SAR' : 'USD',

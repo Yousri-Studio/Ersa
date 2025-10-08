@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocale } from 'next-intl';
-import { AdminCreateCourseRequest, AdminUpdateCourseRequest } from '@/lib/admin-api';
+import { AdminCreateCourseRequest, AdminUpdateCourseRequest, adminApi, CourseCategory, CourseSubCategory } from '@/lib/admin-api';
 import { FileUpload } from '@/components/ui/file-upload';
 
 interface CourseFormProps {
@@ -16,6 +16,9 @@ interface CourseFormProps {
 export function CourseForm({ initialData, onSubmit, onCancel, isEdit = false, isLoading = false }: CourseFormProps) {
   const locale = useLocale();
   const isRTL = locale === 'ar';
+  const [categories, setCategories] = useState<CourseCategory[]>([]);
+  const [subCategories, setSubCategories] = useState<CourseSubCategory[]>([]);
+  const [loadingData, setLoadingData] = useState(true);
   const [formData, setFormData] = useState<AdminCreateCourseRequest>({
     slug: initialData?.slug || '',
     titleAr: initialData?.titleAr || '',
@@ -28,29 +31,62 @@ export function CourseForm({ initialData, onSubmit, onCancel, isEdit = false, is
     currency: initialData?.currency || 'SAR',
     type: initialData?.type || 1, // Live by default
     level: initialData?.level || 1, // Beginner by default
-    category: initialData?.category || 1, // Programming by default
+    categoryId: initialData?.categoryId || null,
+    subCategoryIds: initialData?.subCategoryIds || [],
     videoUrl: initialData?.videoUrl || '',
     duration: initialData?.duration || '',
-    instructorName: initialData?.instructorName || '',
+    instructorNameAr: initialData?.instructorNameAr || '',
+    instructorNameEn: initialData?.instructorNameEn || '',
     photo: initialData?.photo || [],
     tags: initialData?.tags || '',
     instructorsBioAr: initialData?.instructorsBioAr || '',
     instructorsBioEn: initialData?.instructorsBioEn || '',
+    courseTopicsAr: initialData?.courseTopicsAr || '',
+    courseTopicsEn: initialData?.courseTopicsEn || '',
     isActive: initialData?.isActive ?? true,
     isFeatured: initialData?.isFeatured ?? false,
   });
+
+  useEffect(() => {
+    fetchCategoriesAndSubCategories();
+  }, []);
+
+  const fetchCategoriesAndSubCategories = async () => {
+    try {
+      setLoadingData(true);
+      const [categoriesRes, subCategoriesRes] = await Promise.all([
+        adminApi.getCourseCategories({ activeOnly: false }),
+        adminApi.getCourseSubCategories({ activeOnly: false })
+      ]);
+      setCategories(categoriesRes.data || []);
+      setSubCategories(subCategoriesRes.data || []);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    } finally {
+      setLoadingData(false);
+    }
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit(formData);
   };
 
-  const handleChange = (field: keyof AdminCreateCourseRequest, value: string | number | boolean | number[]) => {
+  const handleChange = (field: keyof AdminCreateCourseRequest, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const handleFileUpload = (file: File | null, data: number[]) => {
     handleChange('photo', data);
+  };
+
+  const handleSubCategoryToggle = (subCategoryId: string) => {
+    const currentIds = formData.subCategoryIds || [];
+    if (currentIds.includes(subCategoryId)) {
+      handleChange('subCategoryIds', currentIds.filter(id => id !== subCategoryId));
+    } else {
+      handleChange('subCategoryIds', [...currentIds, subCategoryId]);
+    }
   };
 
   return (
@@ -238,16 +274,20 @@ export function CourseForm({ initialData, onSubmit, onCancel, isEdit = false, is
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              {locale === 'ar' ? 'الفئة' : 'Category'}
+              {locale === 'ar' ? 'التصنيف' : 'Category'}
             </label>
             <select
-              value={formData.category}
-              onChange={(e) => handleChange('category', parseInt(e.target.value))}
+              value={formData.categoryId || ''}
+              onChange={(e) => handleChange('categoryId', e.target.value || null)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={loadingData}
             >
-              <option value={1}>Programming</option>
-              <option value={2}>Business</option>
-              <option value={3}>Design</option>
+              <option value="">{locale === 'ar' ? 'لا يوجد' : 'None'}</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {locale === 'ar' ? cat.titleAr : cat.titleEn}
+                </option>
+              ))}
             </select>
           </div>
           <div>
@@ -265,20 +305,69 @@ export function CourseForm({ initialData, onSubmit, onCancel, isEdit = false, is
           </div>
         </div>
 
-        {/* Instructor Name */}
+        {/* Sub-Categories Multi-Select */}
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">
-            {locale === 'ar' ? 'اسم المدرب *' : 'Instructor Name *'}
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {locale === 'ar' ? 'التصنيفات الفرعية' : 'Sub-Categories'}
           </label>
-          <input
-            type="text"
-            value={formData.instructorName}
-            onChange={(e) => handleChange('instructorName', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder={locale === 'ar' ? 'أدخل اسم المدرب' : 'Enter instructor name'}
-            required
-            maxLength={255}
-          />
+          <div className="border border-gray-300 rounded-md p-3 max-h-48 overflow-y-auto bg-white">
+            {loadingData ? (
+              <p className="text-gray-500 text-sm">{locale === 'ar' ? 'جاري التحميل...' : 'Loading...'}</p>
+            ) : subCategories.length === 0 ? (
+              <p className="text-gray-500 text-sm">{locale === 'ar' ? 'لا توجد تصنيفات فرعية' : 'No sub-categories available'}</p>
+            ) : (
+              <div className="space-y-2">
+                {subCategories.map((subCat) => (
+                  <label key={subCat.id} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-1 rounded">
+                    <input
+                      type="checkbox"
+                      checked={(formData.subCategoryIds || []).includes(subCat.id)}
+                      onChange={() => handleSubCategoryToggle(subCat.id)}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <span className={`text-sm ${isRTL ? 'mr-2' : 'ml-2'}`}>
+                      {locale === 'ar' ? subCat.titleAr : subCat.titleEn}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+          <p className="text-xs text-gray-500 mt-1">
+            {(formData.subCategoryIds || []).length} {locale === 'ar' ? 'محددة' : 'selected'}
+          </p>
+        </div>
+
+        {/* Instructor Name Fields */}
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {locale === 'ar' ? 'اسم المدرب (إنجليزي) *' : 'Instructor Name (English) *'}
+            </label>
+            <input
+              type="text"
+              value={formData.instructorNameEn}
+              onChange={(e) => handleChange('instructorNameEn', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder={locale === 'ar' ? 'أدخل اسم المدرب بالإنجليزية' : 'Enter instructor name in English'}
+              required
+              maxLength={255}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {locale === 'ar' ? 'اسم المدرب (عربي) *' : 'Instructor Name (Arabic) *'}
+            </label>
+            <input
+              type="text"
+              value={formData.instructorNameAr}
+              onChange={(e) => handleChange('instructorNameAr', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder={locale === 'ar' ? 'أدخل اسم المدرب بالعربية' : 'Enter instructor name in Arabic'}
+              required
+              maxLength={255}
+            />
+          </div>
         </div>
 
         {/* Video URL */}
@@ -331,6 +420,35 @@ export function CourseForm({ initialData, onSubmit, onCancel, isEdit = false, is
             maxLength={2000}
           />
           <p className="text-xs text-gray-500 mt-1">{(formData.tags || '').length}/2000 {locale === 'ar' ? 'حرف' : 'characters'}</p>
+        </div>
+
+        {/* Course Topics Fields */}
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {locale === 'ar' ? 'مواضيع الدورة (إنجليزي)' : 'Course Topics (English)'}
+            </label>
+            <textarea
+              rows={3}
+              value={formData.courseTopicsEn}
+              onChange={(e) => handleChange('courseTopicsEn', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder={locale === 'ar' ? 'مواضيع الدورة بالإنجليزية' : 'Course topics in English'}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {locale === 'ar' ? 'مواضيع الدورة (عربي)' : 'Course Topics (Arabic)'}
+            </label>
+            <textarea
+              rows={3}
+              value={formData.courseTopicsAr}
+              onChange={(e) => handleChange('courseTopicsAr', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder={locale === 'ar' ? 'مواضيع الدورة بالعربية' : 'Course topics in Arabic'}
+              dir="rtl"
+            />
+          </div>
         </div>
 
         {/* Instructor Bio Fields */}

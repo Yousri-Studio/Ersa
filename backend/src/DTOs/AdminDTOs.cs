@@ -85,14 +85,19 @@ public class AdminCourseDto
     public string? Currency { get; set; }
     public int? Type { get; set; }
     public int? Level { get; set; }
-    public int? Category { get; set; }
+    public Guid? CategoryId { get; set; }
+    public CourseCategoryDto? Category { get; set; }
+    public List<CourseSubCategoryDto> SubCategories { get; set; } = new();
     public string? VideoUrl { get; set; }
     public string? Duration { get; set; }
-    public string? InstructorName { get; set; }
+    public string? InstructorNameAr { get; set; }
+    public string? InstructorNameEn { get; set; }
     public byte[]? Photo { get; set; }
     public string? Tags { get; set; }
     public string? InstructorsBioAr { get; set; }
     public string? InstructorsBioEn { get; set; }
+    public string? CourseTopicsAr { get; set; }
+    public string? CourseTopicsEn { get; set; }
     public bool IsActive { get; set; }
     public bool? IsFeatured { get; set; }
     public DateTime CreatedAt { get; set; }
@@ -188,14 +193,18 @@ public class AdminCreateCourseRequest
     public string Currency { get; set; } = "SAR";
     public int? Type { get; set; }
     public int? Level { get; set; }
-    public int? Category { get; set; }
+    public Guid? CategoryId { get; set; }
+    public List<Guid> SubCategoryIds { get; set; } = new();
     public string? VideoUrl { get; set; }
     public string? Duration { get; set; }
-    public string InstructorName { get; set; } = string.Empty;
+    public string InstructorNameAr { get; set; } = string.Empty;
+    public string InstructorNameEn { get; set; } = string.Empty;
     public string? Photo { get; set; }
     public string? Tags { get; set; }
     public string? InstructorsBioAr { get; set; }
     public string? InstructorsBioEn { get; set; }
+    public string? CourseTopicsAr { get; set; }
+    public string? CourseTopicsEn { get; set; }
     public bool IsActive { get; set; } = true;
     public bool? IsFeatured { get; set; }
 }
@@ -213,14 +222,18 @@ public class AdminUpdateCourseRequest
     public string Currency { get; set; } = "SAR";
     public int? Type { get; set; }
     public int? Level { get; set; }
-    public int? Category { get; set; }
+    public Guid? CategoryId { get; set; }
+    public List<Guid> SubCategoryIds { get; set; } = new();
     public string? VideoUrl { get; set; }
     public string? Duration { get; set; }
-    public string InstructorName { get; set; } = string.Empty;
+    public string InstructorNameAr { get; set; } = string.Empty;
+    public string InstructorNameEn { get; set; } = string.Empty;
     public string? Photo { get; set; }
     public string? Tags { get; set; }
     public string? InstructorsBioAr { get; set; }
     public string? InstructorsBioEn { get; set; }
+    public string? CourseTopicsAr { get; set; }
+    public string? CourseTopicsEn { get; set; }
     public bool IsActive { get; set; }
     public bool? IsFeatured { get; set; }
 }

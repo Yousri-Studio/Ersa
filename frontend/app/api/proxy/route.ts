@@ -2,18 +2,42 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const API_BASE_URL = process.env.BACKEND_API_URL || 'http://api.ersa-training.com/api';
 
+// Ensure API_BASE_URL ends with /api for local development
+const getBackendUrl = () => {
+  if (API_BASE_URL.includes('localhost') && !API_BASE_URL.endsWith('/api')) {
+    return `${API_BASE_URL}/api`;
+  }
+  return API_BASE_URL;
+};
+
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const endpoint = searchParams.get('endpoint') || '';
   
   console.log(`[API Proxy GET] ${endpoint}`);
-  console.log(`[API Proxy] BACKEND_API_URL: ${API_BASE_URL}`);
+  console.log(`[API Proxy] BACKEND_API_URL: ${getBackendUrl()}`);
   
   try {
     // Remove leading slash from endpoint if present to avoid double slashes
-    const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
-    const apiUrl = `${API_BASE_URL}/${cleanEndpoint}`;
-    console.log(`[API Proxy] Forwarding to: ${apiUrl}`);
+    let cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
+    
+    // If the endpoint starts with 'api/', remove it since backend URL already includes /api
+    if (cleanEndpoint.startsWith('api/')) {
+      cleanEndpoint = cleanEndpoint.slice(4); // Remove 'api/'
+    }
+    
+    // Build URL with query parameters
+    const backendUrl = getBackendUrl();
+    const apiUrl = new URL(`${backendUrl}/${cleanEndpoint}`);
+    
+    // Forward all query parameters except 'endpoint'
+    searchParams.forEach((value, key) => {
+      if (key !== 'endpoint') {
+        apiUrl.searchParams.append(key, value);
+      }
+    });
+    
+    console.log(`[API Proxy] Forwarding to: ${apiUrl.toString()}`);
     
     // Forward authorization header if present
     const headers: HeadersInit = {
@@ -26,7 +50,7 @@ export async function GET(request: NextRequest) {
       console.log(`[API Proxy] Forwarding Authorization header`);
     }
     
-    const response = await fetch(apiUrl, {
+    const response = await fetch(apiUrl.toString(), {
       method: 'GET',
       headers,
       cache: 'no-store',
@@ -60,8 +84,15 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     // Remove leading slash from endpoint if present to avoid double slashes
-    const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
-    const apiUrl = `${API_BASE_URL}/${cleanEndpoint}`;
+    let cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
+    
+    // If the endpoint starts with 'api/', remove it since backend URL already includes /api
+    if (cleanEndpoint.startsWith('api/')) {
+      cleanEndpoint = cleanEndpoint.slice(4); // Remove 'api/'
+    }
+    
+    const backendUrl = getBackendUrl();
+    const apiUrl = `${backendUrl}/${cleanEndpoint}`;
     console.log(`[API Proxy] Forwarding to: ${apiUrl}`);
     
     // Forward authorization header if present
@@ -110,8 +141,15 @@ export async function PUT(request: NextRequest) {
   try {
     const body = await request.json();
     // Remove leading slash from endpoint if present to avoid double slashes
-    const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
-    const apiUrl = `${API_BASE_URL}/${cleanEndpoint}`;
+    let cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
+    
+    // If the endpoint starts with 'api/', remove it since backend URL already includes /api
+    if (cleanEndpoint.startsWith('api/')) {
+      cleanEndpoint = cleanEndpoint.slice(4); // Remove 'api/'
+    }
+    
+    const backendUrl = getBackendUrl();
+    const apiUrl = `${backendUrl}/${cleanEndpoint}`;
     console.log(`[API Proxy] Forwarding to: ${apiUrl}`);
     
     // Forward authorization header if present
@@ -159,8 +197,15 @@ export async function DELETE(request: NextRequest) {
   
   try {
     // Remove leading slash from endpoint if present to avoid double slashes
-    const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
-    const apiUrl = `${API_BASE_URL}/${cleanEndpoint}`;
+    let cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
+    
+    // If the endpoint starts with 'api/', remove it since backend URL already includes /api
+    if (cleanEndpoint.startsWith('api/')) {
+      cleanEndpoint = cleanEndpoint.slice(4); // Remove 'api/'
+    }
+    
+    const backendUrl = getBackendUrl();
+    const apiUrl = `${backendUrl}/${cleanEndpoint}`;
     console.log(`[API Proxy] Forwarding to: ${apiUrl}`);
     
     // Forward authorization header if present

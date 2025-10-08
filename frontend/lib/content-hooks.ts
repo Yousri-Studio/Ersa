@@ -97,7 +97,9 @@ function transformApiCourse(apiCourse: BackendCourse, locale: string = 'ar'): Co
         },
     lessons: apiCourse.sessions?.length || apiCourse.attachments?.length || 1,
     instructor: {
-      name: apiCourse.instructorName || apiCourse.instructor?.name || 'مدرب محترف',
+      name: typeof apiCourse.instructorName === 'string' 
+        ? apiCourse.instructorName 
+        : (apiCourse.instructorName?.ar || apiCourse.instructor?.name || 'مدرب محترف'),
       title: apiCourse.instructor?.title || 'مدرب معتمد',
       avatar: apiCourse.instructor?.avatar || '/api/placeholder/60/60',
       rating: 4.8,

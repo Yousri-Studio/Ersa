@@ -40,14 +40,18 @@ export default function AdminCourses() {
     currency: 'SAR',
     type: 1, // Live
     level: 1, // Beginner
-    category: 1, // Programming
+    categoryId: null,
+    subCategoryIds: [],
     videoUrl: '',
     duration: '',
-    instructorName: '',
+    instructorNameAr: '',
+    instructorNameEn: '',
     photo: [],
     tags: '',
     instructorsBioAr: '',
     instructorsBioEn: '',
+    courseTopicsAr: '',
+    courseTopicsEn: '',
     isActive: true,
     isFeatured: false,
   });
@@ -171,14 +175,18 @@ export default function AdminCourses() {
       currency: course.currency || 'SAR',
       type: course.type || 1,
       level: course.level || 1,
-      category: course.category || 1,
+      categoryId: course.categoryId || null,
+      subCategoryIds: course.subCategories?.map(sc => sc.id) || [],
       videoUrl: course.videoUrl || '',
       duration: course.duration || '',
-      instructorName: course.instructorName || '',
+      instructorNameAr: course.instructorNameAr || '',
+      instructorNameEn: course.instructorNameEn || '',
       photo: course.photo || [],
       tags: course.tags || '',
       instructorsBioAr: course.instructorsBioAr || '',
       instructorsBioEn: course.instructorsBioEn || '',
+      courseTopicsAr: course.courseTopicsAr || '',
+      courseTopicsEn: course.courseTopicsEn || '',
       isActive: course.isActive,
       isFeatured: course.isFeatured || false,
     });
@@ -203,14 +211,18 @@ export default function AdminCourses() {
       currency: 'SAR',
       type: 1,
       level: 1,
-      category: 1,
+      categoryId: null,
+      subCategoryIds: [],
       videoUrl: '',
       duration: '',
-      instructorName: '',
+      instructorNameAr: '',
+      instructorNameEn: '',
       photo: '',
       tags: '',
       instructorsBioAr: '',
       instructorsBioEn: '',
+      courseTopicsAr: '',
+      courseTopicsEn: '',
       isActive: true,
       isFeatured: false,
     });
@@ -324,6 +336,9 @@ export default function AdminCourses() {
                     {locale === 'ar' ? 'الدورة' : 'Course'}
                   </th>
                   <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
+                    {locale === 'ar' ? 'التصنيفات الفرعية' : 'Sub-Categories'}
+                  </th>
+                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
                     {locale === 'ar' ? 'السعر' : 'Price'}
                   </th>
                   <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
@@ -374,6 +389,21 @@ export default function AdminCourses() {
                           )}
                         </div>
                       </div>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-500">
+                      {course.subCategories && course.subCategories.length > 0 ? (
+                        <div className="max-w-xs">
+                          {course.subCategories.map(sc => {
+                            // Handle both string and object formats for backward compatibility
+                            const title = locale === 'ar' 
+                              ? (typeof sc.titleAr === 'string' ? sc.titleAr : sc.titleAr || '')
+                              : (typeof sc.titleEn === 'string' ? sc.titleEn : sc.titleEn || '');
+                            return title;
+                          }).join(', ')}
+                        </div>
+                      ) : (
+                        <span className="text-gray-400 italic">{locale === 'ar' ? 'لا يوجد' : 'None'}</span>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-left">
                       {formatCurrency(course.price, course.currency)}

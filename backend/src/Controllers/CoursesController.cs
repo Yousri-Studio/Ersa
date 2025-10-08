@@ -24,7 +24,8 @@ public class CoursesController : ControllerBase
         [FromQuery] CourseType? type = null,
         [FromQuery] bool activeOnly = true,
         [FromQuery] string? query = null,
-        [FromQuery] CourseCategory? category = null)
+        [FromQuery] Guid? categoryId = null,
+        [FromQuery] Guid? subCategoryId = null)
     {
         try
         {
@@ -40,10 +41,14 @@ public class CoursesController : ControllerBase
                 coursesQuery = coursesQuery.Where(c => c.Type == type.Value);
             }
 
-            if (category.HasValue)
+            if (categoryId.HasValue)
             {
-                var searchCategory=(CourseCategory)category.Value;
-                coursesQuery = coursesQuery.Where(c => c.Category == searchCategory);
+                coursesQuery = coursesQuery.Where(c => c.CategoryId == categoryId.Value);
+            }
+
+            if (subCategoryId.HasValue)
+            {
+                coursesQuery = coursesQuery.Where(c => c.CourseSubCategoryMappings.Any(m => m.SubCategoryId == subCategoryId.Value));
             }
 
             if (!string.IsNullOrEmpty(query))
@@ -57,6 +62,9 @@ public class CoursesController : ControllerBase
             }
 
             var courses = await coursesQuery
+                .Include(c => c.Category)
+                .Include(c => c.CourseSubCategoryMappings)
+                    .ThenInclude(m => m.SubCategory)
                 .OrderBy(c => c.TitleEn)
                 .Select(c => new CourseListDto
                 {
@@ -69,13 +77,36 @@ public class CoursesController : ControllerBase
                     Currency = c.Currency,
                     Type = c.Type,
                     Level = c.Level,
-                    Category = c.Category,
+                    CategoryId = c.CategoryId,
+                    Category = c.Category != null ? new CourseCategoryDto
+                    {
+                        Id = c.Category.Id,
+                        TitleAr = c.Category.TitleAr,
+                        TitleEn = c.Category.TitleEn,
+                        DisplayOrder = c.Category.DisplayOrder,
+                        IsActive = c.Category.IsActive,
+                        CreatedAt = c.Category.CreatedAt,
+                        UpdatedAt = c.Category.UpdatedAt
+                    } : null,
+                    SubCategories = c.CourseSubCategoryMappings
+                        .Select(m => new CourseSubCategoryDto
+                        {
+                            Id = m.SubCategory.Id,
+                            TitleAr = m.SubCategory.TitleAr,
+                            TitleEn = m.SubCategory.TitleEn,
+                            DisplayOrder = m.SubCategory.DisplayOrder,
+                            IsActive = m.SubCategory.IsActive,
+                            CreatedAt = m.SubCategory.CreatedAt,
+                            UpdatedAt = m.SubCategory.UpdatedAt
+                        })
+                        .ToList(),
                     VideoUrl = c.VideoUrl,
                     Duration = c.Duration,
-                    InstructorName = c.InstructorName,
+                    InstructorName = new LocalizedText { Ar = c.InstructorNameAr, En = c.InstructorNameEn },
                     Photo = c.Photo,
                     Tags = c.Tags,
                     InstructorsBio = new LocalizedText { Ar = c.InstructorsBioAr ?? "", En = c.InstructorsBioEn ?? "" },
+                    CourseTopics = new LocalizedText { Ar = c.CourseTopicsAr ?? "", En = c.CourseTopicsEn ?? "" },
                     IsActive = c.IsActive,
                     IsFeatured = c.IsFeatured,
                     CreatedAt = c.CreatedAt,
@@ -98,6 +129,9 @@ public class CoursesController : ControllerBase
         try
         {
             var course = await _context.Courses
+                .Include(c => c.Category)
+                .Include(c => c.CourseSubCategoryMappings)
+                    .ThenInclude(m => m.SubCategory)
                 .Include(c => c.Sessions.Where(s => s.StartAt > DateTime.UtcNow))
                 .Include(c => c.Attachments.Where(a => !a.IsRevoked))
                 .AsSplitQuery()
@@ -119,13 +153,36 @@ public class CoursesController : ControllerBase
                 Currency = course.Currency,
                 Type = course.Type,
                 Level = course.Level,
-                Category = course.Category,
+                CategoryId = course.CategoryId,
+                Category = course.Category != null ? new CourseCategoryDto
+                {
+                    Id = course.Category.Id,
+                    TitleAr = course.Category.TitleAr,
+                    TitleEn = course.Category.TitleEn,
+                    DisplayOrder = course.Category.DisplayOrder,
+                    IsActive = course.Category.IsActive,
+                    CreatedAt = course.Category.CreatedAt,
+                    UpdatedAt = course.Category.UpdatedAt
+                } : null,
+                SubCategories = course.CourseSubCategoryMappings
+                    .Select(m => new CourseSubCategoryDto
+                    {
+                        Id = m.SubCategory.Id,
+                        TitleAr = m.SubCategory.TitleAr,
+                        TitleEn = m.SubCategory.TitleEn,
+                        DisplayOrder = m.SubCategory.DisplayOrder,
+                        IsActive = m.SubCategory.IsActive,
+                        CreatedAt = m.SubCategory.CreatedAt,
+                        UpdatedAt = m.SubCategory.UpdatedAt
+                    })
+                    .ToList(),
                 VideoUrl = course.VideoUrl,
                 Duration = course.Duration,
-                InstructorName = course.InstructorName,
+                InstructorName = new LocalizedText { Ar = course.InstructorNameAr, En = course.InstructorNameEn },
                 Photo = course.Photo,
                 Tags = course.Tags,
                 InstructorsBio = new LocalizedText { Ar = course.InstructorsBioAr ?? "", En = course.InstructorsBioEn ?? "" },
+                CourseTopics = new LocalizedText { Ar = course.CourseTopicsAr ?? "", En = course.CourseTopicsEn ?? "" },
                 IsActive = course.IsActive,
                 IsFeatured = course.IsFeatured,
                 CreatedAt = course.CreatedAt,
@@ -166,6 +223,9 @@ public class CoursesController : ControllerBase
         try
         {
             var featuredCourses = await _context.Courses
+                .Include(c => c.Category)
+                .Include(c => c.CourseSubCategoryMappings)
+                    .ThenInclude(m => m.SubCategory)
                 .Where(c => c.IsActive && c.IsFeatured)
                 .OrderBy(c => c.TitleEn)
                 .Select(c => new CourseListDto
@@ -179,13 +239,36 @@ public class CoursesController : ControllerBase
                     Currency = c.Currency,
                     Type = c.Type,
                     Level = c.Level,
-                    Category = c.Category,
+                    CategoryId = c.CategoryId,
+                    Category = c.Category != null ? new CourseCategoryDto
+                    {
+                        Id = c.Category.Id,
+                        TitleAr = c.Category.TitleAr,
+                        TitleEn = c.Category.TitleEn,
+                        DisplayOrder = c.Category.DisplayOrder,
+                        IsActive = c.Category.IsActive,
+                        CreatedAt = c.Category.CreatedAt,
+                        UpdatedAt = c.Category.UpdatedAt
+                    } : null,
+                    SubCategories = c.CourseSubCategoryMappings
+                        .Select(m => new CourseSubCategoryDto
+                        {
+                            Id = m.SubCategory.Id,
+                            TitleAr = m.SubCategory.TitleAr,
+                            TitleEn = m.SubCategory.TitleEn,
+                            DisplayOrder = m.SubCategory.DisplayOrder,
+                            IsActive = m.SubCategory.IsActive,
+                            CreatedAt = m.SubCategory.CreatedAt,
+                            UpdatedAt = m.SubCategory.UpdatedAt
+                        })
+                        .ToList(),
                     VideoUrl = c.VideoUrl,
                     Duration = c.Duration,
-                    InstructorName = c.InstructorName,
+                    InstructorName = new LocalizedText { Ar = c.InstructorNameAr, En = c.InstructorNameEn },
                     Photo = c.Photo,
                     Tags = c.Tags,
                     InstructorsBio = new LocalizedText { Ar = c.InstructorsBioAr ?? "", En = c.InstructorsBioEn ?? "" },
+                    CourseTopics = new LocalizedText { Ar = c.CourseTopicsAr ?? "", En = c.CourseTopicsEn ?? "" },
                     IsActive = c.IsActive,
                     IsFeatured = c.IsFeatured,
                     CreatedAt = c.CreatedAt,
@@ -258,6 +341,31 @@ public class CoursesController : ControllerBase
             {
                 return BadRequest(new { error = "Price must be greater than 0" });
             }
+
+            // Validate CategoryId if provided
+            if (request.CategoryId.HasValue)
+            {
+                var categoryExists = await _context.CourseCategories.AnyAsync(c => c.Id == request.CategoryId.Value);
+                if (!categoryExists)
+                {
+                    return BadRequest(new { error = "Invalid category ID" });
+                }
+            }
+
+            // Validate SubCategoryIds if provided
+            if (request.SubCategoryIds != null && request.SubCategoryIds.Any())
+            {
+                var validSubCategoryIds = await _context.CourseSubCategories
+                    .Where(sc => request.SubCategoryIds.Contains(sc.Id))
+                    .Select(sc => sc.Id)
+                    .ToListAsync();
+
+                if (validSubCategoryIds.Count != request.SubCategoryIds.Count)
+                {
+                    return BadRequest(new { error = "One or more invalid sub-category IDs" });
+                }
+            }
+
             var course = new Course
             {
                 Id = Guid.NewGuid(),
@@ -266,10 +374,11 @@ public class CoursesController : ControllerBase
                 Currency = request.Currency,
                 Type = request.Type,
                 Level = request.Level,
-                Category = request.Category,
+                CategoryId = request.CategoryId,
                 VideoUrl = request.VideoUrl,
                 Duration = request.Duration,
-                InstructorName = request.InstructorName,
+                InstructorNameAr = request.InstructorNameAr,
+                InstructorNameEn = request.InstructorNameEn,
                 TitleAr = request.TitleAr,
                 TitleEn = request.TitleEn,
                 SummaryAr = request.SummaryAr,
@@ -280,6 +389,8 @@ public class CoursesController : ControllerBase
                 Tags = request.Tags,
                 InstructorsBioAr = request.InstructorsBioAr,
                 InstructorsBioEn = request.InstructorsBioEn,
+                CourseTopicsAr = request.CourseTopicsAr,
+                CourseTopicsEn = request.CourseTopicsEn,
                 IsActive = true,
                 IsFeatured = false,
                 CreatedAt = DateTime.UtcNow,
@@ -289,33 +400,77 @@ public class CoursesController : ControllerBase
             _context.Courses.Add(course);
             await _context.SaveChangesAsync();
 
+            // Add sub-category mappings
+            if (request.SubCategoryIds != null && request.SubCategoryIds.Any())
+            {
+                var mappings = request.SubCategoryIds.Select(subCatId => new CourseSubCategoryMapping
+                {
+                    CourseId = course.Id,
+                    SubCategoryId = subCatId,
+                    CreatedAt = DateTime.UtcNow
+                }).ToList();
+
+                _context.CourseSubCategoryMappings.AddRange(mappings);
+                await _context.SaveChangesAsync();
+            }
+
+            // Reload course with related data
+            var createdCourse = await _context.Courses
+                .Include(c => c.Category)
+                .Include(c => c.CourseSubCategoryMappings)
+                    .ThenInclude(m => m.SubCategory)
+                .FirstOrDefaultAsync(c => c.Id == course.Id);
+
             var courseDto = new CourseDetailDto
             {
-                Id = course.Id,
-                Slug = course.Slug,
-                Title = new LocalizedText { Ar = course.TitleAr, En = course.TitleEn },
-                Summary = new LocalizedText { Ar = course.SummaryAr ?? "", En = course.SummaryEn ?? "" },
-                Description = new LocalizedText { Ar = course.DescriptionAr ?? "", En = course.DescriptionEn ?? "" },
-                Price = course.Price,
-                Currency = course.Currency,
-                Type = course.Type,
-                Level = course.Level,
-                Category = course.Category,
-                VideoUrl = course.VideoUrl,
-                Duration = course.Duration,
-                InstructorName = course.InstructorName,
-                Photo = course.Photo,
-                Tags = course.Tags,
-                InstructorsBio = new LocalizedText { Ar = course.InstructorsBioAr ?? "", En = course.InstructorsBioEn ?? "" },
-                IsActive = course.IsActive,
-                IsFeatured = course.IsFeatured,
-                CreatedAt = course.CreatedAt,
-                UpdatedAt = course.UpdatedAt,
+                Id = createdCourse!.Id,
+                Slug = createdCourse.Slug,
+                Title = new LocalizedText { Ar = createdCourse.TitleAr, En = createdCourse.TitleEn },
+                Summary = new LocalizedText { Ar = createdCourse.SummaryAr ?? "", En = createdCourse.SummaryEn ?? "" },
+                Description = new LocalizedText { Ar = createdCourse.DescriptionAr ?? "", En = createdCourse.DescriptionEn ?? "" },
+                Price = createdCourse.Price,
+                Currency = createdCourse.Currency,
+                Type = createdCourse.Type,
+                Level = createdCourse.Level,
+                CategoryId = createdCourse.CategoryId,
+                Category = createdCourse.Category != null ? new CourseCategoryDto
+                {
+                    Id = createdCourse.Category.Id,
+                    TitleAr = createdCourse.Category.TitleAr,
+                    TitleEn = createdCourse.Category.TitleEn,
+                    DisplayOrder = createdCourse.Category.DisplayOrder,
+                    IsActive = createdCourse.Category.IsActive,
+                    CreatedAt = createdCourse.Category.CreatedAt,
+                    UpdatedAt = createdCourse.Category.UpdatedAt
+                } : null,
+                SubCategories = createdCourse.CourseSubCategoryMappings
+                    .Select(m => new CourseSubCategoryDto
+                    {
+                        Id = m.SubCategory.Id,
+                        TitleAr = m.SubCategory.TitleAr,
+                        TitleEn = m.SubCategory.TitleEn,
+                        DisplayOrder = m.SubCategory.DisplayOrder,
+                        IsActive = m.SubCategory.IsActive,
+                        CreatedAt = m.SubCategory.CreatedAt,
+                        UpdatedAt = m.SubCategory.UpdatedAt
+                    })
+                    .ToList(),
+                VideoUrl = createdCourse.VideoUrl,
+                Duration = createdCourse.Duration,
+                InstructorName = new LocalizedText { Ar = createdCourse.InstructorNameAr, En = createdCourse.InstructorNameEn },
+                Photo = createdCourse.Photo,
+                Tags = createdCourse.Tags,
+                InstructorsBio = new LocalizedText { Ar = createdCourse.InstructorsBioAr ?? "", En = createdCourse.InstructorsBioEn ?? "" },
+                CourseTopics = new LocalizedText { Ar = createdCourse.CourseTopicsAr ?? "", En = createdCourse.CourseTopicsEn ?? "" },
+                IsActive = createdCourse.IsActive,
+                IsFeatured = createdCourse.IsFeatured,
+                CreatedAt = createdCourse.CreatedAt,
+                UpdatedAt = createdCourse.UpdatedAt,
                 Sessions = new List<SessionDto>(),
                 Attachments = new List<AttachmentDto>()
             };
 
-            return CreatedAtAction(nameof(GetCourseBySlug), new { slug = course.Slug }, courseDto);
+            return CreatedAtAction(nameof(GetCourseBySlug), new { slug = createdCourse.Slug }, courseDto);
         }
         catch (Exception ex)
         {
@@ -334,10 +489,38 @@ public class CoursesController : ControllerBase
             {
                 return BadRequest(ModelState);
             }
-            var course = await _context.Courses.FindAsync(id);
+
+            var course = await _context.Courses
+                .Include(c => c.CourseSubCategoryMappings)
+                .FirstOrDefaultAsync(c => c.Id == id);
+
             if (course == null)
             {
                 return NotFound(new { error = "Course not found" });
+            }
+
+            // Validate CategoryId if provided
+            if (request.CategoryId.HasValue)
+            {
+                var categoryExists = await _context.CourseCategories.AnyAsync(c => c.Id == request.CategoryId.Value);
+                if (!categoryExists)
+                {
+                    return BadRequest(new { error = "Invalid category ID" });
+                }
+            }
+
+            // Validate SubCategoryIds if provided
+            if (request.SubCategoryIds != null && request.SubCategoryIds.Any())
+            {
+                var validSubCategoryIds = await _context.CourseSubCategories
+                    .Where(sc => request.SubCategoryIds.Contains(sc.Id))
+                    .Select(sc => sc.Id)
+                    .ToListAsync();
+
+                if (validSubCategoryIds.Count != request.SubCategoryIds.Count)
+                {
+                    return BadRequest(new { error = "One or more invalid sub-category IDs" });
+                }
             }
 
             course.Slug = request.Slug;
@@ -345,10 +528,11 @@ public class CoursesController : ControllerBase
             course.Currency = request.Currency;
             course.Type = request.Type;
             course.Level = request.Level;
-            course.Category = request.Category;
+            course.CategoryId = request.CategoryId;
             course.VideoUrl = request.VideoUrl;
             course.Duration = request.Duration;
-            course.InstructorName = request.InstructorName;
+            course.InstructorNameAr = request.InstructorNameAr;
+            course.InstructorNameEn = request.InstructorNameEn;
             course.TitleAr = request.TitleAr;
             course.TitleEn = request.TitleEn;
             course.SummaryAr = request.SummaryAr;
@@ -359,34 +543,83 @@ public class CoursesController : ControllerBase
             course.Tags = request.Tags;
             course.InstructorsBioAr = request.InstructorsBioAr;
             course.InstructorsBioEn = request.InstructorsBioEn;
+            course.CourseTopicsAr = request.CourseTopicsAr;
+            course.CourseTopicsEn = request.CourseTopicsEn;
             course.IsActive = request.IsActive;
             course.IsFeatured = request.IsFeatured;
             course.UpdatedAt = DateTime.UtcNow;
 
+            // Update sub-category mappings
+            // Remove existing mappings
+            _context.CourseSubCategoryMappings.RemoveRange(course.CourseSubCategoryMappings);
+
+            // Add new mappings
+            if (request.SubCategoryIds != null && request.SubCategoryIds.Any())
+            {
+                var mappings = request.SubCategoryIds.Select(subCatId => new CourseSubCategoryMapping
+                {
+                    CourseId = course.Id,
+                    SubCategoryId = subCatId,
+                    CreatedAt = DateTime.UtcNow
+                }).ToList();
+
+                _context.CourseSubCategoryMappings.AddRange(mappings);
+            }
+
             await _context.SaveChangesAsync();
+
+            // Reload course with related data
+            var updatedCourse = await _context.Courses
+                .Include(c => c.Category)
+                .Include(c => c.CourseSubCategoryMappings)
+                    .ThenInclude(m => m.SubCategory)
+                .FirstOrDefaultAsync(c => c.Id == id);
 
             var courseDto = new CourseDetailDto
             {
-                Id = course.Id,
-                Slug = course.Slug,
-                Title = new LocalizedText { Ar = course.TitleAr, En = course.TitleEn },
-                Summary = new LocalizedText { Ar = course.SummaryAr ?? "", En = course.SummaryEn ?? "" },
-                Description = new LocalizedText { Ar = course.DescriptionAr ?? "", En = course.DescriptionEn ?? "" },
-                Price = course.Price,
-                Currency = course.Currency,
-                Type = course.Type,
-                Level = course.Level,
-                Category = course.Category,
-                VideoUrl = course.VideoUrl,
-                Duration = course.Duration,
-                InstructorName = course.InstructorName,
-                Photo = course.Photo,
-                Tags = course.Tags,
-                InstructorsBio = new LocalizedText { Ar = course.InstructorsBioAr ?? "", En = course.InstructorsBioEn ?? "" },
-                IsActive = course.IsActive,
-                IsFeatured = course.IsFeatured,
-                CreatedAt = course.CreatedAt,
-                UpdatedAt = course.UpdatedAt,
+                Id = updatedCourse!.Id,
+                Slug = updatedCourse.Slug,
+                Title = new LocalizedText { Ar = updatedCourse.TitleAr, En = updatedCourse.TitleEn },
+                Summary = new LocalizedText { Ar = updatedCourse.SummaryAr ?? "", En = updatedCourse.SummaryEn ?? "" },
+                Description = new LocalizedText { Ar = updatedCourse.DescriptionAr ?? "", En = updatedCourse.DescriptionEn ?? "" },
+                Price = updatedCourse.Price,
+                Currency = updatedCourse.Currency,
+                Type = updatedCourse.Type,
+                Level = updatedCourse.Level,
+                CategoryId = updatedCourse.CategoryId,
+                Category = updatedCourse.Category != null ? new CourseCategoryDto
+                {
+                    Id = updatedCourse.Category.Id,
+                    TitleAr = updatedCourse.Category.TitleAr,
+                    TitleEn = updatedCourse.Category.TitleEn,
+                    DisplayOrder = updatedCourse.Category.DisplayOrder,
+                    IsActive = updatedCourse.Category.IsActive,
+                    CreatedAt = updatedCourse.Category.CreatedAt,
+                    UpdatedAt = updatedCourse.Category.UpdatedAt
+                } : null,
+                SubCategories = updatedCourse.CourseSubCategoryMappings
+                    .Select(m => new CourseSubCategoryDto
+                    {
+                        Id = m.SubCategory.Id,
+                        TitleAr = m.SubCategory.TitleAr,
+                        TitleEn = m.SubCategory.TitleEn,
+                        DisplayOrder = m.SubCategory.DisplayOrder,
+                        IsActive = m.SubCategory.IsActive,
+                        CreatedAt = m.SubCategory.CreatedAt,
+                        UpdatedAt = m.SubCategory.UpdatedAt
+                    })
+                    .ToList(),
+                VideoUrl = updatedCourse.VideoUrl,
+                Duration = updatedCourse.Duration,
+                InstructorName = new LocalizedText { Ar = updatedCourse.InstructorNameAr, En = updatedCourse.InstructorNameEn },
+                Photo = updatedCourse.Photo,
+                Tags = updatedCourse.Tags,
+                InstructorsBio = new LocalizedText { Ar = updatedCourse.InstructorsBioAr ?? "", En = updatedCourse.InstructorsBioEn ?? "" },
+                CourseTopics = new LocalizedText { Ar = updatedCourse.CourseTopicsAr ?? "", En = updatedCourse.CourseTopicsEn ?? "" },
+                IsActive = updatedCourse.IsActive,
+                IsFeatured = updatedCourse.IsFeatured,
+                CreatedAt = updatedCourse.CreatedAt,
+                UpdatedAt = updatedCourse.UpdatedAt,
                 Sessions = new List<SessionDto>(),
                 Attachments = new List<AttachmentDto>()
             };

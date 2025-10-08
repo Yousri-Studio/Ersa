@@ -170,7 +170,7 @@ export default function WishlistPage() {
               <div className="relative">
                 <img
                   src={item.imageUrl}
-                  alt={item.title}
+                  alt={typeof item.title === 'string' ? item.title : ''}
                   className="w-full h-48 object-cover"
                 />
                 <button
@@ -200,7 +200,7 @@ export default function WishlistPage() {
                 </div>
                 
                 <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2 font-cairo">
-                  {item.title}
+                  {typeof item.title === 'string' ? item.title : ''}
                 </h3>
                 
                 <p className="text-sm text-gray-600 mb-4 font-cairo">

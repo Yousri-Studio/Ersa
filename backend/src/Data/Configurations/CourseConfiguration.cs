@@ -64,9 +64,11 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
             .IsRequired()
             .HasDefaultValue(CourseLevel.Biginner);
 
-        builder.Property(c => c.Category)
-            .IsRequired()
-            .HasDefaultValue(CourseCategory.Business);
+        // Configure relationship with CourseCategory
+        builder.HasOne(c => c.Category)
+            .WithMany(cat => cat.Courses)
+            .HasForeignKey(c => c.CategoryId)
+            .OnDelete(DeleteBehavior.SetNull);
 
         builder.Property(c => c.CreatedAt)
             .HasDefaultValueSql("GETUTCDATE()");
@@ -79,7 +81,12 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
             .HasDefaultValue("")
             .HasMaxLength(1000);
 
-        builder.Property(c => c.InstructorName)
+        builder.Property(c => c.InstructorNameAr)
+            .IsRequired()
+            .HasMaxLength(255)
+            .HasDefaultValue("");
+
+        builder.Property(c => c.InstructorNameEn)
             .IsRequired()
             .HasMaxLength(255)
             .HasDefaultValue("");
@@ -96,6 +103,10 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
 
         builder.Property(c => c.InstructorsBioEn)
             .HasMaxLength(2500);
+
+        builder.Property(c => c.CourseTopicsAr);
+
+        builder.Property(c => c.CourseTopicsEn);
     }
 }
 

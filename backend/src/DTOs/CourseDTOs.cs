@@ -16,13 +16,16 @@ public class CourseListDto
     public string Currency { get; set; } = string.Empty;
     public CourseType Type { get; set; }
     public CourseLevel Level { get; set; }
-    public CourseCategory Category { get; set; }
+    public Guid? CategoryId { get; set; }
+    public CourseCategoryDto? Category { get; set; }
+    public List<CourseSubCategoryDto> SubCategories { get; set; } = new();
     public string? VideoUrl { get; set; }
     public string Duration { get; set; } = string.Empty;
-    public string InstructorName { get; set; } = string.Empty;
+    public LocalizedText InstructorName { get; set; } = new();
     public byte[]? Photo { get; set; }
     public string? Tags { get; set; }
     public LocalizedText InstructorsBio { get; set; } = new();
+    public LocalizedText CourseTopics { get; set; } = new();
     public bool IsActive { get; set; }
     public bool IsFeatured { get; set; }
     public DateTime CreatedAt { get; set; }
@@ -70,7 +73,9 @@ public class CreateCourseRequest
 
     public CourseLevel Level { get; set; } = CourseLevel.Biginner;
 
-    public CourseCategory Category { get; set; } = CourseCategory.Programming;
+    public Guid? CategoryId { get; set; }
+
+    public List<Guid> SubCategoryIds { get; set; } = new();
 
     [MaxLength(1000)]
     public string? VideoUrl { get; set; }
@@ -80,7 +85,11 @@ public class CreateCourseRequest
 
     [Required]
     [MaxLength(255)]
-    public string InstructorName { get; set; } = string.Empty;
+    public string InstructorNameAr { get; set; } = string.Empty;
+
+    [Required]
+    [MaxLength(255)]
+    public string InstructorNameEn { get; set; } = string.Empty;
 
     [Required]
     [MaxLength(500)]
@@ -112,6 +121,10 @@ public class CreateCourseRequest
 
     [MaxLength(2500)]
     public string? InstructorsBioEn { get; set; }
+
+    public string? CourseTopicsAr { get; set; }
+
+    public string? CourseTopicsEn { get; set; }
 }
 
 public class UpdateCourseRequest : CreateCourseRequest
