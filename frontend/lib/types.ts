@@ -1,6 +1,6 @@
 import { Course as ApiCourse } from './api';
 
-export interface Course extends Omit<ApiCourse, 'description'> {
+export interface Course extends Omit<ApiCourse, 'description' | 'duration'> {
   curriculum: CurriculumSection[];
   features: string[];
   requirements: string[];
@@ -20,7 +20,7 @@ export interface Course extends Omit<ApiCourse, 'description'> {
   };
   reviewsCount: number;
   studentsCount: number;
-  duration: string;
+  duration: string; // This is already localized by transformApiCourse
   level: number;
   language: string;
   originalPrice: number;

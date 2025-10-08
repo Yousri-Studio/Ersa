@@ -1,17 +1,15 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { Icon } from '@/components/ui/icon';
-import { coursesApi, Course } from '@/lib/api';
 import { CourseCard } from '@/components/ui/course-card-new';
-import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { courseToCardProps } from '@/lib/course-adapter';
 import { useCartStore } from '@/lib/cart-store';
 import { useAuthStore } from '@/lib/auth-store';
 import { useHydration } from '@/hooks/useHydration';
+import { useCourses } from '@/lib/content-hooks';
 import toast from 'react-hot-toast';
 
 export function FeaturedCourses() {
@@ -22,11 +20,7 @@ export function FeaturedCourses() {
   const { isAuthenticated } = useAuthStore();
   const { hasItem, addItem, items } = useCartStore();
 
-  const { data: courses, isLoading, error } = useQuery<Course[]>({
-    queryKey: ['featured-courses'],
-    queryFn: () => coursesApi.getFeaturedCourses().then(res => res.data),
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
+  const { courses, loading: isLoading, error } = useCourses({ featured: true });
 
   // Handle wishlist toggle
   const handleToggleWishlist = (courseId: string) => {

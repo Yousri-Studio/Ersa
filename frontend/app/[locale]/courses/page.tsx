@@ -21,6 +21,8 @@ import { ScrollAnimations } from '@/components/scroll-animations';
 import { useCourses } from '@/lib/content-hooks';
 import { categoriesApi, CourseCategoryData } from '@/lib/api';
 
+// Mock courses removed - using API data with proper transformation via useCourses hook
+/*
 const mockCourses: Partial<ApiCourse>[] = [
   {
     id: '1',
@@ -167,6 +169,7 @@ const mockCourses: Partial<ApiCourse>[] = [
     createdAt: ''
   }
 ];
+*/
 
 export default function CoursesPage() {
   const searchParams = useSearchParams();
@@ -230,9 +233,9 @@ export default function CoursesPage() {
 
       setFilteredCourses(filtered);
     } else if (!isLoading && (coursesError || !apiCourses)) {
-      // Use mock courses as fallback when API fails
-      console.log('Using mock courses as fallback');
-      setFilteredCourses(mockCourses as Course[]);
+      // No courses available when API fails
+      console.log('No courses available - API failed or empty');
+      setFilteredCourses([]);
     }
   }, [sortBy, apiCourses, isLoading, coursesError]);
 
@@ -382,8 +385,8 @@ export default function CoursesPage() {
                 const apiFeatured = apiCourses.filter((course: Course) => course.isFeatured);
                 featuredCourses = apiFeatured.length > 0 ? apiFeatured.slice(-2) : apiCourses.slice(-2);
               } else {
-                // Use mock courses as fallback
-                featuredCourses = (mockCourses as Course[]).filter(course => course.isFeatured).slice(-2);
+                // No featured courses available when API fails
+                featuredCourses = [];
               }
               
               console.log('API courses:', !!apiCourses, 'Count:', apiCourses?.length, 'Error:', !!coursesError, 'Loading:', isLoading, 'Displaying:', featuredCourses.length, 'featured courses');

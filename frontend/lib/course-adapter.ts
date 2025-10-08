@@ -1,4 +1,5 @@
-import { Course } from './api';
+import { Course as ApiCourse } from './api';
+import { Course } from './types';
 import { CourseCardProps } from '@/components/ui/course-card-new';
 
 /**
@@ -149,13 +150,13 @@ export const courseToCardProps = (
   // Get category - now handles new database structure
   const category = getCourseCategory(course, locale);
 
-  // Get duration from course data or fallback to course type
+  // Get duration label - the transformed Course already has duration as a localized string
   const getDurationLabel = (): { ar: string; en: string } => {
-    // First try to use the actual duration from backend
-    if (course.duration && typeof course.duration === 'object') {
+    // Use the actual duration from the course if available
+    if (course.duration) {
       return {
-        ar: course.duration.ar || '',
-        en: course.duration.en || ''
+        ar: course.duration,
+        en: course.duration
       };
     }
     

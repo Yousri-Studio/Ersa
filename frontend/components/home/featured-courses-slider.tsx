@@ -1,17 +1,17 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { Icon } from '@/components/ui/icon';
-import { coursesApi, Course } from '@/lib/api';
 import { CourseCard } from '@/components/ui/course-card-new';
 import { courseToCardProps } from '@/lib/course-adapter';
 import { useCartStore } from '@/lib/cart-store';
 import { useWishlistStore } from '@/lib/wishlist-store';
 import { useAuthStore } from '@/lib/auth-store';
 import { useHydration } from '@/hooks/useHydration';
+import { useCourses } from '@/lib/content-hooks';
+import { Course } from '@/lib/types';
 import toast from 'react-hot-toast';
 
 export function FeaturedCoursesSlider() {
@@ -29,20 +29,15 @@ export function FeaturedCoursesSlider() {
   const addWishlistItem = wishlistStore.addItem;
   const removeWishlistItem = wishlistStore.removeItem;
 
-  const { data: apiCourses, isLoading, error } = useQuery<Course[]>({
-    queryKey: ['featured-courses', locale],
-    queryFn: () => coursesApi.getCourses().then(res => res.data.filter(course => course.isFeatured).slice(0, 12)),
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: 1, // Retry once
-    retryDelay: 1000, // Wait 1 second before retry
-  });
+  const { courses: allCourses, loading: isLoading, error } = useCourses({ featured: true });
 
   // Handle query errors
   if (error) {
     console.warn('Failed to fetch featured courses from API, using mock data:', error.message);
   }
 
-  // Mock data for development when API returns empty
+  // Mock data removed - using API data with proper transformation via useCourses hook
+  /*
   const mockCourses: Course[] = [
     {
       id: '1',
@@ -171,11 +166,11 @@ export function FeaturedCoursesSlider() {
       thumbnailUrl: ''
     }
   ];
+  */
 
   // Use mock data if API fails, returns empty, or is loading
   // Always show mock courses to ensure featured section displays properly
-  const courses: Course[] = (apiCourses && Array.isArray(apiCourses) && apiCourses.length > 0 && !error && !isLoading) ? 
-    apiCourses : mockCourses;
+  const courses = allCourses || [];
 
   // Handler functions
   const handleToggleWishlist = (courseId: string) => {
