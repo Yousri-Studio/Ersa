@@ -12,7 +12,7 @@ namespace ErsaTraining.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize(Roles = "Admin,SuperAdmin")]
+[Authorize]
 public class AdminController : ControllerBase
 {
     private readonly ErsaTrainingDbContext _context;
@@ -27,6 +27,18 @@ public class AdminController : ControllerBase
         _context = context;
         _userManager = userManager;
         _logger = logger;
+    }
+
+    private async Task<bool> IsAdminOrSuperAdmin()
+    {
+        var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+        if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
+        {
+            return false;
+        }
+
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+        return user != null && (user.IsAdmin || user.IsSuperAdmin);
     }
 
     private Guid GetCurrentUserId()
@@ -1125,6 +1137,11 @@ public class AdminController : ControllerBase
     [HttpDelete("courses/{courseId}")]
     public async Task<ActionResult> DeleteCourse(Guid courseId)
     {
+        if (!await IsAdminOrSuperAdmin())
+        {
+            return Forbid("Access denied. Admin or SuperAdmin role required.");
+        }
+
         try
         {
             var course = await _context.Courses.FindAsync(courseId);
@@ -1261,6 +1278,11 @@ public class AdminController : ControllerBase
     [HttpDelete("course-categories/{id}")]
     public async Task<IActionResult> DeleteCourseCategory(Guid id)
     {
+        if (!await IsAdminOrSuperAdmin())
+        {
+            return Forbid("Access denied. Admin or SuperAdmin role required.");
+        }
+
         var category = await _context.CourseCategories.FindAsync(id);
 
         if (category == null)
@@ -1398,6 +1420,11 @@ public class AdminController : ControllerBase
     [HttpDelete("course-subcategories/{id}")]
     public async Task<IActionResult> DeleteCourseSubCategory(Guid id)
     {
+        if (!await IsAdminOrSuperAdmin())
+        {
+            return Forbid("Access denied. Admin or SuperAdmin role required.");
+        }
+
         var subCategory = await _context.CourseSubCategories.FindAsync(id);
 
         if (subCategory == null)
@@ -1416,6 +1443,215 @@ public class AdminController : ControllerBase
         await _context.SaveChangesAsync();
 
         return Ok("Course subcategory deleted successfully");
+    }
+
+    // ===================================================================
+    // INSTRUCTORS ENDPOINTS
+    // ===================================================================
+
+    [HttpGet("instructors")]
+    public async Task<ActionResult<IEnumerable<AdminInstructorDto>>> GetInstructors()
+    {
+        var instructors = await _context.Instructors
+            .Include(i => i.CourseInstructors)
+            .OrderBy(i => i.InstructorNameEn)
+            .Select(i => new AdminInstructorDto
+            {
+                Id = i.Id,
+                InstructorNameEn = i.InstructorNameEn,
+                InstructorNameAr = i.InstructorNameAr,
+                InstructorBioEn = i.InstructorBioEn ?? "",
+                InstructorBioAr = i.InstructorBioAr ?? "",
+                CreatedAt = i.CreatedAt,
+                UpdatedAt = i.UpdatedAt,
+                CourseIds = i.CourseInstructors.Select(ci => ci.CourseId).ToList()
+            })
+            .ToListAsync();
+
+        return Ok(instructors);
+    }
+
+    [HttpGet("instructors/{id}")]
+    public async Task<ActionResult<AdminInstructorDto>> GetInstructor(Guid id)
+    {
+        var instructor = await _context.Instructors
+            .Include(i => i.CourseInstructors)
+            .FirstOrDefaultAsync(i => i.Id == id);
+
+        if (instructor == null)
+        {
+            return NotFound($"Instructor with ID {id} not found");
+        }
+
+        return Ok(new AdminInstructorDto
+        {
+            Id = instructor.Id,
+            InstructorNameEn = instructor.InstructorNameEn,
+            InstructorNameAr = instructor.InstructorNameAr,
+            InstructorBioEn = instructor.InstructorBioEn ?? "",
+            InstructorBioAr = instructor.InstructorBioAr ?? "",
+            CreatedAt = instructor.CreatedAt,
+            UpdatedAt = instructor.UpdatedAt,
+            CourseIds = instructor.CourseInstructors.Select(ci => ci.CourseId).ToList()
+        });
+    }
+
+    [HttpPost("instructors")]
+    public async Task<ActionResult<AdminInstructorDto>> CreateInstructor([FromBody] CreateInstructorRequest request)
+    {
+        // Validate CourseIds if provided
+        if (request.CourseIds != null && request.CourseIds.Any())
+        {
+            var validCourseIds = await _context.Courses
+                .Where(c => request.CourseIds.Contains(c.Id))
+                .Select(c => c.Id)
+                .ToListAsync();
+
+            if (validCourseIds.Count != request.CourseIds.Count)
+            {
+                var invalidIds = request.CourseIds.Except(validCourseIds).ToList();
+                _logger.LogWarning($"Invalid course IDs provided when creating instructor: {string.Join(", ", invalidIds)}");
+                return BadRequest($"Invalid course IDs: {string.Join(", ", invalidIds)}. Please provide valid course GUIDs.");
+            }
+        }
+
+        var instructor = new Instructor
+        {
+            Id = Guid.NewGuid(),
+            InstructorNameEn = request.InstructorNameEn,
+            InstructorNameAr = request.InstructorNameAr,
+            InstructorBioEn = request.InstructorBioEn,
+            InstructorBioAr = request.InstructorBioAr,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        _context.Instructors.Add(instructor);
+        await _context.SaveChangesAsync();
+
+        // Add course-instructor mappings
+        if (request.CourseIds != null && request.CourseIds.Any())
+        {
+            var mappings = request.CourseIds.Select(courseId => new CourseInstructor
+            {
+                CourseId = courseId,
+                InstructorId = instructor.Id,
+                CreatedAt = DateTime.UtcNow
+            }).ToList();
+
+            _context.CourseInstructors.AddRange(mappings);
+            await _context.SaveChangesAsync();
+        }
+
+        var dto = new AdminInstructorDto
+        {
+            Id = instructor.Id,
+            InstructorNameEn = instructor.InstructorNameEn,
+            InstructorNameAr = instructor.InstructorNameAr,
+            InstructorBioEn = instructor.InstructorBioEn ?? "",
+            InstructorBioAr = instructor.InstructorBioAr ?? "",
+            CreatedAt = instructor.CreatedAt,
+            UpdatedAt = instructor.UpdatedAt,
+            CourseIds = request.CourseIds ?? new List<Guid>()
+        };
+
+        return CreatedAtAction(nameof(GetInstructor), new { id = instructor.Id }, dto);
+    }
+
+    [HttpPut("instructors/{id}")]
+    public async Task<ActionResult<AdminInstructorDto>> UpdateInstructor(Guid id, [FromBody] UpdateInstructorRequest request)
+    {
+        var instructor = await _context.Instructors
+            .Include(i => i.CourseInstructors)
+            .FirstOrDefaultAsync(i => i.Id == id);
+
+        if (instructor == null)
+        {
+            return NotFound($"Instructor with ID {id} not found");
+        }
+
+        // Validate CourseIds if provided
+        if (request.CourseIds != null && request.CourseIds.Any())
+        {
+            var validCourseIds = await _context.Courses
+                .Where(c => request.CourseIds.Contains(c.Id))
+                .Select(c => c.Id)
+                .ToListAsync();
+
+            if (validCourseIds.Count != request.CourseIds.Count)
+            {
+                var invalidIds = request.CourseIds.Except(validCourseIds).ToList();
+                _logger.LogWarning($"Invalid course IDs provided for instructor {id}: {string.Join(", ", invalidIds)}");
+                return BadRequest($"Invalid course IDs: {string.Join(", ", invalidIds)}. Please provide valid course GUIDs.");
+            }
+        }
+
+        instructor.InstructorNameEn = request.InstructorNameEn;
+        instructor.InstructorNameAr = request.InstructorNameAr;
+        instructor.InstructorBioEn = request.InstructorBioEn;
+        instructor.InstructorBioAr = request.InstructorBioAr;
+        instructor.UpdatedAt = DateTime.UtcNow;
+
+        // Update course-instructor mappings
+        _context.CourseInstructors.RemoveRange(instructor.CourseInstructors);
+
+        if (request.CourseIds != null && request.CourseIds.Any())
+        {
+            var mappings = request.CourseIds.Select(courseId => new CourseInstructor
+            {
+                CourseId = courseId,
+                InstructorId = instructor.Id,
+                CreatedAt = DateTime.UtcNow
+            }).ToList();
+
+            _context.CourseInstructors.AddRange(mappings);
+        }
+
+        await _context.SaveChangesAsync();
+
+        return Ok(new AdminInstructorDto
+        {
+            Id = instructor.Id,
+            InstructorNameEn = instructor.InstructorNameEn,
+            InstructorNameAr = instructor.InstructorNameAr,
+            InstructorBioEn = instructor.InstructorBioEn ?? "",
+            InstructorBioAr = instructor.InstructorBioAr ?? "",
+            CreatedAt = instructor.CreatedAt,
+            UpdatedAt = instructor.UpdatedAt,
+            CourseIds = request.CourseIds ?? new List<Guid>()
+        });
+    }
+
+    [HttpDelete("instructors/{id}")]
+    public async Task<IActionResult> DeleteInstructor(Guid id)
+    {
+        if (!await IsAdminOrSuperAdmin())
+        {
+            return Forbid("Access denied. Admin or SuperAdmin role required.");
+        }
+
+        var instructor = await _context.Instructors
+            .Include(i => i.CourseInstructors)
+            .FirstOrDefaultAsync(i => i.Id == id);
+
+        if (instructor == null)
+        {
+            return NotFound($"Instructor with ID {id} not found");
+        }
+
+        // Remove all course-instructor relationships first
+        if (instructor.CourseInstructors.Any())
+        {
+            _logger.LogInformation($"Removing {instructor.CourseInstructors.Count} course relationships for instructor {id}");
+            _context.CourseInstructors.RemoveRange(instructor.CourseInstructors);
+        }
+
+        // Now remove the instructor
+        _context.Instructors.Remove(instructor);
+        await _context.SaveChangesAsync();
+
+        _logger.LogInformation($"Successfully deleted instructor {id} ({instructor.InstructorNameEn})");
+        return Ok(new { message = "Instructor deleted successfully" });
     }
 
 }

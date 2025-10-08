@@ -395,6 +395,7 @@ export interface Instructor {
   instructorBioAr?: string;
   createdAt: string;
   updatedAt: string;
+  courseIds: string[];
 }
 
 export interface CreateInstructorRequest {
@@ -800,17 +801,17 @@ export const adminApi = {
   },
     
   // Instructors
-  getInstructors: () => api.get<Instructor[]>('/api/instructors'),
+  getInstructors: () => api.get<Instructor[]>('/api/admin/instructors'),
 
-  getInstructor: (id: string) => api.get<Instructor>(`/api/instructors/${id}`),
+  getInstructor: (id: string) => api.get<Instructor>(`/api/admin/instructors/${id}`),
 
   createInstructor: (data: CreateInstructorRequest) =>
-    api.post<Instructor>('/api/instructors', data),
+    api.post<Instructor>('/api/admin/instructors', data),
 
   updateInstructor: (id: string, data: UpdateInstructorRequest) =>
-    api.put<Instructor>(`/api/instructors/${id}`, data),
+    api.put<Instructor>(`/api/admin/instructors/${id}`, data),
 
-  deleteInstructor: (id: string) => api.delete(`/api/instructors/${id}`),
+  deleteInstructor: (id: string) => api.delete(`/api/admin/instructors/${id}`),
 
   // Content Management
   getContentPages: () => api.get<ContentPage[]>('/api/content/pages'),

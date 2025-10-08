@@ -25,6 +25,9 @@ export default function AdminInstructors() {
     instructorBioAr: '',
     courseIds: [],
   });
+  const [filters, setFilters] = useState({
+    search: '',
+  });
   const isHydrated = useHydration();
   const isRTL = locale === 'ar';
 
@@ -47,7 +50,19 @@ export default function AdminInstructors() {
     try {
       setIsLoading(true);
       const response = await adminApi.getInstructors();
-      setInstructors(response.data);
+      let filteredInstructors = response.data;
+      
+      // Apply search filter
+      if (filters.search) {
+        filteredInstructors = filteredInstructors.filter(instructor =>
+          instructor.instructorNameEn.toLowerCase().includes(filters.search.toLowerCase()) ||
+          instructor.instructorNameAr.includes(filters.search) ||
+          (instructor.instructorBioEn && instructor.instructorBioEn.toLowerCase().includes(filters.search.toLowerCase())) ||
+          (instructor.instructorBioAr && instructor.instructorBioAr.includes(filters.search))
+        );
+      }
+      
+      setInstructors(filteredInstructors);
     } catch (error: any) {
       console.error('Error fetching instructors:', error);
       toast.error(isRTL ? 'فشل تحميل المدربين' : 'Failed to load instructors');
@@ -59,7 +74,15 @@ export default function AdminInstructors() {
   const fetchCourses = async () => {
     try {
       const response = await adminApi.getCourses({ page: 1, pageSize: 100 });
-      setCourses(response.data.items);
+      // Filter out courses with invalid GUIDs
+      const validGuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const validCourses = response.data.items.filter(course => validGuidRegex.test(course.id));
+      
+      if (validCourses.length < response.data.items.length) {
+        console.warn(`Filtered out ${response.data.items.length - validCourses.length} courses with invalid IDs`);
+      }
+      
+      setCourses(validCourses);
     } catch (error: any) {
       console.error('Error fetching courses:', error);
     }
@@ -67,14 +90,24 @@ export default function AdminInstructors() {
 
   const handleAddInstructor = async () => {
     try {
-      await adminApi.createInstructor(instructorForm);
+      // Filter out any invalid GUIDs (validate format)
+      const validGuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const validCourseIds = instructorForm.courseIds?.filter(id => validGuidRegex.test(id)) || [];
+      
+      const payload = {
+        ...instructorForm,
+        courseIds: validCourseIds
+      };
+      
+      await adminApi.createInstructor(payload);
       toast.success(isRTL ? 'تم إضافة المدرب بنجاح' : 'Instructor added successfully');
       setShowAddModal(false);
       fetchInstructors();
       resetForm();
     } catch (error: any) {
       console.error('Error adding instructor:', error);
-      toast.error(isRTL ? 'فشلت إضافة المدرب' : 'Failed to add instructor');
+      const errorMessage = error.response?.data?.message || error.response?.data || 'Failed to add instructor';
+      toast.error(isRTL ? `فشلت إضافة المدرب: ${errorMessage}` : `Failed to add instructor: ${errorMessage}`);
     }
   };
 
@@ -82,14 +115,24 @@ export default function AdminInstructors() {
     if (!selectedInstructor) return;
     
     try {
-      await adminApi.updateInstructor(selectedInstructor.id, instructorForm);
+      // Filter out any invalid GUIDs (validate format)
+      const validGuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const validCourseIds = instructorForm.courseIds?.filter(id => validGuidRegex.test(id)) || [];
+      
+      const payload = {
+        ...instructorForm,
+        courseIds: validCourseIds
+      };
+      
+      await adminApi.updateInstructor(selectedInstructor.id, payload);
       toast.success(isRTL ? 'تم تحديث المدرب بنجاح' : 'Instructor updated successfully');
       setShowEditModal(false);
       fetchInstructors();
       resetForm();
     } catch (error: any) {
       console.error('Error updating instructor:', error);
-      toast.error(isRTL ? 'فشل تحديث المدرب' : 'Failed to update instructor');
+      const errorMessage = error.response?.data?.message || error.response?.data || 'Failed to update instructor';
+      toast.error(isRTL ? `فشل تحديث المدرب: ${errorMessage}` : `Failed to update instructor: ${errorMessage}`);
     }
   };
 
@@ -130,7 +173,7 @@ export default function AdminInstructors() {
       instructorNameAr: instructor.instructorNameAr,
       instructorBioEn: instructor.instructorBioEn || '',
       instructorBioAr: instructor.instructorBioAr || '',
-      courseIds: [],
+      courseIds: instructor.courseIds || [],
     });
     setShowEditModal(true);
   };
@@ -149,271 +192,334 @@ export default function AdminInstructors() {
     }));
   };
 
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString(
+      locale === 'ar' ? 'ar-SA' : 'en-US', 
+      {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+      }
+    );
+  };
+
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <h1 style={{
-          background: 'linear-gradient(270deg, #27E8B1 31.94%, #693EB0 59.68%)',
-          backgroundClip: 'text',
-          WebkitBackgroundClip: 'text',
-          WebkitTextFillColor: 'transparent',
-          textAlign: 'center',
-          fontFamily: '"The Year of Handicrafts"',
-          fontSize: '44px',
-          fontStyle: 'normal',
-          fontWeight: 700,
-          lineHeight: 'normal',
-        }}>
-          {isRTL ? 'إدارة المدربين' : 'Instructors Management'}
-        </h1>
-        <button
-          onClick={openAddModal}
-          className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-teal-500 text-white px-6 py-3 rounded-lg hover:opacity-90 transition-opacity"
-        >
-          <Icon name="plus" />
-          {isRTL ? 'إضافة مدرب' : 'Add Instructor'}
-        </button>
+    <div className="space-y-6" style={{maxWidth: '90rem', paddingTop: '50px'}} dir={isRTL ? 'rtl' : 'ltr'}>
+      {/* Page Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">
+            {isRTL ? 'إدارة المدربين' : 'Instructors Management'}
+          </h1>
+          <p className="mt-1 text-sm text-gray-500">
+            {isRTL 
+              ? 'إدارة معلومات المدربين والدورات المرتبطة' 
+              : 'Manage instructor information and associated courses'
+            }
+          </p>
+        </div>
+        <div>
+          <button
+            onClick={openAddModal}
+            className="px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500"
+          >
+            <Icon name="plus" className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
+            {isRTL ? 'إضافة مدرب' : 'Add Instructor'}
+          </button>
+        </div>
+      </div>
+
+      {/* Filters */}
+      <div className="bg-white shadow rounded-lg p-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {isRTL ? 'البحث' : 'Search'}
+            </label>
+            <div className="relative">
+              <input
+                type="text"
+                placeholder={isRTL ? 'البحث بالاسم أو السيرة الذاتية...' : 'Search by name or bio...'}
+                value={filters.search}
+                onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+                className={`w-full py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${isRTL ? 'pr-10 pl-3' : 'pl-10 pr-3'}`}
+                dir={locale === 'ar' ? 'rtl' : 'ltr'}
+              />
+              <Icon name="search" className={`absolute top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400 ${isRTL ? 'right-3' : 'left-3'}`} />
+            </div>
+          </div>
+          <div className="flex items-end">
+            <button
+              onClick={fetchInstructors}
+              className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              {isRTL ? 'بحث' : 'Search'}
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Instructors Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {isRTL ? 'الاسم (عربي)' : 'Name (Arabic)'}
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {isRTL ? 'الاسم (إنجليزي)' : 'Name (English)'}
-              </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {isRTL ? 'تاريخ الإنشاء' : 'Created At'}
-              </th>
-              <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                {isRTL ? 'الإجراءات' : 'Actions'}
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {isLoading ? (
-              <tr>
-                <td colSpan={4} className="px-6 py-4 text-center">
-                  <div className="flex justify-center">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
-                  </div>
-                </td>
-              </tr>
-            ) : instructors.length === 0 ? (
-              <tr>
-                <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
-                  {isRTL ? 'لا يوجد مدربين' : 'No instructors found'}
-                </td>
-              </tr>
-            ) : (
-              instructors.map((instructor) => (
-                <tr key={instructor.id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {instructor.instructorNameAr}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {instructor.instructorNameEn}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {new Date(instructor.createdAt).toLocaleDateString(locale)}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <button
-                      onClick={() => openEditModal(instructor)}
-                      className="text-blue-600 hover:text-blue-900 mr-4"
-                    >
-                      <Icon name="edit" />
-                    </button>
-                    <button
-                      onClick={() => openDeleteModal(instructor)}
-                      className="text-red-600 hover:text-red-900"
-                    >
-                      <Icon name="trash" />
-                    </button>
-                  </td>
+      <div className="bg-white shadow rounded-lg overflow-hidden">
+        <div className="px-6 py-4 border-b border-gray-200">
+          <h3 className="text-lg font-medium text-gray-900">
+            {isRTL ? 'المدربين' : 'Instructors'} ({instructors.length.toLocaleString()})
+          </h3>
+        </div>
+        
+        {isLoading ? (
+          <div className="flex items-center justify-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
+                    {isRTL ? 'المدرب' : 'Instructor'}
+                  </th>
+                  <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
+                    {isRTL ? 'السيرة الذاتية' : 'Bio'}
+                  </th>
+                  <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
+                    {isRTL ? 'تاريخ الإنشاء' : 'Created'}
+                  </th>
+                  <th className="px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider text-left">
+                    {isRTL ? 'الإجراءات' : 'Actions'}
+                  </th>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {instructors.length === 0 ? (
+                  <tr>
+                    <td colSpan={4} className="px-6 py-4 text-center text-gray-500">
+                      {isRTL ? 'لا يوجد مدربين' : 'No instructors found'}
+                    </td>
+                  </tr>
+                ) : (
+                  instructors.map((instructor) => (
+                    <tr key={instructor.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4 whitespace-nowrap text-left">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-10 w-10">
+                            <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                              <Icon name="user" className="h-5 w-5 text-gray-600" />
+                            </div>
+                          </div>
+                          <div className="ml-4">
+                            <div className="text-sm font-medium text-gray-900">
+                              {isRTL ? instructor.instructorNameAr : instructor.instructorNameEn}
+                            </div>
+                            <div className="text-sm text-gray-500">
+                              {isRTL ? instructor.instructorNameEn : instructor.instructorNameAr}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-left">
+                        <div className="text-sm text-gray-900 max-w-xs">
+                          <div className="truncate">
+                            {isRTL ? (instructor.instructorBioAr || '') : (instructor.instructorBioEn || '')}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-left">
+                        {formatDate(instructor.createdAt)}
+                      </td>
+                      <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${isRTL ? 'text-left' : 'text-right'}`}>
+                        <div className={`flex ${isRTL ? 'justify-start' : 'justify-end'} ${isRTL ? 'space-x-reverse' : ''} space-x-2`}>
+                          <button
+                            onClick={() => openEditModal(instructor)}
+                            className="text-blue-600 hover:text-blue-900"
+                          >
+                            <Icon name="edit" className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => openDeleteModal(instructor)}
+                            className="text-red-600 hover:text-red-900"
+                          >
+                            <Icon name="trash" className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
       {/* Add/Edit Modal */}
       {(showAddModal || showEditModal) && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto p-6"
-          >
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold">
-                {showAddModal
-                  ? (isRTL ? 'إضافة مدرب جديد' : 'Add New Instructor')
-                  : (isRTL ? 'تعديل المدرب' : 'Edit Instructor')}
-              </h2>
-              <button
-                onClick={() => {
-                  setShowAddModal(false);
-                  setShowEditModal(false);
-                  resetForm();
-                }}
-                className="text-gray-500 hover:text-gray-700"
-              >
-                <Icon name="times" />
-              </button>
-            </div>
-
-            <div className="space-y-4">
-              {/* Name English */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {isRTL ? 'الاسم (إنجليزي) *' : 'Name (English) *'}
-                </label>
-                <input
-                  type="text"
-                  value={instructorForm.instructorNameEn}
-                  onChange={(e) => setInstructorForm({ ...instructorForm, instructorNameEn: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  required
-                />
-              </div>
-
-              {/* Name Arabic */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {isRTL ? 'الاسم (عربي) *' : 'Name (Arabic) *'}
-                </label>
-                <input
-                  type="text"
-                  value={instructorForm.instructorNameAr}
-                  onChange={(e) => setInstructorForm({ ...instructorForm, instructorNameAr: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  required
-                  dir="rtl"
-                />
-              </div>
-
-              {/* Bio English */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {isRTL ? 'السيرة الذاتية (إنجليزي)' : 'Bio (English)'}
-                </label>
-                <textarea
-                  value={instructorForm.instructorBioEn}
-                  onChange={(e) => setInstructorForm({ ...instructorForm, instructorBioEn: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  rows={4}
-                  maxLength={2500}
-                />
-              </div>
-
-              {/* Bio Arabic */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {isRTL ? 'السيرة الذاتية (عربي)' : 'Bio (Arabic)'}
-                </label>
-                <textarea
-                  value={instructorForm.instructorBioAr}
-                  onChange={(e) => setInstructorForm({ ...instructorForm, instructorBioAr: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                  rows={4}
-                  maxLength={2500}
-                  dir="rtl"
-                />
-              </div>
-
-              {/* Courses Selection */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {isRTL ? 'الدورات' : 'Courses'}
-                </label>
-                <div className="border border-gray-300 rounded-lg p-4 max-h-60 overflow-y-auto space-y-2">
-                  {courses.length === 0 ? (
-                    <p className="text-gray-500 text-sm">
-                      {isRTL ? 'لا توجد دورات متاحة' : 'No courses available'}
-                    </p>
-                  ) : (
-                    courses.map((course) => (
-                      <label key={course.id} className="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded">
-                        <input
-                          type="checkbox"
-                          checked={instructorForm.courseIds?.includes(course.id) || false}
-                          onChange={() => toggleCourse(course.id)}
-                          className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                        />
-                        <span className="text-sm text-gray-700">
-                          {locale === 'ar' ? course.titleAr : course.titleEn}
-                        </span>
-                      </label>
-                    ))
-                  )}
-                </div>
-              </div>
-
-              {/* Buttons */}
-              <div className="flex justify-end gap-4 mt-6">
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border max-w-4xl w-full shadow-lg rounded-md bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
+            <div className="mt-3">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-lg font-medium text-gray-900">
+                  {showAddModal
+                    ? (isRTL ? 'إضافة مدرب جديد' : 'Add New Instructor')
+                    : (isRTL ? 'تعديل المدرب' : 'Edit Instructor')}
+                </h3>
                 <button
                   onClick={() => {
                     setShowAddModal(false);
                     setShowEditModal(false);
                     resetForm();
                   }}
-                  className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  className="text-gray-500 hover:text-gray-700"
                 >
-                  {isRTL ? 'إلغاء' : 'Cancel'}
-                </button>
-                <button
-                  onClick={showAddModal ? handleAddInstructor : handleUpdateInstructor}
-                  className="px-6 py-2 bg-gradient-to-r from-purple-600 to-teal-500 text-white rounded-lg hover:opacity-90"
-                >
-                  {showAddModal ? (isRTL ? 'إضافة' : 'Add') : (isRTL ? 'تحديث' : 'Update')}
+                  <Icon name="times" className="h-6 w-6" />
                 </button>
               </div>
+
+              <div className="space-y-4">
+                {/* Name English */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {isRTL ? 'الاسم (إنجليزي) *' : 'Name (English) *'}
+                  </label>
+                  <input
+                    type="text"
+                    value={instructorForm.instructorNameEn}
+                    onChange={(e) => setInstructorForm({ ...instructorForm, instructorNameEn: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    required
+                  />
+                </div>
+
+                {/* Name Arabic */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {isRTL ? 'الاسم (عربي) *' : 'Name (Arabic) *'}
+                  </label>
+                  <input
+                    type="text"
+                    value={instructorForm.instructorNameAr}
+                    onChange={(e) => setInstructorForm({ ...instructorForm, instructorNameAr: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    required
+                    dir="rtl"
+                  />
+                </div>
+
+                {/* Bio English */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {isRTL ? 'السيرة الذاتية (إنجليزي)' : 'Bio (English)'}
+                  </label>
+                  <textarea
+                    value={instructorForm.instructorBioEn}
+                    onChange={(e) => setInstructorForm({ ...instructorForm, instructorBioEn: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    rows={4}
+                    maxLength={2500}
+                  />
+                </div>
+
+                {/* Bio Arabic */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {isRTL ? 'السيرة الذاتية (عربي)' : 'Bio (Arabic)'}
+                  </label>
+                  <textarea
+                    value={instructorForm.instructorBioAr}
+                    onChange={(e) => setInstructorForm({ ...instructorForm, instructorBioAr: e.target.value })}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                    rows={4}
+                    maxLength={2500}
+                    dir="rtl"
+                  />
+                </div>
+
+                {/* Courses Selection */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {isRTL ? 'الدورات' : 'Courses'}
+                  </label>
+                  <div className="border border-gray-300 rounded-lg p-4 max-h-60 overflow-y-auto space-y-2">
+                    {courses.length === 0 ? (
+                      <p className="text-gray-500 text-sm">
+                        {isRTL ? 'لا توجد دورات متاحة' : 'No courses available'}
+                      </p>
+                    ) : (
+                      courses.map((course) => (
+                        <label key={course.id} className="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                          <input
+                            type="checkbox"
+                            checked={instructorForm.courseIds?.includes(course.id) || false}
+                            onChange={() => toggleCourse(course.id)}
+                            className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                          />
+                          <span className="text-sm text-gray-700">
+                            {locale === 'ar' ? course.titleAr : course.titleEn}
+                          </span>
+                        </label>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* Buttons */}
+                <div className="flex justify-end gap-4 mt-6">
+                  <button
+                    onClick={() => {
+                      setShowAddModal(false);
+                      setShowEditModal(false);
+                      resetForm();
+                    }}
+                    className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  >
+                    {isRTL ? 'إلغاء' : 'Cancel'}
+                  </button>
+                  <button
+                    onClick={showAddModal ? handleAddInstructor : handleUpdateInstructor}
+                    className="px-6 py-2 bg-gradient-to-r from-purple-600 to-teal-500 text-white rounded-lg hover:opacity-90"
+                  >
+                    {showAddModal ? (isRTL ? 'إضافة' : 'Add') : (isRTL ? 'تحديث' : 'Update')}
+                  </button>
+                </div>
+              </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       )}
 
       {/* Delete Confirmation Modal */}
       {showDeleteModal && selectedInstructor && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-lg max-w-md w-full p-6"
-          >
-            <h2 className="text-xl font-bold mb-4">
-              {isRTL ? 'تأكيد الحذف' : 'Confirm Delete'}
-            </h2>
-            <p className="text-gray-600 mb-6">
-              {isRTL
-                ? `هل أنت متأكد من حذف المدرب "${selectedInstructor.instructorNameAr}"؟`
-                : `Are you sure you want to delete instructor "${selectedInstructor.instructorNameEn}"?`}
-            </p>
-            <div className="flex justify-end gap-4">
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-              >
-                {isRTL ? 'إلغاء' : 'Cancel'}
-              </button>
-              <button
-                onClick={handleDeleteInstructor}
-                className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-              >
-                {isRTL ? 'حذف' : 'Delete'}
-              </button>
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
+          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
+            <div className="mt-3">
+              <h3 className="text-lg font-medium text-gray-900 mb-4">
+                {isRTL ? 'تأكيد الحذف' : 'Confirm Delete'}
+              </h3>
+              <p className="text-gray-600 mb-6">
+                {isRTL
+                  ? `هل أنت متأكد من حذف المدرب "${selectedInstructor.instructorNameAr}"؟`
+                  : `Are you sure you want to delete instructor "${selectedInstructor.instructorNameEn}"?`}
+              </p>
+              <div className="flex justify-end gap-4">
+                <button
+                  onClick={() => setShowDeleteModal(false)}
+                  className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                >
+                  {isRTL ? 'إلغاء' : 'Cancel'}
+                </button>
+                <button
+                  onClick={handleDeleteInstructor}
+                  className="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                >
+                  {isRTL ? 'حذف' : 'Delete'}
+                </button>
+              </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       )}
     </div>
   );
 }
-

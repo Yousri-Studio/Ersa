@@ -67,6 +67,7 @@ public class CoursesController : ControllerBase
                     .ThenInclude(m => m.SubCategory)
                 .Include(c => c.CourseInstructors)
                     .ThenInclude(ci => ci.Instructor)
+                .AsSplitQuery()
                 .OrderBy(c => c.TitleEn)
                 .ToListAsync();
 
@@ -113,8 +114,16 @@ public class CoursesController : ControllerBase
                 Instructors = c.CourseInstructors.Select(ci => new InstructorDto
                 {
                     Id = ci.Instructor.Id,
-                    InstructorName = new LocalizedText { Ar = ci.Instructor.InstructorNameAr, En = ci.Instructor.InstructorNameEn },
-                    InstructorBio = new LocalizedText { Ar = ci.Instructor.InstructorBioAr ?? "", En = ci.Instructor.InstructorBioEn ?? "" },
+                    InstructorName = new LocalizedText 
+                    { 
+                        Ar = ci.Instructor.InstructorNameAr, 
+                        En = ci.Instructor.InstructorNameEn 
+                    },
+                    InstructorBio = new LocalizedText 
+                    { 
+                        Ar = ci.Instructor.InstructorBioAr ?? "", 
+                        En = ci.Instructor.InstructorBioEn ?? "" 
+                    },
                     CreatedAt = ci.Instructor.CreatedAt,
                     UpdatedAt = ci.Instructor.UpdatedAt
                 }).ToList(),
@@ -201,8 +210,16 @@ public class CoursesController : ControllerBase
                 Instructors = course.CourseInstructors.Select(ci => new InstructorDto
                 {
                     Id = ci.Instructor.Id,
-                    InstructorName = new LocalizedText { Ar = ci.Instructor.InstructorNameAr, En = ci.Instructor.InstructorNameEn },
-                    InstructorBio = new LocalizedText { Ar = ci.Instructor.InstructorBioAr ?? "", En = ci.Instructor.InstructorBioEn ?? "" },
+                    InstructorName = new LocalizedText 
+                    { 
+                        Ar = ci.Instructor.InstructorNameAr, 
+                        En = ci.Instructor.InstructorNameEn 
+                    },
+                    InstructorBio = new LocalizedText 
+                    { 
+                        Ar = ci.Instructor.InstructorBioAr ?? "", 
+                        En = ci.Instructor.InstructorBioEn ?? "" 
+                    },
                     CreatedAt = ci.Instructor.CreatedAt,
                     UpdatedAt = ci.Instructor.UpdatedAt
                 }).ToList(),
@@ -255,6 +272,7 @@ public class CoursesController : ControllerBase
                     .ThenInclude(m => m.SubCategory)
                 .Include(c => c.CourseInstructors)
                     .ThenInclude(ci => ci.Instructor)
+                .AsSplitQuery()
                 .Where(c => c.IsActive && c.IsFeatured)
                 .OrderBy(c => c.TitleEn)
                 .ToListAsync();
@@ -302,8 +320,16 @@ public class CoursesController : ControllerBase
                 Instructors = c.CourseInstructors.Select(ci => new InstructorDto
                 {
                     Id = ci.Instructor.Id,
-                    InstructorName = new LocalizedText { Ar = ci.Instructor.InstructorNameAr, En = ci.Instructor.InstructorNameEn },
-                    InstructorBio = new LocalizedText { Ar = ci.Instructor.InstructorBioAr ?? "", En = ci.Instructor.InstructorBioEn ?? "" },
+                    InstructorName = new LocalizedText 
+                    { 
+                        Ar = ci.Instructor.InstructorNameAr, 
+                        En = ci.Instructor.InstructorNameEn 
+                    },
+                    InstructorBio = new LocalizedText 
+                    { 
+                        Ar = ci.Instructor.InstructorBioAr ?? "", 
+                        En = ci.Instructor.InstructorBioEn ?? "" 
+                    },
                     CreatedAt = ci.Instructor.CreatedAt,
                     UpdatedAt = ci.Instructor.UpdatedAt
                 }).ToList(),
@@ -494,6 +520,7 @@ public class CoursesController : ControllerBase
                     .ThenInclude(m => m.SubCategory)
                 .Include(c => c.CourseInstructors)
                     .ThenInclude(ci => ci.Instructor)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(c => c.Id == course.Id);
 
             var courseDto = new CourseDetailDto
@@ -539,8 +566,16 @@ public class CoursesController : ControllerBase
                 Instructors = createdCourse.CourseInstructors.Select(ci => new InstructorDto
                 {
                     Id = ci.Instructor.Id,
-                    InstructorName = new LocalizedText { Ar = ci.Instructor.InstructorNameAr, En = ci.Instructor.InstructorNameEn },
-                    InstructorBio = new LocalizedText { Ar = ci.Instructor.InstructorBioAr ?? "", En = ci.Instructor.InstructorBioEn ?? "" },
+                    InstructorName = new LocalizedText 
+                    { 
+                        Ar = ci.Instructor.InstructorNameAr, 
+                        En = ci.Instructor.InstructorNameEn 
+                    },
+                    InstructorBio = new LocalizedText 
+                    { 
+                        Ar = ci.Instructor.InstructorBioAr ?? "", 
+                        En = ci.Instructor.InstructorBioEn ?? "" 
+                    },
                     CreatedAt = ci.Instructor.CreatedAt,
                     UpdatedAt = ci.Instructor.UpdatedAt
                 }).ToList(),
@@ -695,6 +730,7 @@ public class CoursesController : ControllerBase
                     .ThenInclude(m => m.SubCategory)
                 .Include(c => c.CourseInstructors)
                     .ThenInclude(ci => ci.Instructor)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(c => c.Id == id);
 
             var courseDto = new CourseDetailDto
@@ -740,8 +776,16 @@ public class CoursesController : ControllerBase
                 Instructors = updatedCourse.CourseInstructors.Select(ci => new InstructorDto
                 {
                     Id = ci.Instructor.Id,
-                    InstructorName = new LocalizedText { Ar = ci.Instructor.InstructorNameAr, En = ci.Instructor.InstructorNameEn },
-                    InstructorBio = new LocalizedText { Ar = ci.Instructor.InstructorBioAr ?? "", En = ci.Instructor.InstructorBioEn ?? "" },
+                    InstructorName = new LocalizedText 
+                    { 
+                        Ar = ci.Instructor.InstructorNameAr, 
+                        En = ci.Instructor.InstructorNameEn 
+                    },
+                    InstructorBio = new LocalizedText 
+                    { 
+                        Ar = ci.Instructor.InstructorBioAr ?? "", 
+                        En = ci.Instructor.InstructorBioEn ?? "" 
+                    },
                     CreatedAt = ci.Instructor.CreatedAt,
                     UpdatedAt = ci.Instructor.UpdatedAt
                 }).ToList(),

@@ -343,6 +343,29 @@ export const wishlistApi = {
     api.delete(`/wishlist/items/${courseId}`),
 };
 
+// Instructors API
+export interface Instructor {
+  id: string;
+  instructorName: {
+    ar: string;
+    en: string;
+  };
+  instructorBio: {
+    ar: string;
+    en: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}
+
+export const instructorsApi = {
+  getInstructors: (): Promise<AxiosResponse<Instructor[]>> =>
+    api.get('/instructors'),
+
+  getInstructor: (id: string): Promise<AxiosResponse<Instructor>> =>
+    api.get(`/instructors/${id}`),
+};
+
 // Contact API
 export interface ContactFormRequest {
   firstName: string;

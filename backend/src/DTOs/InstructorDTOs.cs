@@ -13,6 +13,18 @@ public class InstructorDto
     public DateTime UpdatedAt { get; set; }
 }
 
+public class AdminInstructorDto
+{
+    public Guid Id { get; set; }
+    public string InstructorNameEn { get; set; } = string.Empty;
+    public string InstructorNameAr { get; set; } = string.Empty;
+    public string? InstructorBioEn { get; set; }
+    public string? InstructorBioAr { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
+    public List<Guid> CourseIds { get; set; } = new();
+}
+
 public class InstructorDetailDto : InstructorDto
 {
     public List<CourseListDto> Courses { get; set; } = new();
