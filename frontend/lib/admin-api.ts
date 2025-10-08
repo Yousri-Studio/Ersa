@@ -228,8 +228,13 @@ export interface AdminCourse {
   subCategories?: CourseSubCategory[];
   videoUrl?: string;
   duration?: string;
+  from?: string;
+  to?: string;
+  sessionsNotesEn?: string;
+  sessionsNotesAr?: string;
   instructorNameAr?: string;
   instructorNameEn?: string;
+  instructors?: Instructor[];
   photo?: number[] | string;
   tags?: string;
   instructorsBioAr?: string;
@@ -344,8 +349,13 @@ export interface AdminCreateCourseRequest {
   subCategoryIds?: string[];
   videoUrl?: string;
   duration?: string;
+  from?: string;
+  to?: string;
+  sessionsNotesEn?: string;
+  sessionsNotesAr?: string;
   instructorNameAr: string;
   instructorNameEn: string;
+  instructorIds?: string[];
   photo?: number[] | string | null;
   tags?: string;
   instructorsBioAr?: string;
@@ -375,6 +385,27 @@ export interface CreateCourseSubCategoryRequest {
 }
 
 export type UpdateCourseSubCategoryRequest = CreateCourseSubCategoryRequest;
+
+// Instructor interfaces
+export interface Instructor {
+  id: string;
+  instructorNameEn: string;
+  instructorNameAr: string;
+  instructorBioEn?: string;
+  instructorBioAr?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateInstructorRequest {
+  instructorNameEn: string;
+  instructorNameAr: string;
+  instructorBioEn?: string;
+  instructorBioAr?: string;
+  courseIds?: string[];
+}
+
+export type UpdateInstructorRequest = CreateInstructorRequest;
 
 // Fallback data for when backend is not available
 const fallbackDashboardStats: DashboardStats = {
@@ -768,6 +799,19 @@ export const adminApi = {
     return { data: result.data, isUsingFallback: result.isUsingFallback };
   },
     
+  // Instructors
+  getInstructors: () => api.get<Instructor[]>('/api/instructors'),
+
+  getInstructor: (id: string) => api.get<Instructor>(`/api/instructors/${id}`),
+
+  createInstructor: (data: CreateInstructorRequest) =>
+    api.post<Instructor>('/api/instructors', data),
+
+  updateInstructor: (id: string, data: UpdateInstructorRequest) =>
+    api.put<Instructor>(`/api/instructors/${id}`, data),
+
+  deleteInstructor: (id: string) => api.delete(`/api/instructors/${id}`),
+
   // Content Management
   getContentPages: () => api.get<ContentPage[]>('/api/content/pages'),
 

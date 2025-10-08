@@ -28,6 +28,8 @@ public class ErsaTrainingDbContext : IdentityDbContext<User, IdentityRole<Guid>,
     public DbSet<CourseCategory> CourseCategories { get; set; } = null!;
     public DbSet<CourseSubCategory> CourseSubCategories { get; set; } = null!;
     public DbSet<CourseSubCategoryMapping> CourseSubCategoryMappings { get; set; } = null!;
+    public DbSet<Instructor> Instructors { get; set; } = null!;
+    public DbSet<CourseInstructor> CourseInstructors { get; set; } = null!;
     public DbSet<Session> Sessions { get; set; } = null!;
     public DbSet<Order> Orders { get; set; } = null!;
     public DbSet<OrderItem> OrderItems { get; set; } = null!;
@@ -62,6 +64,8 @@ public class ErsaTrainingDbContext : IdentityDbContext<User, IdentityRole<Guid>,
         builder.ApplyConfiguration(new CourseCategoryConfiguration());
         builder.ApplyConfiguration(new CourseSubCategoryConfiguration());
         builder.ApplyConfiguration(new CourseSubCategoryMappingConfiguration());
+        builder.ApplyConfiguration(new InstructorConfiguration());
+        builder.ApplyConfiguration(new CourseInstructorConfiguration());
         builder.ApplyConfiguration(new SessionConfiguration());
         builder.ApplyConfiguration(new OrderConfiguration());
         builder.ApplyConfiguration(new OrderItemConfiguration());

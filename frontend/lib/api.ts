@@ -149,6 +149,23 @@ export interface Course {
   };
   videoUrl?: string;
   duration?: string;
+  from?: string;
+  to?: string;
+  sessionsNotes?: {
+    ar: string;
+    en: string;
+  };
+  instructors?: {
+    id: string;
+    instructorName: {
+      ar: string;
+      en: string;
+    };
+    instructorBio: {
+      ar: string;
+      en: string;
+    };
+  }[];
 
   badge?: 'Bestseller' | 'New' | null;
   thumbnailUrl?: string; // Generated from photo data

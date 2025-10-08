@@ -65,56 +65,70 @@ public class CoursesController : ControllerBase
                 .Include(c => c.Category)
                 .Include(c => c.CourseSubCategoryMappings)
                     .ThenInclude(m => m.SubCategory)
+                .Include(c => c.CourseInstructors)
+                    .ThenInclude(ci => ci.Instructor)
                 .OrderBy(c => c.TitleEn)
-                .Select(c => new CourseListDto
-                {
-                    Id = c.Id,
-                    Slug = c.Slug,
-                    Title = new LocalizedText { Ar = c.TitleAr, En = c.TitleEn },
-                    Summary = new LocalizedText { Ar = c.SummaryAr ?? "", En = c.SummaryEn ?? "" },
-                    Description = new LocalizedText { Ar = c.DescriptionAr ?? "", En = c.DescriptionEn ?? "" },
-                    Price = c.Price,
-                    Currency = c.Currency,
-                    Type = c.Type,
-                    Level = c.Level,
-                    CategoryId = c.CategoryId,
-                    Category = c.Category != null ? new CourseCategoryDto
-                    {
-                        Id = c.Category.Id,
-                        TitleAr = c.Category.TitleAr,
-                        TitleEn = c.Category.TitleEn,
-                        DisplayOrder = c.Category.DisplayOrder,
-                        IsActive = c.Category.IsActive,
-                        CreatedAt = c.Category.CreatedAt,
-                        UpdatedAt = c.Category.UpdatedAt
-                    } : null,
-                    SubCategories = c.CourseSubCategoryMappings
-                        .Select(m => new CourseSubCategoryDto
-                        {
-                            Id = m.SubCategory.Id,
-                            TitleAr = m.SubCategory.TitleAr,
-                            TitleEn = m.SubCategory.TitleEn,
-                            DisplayOrder = m.SubCategory.DisplayOrder,
-                            IsActive = m.SubCategory.IsActive,
-                            CreatedAt = m.SubCategory.CreatedAt,
-                            UpdatedAt = m.SubCategory.UpdatedAt
-                        })
-                        .ToList(),
-                    VideoUrl = c.VideoUrl,
-                    Duration = c.Duration,
-                    InstructorName = new LocalizedText { Ar = c.InstructorNameAr, En = c.InstructorNameEn },
-                    Photo = c.Photo,
-                    Tags = c.Tags,
-                    InstructorsBio = new LocalizedText { Ar = c.InstructorsBioAr ?? "", En = c.InstructorsBioEn ?? "" },
-                    CourseTopics = new LocalizedText { Ar = c.CourseTopicsAr ?? "", En = c.CourseTopicsEn ?? "" },
-                    IsActive = c.IsActive,
-                    IsFeatured = c.IsFeatured,
-                    CreatedAt = c.CreatedAt,
-                    UpdatedAt = c.UpdatedAt
-                })
                 .ToListAsync();
 
-            return Ok(courses);
+            var courseDtos = courses.Select(c => new CourseListDto
+            {
+                Id = c.Id,
+                Slug = c.Slug,
+                Title = new LocalizedText { Ar = c.TitleAr, En = c.TitleEn },
+                Summary = new LocalizedText { Ar = c.SummaryAr ?? "", En = c.SummaryEn ?? "" },
+                Description = new LocalizedText { Ar = c.DescriptionAr ?? "", En = c.DescriptionEn ?? "" },
+                Price = c.Price,
+                Currency = c.Currency,
+                Type = c.Type,
+                Level = c.Level,
+                CategoryId = c.CategoryId,
+                Category = c.Category != null ? new CourseCategoryDto
+                {
+                    Id = c.Category.Id,
+                    TitleAr = c.Category.TitleAr,
+                    TitleEn = c.Category.TitleEn,
+                    DisplayOrder = c.Category.DisplayOrder,
+                    IsActive = c.Category.IsActive,
+                    CreatedAt = c.Category.CreatedAt,
+                    UpdatedAt = c.Category.UpdatedAt
+                } : null,
+                SubCategories = c.CourseSubCategoryMappings
+                    .Select(m => new CourseSubCategoryDto
+                    {
+                        Id = m.SubCategory.Id,
+                        TitleAr = m.SubCategory.TitleAr,
+                        TitleEn = m.SubCategory.TitleEn,
+                        DisplayOrder = m.SubCategory.DisplayOrder,
+                        IsActive = m.SubCategory.IsActive,
+                        CreatedAt = m.SubCategory.CreatedAt,
+                        UpdatedAt = m.SubCategory.UpdatedAt
+                    })
+                    .ToList(),
+                VideoUrl = c.VideoUrl,
+                Duration = c.Duration,
+                From = c.From,
+                To = c.To,
+                SessionsNotes = new LocalizedText { Ar = c.SessionsNotesAr ?? "", En = c.SessionsNotesEn ?? "" },
+                InstructorName = new LocalizedText { Ar = c.InstructorNameAr, En = c.InstructorNameEn },
+                Instructors = c.CourseInstructors.Select(ci => new InstructorDto
+                {
+                    Id = ci.Instructor.Id,
+                    InstructorName = new LocalizedText { Ar = ci.Instructor.InstructorNameAr, En = ci.Instructor.InstructorNameEn },
+                    InstructorBio = new LocalizedText { Ar = ci.Instructor.InstructorBioAr ?? "", En = ci.Instructor.InstructorBioEn ?? "" },
+                    CreatedAt = ci.Instructor.CreatedAt,
+                    UpdatedAt = ci.Instructor.UpdatedAt
+                }).ToList(),
+                Photo = c.Photo,
+                Tags = c.Tags,
+                InstructorsBio = new LocalizedText { Ar = c.InstructorsBioAr ?? "", En = c.InstructorsBioEn ?? "" },
+                CourseTopics = new LocalizedText { Ar = c.CourseTopicsAr ?? "", En = c.CourseTopicsEn ?? "" },
+                IsActive = c.IsActive,
+                IsFeatured = c.IsFeatured,
+                CreatedAt = c.CreatedAt,
+                UpdatedAt = c.UpdatedAt
+            }).ToList();
+
+            return Ok(courseDtos);
         }
         catch (Exception ex)
         {
@@ -132,6 +146,8 @@ public class CoursesController : ControllerBase
                 .Include(c => c.Category)
                 .Include(c => c.CourseSubCategoryMappings)
                     .ThenInclude(m => m.SubCategory)
+                .Include(c => c.CourseInstructors)
+                    .ThenInclude(ci => ci.Instructor)
                 .Include(c => c.Sessions.Where(s => s.StartAt > DateTime.UtcNow))
                 .Include(c => c.Attachments.Where(a => !a.IsRevoked))
                 .AsSplitQuery()
@@ -178,7 +194,18 @@ public class CoursesController : ControllerBase
                     .ToList(),
                 VideoUrl = course.VideoUrl,
                 Duration = course.Duration,
+                From = course.From,
+                To = course.To,
+                SessionsNotes = new LocalizedText { Ar = course.SessionsNotesAr ?? "", En = course.SessionsNotesEn ?? "" },
                 InstructorName = new LocalizedText { Ar = course.InstructorNameAr, En = course.InstructorNameEn },
+                Instructors = course.CourseInstructors.Select(ci => new InstructorDto
+                {
+                    Id = ci.Instructor.Id,
+                    InstructorName = new LocalizedText { Ar = ci.Instructor.InstructorNameAr, En = ci.Instructor.InstructorNameEn },
+                    InstructorBio = new LocalizedText { Ar = ci.Instructor.InstructorBioAr ?? "", En = ci.Instructor.InstructorBioEn ?? "" },
+                    CreatedAt = ci.Instructor.CreatedAt,
+                    UpdatedAt = ci.Instructor.UpdatedAt
+                }).ToList(),
                 Photo = course.Photo,
                 Tags = course.Tags,
                 InstructorsBio = new LocalizedText { Ar = course.InstructorsBioAr ?? "", En = course.InstructorsBioEn ?? "" },
@@ -226,57 +253,71 @@ public class CoursesController : ControllerBase
                 .Include(c => c.Category)
                 .Include(c => c.CourseSubCategoryMappings)
                     .ThenInclude(m => m.SubCategory)
+                .Include(c => c.CourseInstructors)
+                    .ThenInclude(ci => ci.Instructor)
                 .Where(c => c.IsActive && c.IsFeatured)
                 .OrderBy(c => c.TitleEn)
-                .Select(c => new CourseListDto
-                {
-                    Id = c.Id,
-                    Slug = c.Slug,
-                    Title = new LocalizedText { Ar = c.TitleAr, En = c.TitleEn },
-                    Summary = new LocalizedText { Ar = c.SummaryAr ?? "", En = c.SummaryEn ?? "" },
-                    Description = new LocalizedText { Ar = c.DescriptionAr ?? "", En = c.DescriptionEn ?? "" },
-                    Price = c.Price,
-                    Currency = c.Currency,
-                    Type = c.Type,
-                    Level = c.Level,
-                    CategoryId = c.CategoryId,
-                    Category = c.Category != null ? new CourseCategoryDto
-                    {
-                        Id = c.Category.Id,
-                        TitleAr = c.Category.TitleAr,
-                        TitleEn = c.Category.TitleEn,
-                        DisplayOrder = c.Category.DisplayOrder,
-                        IsActive = c.Category.IsActive,
-                        CreatedAt = c.Category.CreatedAt,
-                        UpdatedAt = c.Category.UpdatedAt
-                    } : null,
-                    SubCategories = c.CourseSubCategoryMappings
-                        .Select(m => new CourseSubCategoryDto
-                        {
-                            Id = m.SubCategory.Id,
-                            TitleAr = m.SubCategory.TitleAr,
-                            TitleEn = m.SubCategory.TitleEn,
-                            DisplayOrder = m.SubCategory.DisplayOrder,
-                            IsActive = m.SubCategory.IsActive,
-                            CreatedAt = m.SubCategory.CreatedAt,
-                            UpdatedAt = m.SubCategory.UpdatedAt
-                        })
-                        .ToList(),
-                    VideoUrl = c.VideoUrl,
-                    Duration = c.Duration,
-                    InstructorName = new LocalizedText { Ar = c.InstructorNameAr, En = c.InstructorNameEn },
-                    Photo = c.Photo,
-                    Tags = c.Tags,
-                    InstructorsBio = new LocalizedText { Ar = c.InstructorsBioAr ?? "", En = c.InstructorsBioEn ?? "" },
-                    CourseTopics = new LocalizedText { Ar = c.CourseTopicsAr ?? "", En = c.CourseTopicsEn ?? "" },
-                    IsActive = c.IsActive,
-                    IsFeatured = c.IsFeatured,
-                    CreatedAt = c.CreatedAt,
-                    UpdatedAt = c.UpdatedAt
-                })
                 .ToListAsync();
 
-            return Ok(featuredCourses);
+            var courseDtos = featuredCourses.Select(c => new CourseListDto
+            {
+                Id = c.Id,
+                Slug = c.Slug,
+                Title = new LocalizedText { Ar = c.TitleAr, En = c.TitleEn },
+                Summary = new LocalizedText { Ar = c.SummaryAr ?? "", En = c.SummaryEn ?? "" },
+                Description = new LocalizedText { Ar = c.DescriptionAr ?? "", En = c.DescriptionEn ?? "" },
+                Price = c.Price,
+                Currency = c.Currency,
+                Type = c.Type,
+                Level = c.Level,
+                CategoryId = c.CategoryId,
+                Category = c.Category != null ? new CourseCategoryDto
+                {
+                    Id = c.Category.Id,
+                    TitleAr = c.Category.TitleAr,
+                    TitleEn = c.Category.TitleEn,
+                    DisplayOrder = c.Category.DisplayOrder,
+                    IsActive = c.Category.IsActive,
+                    CreatedAt = c.Category.CreatedAt,
+                    UpdatedAt = c.Category.UpdatedAt
+                } : null,
+                SubCategories = c.CourseSubCategoryMappings
+                    .Select(m => new CourseSubCategoryDto
+                    {
+                        Id = m.SubCategory.Id,
+                        TitleAr = m.SubCategory.TitleAr,
+                        TitleEn = m.SubCategory.TitleEn,
+                        DisplayOrder = m.SubCategory.DisplayOrder,
+                        IsActive = m.SubCategory.IsActive,
+                        CreatedAt = m.SubCategory.CreatedAt,
+                        UpdatedAt = m.SubCategory.UpdatedAt
+                    })
+                    .ToList(),
+                VideoUrl = c.VideoUrl,
+                Duration = c.Duration,
+                From = c.From,
+                To = c.To,
+                SessionsNotes = new LocalizedText { Ar = c.SessionsNotesAr ?? "", En = c.SessionsNotesEn ?? "" },
+                InstructorName = new LocalizedText { Ar = c.InstructorNameAr, En = c.InstructorNameEn },
+                Instructors = c.CourseInstructors.Select(ci => new InstructorDto
+                {
+                    Id = ci.Instructor.Id,
+                    InstructorName = new LocalizedText { Ar = ci.Instructor.InstructorNameAr, En = ci.Instructor.InstructorNameEn },
+                    InstructorBio = new LocalizedText { Ar = ci.Instructor.InstructorBioAr ?? "", En = ci.Instructor.InstructorBioEn ?? "" },
+                    CreatedAt = ci.Instructor.CreatedAt,
+                    UpdatedAt = ci.Instructor.UpdatedAt
+                }).ToList(),
+                Photo = c.Photo,
+                Tags = c.Tags,
+                InstructorsBio = new LocalizedText { Ar = c.InstructorsBioAr ?? "", En = c.InstructorsBioEn ?? "" },
+                CourseTopics = new LocalizedText { Ar = c.CourseTopicsAr ?? "", En = c.CourseTopicsEn ?? "" },
+                IsActive = c.IsActive,
+                IsFeatured = c.IsFeatured,
+                CreatedAt = c.CreatedAt,
+                UpdatedAt = c.UpdatedAt
+            }).ToList();
+
+            return Ok(courseDtos);
         }
         catch (Exception ex)
         {
@@ -366,6 +407,20 @@ public class CoursesController : ControllerBase
                 }
             }
 
+            // Validate InstructorIds if provided
+            if (request.InstructorIds != null && request.InstructorIds.Any())
+            {
+                var validInstructorIds = await _context.Instructors
+                    .Where(i => request.InstructorIds.Contains(i.Id))
+                    .Select(i => i.Id)
+                    .ToListAsync();
+
+                if (validInstructorIds.Count != request.InstructorIds.Count)
+                {
+                    return BadRequest(new { error = "One or more invalid instructor IDs" });
+                }
+            }
+
             var course = new Course
             {
                 Id = Guid.NewGuid(),
@@ -377,6 +432,10 @@ public class CoursesController : ControllerBase
                 CategoryId = request.CategoryId,
                 VideoUrl = request.VideoUrl,
                 Duration = request.Duration,
+                From = request.From,
+                To = request.To,
+                SessionsNotesEn = request.SessionsNotesEn,
+                SessionsNotesAr = request.SessionsNotesAr,
                 InstructorNameAr = request.InstructorNameAr,
                 InstructorNameEn = request.InstructorNameEn,
                 TitleAr = request.TitleAr,
@@ -414,11 +473,27 @@ public class CoursesController : ControllerBase
                 await _context.SaveChangesAsync();
             }
 
+            // Add instructor mappings
+            if (request.InstructorIds != null && request.InstructorIds.Any())
+            {
+                var instructorMappings = request.InstructorIds.Select(instructorId => new CourseInstructor
+                {
+                    CourseId = course.Id,
+                    InstructorId = instructorId,
+                    CreatedAt = DateTime.UtcNow
+                }).ToList();
+
+                _context.CourseInstructors.AddRange(instructorMappings);
+                await _context.SaveChangesAsync();
+            }
+
             // Reload course with related data
             var createdCourse = await _context.Courses
                 .Include(c => c.Category)
                 .Include(c => c.CourseSubCategoryMappings)
                     .ThenInclude(m => m.SubCategory)
+                .Include(c => c.CourseInstructors)
+                    .ThenInclude(ci => ci.Instructor)
                 .FirstOrDefaultAsync(c => c.Id == course.Id);
 
             var courseDto = new CourseDetailDto
@@ -457,7 +532,18 @@ public class CoursesController : ControllerBase
                     .ToList(),
                 VideoUrl = createdCourse.VideoUrl,
                 Duration = createdCourse.Duration,
+                From = createdCourse.From,
+                To = createdCourse.To,
+                SessionsNotes = new LocalizedText { Ar = createdCourse.SessionsNotesAr ?? "", En = createdCourse.SessionsNotesEn ?? "" },
                 InstructorName = new LocalizedText { Ar = createdCourse.InstructorNameAr, En = createdCourse.InstructorNameEn },
+                Instructors = createdCourse.CourseInstructors.Select(ci => new InstructorDto
+                {
+                    Id = ci.Instructor.Id,
+                    InstructorName = new LocalizedText { Ar = ci.Instructor.InstructorNameAr, En = ci.Instructor.InstructorNameEn },
+                    InstructorBio = new LocalizedText { Ar = ci.Instructor.InstructorBioAr ?? "", En = ci.Instructor.InstructorBioEn ?? "" },
+                    CreatedAt = ci.Instructor.CreatedAt,
+                    UpdatedAt = ci.Instructor.UpdatedAt
+                }).ToList(),
                 Photo = createdCourse.Photo,
                 Tags = createdCourse.Tags,
                 InstructorsBio = new LocalizedText { Ar = createdCourse.InstructorsBioAr ?? "", En = createdCourse.InstructorsBioEn ?? "" },
@@ -492,6 +578,7 @@ public class CoursesController : ControllerBase
 
             var course = await _context.Courses
                 .Include(c => c.CourseSubCategoryMappings)
+                .Include(c => c.CourseInstructors)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
             if (course == null)
@@ -523,6 +610,20 @@ public class CoursesController : ControllerBase
                 }
             }
 
+            // Validate InstructorIds if provided
+            if (request.InstructorIds != null && request.InstructorIds.Any())
+            {
+                var validInstructorIds = await _context.Instructors
+                    .Where(i => request.InstructorIds.Contains(i.Id))
+                    .Select(i => i.Id)
+                    .ToListAsync();
+
+                if (validInstructorIds.Count != request.InstructorIds.Count)
+                {
+                    return BadRequest(new { error = "One or more invalid instructor IDs" });
+                }
+            }
+
             course.Slug = request.Slug;
             course.Price = request.Price;
             course.Currency = request.Currency;
@@ -531,6 +632,10 @@ public class CoursesController : ControllerBase
             course.CategoryId = request.CategoryId;
             course.VideoUrl = request.VideoUrl;
             course.Duration = request.Duration;
+            course.From = request.From;
+            course.To = request.To;
+            course.SessionsNotesEn = request.SessionsNotesEn;
+            course.SessionsNotesAr = request.SessionsNotesAr;
             course.InstructorNameAr = request.InstructorNameAr;
             course.InstructorNameEn = request.InstructorNameEn;
             course.TitleAr = request.TitleAr;
@@ -566,6 +671,21 @@ public class CoursesController : ControllerBase
                 _context.CourseSubCategoryMappings.AddRange(mappings);
             }
 
+            // Update instructor mappings
+            _context.CourseInstructors.RemoveRange(course.CourseInstructors);
+
+            if (request.InstructorIds != null && request.InstructorIds.Any())
+            {
+                var instructorMappings = request.InstructorIds.Select(instructorId => new CourseInstructor
+                {
+                    CourseId = course.Id,
+                    InstructorId = instructorId,
+                    CreatedAt = DateTime.UtcNow
+                }).ToList();
+
+                _context.CourseInstructors.AddRange(instructorMappings);
+            }
+
             await _context.SaveChangesAsync();
 
             // Reload course with related data
@@ -573,6 +693,8 @@ public class CoursesController : ControllerBase
                 .Include(c => c.Category)
                 .Include(c => c.CourseSubCategoryMappings)
                     .ThenInclude(m => m.SubCategory)
+                .Include(c => c.CourseInstructors)
+                    .ThenInclude(ci => ci.Instructor)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
             var courseDto = new CourseDetailDto
@@ -611,7 +733,18 @@ public class CoursesController : ControllerBase
                     .ToList(),
                 VideoUrl = updatedCourse.VideoUrl,
                 Duration = updatedCourse.Duration,
+                From = updatedCourse.From,
+                To = updatedCourse.To,
+                SessionsNotes = new LocalizedText { Ar = updatedCourse.SessionsNotesAr ?? "", En = updatedCourse.SessionsNotesEn ?? "" },
                 InstructorName = new LocalizedText { Ar = updatedCourse.InstructorNameAr, En = updatedCourse.InstructorNameEn },
+                Instructors = updatedCourse.CourseInstructors.Select(ci => new InstructorDto
+                {
+                    Id = ci.Instructor.Id,
+                    InstructorName = new LocalizedText { Ar = ci.Instructor.InstructorNameAr, En = ci.Instructor.InstructorNameEn },
+                    InstructorBio = new LocalizedText { Ar = ci.Instructor.InstructorBioAr ?? "", En = ci.Instructor.InstructorBioEn ?? "" },
+                    CreatedAt = ci.Instructor.CreatedAt,
+                    UpdatedAt = ci.Instructor.UpdatedAt
+                }).ToList(),
                 Photo = updatedCourse.Photo,
                 Tags = updatedCourse.Tags,
                 InstructorsBio = new LocalizedText { Ar = updatedCourse.InstructorsBioAr ?? "", En = updatedCourse.InstructorsBioEn ?? "" },

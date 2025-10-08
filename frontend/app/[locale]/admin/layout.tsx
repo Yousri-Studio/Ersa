@@ -77,9 +77,9 @@ export default function AdminLayout({
     checkAdminAccess();
   }, [isHydrated, locale, router, initFromCookie]);
 
-  // Auto-expand Course Settings if on categories or subcategories page
+  // Auto-expand Course Settings if on categories, subcategories, or instructors page
   useEffect(() => {
-    if (pathname?.includes('/course-categories') || pathname?.includes('/course-subcategories')) {
+    if (pathname?.includes('/course-categories') || pathname?.includes('/course-subcategories') || pathname?.includes('/instructors')) {
       setCourseSettingsOpen(true);
     }
   }, [pathname]);
@@ -111,6 +111,7 @@ export default function AdminLayout({
   const courseSettingsItems = [
     { id: 'categories', label: t('sidebar.courseCategories'), href: `/${locale}/admin/course-categories` },
     { id: 'subcategories', label: t('sidebar.courseSubCategories'), href: `/${locale}/admin/course-subcategories` },
+    { id: 'instructors', label: isRTL ? 'المدربون' : 'Instructors', href: `/${locale}/admin/instructors` },
   ];
 
   // Super admin items can be added here if needed in the future

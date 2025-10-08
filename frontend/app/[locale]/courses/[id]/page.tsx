@@ -244,31 +244,88 @@ export default function CourseDetailsPage() {
                   </div>
                 </div>
 
-                {/* Instructor */}
-                <div className="flex items-center space-x-3 rtl:space-x-reverse mt-6 p-4 bg-gray-50 rounded-lg">
-                  <img
-                    src={course.instructor.avatar}
-                    alt={course.instructor.name}
-                    className="h-12 w-12 rounded-full object-cover"
-                  />
-                  <div>
-                    <h3 className="font-semibold text-gray-900 font-cairo">{course.instructor.name}</h3>
-                    <p className="text-sm text-gray-600 font-cairo">{course.instructor.title}</p>
-                    <div className="flex items-center space-x-4 rtl:space-x-reverse text-xs text-gray-500 mt-1">
-                      <span className="font-cairo">{course.instructor.rating} ⭐</span>
-                      <span className="font-cairo">{course.instructor.studentsCount} {t('course.students')}</span>
-                      <span className="font-cairo">{course.instructor.coursesCount} {t('course.courses')}</span>
+                {/* Course Dates */}
+                {(course.from || course.to) && (
+                  <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                    <div className="flex items-center space-x-2 rtl:space-x-reverse mb-2">
+                      <Icon name="far fa-calendar" className="text-blue-600" />
+                      <h4 className="font-semibold text-gray-900 font-cairo">
+                        {locale === 'ar' ? 'مواعيد الدورة' : 'Course Schedule'}
+                      </h4>
                     </div>
-                    {/* Instructor Bio */}
-                    {course.instructorsBio && (
+                    <div className="grid grid-cols-2 gap-4 text-sm">
+                      {course.from && (
+                        <div>
+                          <span className="text-gray-600 font-cairo">{locale === 'ar' ? 'تاريخ البدء:' : 'Start Date:'}</span>
+                          <p className="text-gray-900 font-semibold font-cairo">
+                            {new Date(course.from).toLocaleDateString(locale, { dateStyle: 'medium' })}
+                          </p>
+                        </div>
+                      )}
+                      {course.to && (
+                        <div>
+                          <span className="text-gray-600 font-cairo">{locale === 'ar' ? 'تاريخ الانتهاء:' : 'End Date:'}</span>
+                          <p className="text-gray-900 font-semibold font-cairo">
+                            {new Date(course.to).toLocaleDateString(locale, { dateStyle: 'medium' })}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                    {course.sessionsNotes && (
                       <div className="mt-3">
-                        <p className="text-sm text-gray-600 font-cairo">
-                          {locale === 'ar' ? course.instructorsBio.ar : course.instructorsBio.en}
+                        <p className="text-sm text-gray-700 font-cairo">
+                          {locale === 'ar' ? course.sessionsNotes.ar : course.sessionsNotes.en}
                         </p>
                       </div>
                     )}
                   </div>
-                </div>
+                )}
+
+                {/* Instructors */}
+                {course.instructors && course.instructors.length > 0 ? (
+                  <div className="mt-6 space-y-4">
+                    <h4 className="font-semibold text-gray-900 font-cairo">
+                      {locale === 'ar' ? 'المدربون' : 'Instructors'}
+                    </h4>
+                    {course.instructors.map((instructor) => (
+                      <div key={instructor.id} className="p-4 bg-gray-50 rounded-lg">
+                        <h5 className="font-semibold text-gray-900 font-cairo">
+                          {locale === 'ar' ? instructor.instructorName.ar : instructor.instructorName.en}
+                        </h5>
+                        {instructor.instructorBio && (
+                          <p className="text-sm text-gray-600 font-cairo mt-2">
+                            {locale === 'ar' ? instructor.instructorBio.ar : instructor.instructorBio.en}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : course.instructor && (
+                  <div className="flex items-center space-x-3 rtl:space-x-reverse mt-6 p-4 bg-gray-50 rounded-lg">
+                    <img
+                      src={course.instructor.avatar}
+                      alt={course.instructor.name}
+                      className="h-12 w-12 rounded-full object-cover"
+                    />
+                    <div>
+                      <h3 className="font-semibold text-gray-900 font-cairo">{course.instructor.name}</h3>
+                      <p className="text-sm text-gray-600 font-cairo">{course.instructor.title}</p>
+                      <div className="flex items-center space-x-4 rtl:space-x-reverse text-xs text-gray-500 mt-1">
+                        <span className="font-cairo">{course.instructor.rating} ⭐</span>
+                        <span className="font-cairo">{course.instructor.studentsCount} {t('course.students')}</span>
+                        <span className="font-cairo">{course.instructor.coursesCount} {t('course.courses')}</span>
+                      </div>
+                      {/* Instructor Bio */}
+                      {course.instructorsBio && (
+                        <div className="mt-3">
+                          <p className="text-sm text-gray-600 font-cairo">
+                            {locale === 'ar' ? course.instructorsBio.ar : course.instructorsBio.en}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
             
@@ -573,35 +630,61 @@ export default function CourseDetailsPage() {
                     <h2 className="text-xl font-semibold text-gray-900 mb-6 font-cairo">
                       {t('course.instructor-info')}
                     </h2>
-                    <div className="flex items-start space-x-4 rtl:space-x-reverse">
-                      <img
-                        src={course.instructor.avatar}
-                        alt={course.instructor.name}
-                        className="h-20 w-20 rounded-full object-cover"
-                      />
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900 font-cairo">
-                          {course.instructor.name}
-                        </h3>
-                        <p className="text-gray-600 mb-3 font-cairo">
-                          {course.instructor.title}
-                        </p>
-                        <div className="flex items-center space-x-6 rtl:space-x-reverse text-sm text-gray-600">
-                          <div className="flex items-center">
-                            <Icon name="star" className="h-4 w-4 mr-1" style={{ color: '#FB831D' }} />
-                            <span className="font-cairo">{course.instructor.rating}</span>
+                    
+                    {/* New Instructors Array Display */}
+                    {course.instructors && course.instructors.length > 0 ? (
+                      <div className="space-y-6">
+                        {course.instructors.map((instructor) => (
+                          <div key={instructor.id} className="p-6 bg-gray-50 rounded-lg">
+                            <h3 className="text-lg font-semibold text-gray-900 font-cairo mb-2">
+                              {locale === 'ar' ? instructor.instructorName.ar : instructor.instructorName.en}
+                            </h3>
+                            {instructor.instructorBio && (
+                              <p className="text-gray-700 font-cairo leading-relaxed">
+                                {locale === 'ar' ? instructor.instructorBio.ar : instructor.instructorBio.en}
+                              </p>
+                            )}
                           </div>
-                          <div className="flex items-center space-x-1 rtl:space-x-reverse">
-                            <Icon name="users" className="h-4 w-4" />
-                            <span className="font-cairo">{course.instructor.studentsCount}</span>
+                        ))}
+                      </div>
+                    ) : course.instructor && (
+                      <div className="flex items-start space-x-4 rtl:space-x-reverse">
+                        <img
+                          src={course.instructor.avatar}
+                          alt={course.instructor.name}
+                          className="h-20 w-20 rounded-full object-cover"
+                        />
+                        <div className="flex-1">
+                          <h3 className="text-lg font-semibold text-gray-900 font-cairo">
+                            {course.instructor.name}
+                          </h3>
+                          <p className="text-gray-600 mb-3 font-cairo">
+                            {course.instructor.title}
+                          </p>
+                          <div className="flex items-center space-x-6 rtl:space-x-reverse text-sm text-gray-600">
+                            <div className="flex items-center">
+                              <Icon name="star" className="h-4 w-4 mr-1" style={{ color: '#FB831D' }} />
+                              <span className="font-cairo">{course.instructor.rating}</span>
+                            </div>
+                            <div className="flex items-center space-x-1 rtl:space-x-reverse">
+                              <Icon name="users" className="h-4 w-4" />
+                              <span className="font-cairo">{course.instructor.studentsCount}</span>
+                            </div>
+                            <div className="flex items-center space-x-1 rtl:space-x-reverse">
+                              <Icon name="graduation-cap" className="h-4 w-4" />
+                              <span className="font-cairo">{course.instructor.coursesCount}</span>
+                            </div>
                           </div>
-                          <div className="flex items-center space-x-1 rtl:space-x-reverse">
-                            <Icon name="graduation-cap" className="h-4 w-4" />
-                            <span className="font-cairo">{course.instructor.coursesCount}</span>
-                          </div>
+                          {course.instructorsBio && (
+                            <div className="mt-4">
+                              <p className="text-gray-700 font-cairo">
+                                {locale === 'ar' ? course.instructorsBio.ar : course.instructorsBio.en}
+                              </p>
+                            </div>
+                          )}
                         </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 )}
                 

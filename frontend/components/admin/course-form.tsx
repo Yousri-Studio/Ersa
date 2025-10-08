@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useLocale } from 'next-intl';
-import { AdminCreateCourseRequest, AdminUpdateCourseRequest, adminApi, CourseCategory, CourseSubCategory } from '@/lib/admin-api';
+import { AdminCreateCourseRequest, AdminUpdateCourseRequest, adminApi, CourseCategory, CourseSubCategory, Instructor } from '@/lib/admin-api';
 import { FileUpload } from '@/components/ui/file-upload';
 
 interface CourseFormProps {
@@ -18,6 +18,7 @@ export function CourseForm({ initialData, onSubmit, onCancel, isEdit = false, is
   const isRTL = locale === 'ar';
   const [categories, setCategories] = useState<CourseCategory[]>([]);
   const [subCategories, setSubCategories] = useState<CourseSubCategory[]>([]);
+  const [instructors, setInstructors] = useState<Instructor[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [formData, setFormData] = useState<AdminCreateCourseRequest>({
     slug: initialData?.slug || '',
@@ -35,8 +36,13 @@ export function CourseForm({ initialData, onSubmit, onCancel, isEdit = false, is
     subCategoryIds: initialData?.subCategoryIds || [],
     videoUrl: initialData?.videoUrl || '',
     duration: initialData?.duration || '',
+    from: initialData?.from || '',
+    to: initialData?.to || '',
+    sessionsNotesEn: initialData?.sessionsNotesEn || '',
+    sessionsNotesAr: initialData?.sessionsNotesAr || '',
     instructorNameAr: initialData?.instructorNameAr || '',
     instructorNameEn: initialData?.instructorNameEn || '',
+    instructorIds: initialData?.instructorIds || [],
     photo: initialData?.photo || [],
     tags: initialData?.tags || '',
     instructorsBioAr: initialData?.instructorsBioAr || '',
@@ -54,12 +60,14 @@ export function CourseForm({ initialData, onSubmit, onCancel, isEdit = false, is
   const fetchCategoriesAndSubCategories = async () => {
     try {
       setLoadingData(true);
-      const [categoriesRes, subCategoriesRes] = await Promise.all([
+      const [categoriesRes, subCategoriesRes, instructorsRes] = await Promise.all([
         adminApi.getCourseCategories({ activeOnly: false }),
-        adminApi.getCourseSubCategories({ activeOnly: false })
+        adminApi.getCourseSubCategories({ activeOnly: false }),
+        adminApi.getInstructors()
       ]);
       setCategories(categoriesRes.data || []);
       setSubCategories(subCategoriesRes.data || []);
+      setInstructors(instructorsRes.data || []);
     } catch (error) {
       console.error('Error fetching categories:', error);
     } finally {
@@ -86,6 +94,15 @@ export function CourseForm({ initialData, onSubmit, onCancel, isEdit = false, is
       handleChange('subCategoryIds', currentIds.filter(id => id !== subCategoryId));
     } else {
       handleChange('subCategoryIds', [...currentIds, subCategoryId]);
+    }
+  };
+
+  const handleInstructorToggle = (instructorId: string) => {
+    const currentIds = formData.instructorIds || [];
+    if (currentIds.includes(instructorId)) {
+      handleChange('instructorIds', currentIds.filter(id => id !== instructorId));
+    } else {
+      handleChange('instructorIds', [...currentIds, instructorId]);
     }
   };
 
@@ -305,6 +322,63 @@ export function CourseForm({ initialData, onSubmit, onCancel, isEdit = false, is
           </div>
         </div>
 
+        {/* Course Dates */}
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {locale === 'ar' ? 'تاريخ البدء' : 'Start Date'}
+            </label>
+            <input
+              type="date"
+              value={formData.from ? new Date(formData.from).toISOString().split('T')[0] : ''}
+              onChange={(e) => handleChange('from', e.target.value ? new Date(e.target.value).toISOString() : '')}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {locale === 'ar' ? 'تاريخ الانتهاء' : 'End Date'}
+            </label>
+            <input
+              type="date"
+              value={formData.to ? new Date(formData.to).toISOString().split('T')[0] : ''}
+              onChange={(e) => handleChange('to', e.target.value ? new Date(e.target.value).toISOString() : '')}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        </div>
+
+        {/* Session Notes */}
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {locale === 'ar' ? 'ملاحظات الجلسات (إنجليزي)' : 'Session Notes (English)'}
+            </label>
+            <input
+              type="text"
+              value={formData.sessionsNotesEn}
+              onChange={(e) => handleChange('sessionsNotesEn', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder={locale === 'ar' ? 'مثال: الحصص أيام الأحد والثلاثاء من 6-9 مساءً' : 'e.g., Classes on Sun & Tue from 6-9 PM'}
+              maxLength={150}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {locale === 'ar' ? 'ملاحظات الجلسات (عربي)' : 'Session Notes (Arabic)'}
+            </label>
+            <input
+              type="text"
+              value={formData.sessionsNotesAr}
+              onChange={(e) => handleChange('sessionsNotesAr', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder={locale === 'ar' ? 'مثال: الحصص أيام الأحد والثلاثاء من 6-9 مساءً' : 'e.g., Classes on Sun & Tue from 6-9 PM'}
+              maxLength={150}
+              dir="rtl"
+            />
+          </div>
+        </div>
+
         {/* Sub-Categories Multi-Select */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -368,6 +442,39 @@ export function CourseForm({ initialData, onSubmit, onCancel, isEdit = false, is
               maxLength={255}
             />
           </div>
+        </div>
+
+        {/* Instructors Multi-Select */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            {locale === 'ar' ? 'المدربون' : 'Instructors'}
+          </label>
+          <div className="border border-gray-300 rounded-md p-3 max-h-48 overflow-y-auto bg-white">
+            {loadingData ? (
+              <p className="text-gray-500 text-sm">{locale === 'ar' ? 'جاري التحميل...' : 'Loading...'}</p>
+            ) : instructors.length === 0 ? (
+              <p className="text-gray-500 text-sm">{locale === 'ar' ? 'لا يوجد مدربون' : 'No instructors available'}</p>
+            ) : (
+              <div className="space-y-2">
+                {instructors.map((instructor) => (
+                  <label key={instructor.id} className="flex items-center space-x-2 cursor-pointer hover:bg-gray-50 p-1 rounded">
+                    <input
+                      type="checkbox"
+                      checked={(formData.instructorIds || []).includes(instructor.id)}
+                      onChange={() => handleInstructorToggle(instructor.id)}
+                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                    />
+                    <span className={`text-sm ${isRTL ? 'mr-2' : 'ml-2'}`}>
+                      {locale === 'ar' ? instructor.instructorNameAr : instructor.instructorNameEn}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+          <p className="text-xs text-gray-500 mt-1">
+            {(formData.instructorIds || []).length} {locale === 'ar' ? 'محدد' : 'selected'}
+          </p>
         </div>
 
         {/* Video URL */}

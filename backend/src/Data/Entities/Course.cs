@@ -29,6 +29,16 @@ public class Course
     [MaxLength(50)]
     public string? Duration { get; set; }
     
+    // Course Schedule
+    public DateTime? From { get; set; }
+    public DateTime? To { get; set; }
+    
+    [MaxLength(150)]
+    public string? SessionsNotesEn { get; set; }
+    
+    [MaxLength(150)]
+    public string? SessionsNotesAr { get; set; }
+    
     [Required]
     [MaxLength(255)]
     public string InstructorNameAr { get; set; } = string.Empty;
@@ -82,6 +92,7 @@ public class Course
     // Navigation properties
     public virtual CourseCategory? Category { get; set; }
     public virtual ICollection<CourseSubCategoryMapping> CourseSubCategoryMappings { get; set; } = new List<CourseSubCategoryMapping>();
+    public virtual ICollection<CourseInstructor> CourseInstructors { get; set; } = new List<CourseInstructor>();
     public virtual ICollection<Session> Sessions { get; set; } = new List<Session>();
     public virtual ICollection<Attachment> Attachments { get; set; } = new List<Attachment>();
     public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();

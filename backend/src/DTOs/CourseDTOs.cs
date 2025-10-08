@@ -21,7 +21,11 @@ public class CourseListDto
     public List<CourseSubCategoryDto> SubCategories { get; set; } = new();
     public string? VideoUrl { get; set; }
     public string Duration { get; set; } = string.Empty;
+    public DateTime? From { get; set; }
+    public DateTime? To { get; set; }
+    public LocalizedText SessionsNotes { get; set; } = new();
     public LocalizedText InstructorName { get; set; } = new();
+    public List<InstructorDto> Instructors { get; set; } = new();
     public byte[]? Photo { get; set; }
     public string? Tags { get; set; }
     public LocalizedText InstructorsBio { get; set; } = new();
@@ -82,6 +86,16 @@ public class CreateCourseRequest
 
     [MaxLength(50)]
     public string? Duration { get; set; }
+    
+    public DateTime? From { get; set; }
+    
+    public DateTime? To { get; set; }
+    
+    [MaxLength(150)]
+    public string? SessionsNotesEn { get; set; }
+    
+    [MaxLength(150)]
+    public string? SessionsNotesAr { get; set; }
 
     [Required]
     [MaxLength(255)]
@@ -90,6 +104,8 @@ public class CreateCourseRequest
     [Required]
     [MaxLength(255)]
     public string InstructorNameEn { get; set; } = string.Empty;
+    
+    public List<Guid> InstructorIds { get; set; } = new();
 
     [Required]
     [MaxLength(500)]
