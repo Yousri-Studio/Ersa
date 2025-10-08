@@ -100,6 +100,8 @@ export default function AdminLayout({
     );
   }
 
+  const isRTL = locale === 'ar';
+
   const menuItems = [
     { id: 'dashboard', label: t('sidebar.dashboard'), icon: 'chart-line', href: `/${locale}/admin` },
     { id: 'content', label: t('sidebar.contentManagement'), icon: 'edit', href: `/${locale}/admin/content` },
@@ -109,14 +111,12 @@ export default function AdminLayout({
   ];
 
   const courseSettingsItems = [
-    { id: 'categories', label: t('sidebar.courseCategories'), href: `/${locale}/admin/course-categories` },
-    { id: 'subcategories', label: t('sidebar.courseSubCategories'), href: `/${locale}/admin/course-subcategories` },
-    { id: 'instructors', label: isRTL ? 'المدربون' : 'Instructors', href: `/${locale}/admin/instructors` },
+    { id: 'categories', label: t('sidebar.courseCategories'), icon: 'folder', href: `/${locale}/admin/course-categories` },
+    { id: 'subcategories', label: t('sidebar.courseSubCategories'), icon: 'layer-group', href: `/${locale}/admin/course-subcategories` },
+    { id: 'instructors', label: isRTL ? 'المدربون' : 'Instructors', icon: 'users', href: `/${locale}/admin/instructors` },
   ];
 
   // Super admin items can be added here if needed in the future
-
-  const isRTL = locale === 'ar';
 
   return (
     <div className={`min-h-screen bg-white ${isRTL ? 'rtl' : 'ltr'}`} data-admin-page>
@@ -210,13 +210,19 @@ export default function AdminLayout({
                         key={subItem.id}
                         href={subItem.href}
                         onClick={() => setIsMenuOpen(false)}
-                        className={`block px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors ${
+                        className={`flex items-center px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors ${
                           pathname === subItem.href
                             ? 'bg-opacity-10 bg-[#00AC96] text-[#00AC96]'
                             : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                         }`}
                       >
-                        {subItem.label}
+                        <Icon
+                          name={subItem.icon}
+                          className={`${isRTL ? 'ml-2' : 'mr-2'} h-4 w-4 flex-shrink-0 ${
+                            pathname === subItem.href ? 'text-[#00AC96]' : 'text-gray-400'
+                          }`}
+                        />
+                        <span className="truncate">{subItem.label}</span>
                       </Link>
                     ))}
                   </div>

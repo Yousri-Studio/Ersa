@@ -171,7 +171,7 @@ export default function AdminInstructors() {
           onClick={openAddModal}
           className="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-teal-500 text-white px-6 py-3 rounded-lg hover:opacity-90 transition-opacity"
         >
-          <Icon name="fas fa-plus" />
+          <Icon name="plus" />
           {isRTL ? 'إضافة مدرب' : 'Add Instructor'}
         </button>
       </div>
@@ -227,13 +227,13 @@ export default function AdminInstructors() {
                       onClick={() => openEditModal(instructor)}
                       className="text-blue-600 hover:text-blue-900 mr-4"
                     >
-                      <Icon name="fas fa-edit" />
+                      <Icon name="edit" />
                     </button>
                     <button
                       onClick={() => openDeleteModal(instructor)}
                       className="text-red-600 hover:text-red-900"
                     >
-                      <Icon name="fas fa-trash" />
+                      <Icon name="trash" />
                     </button>
                   </td>
                 </tr>
@@ -265,7 +265,7 @@ export default function AdminInstructors() {
                 }}
                 className="text-gray-500 hover:text-gray-700"
               >
-                <Icon name="fas fa-times" />
+                <Icon name="times" />
               </button>
             </div>
 
