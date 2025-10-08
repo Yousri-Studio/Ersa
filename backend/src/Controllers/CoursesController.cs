@@ -106,7 +106,7 @@ public class CoursesController : ControllerBase
                     })
                     .ToList(),
                 VideoUrl = c.VideoUrl,
-                Duration = c.Duration,
+                Duration = new LocalizedText { Ar = c.DurationAr ?? "", En = c.DurationEn ?? "" },
                 From = c.From,
                 To = c.To,
                 SessionsNotes = new LocalizedText { Ar = c.SessionsNotesAr ?? "", En = c.SessionsNotesEn ?? "" },
@@ -202,7 +202,7 @@ public class CoursesController : ControllerBase
                     })
                     .ToList(),
                 VideoUrl = course.VideoUrl,
-                Duration = course.Duration,
+                Duration = new LocalizedText { Ar = course.DurationAr ?? "", En = course.DurationEn ?? "" },
                 From = course.From,
                 To = course.To,
                 SessionsNotes = new LocalizedText { Ar = course.SessionsNotesAr ?? "", En = course.SessionsNotesEn ?? "" },
@@ -312,7 +312,7 @@ public class CoursesController : ControllerBase
                     })
                     .ToList(),
                 VideoUrl = c.VideoUrl,
-                Duration = c.Duration,
+                Duration = new LocalizedText { Ar = c.DurationAr ?? "", En = c.DurationEn ?? "" },
                 From = c.From,
                 To = c.To,
                 SessionsNotes = new LocalizedText { Ar = c.SessionsNotesAr ?? "", En = c.SessionsNotesEn ?? "" },
@@ -457,7 +457,8 @@ public class CoursesController : ControllerBase
                 Level = request.Level,
                 CategoryId = request.CategoryId,
                 VideoUrl = request.VideoUrl,
-                Duration = request.Duration,
+                DurationEn = request.DurationEn,
+                DurationAr = request.DurationAr,
                 From = request.From,
                 To = request.To,
                 SessionsNotesEn = request.SessionsNotesEn,
@@ -558,7 +559,7 @@ public class CoursesController : ControllerBase
                     })
                     .ToList(),
                 VideoUrl = createdCourse.VideoUrl,
-                Duration = createdCourse.Duration,
+                Duration = new LocalizedText { Ar = createdCourse.DurationAr ?? "", En = createdCourse.DurationEn ?? "" },
                 From = createdCourse.From,
                 To = createdCourse.To,
                 SessionsNotes = new LocalizedText { Ar = createdCourse.SessionsNotesAr ?? "", En = createdCourse.SessionsNotesEn ?? "" },
@@ -666,7 +667,8 @@ public class CoursesController : ControllerBase
             course.Level = request.Level;
             course.CategoryId = request.CategoryId;
             course.VideoUrl = request.VideoUrl;
-            course.Duration = request.Duration;
+            course.DurationEn = request.DurationEn;
+            course.DurationAr = request.DurationAr;
             course.From = request.From;
             course.To = request.To;
             course.SessionsNotesEn = request.SessionsNotesEn;
@@ -768,7 +770,7 @@ public class CoursesController : ControllerBase
                     })
                     .ToList(),
                 VideoUrl = updatedCourse.VideoUrl,
-                Duration = updatedCourse.Duration,
+                Duration = new LocalizedText { Ar = updatedCourse.DurationAr ?? "", En = updatedCourse.DurationEn ?? "" },
                 From = updatedCourse.From,
                 To = updatedCourse.To,
                 SessionsNotes = new LocalizedText { Ar = updatedCourse.SessionsNotesAr ?? "", En = updatedCourse.SessionsNotesEn ?? "" },

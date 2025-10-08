@@ -149,9 +149,17 @@ export const courseToCardProps = (
   // Get category - now handles new database structure
   const category = getCourseCategory(course, locale);
 
-  // Generate duration label based on course type
+  // Get duration from course data or fallback to course type
   const getDurationLabel = (): { ar: string; en: string } => {
-    // Handle both string and numeric course types
+    // First try to use the actual duration from backend
+    if (course.duration && typeof course.duration === 'object') {
+      return {
+        ar: course.duration.ar || '',
+        en: course.duration.en || ''
+      };
+    }
+    
+    // Fallback to course type-based labels if no duration data
     const courseType = typeof course.type === 'string' ? 
       (course.type === 'Live' ? 1 : 0) : 
       course.type;

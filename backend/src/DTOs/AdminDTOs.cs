@@ -89,7 +89,8 @@ public class AdminCourseDto
     public CourseCategoryDto? Category { get; set; }
     public List<CourseSubCategoryDto> SubCategories { get; set; } = new();
     public string? VideoUrl { get; set; }
-    public string? Duration { get; set; }
+    public string? DurationEn { get; set; }
+    public string? DurationAr { get; set; }
     public string? InstructorNameAr { get; set; }
     public string? InstructorNameEn { get; set; }
     public byte[]? Photo { get; set; }
@@ -196,7 +197,8 @@ public class AdminCreateCourseRequest
     public Guid? CategoryId { get; set; }
     public List<Guid> SubCategoryIds { get; set; } = new();
     public string? VideoUrl { get; set; }
-    public string? Duration { get; set; }
+    public string? DurationEn { get; set; }
+    public string? DurationAr { get; set; }
     public string InstructorNameAr { get; set; } = string.Empty;
     public string InstructorNameEn { get; set; } = string.Empty;
     public string? Photo { get; set; }
@@ -225,7 +227,8 @@ public class AdminUpdateCourseRequest
     public Guid? CategoryId { get; set; }
     public List<Guid> SubCategoryIds { get; set; } = new();
     public string? VideoUrl { get; set; }
-    public string? Duration { get; set; }
+    public string? DurationEn { get; set; }
+    public string? DurationAr { get; set; }
     public string InstructorNameAr { get; set; } = string.Empty;
     public string InstructorNameEn { get; set; } = string.Empty;
     public string? Photo { get; set; }

@@ -468,7 +468,7 @@ export default function CourseDetailsPage() {
                 <nav className="flex space-x-8 rtl:space-x-reverse px-6">
                   {[
                     { id: 'overview', label: t('course.tabs.overview') },
-                    { id: 'curriculum', label: t('course.tabs.curriculum') },
+                    { id: 'curriculum', label: t('course.tabs.topics') },
                     { id: 'instructor', label: t('course.tabs.instructor') },
                     { id: 'reviews', label: t('course.tabs.reviews') }
                   ].map((tab) => (
@@ -531,14 +531,19 @@ export default function CourseDetailsPage() {
                           <Icon name="signal" className="h-5 w-5 text-gray-500" />
                           <div>
                             <p className="text-sm font-medium text-gray-700 font-cairo">{t('course.level')}</p>
-                            <p className="text-sm text-gray-600 font-cairo">{course.level}</p>
+                            <p className="text-sm text-gray-600 font-cairo">
+                              {course.level === 1 ? (locale === 'ar' ? 'مبتدئ' : 'Beginner') :
+                               course.level === 2 ? (locale === 'ar' ? 'متوسط' : 'Intermediate') :
+                               course.level === 3 ? (locale === 'ar' ? 'متقدم' : 'Advanced') :
+                               course.level}
+                            </p>
                           </div>
                         </div>
 
                         <div className="flex items-center space-x-3 rtl:space-x-reverse p-3 bg-gray-50 rounded-lg">
                           <Icon name="monitor" className="h-5 w-5 text-gray-500" />
                           <div>
-                            <p className="text-sm font-medium text-gray-700 font-cairo">نوع الدورة</p>
+                            <p className="text-sm font-medium text-gray-700 font-cairo">{t('course.type')}</p>
                             <p className="text-sm text-gray-600 font-cairo">
                               {course.type === 1 ? 
                                 (locale === 'ar' ? 'جلسة مباشرة' : 'Live Session') : 
@@ -549,10 +554,24 @@ export default function CourseDetailsPage() {
                         </div>
 
                         <div className="flex items-center space-x-3 rtl:space-x-reverse p-3 bg-gray-50 rounded-lg">
-                          <Icon name="globe" className="h-5 w-5 text-gray-500" />
+                          <Icon name="calendar" className="h-5 w-5 text-gray-500" />
                           <div>
-                            <p className="text-sm font-medium text-gray-700 font-cairo">{t('course.language')}</p>
-                            <p className="text-sm text-gray-600 font-cairo">{course.language}</p>
+                            <p className="text-sm font-medium text-gray-700 font-cairo">
+                              {locale === 'ar' ? 'ملاحظات الجلسة' : 'Session Notes'}
+                            </p>
+                            <div className="text-sm text-gray-600 font-cairo">
+                              {course.sessionsNotes && (
+                                <p className="mb-1">
+                                  {locale === 'ar' ? course.sessionsNotes.ar : course.sessionsNotes.en}
+                                </p>
+                              )}
+                              {course.from && course.to && (
+                                <p className="text-xs text-gray-500">
+                                  {locale === 'ar' ? 'من:' : 'From:'} {new Date(course.from).toLocaleDateString(locale)} • 
+                                  {locale === 'ar' ? 'إلى:' : 'To:'} {new Date(course.to).toLocaleDateString(locale)}
+                                </p>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -560,66 +579,27 @@ export default function CourseDetailsPage() {
                   </div>
                 )}
                 
-                {/* Curriculum Tab */}
+                {/* Topics Tab */}
                 {activeTab === 'curriculum' && (
                   <div>
                     <h2 className="text-xl font-semibold text-gray-900 mb-6 font-cairo">
-                      {t('course.curriculum')}
+                      {t('course.topics')}
                     </h2>
-                    <div className="space-y-4">
-                      {course.curriculum.map((section: CurriculumSection, index: number) => (
-                        <div 
-                          key={section.id} 
-                          ref={setCurriculumRef(index)}
-                          className={`border border-gray-200 rounded-lg scroll-item hover-lift ${
-                            curriculumVisible.has(index) ? 'visible' : ''
-                          }`}
-                        >
-                          <button
-                            onClick={() => setExpandedSection(expandedSection === section.id ? null : section.id)}
-                            className="w-full px-4 py-4 flex items-center justify-between text-left hover:bg-gray-50 transition-colors duration-200"
-                          >
-                            <div className="flex items-center space-x-3 rtl:space-x-reverse">
-                              <span className="text-lg font-semibold text-gray-900 font-cairo">
-                                {section.title}
-                              </span>
-                              {section.isPreview && (
-                                <span className="text-xs font-semibold px-2 py-1 rounded font-cairo course-badge">
-                                  {t('course.preview')}
-                                </span>
-                              )}
-                            </div>
-                            <div className="flex items-center space-x-4 rtl:space-x-reverse">
-                              <span className="text-sm text-gray-500 font-cairo">
-                                {section.lessons} {t('course.lessons')} • {section.duration}
-                              </span>
-                                                             <Icon 
-                                 name={expandedSection === section.id ? 'chevron-up' : 'chevron-down'} 
-                                 className="text-gray-400" 
-                                 style={{ height: '1.0rem', width: '1.0rem' }}
-                               />
-                            </div>
-                          </button>
-                          
-                          {expandedSection === section.id && (
-                            <div className="px-4 pb-4">
-                              <div className="space-y-2">
-                                {Array.from({ length: section.lessons }).map((_, index) => (
-                                  <div key={index} className="flex items-center justify-between py-2 px-3 hover:bg-gray-50 rounded">
-                                    <div className="flex items-center space-x-2 rtl:space-x-reverse">
-                                                                             <Icon name="play" className="h-3 w-3 text-gray-400" />
-                                      <span className="text-sm text-gray-700 font-cairo">
-                                        {t('course.lesson')} {index + 1}: {t('course.lesson-title')} {index + 1}
-                                      </span>
-                                    </div>
-                                    <span className="text-xs text-gray-500 font-cairo">5:30</span>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
+                    <div className="space-y-3">
+                      {course.topics && course.topics.length > 0 ? (
+                        <ul className="space-y-2">
+                          {course.topics.map((topic: string, index: number) => (
+                            <li key={index} className="flex items-start space-x-3 rtl:space-x-reverse text-gray-700">
+                              <Icon name="check" className="h-4 w-4 text-green-500 mt-1 flex-shrink-0" />
+                              <span className="font-cairo">{topic}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <div className="text-center text-gray-500 py-8 font-cairo">
+                          {t('course.no-topics-available')}
                         </div>
-                      ))}
+                      )}
                     </div>
                   </div>
                 )}
@@ -724,8 +704,25 @@ export default function CourseDetailsPage() {
                   <span className="font-semibold text-gray-900 font-cairo">{course.lessons}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-cairo">{t('course.language')}:</span>
-                  <span className="font-semibold text-gray-900 font-cairo">{course.language}</span>
+                  <span className="text-gray-600 font-cairo">
+                    {locale === 'ar' ? 'ملاحظات الجلسة:' : 'Session Notes:'}
+                  </span>
+                  <span className="font-semibold text-gray-900 font-cairo text-right">
+                    {course.sessionsNotes ? (
+                      <div>
+                        <p className="text-xs">
+                          {locale === 'ar' ? course.sessionsNotes.ar : course.sessionsNotes.en}
+                        </p>
+                        {course.from && course.to && (
+                          <p className="text-xs text-gray-500 mt-1">
+                            {new Date(course.from).toLocaleDateString(locale)} - {new Date(course.to).toLocaleDateString(locale)}
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                      '-'
+                    )}
+                  </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600 font-cairo">{t('course.last-updated')}:</span>

@@ -342,7 +342,8 @@ public class AdminController : ControllerBase
                         UpdatedAt = m.SubCategory.UpdatedAt
                     }).ToList(),
                     VideoUrl = c.VideoUrl,
-                    Duration = c.Duration,
+                    DurationEn = c.DurationEn,
+                    DurationAr = c.DurationAr,
                     InstructorNameAr = c.InstructorNameAr,
                     InstructorNameEn = c.InstructorNameEn,
                     Photo = c.Photo,
@@ -881,7 +882,8 @@ public class AdminController : ControllerBase
                 Level = (CourseLevel)(request.Level ?? 1),
                 CategoryId = request.CategoryId,
                 VideoUrl = request.VideoUrl,
-                Duration = request.Duration,
+                DurationEn = request.DurationEn,
+                DurationAr = request.DurationAr,
                 InstructorNameAr = request.InstructorNameAr,
                 InstructorNameEn = request.InstructorNameEn,
                 Photo = !string.IsNullOrEmpty(request.Photo) ? Convert.FromBase64String(request.Photo) : null,
@@ -958,7 +960,8 @@ public class AdminController : ControllerBase
                     UpdatedAt = m.SubCategory.UpdatedAt
                 }).ToList(),
                 VideoUrl = createdCourse.VideoUrl,
-                Duration = createdCourse.Duration,
+                DurationEn = createdCourse.DurationEn,
+                DurationAr = createdCourse.DurationAr,
                 InstructorNameAr = createdCourse.InstructorNameAr,
                 InstructorNameEn = createdCourse.InstructorNameEn,
                 Photo = createdCourse.Photo,
@@ -1033,7 +1036,8 @@ public class AdminController : ControllerBase
             course.Level = (CourseLevel)(request.Level ?? 1);
             course.CategoryId = request.CategoryId;
             course.VideoUrl = request.VideoUrl;
-            course.Duration = request.Duration;
+            course.DurationEn = request.DurationEn;
+            course.DurationAr = request.DurationAr;
             course.InstructorNameAr = request.InstructorNameAr;
             course.InstructorNameEn = request.InstructorNameEn;
             course.Photo = !string.IsNullOrEmpty(request.Photo) ? Convert.FromBase64String(request.Photo) : null;
@@ -1110,7 +1114,8 @@ public class AdminController : ControllerBase
                     UpdatedAt = m.SubCategory.UpdatedAt
                 }).ToList(),
                 VideoUrl = updatedCourse.VideoUrl,
-                Duration = updatedCourse.Duration,
+                DurationEn = updatedCourse.DurationEn,
+                DurationAr = updatedCourse.DurationAr,
                 InstructorNameAr = updatedCourse.InstructorNameAr,
                 InstructorNameEn = updatedCourse.InstructorNameEn,
                 Photo = updatedCourse.Photo,

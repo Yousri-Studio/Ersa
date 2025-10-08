@@ -227,7 +227,8 @@ export interface AdminCourse {
   category?: CourseCategory | null;
   subCategories?: CourseSubCategory[];
   videoUrl?: string;
-  duration?: string;
+  durationEn?: string;
+  durationAr?: string;
   from?: string;
   to?: string;
   sessionsNotesEn?: string;
@@ -348,7 +349,8 @@ export interface AdminCreateCourseRequest {
   categoryId?: string | null;
   subCategoryIds?: string[];
   videoUrl?: string;
-  duration?: string;
+  durationEn?: string;
+  durationAr?: string;
   from?: string;
   to?: string;
   sessionsNotesEn?: string;

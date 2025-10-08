@@ -4,6 +4,7 @@ export interface Course extends Omit<ApiCourse, 'description'> {
   curriculum: CurriculumSection[];
   features: string[];
   requirements: string[];
+  topics: string[];
   description?: {
     ar: string;
     en: string;

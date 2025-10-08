@@ -11,7 +11,10 @@ const testCourse = {
   level: 1,
   category: 1,
   videoUrl: "test-video",
-  duration: null,
+  duration: {
+    ar: "30 ساعة",
+    en: "30 hours"
+  },
   instructorName: "Test Instructor",
   photo: [255, 216, 255, 224, 0, 16, 74, 70, 73, 70], // Sample image data
   tags: "",

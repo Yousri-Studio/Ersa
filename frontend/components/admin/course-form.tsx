@@ -35,7 +35,8 @@ export function CourseForm({ initialData, onSubmit, onCancel, isEdit = false, is
     categoryId: initialData?.categoryId || null,
     subCategoryIds: initialData?.subCategoryIds || [],
     videoUrl: initialData?.videoUrl || '',
-    duration: initialData?.duration || '',
+    durationEn: initialData?.durationEn || '',
+    durationAr: initialData?.durationAr || '',
     from: initialData?.from || '',
     to: initialData?.to || '',
     sessionsNotesEn: initialData?.sessionsNotesEn || '',
@@ -307,16 +308,33 @@ export function CourseForm({ initialData, onSubmit, onCancel, isEdit = false, is
               ))}
             </select>
           </div>
+        </div>
+
+        {/* Duration Fields */}
+        <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              {locale === 'ar' ? 'المدة' : 'Duration'}
+              {locale === 'ar' ? 'المدة (الإنجليزية)' : 'Duration (English)'}
             </label>
             <input
               type="text"
-              value={formData.duration}
-              onChange={(e) => handleChange('duration', e.target.value)}
+              value={formData.durationEn}
+              onChange={(e) => handleChange('durationEn', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder={locale === 'ar' ? 'مثال: 4 أسابيع، 20 ساعة' : 'e.g., 4 weeks, 20 hours'}
+              placeholder="e.g., 4 weeks, 20 hours"
+              maxLength={50}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {locale === 'ar' ? 'المدة (العربية)' : 'Duration (Arabic)'}
+            </label>
+            <input
+              type="text"
+              value={formData.durationAr}
+              onChange={(e) => handleChange('durationAr', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="مثال: 4 أسابيع، 20 ساعة"
               maxLength={50}
             />
           </div>

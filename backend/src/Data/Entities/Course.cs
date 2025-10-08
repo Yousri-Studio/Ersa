@@ -27,7 +27,10 @@ public class Course
     public string? VideoUrl { get; set; }
    
     [MaxLength(50)]
-    public string? Duration { get; set; }
+    public string? DurationEn { get; set; }
+    
+    [MaxLength(50)]
+    public string? DurationAr { get; set; }
     
     // Course Schedule
     public DateTime? From { get; set; }

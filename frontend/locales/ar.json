@@ -478,6 +478,7 @@
     "duration": "المدة",
     "level": "المستوى",
     "language": "اللغة",
+    "type": "نوع الدورة",
     "lessons": "الدروس",
     "last-updated": "آخر تحديث",
     "student-reviews": "تقييمات الطلاب",
@@ -487,9 +488,12 @@
     "tabs": {
       "overview": "نظرة عامة",
       "curriculum": "المنهج",
+      "topics": "المواضيع",
       "instructor": "المدرب",
       "reviews": "التقييمات"
-    }
+    },
+    "topics": "مواضيع الدورة",
+    "no-topics-available": "لا توجد مواضيع متاحة لهذه الدورة"
   },
   "courses": {
     "title": "دوراتنا",

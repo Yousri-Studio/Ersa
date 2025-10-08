@@ -148,10 +148,17 @@ export interface Course {
     en: string;
   };
   videoUrl?: string;
-  duration?: string;
+  duration?: {
+    ar: string;
+    en: string;
+  };
   from?: string;
   to?: string;
   sessionsNotes?: {
+    ar: string;
+    en: string;
+  };
+  courseTopics?: {
     ar: string;
     en: string;
   };

@@ -20,7 +20,7 @@ public class CourseListDto
     public CourseCategoryDto? Category { get; set; }
     public List<CourseSubCategoryDto> SubCategories { get; set; } = new();
     public string? VideoUrl { get; set; }
-    public string Duration { get; set; } = string.Empty;
+    public LocalizedText Duration { get; set; } = new();
     public DateTime? From { get; set; }
     public DateTime? To { get; set; }
     public LocalizedText SessionsNotes { get; set; } = new();
@@ -85,7 +85,10 @@ public class CreateCourseRequest
     public string? VideoUrl { get; set; }
 
     [MaxLength(50)]
-    public string? Duration { get; set; }
+    public string? DurationEn { get; set; }
+    
+    [MaxLength(50)]
+    public string? DurationAr { get; set; }
     
     public DateTime? From { get; set; }
     

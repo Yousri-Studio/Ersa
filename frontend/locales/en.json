@@ -595,6 +595,7 @@
     "duration": "Duration",
     "level": "Level",
     "language": "Language",
+    "type": "Course Type",
     "lessons": "Lessons",
     "last-updated": "Last Updated",
     "student-reviews": "Student Reviews",
@@ -604,9 +605,12 @@
     "tabs": {
       "overview": "Overview",
       "curriculum": "Curriculum",
+      "topics": "Topics",
       "instructor": "Instructor",
       "reviews": "Reviews"
-    }
+    },
+    "topics": "Course Topics",
+    "no-topics-available": "No topics available for this course"
   },
   "courses": {
     "title": "Our Courses",

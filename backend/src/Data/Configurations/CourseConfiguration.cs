@@ -51,7 +51,11 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
         builder.Property(c => c.IsFeatured)
             .HasDefaultValue(false);
         
-        builder.Property(c => c.Duration);
+        builder.Property(c => c.DurationEn)
+            .HasMaxLength(50);
+
+        builder.Property(c => c.DurationAr)
+            .HasMaxLength(50);
 
         builder.Property(c => c.CreatedAt)
             .HasDefaultValueSql("GETUTCDATE()");

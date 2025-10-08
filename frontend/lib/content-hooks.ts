@@ -66,29 +66,40 @@ function transformApiCourse(apiCourse: BackendCourse, locale: string = 'ar'): Co
     imageUrl: getImageUrl(),
     curriculum: apiCourse.sessions?.map((session, index) => ({
       id: index + 1,
-      title: `الجلسة ${index + 1}`,
+      title: locale === 'ar' ? `الجلسة ${index + 1}` : `Session ${index + 1}`,
       lessons: 4,
-      duration: '2 ساعة',
+      duration: locale === 'ar' ? '2 ساعة' : '2 hours',
       isPreview: index === 0
     })) || apiCourse.attachments?.map((attachment, index) => ({
       id: index + 1,
       title: `${attachment.fileName}`,
       lessons: 1,
-      duration: 'ملف PDF',
+      duration: locale === 'ar' ? 'ملف PDF' : 'PDF File',
       isPreview: index === 0
     })) || [
       {
         id: 1,
-        title: 'مقدمة في الدورة',
+        title: locale === 'ar' ? 'مقدمة في الدورة' : 'Course Introduction',
         lessons: 4,
-        duration: '2 ساعة',
+        duration: locale === 'ar' ? '2 ساعة' : '2 hours',
         isPreview: true
       }
     ],
     features: apiCourse.type === 1 
-      ? ['جلسات مباشرة', 'شهادة إتمام', 'دعم المدرب', 'تسجيلات الجلسات', 'مواد تدريبية']
-      : ['وصول مدى الحياة', 'ملفات PDF', 'شهادة إتمام', 'دعم المدرب', 'ملفات قابلة للتحميل'],
-    requirements: ['معرفة أساسية بالحاسوب', 'الرغبة في التعلم والإبداع'],
+      ? (locale === 'ar' 
+          ? ['جلسات مباشرة', 'شهادة إتمام', 'دعم المدرب', 'تسجيلات الجلسات', 'مواد تدريبية']
+          : ['Live Sessions', 'Certificate of Completion', 'Instructor Support', 'Session Recordings', 'Training Materials'])
+      : (locale === 'ar'
+          ? ['وصول مدى الحياة', 'ملفات PDF', 'شهادة إتمام', 'دعم المدرب', 'ملفات قابلة للتحميل']
+          : ['Lifetime Access', 'PDF Files', 'Certificate of Completion', 'Instructor Support', 'Downloadable Files']),
+    requirements: locale === 'ar' 
+      ? ['معرفة أساسية بالحاسوب', 'الرغبة في التعلم والإبداع']
+      : ['Basic computer knowledge', 'Desire to learn and innovate'],
+    topics: apiCourse.courseTopics ? 
+      (locale === 'ar' ? 
+        (apiCourse.courseTopics.ar ? apiCourse.courseTopics.ar.split(',').map(t => t.trim()) : []) :
+        (apiCourse.courseTopics.en ? apiCourse.courseTopics.en.split(',').map(t => t.trim()) : [])) :
+      [],
     description: typeof apiCourse.summary === 'object' 
       ? apiCourse.summary
       : {
@@ -97,10 +108,12 @@ function transformApiCourse(apiCourse: BackendCourse, locale: string = 'ar'): Co
         },
     lessons: apiCourse.sessions?.length || apiCourse.attachments?.length || 1,
     instructor: {
-      name: typeof apiCourse.instructorName === 'string' 
-        ? apiCourse.instructorName 
-        : (apiCourse.instructorName?.ar || apiCourse.instructor?.name || 'مدرب محترف'),
-      title: apiCourse.instructor?.title || 'مدرب معتمد',
+      name: apiCourse.instructors && apiCourse.instructors.length > 0
+        ? (locale === 'ar' ? apiCourse.instructors[0].instructorName.ar : apiCourse.instructors[0].instructorName.en)
+        : (typeof apiCourse.instructorName === 'string' 
+            ? apiCourse.instructorName 
+            : (apiCourse.instructorName?.ar || apiCourse.instructor?.name || (locale === 'ar' ? 'مدرب محترف' : 'Professional Instructor'))),
+      title: locale === 'ar' ? 'مدرب معتمد' : 'Certified Instructor',
       avatar: apiCourse.instructor?.avatar || '/api/placeholder/60/60',
       rating: 4.8,
       studentsCount: Math.floor(Math.random() * 5000) + 1000,
@@ -108,11 +121,13 @@ function transformApiCourse(apiCourse: BackendCourse, locale: string = 'ar'): Co
     },
     reviewsCount: Math.floor(Math.random() * 2000) + 500,
     studentsCount: Math.floor(Math.random() * 5000) + 1000,
-    duration: apiCourse.type === 1 
-      ? `${(apiCourse.sessions?.length || 1) * 2} ساعة` 
-      : 'وصول مدى الحياة',
+    duration: apiCourse.duration ? 
+      (locale === 'ar' ? apiCourse.duration.ar : apiCourse.duration.en) :
+      (apiCourse.type === 1 
+        ? (locale === 'ar' ? `${(apiCourse.sessions?.length || 1) * 2} ساعة` : `${(apiCourse.sessions?.length || 1) * 2} hours`)
+        : (locale === 'ar' ? 'وصول مدى الحياة' : 'Lifetime Access')),
     level: apiCourse.level || 2,
-    language: 'العربية',
+    language: locale === 'ar' ? 'العربية' : 'English',
     originalPrice: Math.round(apiCourse.price * 1.3),
     lastUpdated: apiCourse.createdAt?.split('T')[0] || new Date().toISOString().split('T')[0],
     videoPreviewUrl: '/api/placeholder/video',

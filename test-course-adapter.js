@@ -23,7 +23,10 @@ const testCourse = {
   "level": 3,
   "category": 3,
   "videoUrl": "https://www.youtube.com/watch?v=vlLVTLXCZRg",
-  "duration": null,
+  "duration": {
+    "ar": "80 ساعة",
+    "en": "80 hours"
+  },
   "instructorName": "Aly",
   "photo": null,
   "tags": null,
