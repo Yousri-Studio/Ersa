@@ -110,7 +110,7 @@ public class CoursesController : ControllerBase
                 From = c.From,
                 To = c.To,
                 SessionsNotes = new LocalizedText { Ar = c.SessionsNotesAr ?? "", En = c.SessionsNotesEn ?? "" },
-                InstructorName = new LocalizedText { Ar = c.InstructorNameAr, En = c.InstructorNameEn },
+                InstructorName = new LocalizedText { Ar = c.InstructorNameAr ?? "", En = c.InstructorNameEn ?? "" },
                 Instructors = c.CourseInstructors.Select(ci => new InstructorDto
                 {
                     Id = ci.Instructor.Id,
@@ -206,7 +206,7 @@ public class CoursesController : ControllerBase
                 From = course.From,
                 To = course.To,
                 SessionsNotes = new LocalizedText { Ar = course.SessionsNotesAr ?? "", En = course.SessionsNotesEn ?? "" },
-                InstructorName = new LocalizedText { Ar = course.InstructorNameAr, En = course.InstructorNameEn },
+                InstructorName = new LocalizedText { Ar = course.InstructorNameAr ?? "", En = course.InstructorNameEn ?? "" },
                 Instructors = course.CourseInstructors.Select(ci => new InstructorDto
                 {
                     Id = ci.Instructor.Id,
@@ -316,7 +316,7 @@ public class CoursesController : ControllerBase
                 From = c.From,
                 To = c.To,
                 SessionsNotes = new LocalizedText { Ar = c.SessionsNotesAr ?? "", En = c.SessionsNotesEn ?? "" },
-                InstructorName = new LocalizedText { Ar = c.InstructorNameAr, En = c.InstructorNameEn },
+                InstructorName = new LocalizedText { Ar = c.InstructorNameAr ?? "", En = c.InstructorNameEn ?? "" },
                 Instructors = c.CourseInstructors.Select(ci => new InstructorDto
                 {
                     Id = ci.Instructor.Id,
@@ -563,7 +563,7 @@ public class CoursesController : ControllerBase
                 From = createdCourse.From,
                 To = createdCourse.To,
                 SessionsNotes = new LocalizedText { Ar = createdCourse.SessionsNotesAr ?? "", En = createdCourse.SessionsNotesEn ?? "" },
-                InstructorName = new LocalizedText { Ar = createdCourse.InstructorNameAr, En = createdCourse.InstructorNameEn },
+                InstructorName = new LocalizedText { Ar = createdCourse.InstructorNameAr ?? "", En = createdCourse.InstructorNameEn ?? "" },
                 Instructors = createdCourse.CourseInstructors.Select(ci => new InstructorDto
                 {
                     Id = ci.Instructor.Id,
@@ -774,7 +774,7 @@ public class CoursesController : ControllerBase
                 From = updatedCourse.From,
                 To = updatedCourse.To,
                 SessionsNotes = new LocalizedText { Ar = updatedCourse.SessionsNotesAr ?? "", En = updatedCourse.SessionsNotesEn ?? "" },
-                InstructorName = new LocalizedText { Ar = updatedCourse.InstructorNameAr, En = updatedCourse.InstructorNameEn },
+                InstructorName = new LocalizedText { Ar = updatedCourse.InstructorNameAr ?? "", En = updatedCourse.InstructorNameEn ?? "" },
                 Instructors = updatedCourse.CourseInstructors.Select(ci => new InstructorDto
                 {
                     Id = ci.Instructor.Id,

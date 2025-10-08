@@ -42,12 +42,11 @@ public class Course
     [MaxLength(150)]
     public string? SessionsNotesAr { get; set; }
     
-    [Required]
     [MaxLength(255)]
-    public string InstructorNameAr { get; set; } = string.Empty;
+    public string? InstructorNameAr { get; set; }
 
     [MaxLength(255)]
-    public string InstructorNameEn { get; set; } = string.Empty;
+    public string? InstructorNameEn { get; set; }
     
     public bool IsActive { get; set; } = true;
     
