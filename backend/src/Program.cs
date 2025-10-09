@@ -238,7 +238,5 @@ using (var scope = app.Services.CreateScope())
 
 Log.Information("Starting Ersa Training API");
 
-
-
 app.Run();
 

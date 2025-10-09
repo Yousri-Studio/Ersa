@@ -182,6 +182,12 @@ export const courseToCardProps = (
 
   // Extract instructor name based on locale
   const getInstructorName = (): string | undefined => {
+    // First check if there's a transformed instructor object
+    if (course.instructor?.name) {
+      return course.instructor.name;
+    }
+    
+    // Fallback to instructorName field
     if (!course.instructorName) return undefined;
     
     // If it's already a string, return it

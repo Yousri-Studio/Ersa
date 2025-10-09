@@ -10,7 +10,7 @@ export interface Course extends Omit<ApiCourse, 'description' | 'duration'> {
     en: string;
   };
   lessons: number;
-  instructor: {
+  instructor?: {
     name: string;
     title: string;
     avatar: string;

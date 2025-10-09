@@ -105,7 +105,9 @@ function transformApiCourse(apiCourse: BackendCourse, locale: string = 'ar'): Co
           en: apiCourse.summary || 'Course description'
         },
     lessons: apiCourse.sessions?.length || apiCourse.attachments?.length || 1,
-    instructor: {
+    instructor: (apiCourse.instructors && apiCourse.instructors.length > 0) || 
+                 (apiCourse.instructorName && (typeof apiCourse.instructorName === 'string' ? apiCourse.instructorName.trim() !== '' : (apiCourse.instructorName.ar?.trim() !== '' || apiCourse.instructorName.en?.trim() !== ''))) ||
+                 apiCourse.instructor?.name ? {
       name: apiCourse.instructors && apiCourse.instructors.length > 0
         ? (locale === 'ar' ? apiCourse.instructors[0].instructorName.ar : apiCourse.instructors[0].instructorName.en)
         : (typeof apiCourse.instructorName === 'string' 
@@ -116,7 +118,7 @@ function transformApiCourse(apiCourse: BackendCourse, locale: string = 'ar'): Co
       rating: 4.8,
       studentsCount: Math.floor(Math.random() * 5000) + 1000,
       coursesCount: Math.floor(Math.random() * 20) + 5
-    },
+    } : undefined,
     reviewsCount: Math.floor(Math.random() * 2000) + 500,
     studentsCount: Math.floor(Math.random() * 5000) + 1000,
     duration: apiCourse.duration ? 

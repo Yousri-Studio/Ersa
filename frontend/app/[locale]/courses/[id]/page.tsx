@@ -473,7 +473,11 @@ export default function CourseDetailsPage() {
                   {[
                     { id: 'overview', label: t('course.tabs.overview') },
                     { id: 'curriculum', label: t('course.tabs.topics') },
-                    { id: 'instructor', label: t('course.tabs.instructor') },
+                    // Only show instructor tab if there's instructor data
+                    ...((course.instructors && course.instructors.length > 0) || course.instructor 
+                      ? [{ id: 'instructor', label: t('course.tabs.instructor') }] 
+                      : []
+                    ),
                     { id: 'reviews', label: t('course.tabs.reviews') }
                   ].map((tab) => (
                     <button
@@ -600,7 +604,7 @@ export default function CourseDetailsPage() {
                 )}
                 
                 {/* Instructor Tab */}
-                {activeTab === 'instructor' && (
+                {activeTab === 'instructor' && ((course.instructors && course.instructors.length > 0) || course.instructor) && (
                   <div>
                     <h2 className="text-xl font-semibold text-gray-900 mb-6 font-cairo">
                       {t('course.instructor-info')}
