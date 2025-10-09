@@ -23,13 +23,13 @@ public class CourseListDto
     public LocalizedText Duration { get; set; } = new();
     public DateTime? From { get; set; }
     public DateTime? To { get; set; }
-    public LocalizedText SessionsNotes { get; set; } = new();
-    public LocalizedText InstructorName { get; set; } = new();
+    public LocalizedText sessionsNotes { get; set; } = new();
+    public LocalizedText instructorName { get; set; } = new();
     public List<InstructorDto> Instructors { get; set; } = new();
     public byte[]? Photo { get; set; }
     public string? Tags { get; set; }
-    public LocalizedText InstructorsBio { get; set; } = new();
-    public LocalizedText CourseTopics { get; set; } = new();
+    public LocalizedText instructorsBio { get; set; } = new();
+    public LocalizedText courseTopics { get; set; } = new();
     public bool IsActive { get; set; }
     public bool IsFeatured { get; set; }
     public DateTime CreatedAt { get; set; }

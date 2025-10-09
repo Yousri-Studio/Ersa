@@ -91,6 +91,10 @@ public class AdminCourseDto
     public string? VideoUrl { get; set; }
     public string? DurationEn { get; set; }
     public string? DurationAr { get; set; }
+    public DateTime? From { get; set; }
+    public DateTime? To { get; set; }
+    public string? SessionsNotesEn { get; set; }
+    public string? SessionsNotesAr { get; set; }
     public string? InstructorNameAr { get; set; }
     public string? InstructorNameEn { get; set; }
     public byte[]? Photo { get; set; }
@@ -199,6 +203,10 @@ public class AdminCreateCourseRequest
     public string? VideoUrl { get; set; }
     public string? DurationEn { get; set; }
     public string? DurationAr { get; set; }
+    public DateTime? From { get; set; }
+    public DateTime? To { get; set; }
+    public string? SessionsNotesEn { get; set; }
+    public string? SessionsNotesAr { get; set; }
     public string InstructorNameAr { get; set; } = string.Empty;
     public string InstructorNameEn { get; set; } = string.Empty;
     public string? Photo { get; set; }
@@ -229,6 +237,10 @@ public class AdminUpdateCourseRequest
     public string? VideoUrl { get; set; }
     public string? DurationEn { get; set; }
     public string? DurationAr { get; set; }
+    public DateTime? From { get; set; }
+    public DateTime? To { get; set; }
+    public string? SessionsNotesEn { get; set; }
+    public string? SessionsNotesAr { get; set; }
     public string InstructorNameAr { get; set; } = string.Empty;
     public string InstructorNameEn { get; set; } = string.Empty;
     public string? Photo { get; set; }

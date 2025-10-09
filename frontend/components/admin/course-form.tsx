@@ -558,7 +558,7 @@ export function CourseForm({ initialData, onSubmit, onCancel, isEdit = false, is
               value={formData.courseTopicsEn}
               onChange={(e) => handleChange('courseTopicsEn', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder={locale === 'ar' ? 'مواضيع الدورة بالإنجليزية' : 'Course topics in English'}
+              placeholder={locale === 'ar' ? 'مواضيع الدورة بالإنجليزية، مفصولة بفواصل' : 'Course topics in English, comma separated'}
             />
           </div>
           <div>
@@ -570,7 +570,7 @@ export function CourseForm({ initialData, onSubmit, onCancel, isEdit = false, is
               value={formData.courseTopicsAr}
               onChange={(e) => handleChange('courseTopicsAr', e.target.value)}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder={locale === 'ar' ? 'مواضيع الدورة بالعربية' : 'Course topics in Arabic'}
+              placeholder={locale === 'ar' ? 'مواضيع الدورة بالعربية، مفصولة بفواصل' : 'Course topics in Arabic, comma separated'}
               dir="rtl"
             />
           </div>

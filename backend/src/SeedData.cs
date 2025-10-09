@@ -769,7 +769,7 @@ public static class SeedData
             new Course
             {
                 Id = course12Id,
-                Slug = "mobile-app-development2",
+                Slug = "mobile-app-development",
                 TitleEn = "Mobile App Development",
                 TitleAr = "تطوير تطبيقات الهاتف المحمول",
                 SummaryEn = "Build native and cross-platform mobile applications using React Native and Flutter.",
@@ -789,6 +789,10 @@ public static class SeedData
                 InstructorsBioEn = "Professional mobile app developer",
                 DurationEn = "70 hours",
                 DurationAr = "70 ساعة",
+                From = DateTime.UtcNow.AddDays(15),
+                To = DateTime.UtcNow.AddDays(45),
+                SessionsNotesEn = "Live sessions on Mondays and Wednesdays from 7PM to 9PM. Interactive coding sessions with real-time feedback.",
+                SessionsNotesAr = "جلسات مباشرة أيام الاثنين والأربعاء من 7 مساءً إلى 9 مساءً. جلسات برمجة تفاعلية مع تعليقات فورية.",
                 VideoUrl = "https://example.com/video12.mp4",
                 Tags = "mobile,react-native,flutter,ios,android",
                 IsFeatured = false,

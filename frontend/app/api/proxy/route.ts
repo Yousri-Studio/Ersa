@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const API_BASE_URL = process.env.BACKEND_API_URL || 'http://api.ersa-training.com/api';
+const API_BASE_URL = process.env.BACKEND_API_URL || 'http://localhost:5002/api';
 
 // Ensure API_BASE_URL ends with /api for local development
 const getBackendUrl = () => {

@@ -245,14 +245,14 @@ export default function CourseDetailsPage() {
                 </div>
 
                 {/* Course Dates */}
-                {(course.from || course.to) && (
-                  <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-                    <div className="flex items-center space-x-2 rtl:space-x-reverse mb-2">
-                      <Icon name="far fa-calendar" className="text-blue-600" />
-                      <h4 className="font-semibold text-gray-900 font-cairo">
-                        {locale === 'ar' ? 'مواعيد الدورة' : 'Course Schedule'}
-                      </h4>
-                    </div>
+                <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                  <div className="flex items-center space-x-2 rtl:space-x-reverse mb-2">
+                    <Icon name="far fa-calendar" className="text-blue-600" />
+                    <h4 className="font-semibold text-gray-900 font-cairo">
+                      {locale === 'ar' ? 'مواعيد الدورة' : 'Course Schedule'}
+                    </h4>
+                  </div>
+                  {(course.from || course.to) ? (
                     <div className="grid grid-cols-2 gap-4 text-sm">
                       {course.from && (
                         <div>
@@ -271,15 +271,19 @@ export default function CourseDetailsPage() {
                         </div>
                       )}
                     </div>
-                    {course.sessionsNotes && (
-                      <div className="mt-3">
-                        <p className="text-sm text-gray-700 font-cairo">
-                          {locale === 'ar' ? course.sessionsNotes.ar : course.sessionsNotes.en}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                )}
+                  ) : (
+                    <p className="text-sm text-gray-500 font-cairo italic">
+                      {locale === 'ar' ? 'لم يتم تحديد مواعيد الدورة بعد' : 'Course dates not yet scheduled'}
+                    </p>
+                  )}
+                  {course.sessionsNotes && (course.sessionsNotes.ar || course.sessionsNotes.en) && (
+                    <div className="mt-3">
+                      <p className="text-sm text-gray-700 font-cairo">
+                        {locale === 'ar' ? course.sessionsNotes.ar : course.sessionsNotes.en}
+                      </p>
+                    </div>
+                  )}
+                </div>
 
                 {/* Instructors */}
                 {course.instructors && course.instructors.length > 0 ? (
@@ -560,9 +564,13 @@ export default function CourseDetailsPage() {
                               {locale === 'ar' ? 'ملاحظات الجلسة' : 'Session Notes'}
                             </p>
                             <div className="text-sm text-gray-600 font-cairo">
-                              {course.sessionsNotes && (
+                              {course.sessionsNotes && (course.sessionsNotes.ar || course.sessionsNotes.en) ? (
                                 <p className="mb-1">
                                   {locale === 'ar' ? course.sessionsNotes.ar : course.sessionsNotes.en}
+                                </p>
+                              ) : (
+                                <p className="mb-1 text-gray-400 italic">
+                                  {locale === 'ar' ? 'لا توجد ملاحظات للجلسة' : 'No session notes available'}
                                 </p>
                               )}
                               {course.from && course.to && (
@@ -692,38 +700,44 @@ export default function CourseDetailsPage() {
               
               <div className="space-y-4 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-600 font-cairo">{t('course.level')}:</span>
-                  <span className="font-semibold text-gray-900 font-cairo">{course.level}</span>
-                </div>
-                <div className="flex justify-between">
                   <span className="text-gray-600 font-cairo">{t('course.duration')}:</span>
                   <span className="font-semibold text-gray-900 font-cairo">{course.duration}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600 font-cairo">{t('course.lessons')}:</span>
-                  <span className="font-semibold text-gray-900 font-cairo">{course.lessons}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600 font-cairo">
                     {locale === 'ar' ? 'ملاحظات الجلسة:' : 'Session Notes:'}
                   </span>
                   <span className="font-semibold text-gray-900 font-cairo text-right">
-                    {course.sessionsNotes ? (
+                    {course.sessionsNotes && (course.sessionsNotes.ar || course.sessionsNotes.en) ? (
                       <div>
                         <p className="text-xs">
                           {locale === 'ar' ? course.sessionsNotes.ar : course.sessionsNotes.en}
                         </p>
                         {course.from && course.to && (
                           <p className="text-xs text-gray-500 mt-1">
-                            {new Date(course.from).toLocaleDateString(locale)} - {new Date(course.to).toLocaleDateString(locale)}
+                            {locale === 'ar' ? 'من:' : 'From:'} {new Date(course.from).toLocaleDateString(locale)} - {locale === 'ar' ? 'إلى:' : 'To:'} {new Date(course.to).toLocaleDateString(locale)}
                           </p>
                         )}
                       </div>
                     ) : (
-                      '-'
+                      <span className="text-gray-400 italic text-xs">
+                        {locale === 'ar' ? 'لا توجد ملاحظات' : 'No notes available'}
+                      </span>
                     )}
                   </span>
                 </div>
+                {course.subCategories && course.subCategories.length > 0 && (
+                  <div className="flex justify-between">
+                    <span className="text-gray-600 font-cairo">
+                      {locale === 'ar' ? 'التصنيفات الفرعية:' : 'Subcategories:'}
+                    </span>
+                    <span className="font-semibold text-gray-900 font-cairo text-right">
+                      {course.subCategories.map(sub => 
+                        locale === 'ar' ? sub.titleAr : sub.titleEn
+                      ).join(', ')}
+                    </span>
+                  </div>
+                )}
                 <div className="flex justify-between">
                   <span className="text-gray-600 font-cairo">{t('course.last-updated')}:</span>
                   <span className="font-semibold text-gray-900 font-cairo">{course.lastUpdated}</span>

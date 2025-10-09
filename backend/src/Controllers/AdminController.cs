@@ -884,6 +884,10 @@ public class AdminController : ControllerBase
                 VideoUrl = request.VideoUrl,
                 DurationEn = request.DurationEn,
                 DurationAr = request.DurationAr,
+                From = request.From,
+                To = request.To,
+                SessionsNotesEn = request.SessionsNotesEn,
+                SessionsNotesAr = request.SessionsNotesAr,
                 InstructorNameAr = request.InstructorNameAr,
                 InstructorNameEn = request.InstructorNameEn,
                 Photo = !string.IsNullOrEmpty(request.Photo) ? Convert.FromBase64String(request.Photo) : null,
@@ -962,6 +966,10 @@ public class AdminController : ControllerBase
                 VideoUrl = createdCourse.VideoUrl,
                 DurationEn = createdCourse.DurationEn,
                 DurationAr = createdCourse.DurationAr,
+                From = createdCourse.From,
+                To = createdCourse.To,
+                SessionsNotesEn = createdCourse.SessionsNotesEn,
+                SessionsNotesAr = createdCourse.SessionsNotesAr,
                 InstructorNameAr = createdCourse.InstructorNameAr,
                 InstructorNameEn = createdCourse.InstructorNameEn,
                 Photo = createdCourse.Photo,
@@ -1038,6 +1046,13 @@ public class AdminController : ControllerBase
             course.VideoUrl = request.VideoUrl;
             course.DurationEn = request.DurationEn;
             course.DurationAr = request.DurationAr;
+            course.From = request.From;
+            course.To = request.To;
+            course.SessionsNotesEn = request.SessionsNotesEn;
+            course.SessionsNotesAr = request.SessionsNotesAr;
+            
+            // Debug logging
+            _logger.LogInformation($"Updating course {courseId} with From: {request.From}, To: {request.To}, SessionsNotesEn: {request.SessionsNotesEn}, SessionsNotesAr: {request.SessionsNotesAr}");
             course.InstructorNameAr = request.InstructorNameAr;
             course.InstructorNameEn = request.InstructorNameEn;
             course.Photo = !string.IsNullOrEmpty(request.Photo) ? Convert.FromBase64String(request.Photo) : null;
@@ -1070,6 +1085,9 @@ public class AdminController : ControllerBase
             }
 
             await _context.SaveChangesAsync();
+            
+            // Debug logging after save
+            _logger.LogInformation($"Course {courseId} saved successfully. From: {course.From}, To: {course.To}, SessionsNotesEn: {course.SessionsNotesEn}, SessionsNotesAr: {course.SessionsNotesAr}");
 
             // Reload course with related data
             var updatedCourse = await _context.Courses
@@ -1116,6 +1134,10 @@ public class AdminController : ControllerBase
                 VideoUrl = updatedCourse.VideoUrl,
                 DurationEn = updatedCourse.DurationEn,
                 DurationAr = updatedCourse.DurationAr,
+                From = updatedCourse.From,
+                To = updatedCourse.To,
+                SessionsNotesEn = updatedCourse.SessionsNotesEn,
+                SessionsNotesAr = updatedCourse.SessionsNotesAr,
                 InstructorNameAr = updatedCourse.InstructorNameAr,
                 InstructorNameEn = updatedCourse.InstructorNameEn,
                 Photo = updatedCourse.Photo,
