@@ -247,7 +247,7 @@ export default function CourseDetailsPage() {
                 {/* Course Dates */}
                 <div className="mt-6 p-4 bg-blue-50 rounded-lg">
                   <div className="flex items-center space-x-2 rtl:space-x-reverse mb-2">
-                    <Icon name="far fa-calendar" className="text-blue-600" />
+                    <Icon name="calendar" className="text-blue-600" />
                     <h4 className="font-semibold text-gray-900 font-cairo">
                       {locale === 'ar' ? 'مواعيد الدورة' : 'Course Schedule'}
                     </h4>
@@ -504,19 +504,6 @@ export default function CourseDetailsPage() {
                       </p>
                     </div>
                     
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 mb-3 font-cairo">
-                        {t('course.requirements')}
-                      </h3>
-                      <ul className="space-y-2">
-                        {course.requirements.map((req: string, index: number) => (
-                          <li key={index} className="flex items-start space-x-2 rtl:space-x-reverse text-gray-600">
-                            <span className="text-primary-500 mt-1">•</span>
-                            <span className="font-cairo">{req}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
 
                     <div>
                       <h3 className="text-lg font-semibold text-gray-900 mb-3 font-cairo">

@@ -92,9 +92,7 @@ function transformApiCourse(apiCourse: BackendCourse, locale: string = 'ar'): Co
       : (locale === 'ar'
           ? ['وصول مدى الحياة', 'ملفات PDF', 'شهادة إتمام', 'دعم المدرب', 'ملفات قابلة للتحميل']
           : ['Lifetime Access', 'PDF Files', 'Certificate of Completion', 'Instructor Support', 'Downloadable Files']),
-    requirements: locale === 'ar' 
-      ? ['معرفة أساسية بالحاسوب', 'الرغبة في التعلم والإبداع']
-      : ['Basic computer knowledge', 'Desire to learn and innovate'],
+    requirements: [],
     topics: apiCourse.courseTopics ? 
       (locale === 'ar' ? 
         (apiCourse.courseTopics.ar ? apiCourse.courseTopics.ar.split(',').map(t => t.trim()) : []) :
