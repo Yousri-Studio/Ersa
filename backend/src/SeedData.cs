@@ -108,7 +108,7 @@ public static class SeedData
             Locale = "en",
             Status = UserStatus.Active,
             // Keep boolean properties for backward compatibility
-            IsAdmin = roleName == RoleNames.Admin || roleName == RoleNames.SuperAdmin,
+            IsAdmin = roleName == RoleNames.Admin || roleName == RoleNames.SuperAdmin || roleName == RoleNames.Operation,
             IsSuperAdmin = roleName == RoleNames.SuperAdmin,
             EmailConfirmed = true,
             CreatedAt = DateTime.UtcNow

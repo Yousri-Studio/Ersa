@@ -20,13 +20,13 @@ export default function AdminLoginPage() {
   // Account credentials for different roles
   const accountCredentials = {
     'system-manager': {
-      email: 'superadmin@ersatraining.com',
+      email: 'superadmin@ersa-training.com',
       password: 'SuperAdmin123!',
       title: t('roles.system-manager'),
       description: t('roles.system-manager-desc')
     },
     'operations-manager': {
-      email: 'operations@ersatraining.com',
+      email: 'operations@ersa-training.com',
       password: 'Operations123!',
       title: t('roles.operations-manager'),
       description: t('roles.operations-manager-desc')
