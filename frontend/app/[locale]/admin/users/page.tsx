@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Icon } from '@/components/ui/icon';
-import { adminApi, AdminUser, PagedResult, CreateUserRequest } from '@/lib/admin-api';
+import { adminApi, AdminUser, PagedResult, CreateUserRequest, RoleInfo } from '@/lib/admin-api';
+import { RoleNames, getRoleDisplayName } from '@/lib/roles';
 import { useAuthStore } from '@/lib/auth-store';
 import { useHydration } from '@/hooks/useHydration';
 import toast from 'react-hot-toast';
@@ -45,6 +46,7 @@ export default function AdminUsers() {
     isAdmin: false,
     isSuperAdmin: false,
   });
+  const [availableRoles, setAvailableRoles] = useState<RoleInfo[]>([]);
 
   const { user: currentUser } = useAuthStore();
   const isHydrated = useHydration();
@@ -52,6 +54,7 @@ export default function AdminUsers() {
   useEffect(() => {
     if (isHydrated) {
       fetchUsers();
+      fetchAvailableRoles();
     }
   }, [isHydrated, pagination.page, filters]);
 
@@ -88,6 +91,22 @@ export default function AdminUsers() {
       toast.error('Failed to load users');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchAvailableRoles = async () => {
+    try {
+      const response = await adminApi.getAllRoles();
+      setAvailableRoles(response.data);
+    } catch (error) {
+      console.error('Error fetching roles:', error);
+      // Fallback to default roles if API fails
+      setAvailableRoles([
+        { id: '1', name: 'SuperAdmin' },
+        { id: '2', name: 'Admin' },
+        { id: '3', name: 'Operation' },
+        { id: '4', name: 'PublicUser' },
+      ]);
     }
   };
 
@@ -643,31 +662,34 @@ export default function AdminUsers() {
                     <option value="ar">{locale === 'ar' ? 'العربية' : 'Arabic'}</option>
                   </select>
                 </div>
-                <div className="space-y-2">
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="addUserIsAdmin"
-                      checked={addUserForm.isAdmin}
-                      onChange={(e) => setAddUserForm(prev => ({ ...prev, isAdmin: e.target.checked }))}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                    <label htmlFor="addUserIsAdmin" className="ml-2 block text-sm text-gray-900">
-                      {locale === 'ar' ? 'مدير' : 'Admin'}
-                    </label>
-                  </div>
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      id="addUserIsSuperAdmin"
-                      checked={addUserForm.isSuperAdmin}
-                      onChange={(e) => setAddUserForm(prev => ({ ...prev, isSuperAdmin: e.target.checked }))}
-                      className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
-                    />
-                    <label htmlFor="addUserIsSuperAdmin" className="ml-2 block text-sm text-gray-900">
-                      {locale === 'ar' ? 'مدير النظام' : 'Super Admin'}
-                    </label>
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {locale === 'ar' ? 'الدور' : 'Role'}
+                  </label>
+                  <select
+                    value={addUserForm.isSuperAdmin ? 'SuperAdmin' : addUserForm.isAdmin ? 'Admin' : 'PublicUser'}
+                    onChange={(e) => {
+                      const role = e.target.value;
+                      setAddUserForm(prev => ({
+                        ...prev,
+                        isAdmin: role === 'Admin',
+                        isSuperAdmin: role === 'SuperAdmin'
+                      }));
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {availableRoles.map((role) => (
+                      <option key={role.id} value={role.name}>
+                        {getRoleDisplayName(role.name, locale)}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {locale === 'ar' 
+                      ? 'اختر دور المستخدم الجديد في النظام' 
+                      : 'Select the role for the new user in the system'
+                    }
+                  </p>
                 </div>
               </div>
               <div className="flex justify-end space-x-3 mt-6">

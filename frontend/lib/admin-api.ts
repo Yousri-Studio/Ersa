@@ -410,6 +410,21 @@ export interface CreateInstructorRequest {
 
 export type UpdateInstructorRequest = CreateInstructorRequest;
 
+// Role Management
+export interface UserWithRoles {
+  email: string;
+  fullName: string;
+  roles: string[];
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface RoleInfo {
+  id: string;
+  name: string;
+  normalizedName?: string;
+}
+
 // Fallback data for when backend is not available
 const fallbackDashboardStats: DashboardStats = {
   totalUsers: 11, // Only public users (excluding admin users)
@@ -870,6 +885,22 @@ export const adminApi = {
 
   publishContentVersion: (pageId: string, versionId: string) =>
     api.post(`/api/content/pages/${pageId}/versions/${versionId}/publish`),
+
+  // Role Management (SuperAdmin only)
+  getUsersWithRoles: () =>
+    api.get<UserWithRoles[]>('/api/admin/users-with-roles'),
+
+  assignRoleToUser: (email: string, roleName: string) =>
+    api.post(`/api/admin/users/${encodeURIComponent(email)}/roles/${roleName}`),
+
+  removeRoleFromUser: (email: string, roleName: string) =>
+    api.delete(`/api/admin/users/${encodeURIComponent(email)}/roles/${roleName}`),
+
+  getAllRoles: () =>
+    api.get<RoleInfo[]>('/api/role/roles'),
+
+  getUserRoles: (email: string) =>
+    api.get<string[]>(`/api/role/user/${encodeURIComponent(email)}/roles`),
 };
 
 

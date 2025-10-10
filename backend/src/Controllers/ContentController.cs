@@ -1810,7 +1810,7 @@ public class ContentController : ControllerBase
                 new() { Key = "title", Name = "Contact Title", Type = "text", ContentEn = "Get in Touch", ContentAr = "ØªÙˆØ§ØµÙ„ Ù…Ø¹Ù†Ø§", SortOrder = 1 },
                 new() { Key = "address", Name = "Address", Type = "text", ContentEn = "Riyadh, Saudi Arabia", ContentAr = "Ø§Ù„Ø±ÙŠØ§Ø¶ØŒ Ø§Ù„Ù…Ù…Ù„ÙƒØ© Ø§Ù„Ø¹Ø±Ø¨ÙŠØ© Ø§Ù„Ø³Ø¹ÙˆØ¯ÙŠØ©", SortOrder = 2 },
                 new() { Key = "phone", Name = "Phone Number", Type = "text", ContentEn = "+966 XX XXX XXXX", ContentAr = "+966 XX XXX XXXX", SortOrder = 3 },
-                new() { Key = "email", Name = "Email Address", Type = "text", ContentEn = "info@ersatraining.com", ContentAr = "info@ersatraining.com", SortOrder = 4 }
+                new() { Key = "email", Name = "Email Address", Type = "text", ContentEn = "info@ersa-training.com", ContentAr = "info@ersa-training.com", SortOrder = 4 }
             },
             "faq" => new List<DefaultBlockData>
             {
@@ -2147,7 +2147,7 @@ public class ContentController : ControllerBase
                     id = "email",
                     label = "Email Address",
                     type = "text",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "email")?.ContentEn ?? "info@ersatraining.com",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "email")?.ContentEn ?? "info@ersa-training.com",
                     required = true,
                     placeholder = "Enter email address"
                 });

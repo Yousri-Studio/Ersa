@@ -11,6 +11,7 @@ using ErsaTraining.API.Data;
 using ErsaTraining.API.Data.Entities;
 using ErsaTraining.API.Services;
 using ErsaTraining.API.Middleware;
+using ErsaTraining.API.Authorization;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -128,6 +129,10 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IBillService, BillService>();
 builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<RoleService>();
+
+// Authorization
+builder.Services.AddRoleAuthorization();
 
 // Swagger
 builder.Services.AddEndpointsApiExplorer();

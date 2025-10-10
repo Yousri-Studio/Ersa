@@ -4,7 +4,8 @@ namespace ErsaTraining.API.Services;
 
 public interface IJwtService
 {
-    string GenerateToken(User user);
+    Task<string> GenerateTokenAsync(User user);
+    string GenerateToken(User user); // Keep for backward compatibility
     bool ValidateToken(string token);
     Guid? GetUserIdFromToken(string token);
 }

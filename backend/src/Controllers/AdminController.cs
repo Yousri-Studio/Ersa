@@ -7,12 +7,13 @@ using ErsaTraining.API.Data;
 using ErsaTraining.API.Data.Entities;
 using ErsaTraining.API.DTOs;
 using ErsaTraining.API.Services;
+using ErsaTraining.API.Authorization;
 
 namespace ErsaTraining.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+[Authorize(Policy = PolicyNames.AdminAccess)]
 public class AdminController : ControllerBase
 {
     private readonly ErsaTrainingDbContext _context;
@@ -833,6 +834,28 @@ public class AdminController : ControllerBase
             {
                 var errors = string.Join(", ", result.Errors.Select(e => e.Description));
                 return BadRequest(new { error = "Failed to create user", details = errors });
+            }
+
+            // Assign role based on the boolean properties
+            string roleToAssign = "PublicUser"; // Default role
+            if (request.IsSuperAdmin == true)
+            {
+                roleToAssign = "SuperAdmin";
+            }
+            else if (request.IsAdmin == true)
+            {
+                roleToAssign = "Admin";
+            }
+
+            try
+            {
+                await _userManager.AddToRoleAsync(user, roleToAssign);
+                _logger.LogInformation("User {Email} created and assigned {Role} role", user.Email, roleToAssign);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to assign {Role} role to user {UserId}", roleToAssign, user.Id);
+                // Don't fail user creation if role assignment fails
             }
 
             var userDto = new UserDto
@@ -1784,4 +1807,133 @@ public class AdminController : ControllerBase
         return Ok(new { message = "Instructor deleted successfully" });
     }
 
+    // Role Management Endpoints (SuperAdmin only)
+    [HttpGet("users-with-roles")]
+    [Authorize(Policy = PolicyNames.SuperAdminOnly)]
+    public async Task<ActionResult<List<UserRoleInfo>>> GetUsersWithRoles()
+    {
+        try
+        {
+            var users = await _userManager.Users
+                .Where(u => u.Status == UserStatus.Active)
+                .OrderBy(u => u.FullName)
+                .ToListAsync();
+
+            var userRoleInfos = new List<UserRoleInfo>();
+
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                userRoleInfos.Add(new UserRoleInfo
+                {
+                    Email = user.Email!,
+                    FullName = user.FullName,
+                    Roles = roles.ToList(),
+                    IsActive = user.Status == UserStatus.Active,
+                    CreatedAt = user.CreatedAt
+                });
+            }
+
+            return Ok(userRoleInfos);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting users with roles");
+            return StatusCode(500, new { error = "Internal server error" });
+        }
+    }
+
+    [HttpPost("users/{email}/roles/{roleName}")]
+    [Authorize(Policy = PolicyNames.SuperAdminOnly)]
+    public async Task<ActionResult> AssignRoleToUser(string email, string roleName)
+    {
+        try
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                return NotFound(new { error = "User not found" });
+            }
+
+            // Validate role name
+            var validRoles = new[] { RoleNames.SuperAdmin, RoleNames.Admin, RoleNames.Operation, RoleNames.PublicUser };
+            if (!validRoles.Contains(roleName))
+            {
+                return BadRequest(new { error = $"Invalid role name: {roleName}" });
+            }
+
+            var isInRole = await _userManager.IsInRoleAsync(user, roleName);
+            if (!isInRole)
+            {
+                var result = await _userManager.AddToRoleAsync(user, roleName);
+                if (result.Succeeded)
+                {
+                    _logger.LogInformation($"User {email} assigned to role {roleName}");
+                    return Ok(new { message = $"User {email} assigned to role {roleName} successfully" });
+                }
+                else
+                {
+                    return BadRequest(new { error = "Failed to assign role", details = result.Errors });
+                }
+            }
+            else
+            {
+                return BadRequest(new { error = $"User {email} is already in role {roleName}" });
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error assigning role {RoleName} to user {Email}", roleName, email);
+            return StatusCode(500, new { error = "Internal server error" });
+        }
+    }
+
+    [HttpDelete("users/{email}/roles/{roleName}")]
+    [Authorize(Policy = PolicyNames.SuperAdminOnly)]
+    public async Task<ActionResult> RemoveRoleFromUser(string email, string roleName)
+    {
+        try
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                return NotFound(new { error = "User not found" });
+            }
+
+            var isInRole = await _userManager.IsInRoleAsync(user, roleName);
+            if (isInRole)
+            {
+                var result = await _userManager.RemoveFromRoleAsync(user, roleName);
+                if (result.Succeeded)
+                {
+                    _logger.LogInformation($"User {email} removed from role {roleName}");
+                    return Ok(new { message = $"User {email} removed from role {roleName} successfully" });
+                }
+                else
+                {
+                    return BadRequest(new { error = "Failed to remove role", details = result.Errors });
+                }
+            }
+            else
+            {
+                return BadRequest(new { error = $"User {email} is not in role {roleName}" });
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error removing role {RoleName} from user {Email}", roleName, email);
+            return StatusCode(500, new { error = "Internal server error" });
+        }
+    }
+
+}
+
+// DTO for user role information
+public class UserRoleInfo
+{
+    public string Email { get; set; } = string.Empty;
+    public string FullName { get; set; } = string.Empty;
+    public List<string> Roles { get; set; } = new();
+    public bool IsActive { get; set; }
+    public DateTime CreatedAt { get; set; }
 }

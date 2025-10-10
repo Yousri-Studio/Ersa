@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using ErsaTraining.API.Data.Entities;
 using ErsaTraining.API.DTOs;
 using ErsaTraining.API.Services;
+using ErsaTraining.API.Authorization;
 
 namespace ErsaTraining.API.Controllers;
 
@@ -61,6 +62,18 @@ public class AuthController : ControllerBase
             if (!result.Succeeded)
             {
                 return BadRequest(new { error = string.Join(", ", result.Errors.Select(e => e.Description)) });
+            }
+
+            // Assign PublicUser role to all new registrations
+            try
+            {
+                await _userManager.AddToRoleAsync(user, RoleNames.PublicUser);
+                _logger.LogInformation("User {Email} registered and assigned PublicUser role", user.Email);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to assign PublicUser role to user {UserId}", user.Id);
+                // Don't fail registration if role assignment fails
             }
 
             // Generate verification token and send verification email
@@ -123,7 +136,7 @@ public class AuthController : ControllerBase
             user.LastLoginAt = DateTime.UtcNow;
             await _userManager.UpdateAsync(user);
 
-            var token = _jwtService.GenerateToken(user);
+            var token = await _jwtService.GenerateTokenAsync(user);
             
             return Ok(new LoginResponse
             {
@@ -224,7 +237,7 @@ public class AuthController : ControllerBase
             await _userManager.UpdateAsync(user);
 
             // Generate token and return login response
-            var token = _jwtService.GenerateToken(user);
+            var token = await _jwtService.GenerateTokenAsync(user);
             
             return Ok(new LoginResponse
             {

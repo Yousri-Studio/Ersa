@@ -14,7 +14,7 @@ public static class CreateSuperAdmin
 
         // Create Super Admin (System Manager)
         await CreateUserIfNotExists(userManager, 
-            "superadmin@ersatraining.com", 
+            "superadmin@ersa-training.com", 
             "SuperAdmin123!", 
             "System Manager", 
             true, 
@@ -22,7 +22,7 @@ public static class CreateSuperAdmin
 
         // Create Operations Manager
         await CreateUserIfNotExists(userManager, 
-            "operations@ersatraining.com", 
+            "operations@ersa-training.com", 
             "Operations123!", 
             "Operations Manager", 
             true, 
@@ -30,7 +30,7 @@ public static class CreateSuperAdmin
 
         // Create legacy admin account for backward compatibility
         await CreateUserIfNotExists(userManager, 
-            "admin@ersatraining.com", 
+            "admin@ersa-training.com", 
             "Admin123!", 
             "Legacy Administrator", 
             true, 

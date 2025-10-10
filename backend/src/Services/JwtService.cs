@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using ErsaTraining.API.Data.Entities;
 
@@ -9,19 +10,21 @@ namespace ErsaTraining.API.Services;
 public class JwtService : IJwtService
 {
     private readonly IConfiguration _configuration;
+    private readonly UserManager<User> _userManager;
     private readonly string _secretKey;
     private readonly string _issuer;
     private readonly string _audience;
 
-    public JwtService(IConfiguration configuration)
+    public JwtService(IConfiguration configuration, UserManager<User> userManager)
     {
         _configuration = configuration;
+        _userManager = userManager;
         _secretKey = _configuration["Jwt:SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey is not configured");
         _issuer = _configuration["Jwt:Issuer"] ?? throw new InvalidOperationException("JWT Issuer is not configured");
         _audience = _configuration["Jwt:Audience"] ?? throw new InvalidOperationException("JWT Audience is not configured");
     }
 
-    public string GenerateToken(User user)
+    public async Task<string> GenerateTokenAsync(User user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_secretKey);
@@ -36,13 +39,19 @@ public class JwtService : IJwtService
             new(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
         };
 
-        // Add admin role claims
-        if (user.IsSuperAdmin)
+        // Get user roles from UserManager
+        var roles = await _userManager.GetRolesAsync(user);
+        foreach (var role in roles)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role));
+        }
+
+        // Keep backward compatibility with boolean properties
+        if (user.IsSuperAdmin && !roles.Contains("SuperAdmin"))
         {
             claims.Add(new Claim(ClaimTypes.Role, "SuperAdmin"));
-            claims.Add(new Claim(ClaimTypes.Role, "Admin"));
         }
-        else if (user.IsAdmin)
+        if (user.IsAdmin && !roles.Contains("Admin"))
         {
             claims.Add(new Claim(ClaimTypes.Role, "Admin"));
         }
@@ -58,6 +67,12 @@ public class JwtService : IJwtService
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
+    }
+
+    // Backward compatibility method
+    public string GenerateToken(User user)
+    {
+        return GenerateTokenAsync(user).GetAwaiter().GetResult();
     }
 
     public bool ValidateToken(string token)

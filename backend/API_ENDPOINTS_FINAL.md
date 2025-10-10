@@ -257,7 +257,7 @@ curl -X GET "http://localhost:5002/api/CourseCategories?activeOnly=true"
 # 1. Login
 TOKEN=$(curl -X POST "http://localhost:5002/api/auth/login" \
   -H "Content-Type: application/json" \
-  -d '{"email":"superadmin@ersatraining.com","password":"SuperAdmin123!"}' \
+  -d '{"email":"superadmin@ersa-training.com","password":"SuperAdmin123!"}' \
   | jq -r '.token')
 
 # 2. Get categories (admin)

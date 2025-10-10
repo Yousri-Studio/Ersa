@@ -7,6 +7,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useAuthStore } from '@/lib/auth-store';
 import { Icon } from '@/components/ui/icon';
 import { useHydration } from '@/hooks/useHydration';
+import { useRoles } from '@/hooks/useRoles';
 import { adminApi } from '@/lib/admin-api';
 import { LanguageSwitcher } from '@/components/layout/language-switcher';
 import toast from 'react-hot-toast';
@@ -27,6 +28,7 @@ export default function AdminLayout({
   const [activeTab, setActiveTab] = useState('dashboard');
   const [courseSettingsOpen, setCourseSettingsOpen] = useState(false);
   const isHydrated = useHydration();
+  const { isSuperAdmin, isAdmin: hasAdminRole } = useRoles();
   const router = useRouter();
   const pathname = usePathname();
   const locale = useLocale();
@@ -61,21 +63,23 @@ export default function AdminLayout({
         return;
       }
 
-      // For development, temporarily allow any authenticated user to access admin
-      // TODO: Re-enable role check when proper admin users are set up
-      // if (!currentState.user?.isAdmin && !currentState.user?.isSuperAdmin) {
-      //   toast.error(t('errors.access-denied'));
-      //   router.push(`/${locale}/`);
-      //   return;
-      // }
+      // Use role-based access control
+      // Allow access if user has admin role OR if they have boolean admin properties (backward compatibility)
+      const hasAdminAccess = hasAdminRole || currentState.user?.isAdmin || currentState.user?.isSuperAdmin;
+      
+      if (!hasAdminAccess) {
+        console.log('User does not have admin access, redirecting');
+        toast.error(t('errors.access-denied'));
+        router.push(`/${locale}/`);
+        return;
+      }
 
-      // For development, skip API check and proceed with mock data
-      console.log('Admin access granted, using demo mode');
+      console.log('Admin access granted');
       setIsLoading(false);
     };
 
     checkAdminAccess();
-  }, [isHydrated, locale, router, initFromCookie]);
+  }, [isHydrated, hasAdminRole, locale, router, initFromCookie, t]);
 
   // Auto-expand Course Settings if on categories, subcategories, or instructors page
   useEffect(() => {
@@ -116,7 +120,10 @@ export default function AdminLayout({
     { id: 'instructors', label: isRTL ? 'المدربون' : 'Instructors', icon: 'users', href: `/${locale}/admin/instructors` },
   ];
 
-  // Super admin items can be added here if needed in the future
+  // Super admin items - only visible to SuperAdmin role
+  const superAdminItems = [
+    { id: 'roles', label: locale === 'ar' ? 'إدارة الأدوار' : 'Role Management', icon: 'shield-alt', href: `/${locale}/admin/roles` },
+  ];
 
   return (
     <div className={`min-h-screen bg-white ${isRTL ? 'rtl' : 'ltr'}`} data-admin-page>
@@ -228,6 +235,40 @@ export default function AdminLayout({
                   </div>
                 )}
               </div>
+
+              {/* Super Admin Section - Only visible to SuperAdmin */}
+              {isSuperAdmin && (
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <div className="px-2 mb-2">
+                    <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                      {locale === 'ar' ? 'المدير الرئيسي' : 'Super Admin'}
+                    </h3>
+                  </div>
+                  {superAdminItems.map((item) => (
+                    <Link
+                      key={item.id}
+                      href={item.href}
+                      onClick={() => {
+                        setActiveTab(item.id);
+                        setIsMenuOpen(false);
+                      }}
+                      className={`flex items-center px-2 sm:px-3 py-2 sm:py-2.5 text-xs sm:text-sm font-medium rounded-lg transition-colors ${
+                        pathname === item.href
+                          ? 'bg-opacity-10 bg-[#00AC96] text-[#00AC96]'
+                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                      }`}
+                    >
+                      <Icon
+                        name={item.icon}
+                        className={`${isRTL ? 'ml-2 sm:ml-3' : 'mr-2 sm:mr-3'} h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0 ${
+                          pathname === item.href ? 'text-[#00AC96]' : 'text-gray-400'
+                        }`}
+                      />
+                      <span className="truncate">{item.label}</span>
+                    </Link>
+                  ))}
+                </div>
+              )}
             </nav>
 
             {/* Language Switcher */}

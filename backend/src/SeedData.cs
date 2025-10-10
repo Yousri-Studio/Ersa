@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using ErsaTraining.API.Data;
 using ErsaTraining.API.Data.Entities;
+using ErsaTraining.API.Services;
 
 namespace ErsaTraining.API;
 
@@ -12,6 +13,7 @@ public static class SeedData
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ErsaTrainingDbContext>();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+        var roleService = scope.ServiceProvider.GetRequiredService<RoleService>();
         var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
 
         try
@@ -19,11 +21,14 @@ public static class SeedData
             // Database should already be created by the calling code
             // Remove the EnsureCreatedAsync call to avoid conflicts
 
-            // Seed Default Super Admins
-            await CreateSuperAdminUser(serviceProvider);
+            // Seed Roles First
+            await roleService.SeedRolesAsync();
 
-            // Seed Super Admin User
-            await SeedSuperAdminAsync(userManager, logger);
+            // Seed Default Super Admins
+            await CreateSuperAdminUser(serviceProvider, roleService);
+
+            // Seed Super Admin User (with role assignment)
+            await SeedSuperAdminAsync(userManager, roleService, logger);
 
             // Seed Course Categories
             await SeedCourseCategoriesAsync(context, logger);
@@ -44,7 +49,7 @@ public static class SeedData
             await SeedContentPagesAsync(context, logger);
 
             // Seed Mock Users for Orders
-            await SeedMockUsersAsync(userManager, logger);
+            await SeedMockUsersAsync(userManager, roleService, logger);
 
             // Seed Mock Orders and Payments
             await SeedMockOrdersAndPaymentsAsync(context, logger);
@@ -60,49 +65,48 @@ public static class SeedData
     }
 
 
-    public static async Task CreateSuperAdminUser(IServiceProvider serviceProvider)
+    public static async Task CreateSuperAdminUser(IServiceProvider serviceProvider, RoleService roleService)
     {
         using var scope = serviceProvider.CreateScope();
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
         var context = scope.ServiceProvider.GetRequiredService<ErsaTrainingDbContext>();
 
         // Create Super Admin (System Manager)
-        await CreateUserIfNotExists(userManager,
-            "superadmin@ersatraining.com",
+        await CreateUserIfNotExists(userManager, roleService,
+            "superadmin@ersa-training.com",
             "SuperAdmin123!",
             "System Manager",
-            true,
-            true);
+            RoleNames.SuperAdmin);
 
         // Create Operations Manager
-        await CreateUserIfNotExists(userManager,
-            "operations@ersatraining.com",
+        await CreateUserIfNotExists(userManager, roleService,
+            "operations@ersa-training.com",
             "Operations123!",
             "Operations Manager",
-            true,
-            false);
+            RoleNames.Operation);
 
         // Create legacy admin account for backward compatibility
-        await CreateUserIfNotExists(userManager,
-            "admin@ersatraining.com",
+        await CreateUserIfNotExists(userManager, roleService,
+            "admin@ersa-training.com",
             "Admin123!",
             "Legacy Administrator",
-            true,
-            true);
+            RoleNames.Admin);
     }
 
     private static async Task CreateUserIfNotExists(
         UserManager<User> userManager,
+        RoleService roleService,
         string email,
         string password,
         string fullName,
-        bool isAdmin,
-        bool isSuperAdmin)
+        string roleName)
     {
         var existingUser = await userManager.FindByEmailAsync(email);
         if (existingUser != null)
         {
             Console.WriteLine($"User {email} already exists!");
+            // Ensure existing user has the correct role
+            await roleService.AssignUserToRoleAsync(email, roleName);
             return;
         }
 
@@ -113,8 +117,9 @@ public static class SeedData
             FullName = fullName,
             Locale = "en",
             Status = UserStatus.Active,
-            IsAdmin = isAdmin,
-            IsSuperAdmin = isSuperAdmin,
+            // Keep boolean properties for backward compatibility
+            IsAdmin = roleName == RoleNames.Admin || roleName == RoleNames.SuperAdmin,
+            IsSuperAdmin = roleName == RoleNames.SuperAdmin,
             EmailConfirmed = true,
             CreatedAt = DateTime.UtcNow
         };
@@ -126,7 +131,10 @@ public static class SeedData
             Console.WriteLine($"User {email} created successfully!");
             Console.WriteLine($"Email: {email}");
             Console.WriteLine($"Password: {password}");
-            Console.WriteLine($"Role: {(isSuperAdmin ? "Super Admin" : "Operations Admin")}");
+            Console.WriteLine($"Role: {roleName}");
+            
+            // Assign user to role
+            await roleService.AssignUserToRoleAsync(email, roleName);
         }
         else
         {
@@ -138,9 +146,9 @@ public static class SeedData
         }
     }
 
-    private static async Task SeedSuperAdminAsync(UserManager<User> userManager, ILogger logger)
+    private static async Task SeedSuperAdminAsync(UserManager<User> userManager, RoleService roleService, ILogger logger)
     {
-        const string superAdminEmail = "superadmin@ersatraining.com";
+        const string superAdminEmail = "superadmin@ersa-training.com";
         const string superAdminPassword = "SuperAdmin123!";
 
         var existingUser = await userManager.FindByEmailAsync(superAdminEmail);
@@ -163,7 +171,9 @@ public static class SeedData
             var result = await userManager.CreateAsync(superAdmin, superAdminPassword);
             if (result.Succeeded)
             {
-                logger.LogInformation("Super admin user created successfully");
+                // Assign SuperAdmin role
+                await roleService.AssignUserToRoleAsync(superAdminEmail, RoleNames.SuperAdmin);
+                logger.LogInformation("Super admin user created successfully with SuperAdmin role");
             }
             else
             {
@@ -172,7 +182,9 @@ public static class SeedData
         }
         else
         {
-            logger.LogInformation("Super admin user already exists");
+            // Ensure existing user has the SuperAdmin role
+            await roleService.AssignUserToRoleAsync(superAdminEmail, RoleNames.SuperAdmin);
+            logger.LogInformation("Super admin user already exists, role assignment verified");
         }
     }
 
@@ -1187,7 +1199,7 @@ public static class SeedData
         logger.LogInformation("Added content pages with sections and blocks");
     }
 
-    private static async Task SeedMockUsersAsync(UserManager<User> userManager, ILogger logger)
+    private static async Task SeedMockUsersAsync(UserManager<User> userManager, RoleService roleService, ILogger logger)
     {
         var mockUsers = new[]
         {
@@ -1221,12 +1233,19 @@ public static class SeedData
                 var result = await userManager.CreateAsync(user, mockUser.Password);
                 if (result.Succeeded)
                 {
-                    logger.LogInformation("Mock user {Email} created successfully", mockUser.Email);
+                    // Assign PublicUser role to mock users
+                    await roleService.AssignUserToRoleAsync(mockUser.Email, RoleNames.PublicUser);
+                    logger.LogInformation("Mock user {Email} created successfully with PublicUser role", mockUser.Email);
                 }
                 else
                 {
                     logger.LogError("Failed to create mock user {Email}: {Errors}", mockUser.Email, string.Join(", ", result.Errors.Select(e => e.Description)));
                 }
+            }
+            else
+            {
+                // Ensure existing mock users have PublicUser role
+                await roleService.AssignUserToRoleAsync(mockUser.Email, RoleNames.PublicUser);
             }
         }
     }

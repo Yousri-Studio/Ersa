@@ -15,7 +15,7 @@ LOGIN_ENDPOINT="/api/auth/login"
 RESEED_ENDPOINT="/api/admin/reseed-course-data"
 
 # SuperAdmin credentials (update these)
-EMAIL="superadmin@ersatraining.com"
+EMAIL="superadmin@ersa-training.com"
 PASSWORD="SuperAdmin123!"
 
 echo "Step 1: Authenticating..."

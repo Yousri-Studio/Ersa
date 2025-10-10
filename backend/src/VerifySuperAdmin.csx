@@ -7,7 +7,7 @@ var connection = new SqliteConnection("Data Source=ErsaTrainingDB.db");
 connection.Open();
 
 var command = connection.CreateCommand();
-command.CommandText = "SELECT Email FROM AspNetUsers WHERE Email = 'superadmin@ersatraining.com';";
+command.CommandText = "SELECT Email FROM AspNetUsers WHERE Email = 'superadmin@ersa-training.com';";
 
 Console.WriteLine("Super Admin Verification:");
 using (var reader = command.ExecuteReader())
