@@ -41,13 +41,9 @@ export function CourseForm({ initialData, onSubmit, onCancel, isEdit = false, is
     to: initialData?.to || '',
     sessionsNotesEn: initialData?.sessionsNotesEn || '',
     sessionsNotesAr: initialData?.sessionsNotesAr || '',
-    instructorNameAr: '', // Deprecated - using instructors table
-    instructorNameEn: '', // Deprecated - using instructors table
     instructorIds: initialData?.instructorIds || [],
     photo: initialData?.photo || [],
     tags: initialData?.tags || '',
-    instructorsBioAr: '', // Deprecated - using instructors table
-    instructorsBioEn: '', // Deprecated - using instructors table
     courseTopicsAr: initialData?.courseTopicsAr || '',
     courseTopicsEn: initialData?.courseTopicsEn || '',
     isActive: initialData?.isActive ?? true,
@@ -82,13 +78,9 @@ export function CourseForm({ initialData, onSubmit, onCancel, isEdit = false, is
         to: initialData.to || '',
         sessionsNotesEn: initialData.sessionsNotesEn || '',
         sessionsNotesAr: initialData.sessionsNotesAr || '',
-        instructorNameAr: '', // Deprecated - using instructors table
-        instructorNameEn: '', // Deprecated - using instructors table
         instructorIds: initialData.instructorIds || [],
         photo: initialData.photo || [],
         tags: initialData.tags || '',
-        instructorsBioAr: '', // Deprecated - using instructors table
-        instructorsBioEn: '', // Deprecated - using instructors table
         courseTopicsAr: initialData.courseTopicsAr || '',
         courseTopicsEn: initialData.courseTopicsEn || '',
         isActive: initialData.isActive ?? true,

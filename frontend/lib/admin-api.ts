@@ -355,13 +355,9 @@ export interface AdminCreateCourseRequest {
   to?: string;
   sessionsNotesEn?: string;
   sessionsNotesAr?: string;
-  instructorNameAr: string;
-  instructorNameEn: string;
   instructorIds?: string[];
   photo?: number[] | string | null;
   tags?: string;
-  instructorsBioAr?: string;
-  instructorsBioEn?: string;
   courseTopicsAr?: string;
   courseTopicsEn?: string;
   isActive: boolean;

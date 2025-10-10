@@ -110,7 +110,6 @@ public class CoursesController : ControllerBase
                 From = c.From,
                 To = c.To,
                 sessionsNotes = new LocalizedText { Ar = c.SessionsNotesAr ?? "", En = c.SessionsNotesEn ?? "" },
-                instructorName = new LocalizedText { Ar = c.InstructorNameAr ?? "", En = c.InstructorNameEn ?? "" },
                 Instructors = c.CourseInstructors.Select(ci => new InstructorDto
                 {
                     Id = ci.Instructor.Id,
@@ -129,7 +128,6 @@ public class CoursesController : ControllerBase
                 }).ToList(),
                 Photo = c.Photo,
                 Tags = c.Tags,
-                instructorsBio = new LocalizedText { Ar = c.InstructorsBioAr ?? "", En = c.InstructorsBioEn ?? "" },
                 courseTopics = new LocalizedText { Ar = c.CourseTopicsAr ?? "", En = c.CourseTopicsEn ?? "" },
                 IsActive = c.IsActive,
                 IsFeatured = c.IsFeatured,
@@ -206,7 +204,6 @@ public class CoursesController : ControllerBase
                 From = course.From,
                 To = course.To,
                 sessionsNotes = new LocalizedText { Ar = course.SessionsNotesAr ?? "", En = course.SessionsNotesEn ?? "" },
-                instructorName = new LocalizedText { Ar = course.InstructorNameAr ?? "", En = course.InstructorNameEn ?? "" },
                 Instructors = course.CourseInstructors.Select(ci => new InstructorDto
                 {
                     Id = ci.Instructor.Id,
@@ -225,7 +222,6 @@ public class CoursesController : ControllerBase
                 }).ToList(),
                 Photo = course.Photo,
                 Tags = course.Tags,
-                instructorsBio = new LocalizedText { Ar = course.InstructorsBioAr ?? "", En = course.InstructorsBioEn ?? "" },
                 courseTopics = new LocalizedText { Ar = course.CourseTopicsAr ?? "", En = course.CourseTopicsEn ?? "" },
                 IsActive = course.IsActive,
                 IsFeatured = course.IsFeatured,
@@ -316,7 +312,6 @@ public class CoursesController : ControllerBase
                 From = c.From,
                 To = c.To,
                 sessionsNotes = new LocalizedText { Ar = c.SessionsNotesAr ?? "", En = c.SessionsNotesEn ?? "" },
-                instructorName = new LocalizedText { Ar = c.InstructorNameAr ?? "", En = c.InstructorNameEn ?? "" },
                 Instructors = c.CourseInstructors.Select(ci => new InstructorDto
                 {
                     Id = ci.Instructor.Id,
@@ -335,7 +330,6 @@ public class CoursesController : ControllerBase
                 }).ToList(),
                 Photo = c.Photo,
                 Tags = c.Tags,
-                instructorsBio = new LocalizedText { Ar = c.InstructorsBioAr ?? "", En = c.InstructorsBioEn ?? "" },
                 courseTopics = new LocalizedText { Ar = c.CourseTopicsAr ?? "", En = c.CourseTopicsEn ?? "" },
                 IsActive = c.IsActive,
                 IsFeatured = c.IsFeatured,
@@ -463,8 +457,6 @@ public class CoursesController : ControllerBase
                 To = request.To,
                 SessionsNotesEn = request.SessionsNotesEn,
                 SessionsNotesAr = request.SessionsNotesAr,
-                InstructorNameAr = request.InstructorNameAr,
-                InstructorNameEn = request.InstructorNameEn,
                 TitleAr = request.TitleAr,
                 TitleEn = request.TitleEn,
                 SummaryAr = request.SummaryAr,
@@ -473,8 +465,6 @@ public class CoursesController : ControllerBase
                 DescriptionEn = request.DescriptionEn,
                 Photo = request.Photo,
                 Tags = request.Tags,
-                InstructorsBioAr = request.InstructorsBioAr,
-                InstructorsBioEn = request.InstructorsBioEn,
                 CourseTopicsAr = request.CourseTopicsAr,
                 CourseTopicsEn = request.CourseTopicsEn,
                 IsActive = true,
@@ -563,7 +553,6 @@ public class CoursesController : ControllerBase
                 From = createdCourse.From,
                 To = createdCourse.To,
                 sessionsNotes = new LocalizedText { Ar = createdCourse.SessionsNotesAr ?? "", En = createdCourse.SessionsNotesEn ?? "" },
-                instructorName = new LocalizedText { Ar = createdCourse.InstructorNameAr ?? "", En = createdCourse.InstructorNameEn ?? "" },
                 Instructors = createdCourse.CourseInstructors.Select(ci => new InstructorDto
                 {
                     Id = ci.Instructor.Id,
@@ -582,7 +571,6 @@ public class CoursesController : ControllerBase
                 }).ToList(),
                 Photo = createdCourse.Photo,
                 Tags = createdCourse.Tags,
-                instructorsBio = new LocalizedText { Ar = createdCourse.InstructorsBioAr ?? "", En = createdCourse.InstructorsBioEn ?? "" },
                 courseTopics = new LocalizedText { Ar = createdCourse.CourseTopicsAr ?? "", En = createdCourse.CourseTopicsEn ?? "" },
                 IsActive = createdCourse.IsActive,
                 IsFeatured = createdCourse.IsFeatured,
@@ -673,8 +661,6 @@ public class CoursesController : ControllerBase
             course.To = request.To;
             course.SessionsNotesEn = request.SessionsNotesEn;
             course.SessionsNotesAr = request.SessionsNotesAr;
-            course.InstructorNameAr = request.InstructorNameAr;
-            course.InstructorNameEn = request.InstructorNameEn;
             course.TitleAr = request.TitleAr;
             course.TitleEn = request.TitleEn;
             course.SummaryAr = request.SummaryAr;
@@ -683,8 +669,6 @@ public class CoursesController : ControllerBase
             course.DescriptionEn = request.DescriptionEn;
             course.Photo = request.Photo;
             course.Tags = request.Tags;
-            course.InstructorsBioAr = request.InstructorsBioAr;
-            course.InstructorsBioEn = request.InstructorsBioEn;
             course.CourseTopicsAr = request.CourseTopicsAr;
             course.CourseTopicsEn = request.CourseTopicsEn;
             course.IsActive = request.IsActive;
@@ -774,7 +758,6 @@ public class CoursesController : ControllerBase
                 From = updatedCourse.From,
                 To = updatedCourse.To,
                 sessionsNotes = new LocalizedText { Ar = updatedCourse.SessionsNotesAr ?? "", En = updatedCourse.SessionsNotesEn ?? "" },
-                instructorName = new LocalizedText { Ar = updatedCourse.InstructorNameAr ?? "", En = updatedCourse.InstructorNameEn ?? "" },
                 Instructors = updatedCourse.CourseInstructors.Select(ci => new InstructorDto
                 {
                     Id = ci.Instructor.Id,
@@ -793,7 +776,6 @@ public class CoursesController : ControllerBase
                 }).ToList(),
                 Photo = updatedCourse.Photo,
                 Tags = updatedCourse.Tags,
-                instructorsBio = new LocalizedText { Ar = updatedCourse.InstructorsBioAr ?? "", En = updatedCourse.InstructorsBioEn ?? "" },
                 courseTopics = new LocalizedText { Ar = updatedCourse.CourseTopicsAr ?? "", En = updatedCourse.CourseTopicsEn ?? "" },
                 IsActive = updatedCourse.IsActive,
                 IsFeatured = updatedCourse.IsFeatured,

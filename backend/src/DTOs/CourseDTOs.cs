@@ -24,11 +24,9 @@ public class CourseListDto
     public DateTime? From { get; set; }
     public DateTime? To { get; set; }
     public LocalizedText sessionsNotes { get; set; } = new();
-    public LocalizedText instructorName { get; set; } = new();
     public List<InstructorDto> Instructors { get; set; } = new();
     public byte[]? Photo { get; set; }
     public string? Tags { get; set; }
-    public LocalizedText instructorsBio { get; set; } = new();
     public LocalizedText courseTopics { get; set; } = new();
     public bool IsActive { get; set; }
     public bool IsFeatured { get; set; }
@@ -99,14 +97,6 @@ public class CreateCourseRequest
     
     [MaxLength(150)]
     public string? SessionsNotesAr { get; set; }
-
-    [Required]
-    [MaxLength(255)]
-    public string InstructorNameAr { get; set; } = string.Empty;
-
-    [Required]
-    [MaxLength(255)]
-    public string InstructorNameEn { get; set; } = string.Empty;
     
     public List<Guid> InstructorIds { get; set; } = new();
 
@@ -134,12 +124,6 @@ public class CreateCourseRequest
 
     [MaxLength(2000)]
     public string? Tags { get; set; }
-
-    [MaxLength(2500)]
-    public string? InstructorsBioAr { get; set; }
-
-    [MaxLength(2500)]
-    public string? InstructorsBioEn { get; set; }
 
     public string? CourseTopicsAr { get; set; }
 

@@ -42,12 +42,6 @@ public class Course
     [MaxLength(150)]
     public string? SessionsNotesAr { get; set; }
     
-    [MaxLength(255)]
-    public string? InstructorNameAr { get; set; }
-
-    [MaxLength(255)]
-    public string? InstructorNameEn { get; set; }
-    
     public bool IsActive { get; set; } = true;
     
     public bool IsFeatured { get; set; } = false;
@@ -72,17 +66,11 @@ public class Course
     [MaxLength(5000)]
     public string? DescriptionEn { get; set; }
     
-    // New fields for photo, tags, and instructor bio
+    // New fields for photo, tags
     public byte[]? Photo { get; set; }
     
     [MaxLength(2000)]
     public string? Tags { get; set; }
-    
-    [MaxLength(2500)]
-    public string? InstructorsBioAr { get; set; }
-    
-    [MaxLength(2500)]
-    public string? InstructorsBioEn { get; set; }
     
     public string? CourseTopicsAr { get; set; }
     

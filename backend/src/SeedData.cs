@@ -36,14 +36,8 @@ public static class SeedData
             // Seed Course Sub-Categories
             await SeedCourseSubCategoriesAsync(context, logger);
 
-            // Seed Instructors
-            await SeedInstructorsAsync(context, logger);
-
             // Seed Test Courses
             await SeedCoursesAsync(context, logger);
-
-            // Seed Course-Instructor Mappings
-            await SeedCourseInstructorsAsync(context, logger);
 
             // Seed Content Pages
             await SeedContentPagesAsync(context, logger);
@@ -328,82 +322,6 @@ public static class SeedData
         logger.LogInformation("Added {Count} course sub-categories", subCategories.Count);
     }
 
-    private static async Task SeedInstructorsAsync(ErsaTrainingDbContext context, ILogger logger)
-    {
-        if (await context.Instructors.AnyAsync())
-        {
-            logger.LogInformation("Instructors already exist, skipping seed");
-            return;
-        }
-
-        var instructors = new List<Instructor>
-        {
-            new Instructor
-            {
-                Id = new Guid("11111111-1111-1111-1111-000000000001"),
-                InstructorNameEn = "Dr. Mohammed Ahmed",
-                InstructorNameAr = "د. محمد أحمد",
-                InstructorBioEn = "Expert in project management with over 15 years of experience. Certified PMP and Agile coach with extensive international experience.",
-                InstructorBioAr = "خبير في إدارة المشاريع مع أكثر من 15 عامًا من الخبرة. حاصل على شهادة PMP ومدرب أجايل معتمد مع خبرة دولية واسعة.",
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            },
-            new Instructor
-            {
-                Id = new Guid("11111111-1111-1111-1111-000000000002"),
-                InstructorNameEn = "Sarah Mahmoud",
-                InstructorNameAr = "سارة محمود",
-                InstructorBioEn = "Certified digital marketing expert with 10 years experience. Specializes in SEO, social media marketing, and content strategy.",
-                InstructorBioAr = "خبيرة تسويق رقمي معتمدة مع 10 سنوات خبرة. متخصصة في تحسين محركات البحث والتسويق عبر وسائل التواصل الاجتماعي واستراتيجية المحتوى.",
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            },
-            new Instructor
-            {
-                Id = new Guid("11111111-1111-1111-1111-000000000003"),
-                InstructorNameEn = "Dr. Ahmed Abdullah",
-                InstructorNameAr = "د. أحمد عبدالله",
-                InstructorBioEn = "Certified data scientist and AI trainer. PhD in Computer Science with focus on machine learning and deep learning applications.",
-                InstructorBioAr = "عالم بيانات معتمد ومدرب في الذكاء الاصطناعي. دكتوراه في علوم الحاسوب مع التركيز على تطبيقات التعلم الآلي والتعلم العميق.",
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            },
-            new Instructor
-            {
-                Id = new Guid("11111111-1111-1111-1111-000000000004"),
-                InstructorNameEn = "Fatima Al-Ali",
-                InstructorNameAr = "فاطمة العلي",
-                InstructorBioEn = "Organizational leadership consultant and certified trainer. Expert in team building, conflict resolution, and performance management.",
-                InstructorBioAr = "مستشارة قيادة تنظيمية ومدربة معتمدة. خبيرة في بناء الفريق وحل النزاعات وإدارة الأداء.",
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            },
-            new Instructor
-            {
-                Id = new Guid("11111111-1111-1111-1111-000000000005"),
-                InstructorNameEn = "Eng. Omar Hassan",
-                InstructorNameAr = "م. عمر حسن",
-                InstructorBioEn = "Full-stack web developer and university lecturer. Expert in modern web technologies including React, Node.js, and cloud platforms.",
-                InstructorBioAr = "مطور ويب متخصص وأستاذ جامعي. خبير في تقنيات الويب الحديثة بما في ذلك React و Node.js والمنصات السحابية.",
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            },
-            new Instructor
-            {
-                Id = new Guid("11111111-1111-1111-1111-000000000006"),
-                InstructorNameEn = "Maryam Al-Zahrani",
-                InstructorNameAr = "مريم الزهراني",
-                InstructorBioEn = "Award-winning UX/UI designer with expertise in user research, prototyping, and design systems. 8+ years of industry experience.",
-                InstructorBioAr = "مصممة UX/UI حائزة على جوائز مع خبرة في بحث المستخدم والنماذج الأولية وأنظمة التصميم. أكثر من 8 سنوات من الخبرة في هذا المجال.",
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow
-            }
-        };
-
-        context.Instructors.AddRange(instructors);
-        await context.SaveChangesAsync();
-        logger.LogInformation("Added {Count} instructors", instructors.Count);
-    }
 
     private static async Task SeedCoursesAsync(ErsaTrainingDbContext context, ILogger logger)
     {
@@ -422,103 +340,6 @@ public static class SeedData
         logger.LogInformation("Added {Count} courses from Excel data", courses.Count);
     }
 
-    private static async Task SeedCourseInstructorsAsync(ErsaTrainingDbContext context, ILogger logger)
-    {
-        if (await context.CourseInstructors.AnyAsync())
-        {
-            logger.LogInformation("Course-instructor mappings already exist, skipping seed");
-            return;
-        }
-
-        // Get instructor IDs
-        var instructors = await context.Instructors.ToListAsync();
-        if (!instructors.Any())
-        {
-            logger.LogWarning("No instructors found for course-instructor mapping");
-            return;
-        }
-
-        var drMohammedAhmed = new Guid("11111111-1111-1111-1111-000000000001");
-        var sarahMahmoud = new Guid("11111111-1111-1111-1111-000000000002");
-        var drAhmedAbdullah = new Guid("11111111-1111-1111-1111-000000000003");
-        var fatimaAlAli = new Guid("11111111-1111-1111-1111-000000000004");
-        var omarHassan = new Guid("11111111-1111-1111-1111-000000000005");
-        var maryamAlZahrani = new Guid("11111111-1111-1111-1111-000000000006");
-
-        // Get course IDs
-        var courses = await context.Courses.ToListAsync();
-        if (!courses.Any())
-        {
-            logger.LogWarning("No courses found for course-instructor mapping");
-            return;
-        }
-
-        var courseInstructorMappings = new List<CourseInstructor>();
-
-        // Map instructors to courses
-        foreach (var course in courses)
-        {
-            if (course.TitleEn.Contains("Project Management") || course.TitleEn.Contains("Agile"))
-            {
-                courseInstructorMappings.Add(new CourseInstructor
-                {
-                    CourseId = course.Id,
-                    InstructorId = drMohammedAhmed,
-                    CreatedAt = DateTime.UtcNow
-                });
-            }
-            else if (course.TitleEn.Contains("Digital Marketing"))
-            {
-                courseInstructorMappings.Add(new CourseInstructor
-                {
-                    CourseId = course.Id,
-                    InstructorId = sarahMahmoud,
-                    CreatedAt = DateTime.UtcNow
-                });
-            }
-            else if (course.TitleEn.Contains("Data Science") || course.TitleEn.Contains("Intelligence"))
-            {
-                courseInstructorMappings.Add(new CourseInstructor
-                {
-                    CourseId = course.Id,
-                    InstructorId = drAhmedAbdullah,
-                    CreatedAt = DateTime.UtcNow
-                });
-            }
-            else if (course.TitleEn.Contains("Leadership"))
-            {
-                courseInstructorMappings.Add(new CourseInstructor
-                {
-                    CourseId = course.Id,
-                    InstructorId = fatimaAlAli,
-                    CreatedAt = DateTime.UtcNow
-                });
-            }
-            else if (course.TitleEn.Contains("Web Development") || course.TitleEn.Contains("Mobile") || course.TitleEn.Contains("Cloud"))
-            {
-                courseInstructorMappings.Add(new CourseInstructor
-                {
-                    CourseId = course.Id,
-                    InstructorId = omarHassan,
-                    CreatedAt = DateTime.UtcNow
-                });
-            }
-            else if (course.TitleEn.Contains("UX") || course.TitleEn.Contains("UI") || course.TitleEn.Contains("Design"))
-            {
-                courseInstructorMappings.Add(new CourseInstructor
-                {
-                    CourseId = course.Id,
-                    InstructorId = maryamAlZahrani,
-                    CreatedAt = DateTime.UtcNow
-                });
-            }
-        }
-
-        context.CourseInstructors.AddRange(courseInstructorMappings);
-        await context.SaveChangesAsync();
-        
-        logger.LogInformation("Added {Count} course-instructor mappings", courseInstructorMappings.Count);
-    }
 
     private static async Task SeedContentPagesAsync(ErsaTrainingDbContext context, ILogger logger)
     {

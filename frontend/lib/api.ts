@@ -137,16 +137,8 @@ export interface Course {
   rating?: number;
   createdAt?: string;
   imageUrl?: string;
-  instructorName?: {
-    ar: string;
-    en: string;
-  } | string; // Can be localized object or string for backward compatibility
   photo?: string; // Base64 encoded photo data from backend
   tags?: string;
-  instructorsBio?: {
-    ar: string;
-    en: string;
-  };
   videoUrl?: string;
   duration?: {
     ar: string;

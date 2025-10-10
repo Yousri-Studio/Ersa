@@ -366,12 +366,8 @@ public class AdminController : ControllerBase
                     To = c.To,
                     SessionsNotesEn = c.SessionsNotesEn,
                     SessionsNotesAr = c.SessionsNotesAr,
-                    InstructorNameAr = c.InstructorNameAr,
-                    InstructorNameEn = c.InstructorNameEn,
                     Photo = c.Photo,
                     Tags = c.Tags,
-                    InstructorsBioAr = c.InstructorsBioAr,
-                    InstructorsBioEn = c.InstructorsBioEn,
                     CourseTopicsAr = c.CourseTopicsAr,
                     CourseTopicsEn = c.CourseTopicsEn,
                     IsActive = c.IsActive,
@@ -932,12 +928,8 @@ public class AdminController : ControllerBase
                 To = request.To,
                 SessionsNotesEn = request.SessionsNotesEn,
                 SessionsNotesAr = request.SessionsNotesAr,
-                InstructorNameAr = request.InstructorNameAr,
-                InstructorNameEn = request.InstructorNameEn,
                 Photo = !string.IsNullOrEmpty(request.Photo) ? Convert.FromBase64String(request.Photo) : null,
                 Tags = request.Tags,
-                InstructorsBioAr = request.InstructorsBioAr,
-                InstructorsBioEn = request.InstructorsBioEn,
                 CourseTopicsAr = request.CourseTopicsAr,
                 CourseTopicsEn = request.CourseTopicsEn,
                 IsActive = request.IsActive,
@@ -1054,12 +1046,8 @@ public class AdminController : ControllerBase
                 To = createdCourse.To,
                 SessionsNotesEn = createdCourse.SessionsNotesEn,
                 SessionsNotesAr = createdCourse.SessionsNotesAr,
-                InstructorNameAr = createdCourse.InstructorNameAr,
-                InstructorNameEn = createdCourse.InstructorNameEn,
                 Photo = createdCourse.Photo,
                 Tags = createdCourse.Tags,
-                InstructorsBioAr = createdCourse.InstructorsBioAr,
-                InstructorsBioEn = createdCourse.InstructorsBioEn,
                 CourseTopicsAr = createdCourse.CourseTopicsAr,
                 CourseTopicsEn = createdCourse.CourseTopicsEn,
                 IsActive = createdCourse.IsActive,
@@ -1138,12 +1126,8 @@ public class AdminController : ControllerBase
             
             // Debug logging
             _logger.LogInformation($"Updating course {courseId} with From: {request.From}, To: {request.To}, SessionsNotesEn: {request.SessionsNotesEn}, SessionsNotesAr: {request.SessionsNotesAr}");
-            course.InstructorNameAr = request.InstructorNameAr;
-            course.InstructorNameEn = request.InstructorNameEn;
             course.Photo = !string.IsNullOrEmpty(request.Photo) ? Convert.FromBase64String(request.Photo) : null;
             course.Tags = request.Tags;
-            course.InstructorsBioAr = request.InstructorsBioAr;
-            course.InstructorsBioEn = request.InstructorsBioEn;
             course.CourseTopicsAr = request.CourseTopicsAr;
             course.CourseTopicsEn = request.CourseTopicsEn;
             course.IsActive = request.IsActive;
@@ -1264,12 +1248,8 @@ public class AdminController : ControllerBase
                 To = updatedCourse.To,
                 SessionsNotesEn = updatedCourse.SessionsNotesEn,
                 SessionsNotesAr = updatedCourse.SessionsNotesAr,
-                InstructorNameAr = updatedCourse.InstructorNameAr,
-                InstructorNameEn = updatedCourse.InstructorNameEn,
                 Photo = updatedCourse.Photo,
                 Tags = updatedCourse.Tags,
-                InstructorsBioAr = updatedCourse.InstructorsBioAr,
-                InstructorsBioEn = updatedCourse.InstructorsBioEn,
                 CourseTopicsAr = updatedCourse.CourseTopicsAr,
                 CourseTopicsEn = updatedCourse.CourseTopicsEn,
                 IsActive = updatedCourse.IsActive,

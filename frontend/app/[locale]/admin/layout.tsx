@@ -133,7 +133,7 @@ export default function AdminLayout({
           isMenuOpen ? 'block' : 'hidden'
         } lg:block lg:w-64 lg:fixed lg:inset-y-0 lg:overflow-y-auto fixed inset-y-0 ${
           isRTL ? 'right-0' : 'left-0'
-        } z-40 w-64 ${
+        } z-50 w-64 ${
           isMenuOpen
             ? 'translate-x-0'
             : isRTL
@@ -319,7 +319,7 @@ export default function AdminLayout({
         {/* Main content */}
         <div className={`${isRTL ? 'lg:pr-64' : 'lg:pl-64'} flex-1 min-w-0`} dir={isRTL ? 'rtl' : 'ltr'}>
           {/* Mobile menu button */}
-          <div className={`lg:hidden fixed top-4 ${isRTL ? 'right-4' : 'left-4'} z-50`}>
+          <div className={`lg:hidden fixed top-4 ${isRTL ? 'right-4' : 'left-4'} z-60`}>
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500 bg-white shadow-md"
@@ -337,7 +337,7 @@ export default function AdminLayout({
       {/* Mobile menu overlay */}
       {isMenuOpen && (
         <div
-          className="lg:hidden fixed inset-0 z-40 bg-gray-600 bg-opacity-75"
+          className="lg:hidden fixed inset-0 z-40 bg-gray-600 bg-opacity-50"
           onClick={() => setIsMenuOpen(false)}
         />
       )}

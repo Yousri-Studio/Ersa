@@ -85,28 +85,12 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
             .HasDefaultValue("")
             .HasMaxLength(1000);
 
-        builder.Property(c => c.InstructorNameAr)
-            .IsRequired()
-            .HasMaxLength(255)
-            .HasDefaultValue("");
-
-        builder.Property(c => c.InstructorNameEn)
-            .IsRequired()
-            .HasMaxLength(255)
-            .HasDefaultValue("");
-
         // New field configurations
         builder.Property(c => c.Photo)
             .HasMaxLength(1000);
 
         builder.Property(c => c.Tags)
             .HasMaxLength(2000);
-
-        builder.Property(c => c.InstructorsBioAr)
-            .HasMaxLength(2500);
-
-        builder.Property(c => c.InstructorsBioEn)
-            .HasMaxLength(2500);
 
         builder.Property(c => c.CourseTopicsAr);
 
