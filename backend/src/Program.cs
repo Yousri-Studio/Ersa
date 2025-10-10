@@ -227,10 +227,12 @@ using (var scope = app.Services.CreateScope())
                 Log.Information("No pending migrations");
             }
             
-            // Clean database completely to ensure fresh start
+            // uncomment to Clean database completely to ensure fresh start
+            /*
             Log.Information("Cleaning database completely...");
             await ErsaTraining.API.CleanDatabase.CleanDatabaseAsync(app.Services);
             Log.Information("Database cleanup completed");
+            */
 
             // Run data seeding
             Log.Information("Running data seeding...");

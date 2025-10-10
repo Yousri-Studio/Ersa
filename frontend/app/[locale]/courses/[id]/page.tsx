@@ -82,11 +82,9 @@ export default function CourseDetailsPage() {
     : course.summary;
 
   const addToCart = () => {
-    // Extract instructor name as string
-    const instructorName = course.instructorName 
-      ? (typeof course.instructorName === 'string' 
-          ? course.instructorName 
-          : course.instructorName[locale as 'ar' | 'en'] || course.instructorName.en || course.instructorName.ar)
+    // Extract instructor name as string from instructors relationship
+    const instructorName = course.instructors && course.instructors.length > 0
+      ? (locale === 'ar' ? course.instructors[0].instructorName.ar : course.instructors[0].instructorName.en)
       : undefined;
     
     addItem({
@@ -320,10 +318,10 @@ export default function CourseDetailsPage() {
                         <span className="font-cairo">{course.instructor.coursesCount} {t('course.courses')}</span>
                       </div>
                       {/* Instructor Bio */}
-                      {course.instructorsBio && (
+                      {course.instructors && course.instructors.length > 0 && course.instructors[0].instructorBio && (
                         <div className="mt-3">
                           <p className="text-sm text-gray-600 font-cairo">
-                            {locale === 'ar' ? course.instructorsBio.ar : course.instructorsBio.en}
+                            {locale === 'ar' ? course.instructors[0].instructorBio.ar : course.instructors[0].instructorBio.en}
                           </p>
                         </div>
                       )}
@@ -654,10 +652,10 @@ export default function CourseDetailsPage() {
                               <span className="font-cairo">{course.instructor.coursesCount}</span>
                             </div>
                           </div>
-                          {course.instructorsBio && (
+                          {course.instructors && course.instructors.length > 0 && course.instructors[0].instructorBio && (
                             <div className="mt-4">
                               <p className="text-gray-700 font-cairo">
-                                {locale === 'ar' ? course.instructorsBio.ar : course.instructorsBio.en}
+                                {locale === 'ar' ? course.instructors[0].instructorBio.ar : course.instructors[0].instructorBio.en}
                               </p>
                             </div>
                           )}

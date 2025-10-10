@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
@@ -196,6 +196,7 @@ export default function AdminLayout({
                   onClick={() => setCourseSettingsOpen(!courseSettingsOpen)}
                   className="w-full group flex items-center justify-between px-2 sm:px-3 py-2 sm:py-3 text-xs sm:text-sm font-medium rounded-lg transition-colors text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   style={{fontWeight: 700}}
+                  type="button"
                 >
                   <div className="flex items-center">
                     <Icon
@@ -212,32 +213,33 @@ export default function AdminLayout({
                 
                 {courseSettingsOpen && (
                   <div className={`${isRTL ? 'pr-6' : 'pl-6'} space-y-1`}>
-                    {courseSettingsItems.map((subItem) => (
-                      <Link
-                        key={subItem.id}
-                        href={subItem.href}
-                        onClick={() => setIsMenuOpen(false)}
-                        className={`flex items-center px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors ${
-                          pathname === subItem.href
-                            ? 'bg-opacity-10 bg-[#00AC96] text-[#00AC96]'
-                            : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
-                        }`}
-                      >
-                        <Icon
-                          name={subItem.icon}
-                          className={`${isRTL ? 'ml-2' : 'mr-2'} h-4 w-4 flex-shrink-0 ${
-                            pathname === subItem.href ? 'text-[#00AC96]' : 'text-gray-400'
+                    {courseSettingsItems.map((subItem) => {
+                      return (
+                        <Link
+                          key={subItem.id}
+                          href={subItem.href}
+                          onClick={() => setIsMenuOpen(false)}
+                          className={`flex items-center px-2 sm:px-3 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors ${
+                            pathname === subItem.href
+                              ? 'bg-opacity-10 bg-[#00AC96] text-[#00AC96]'
+                              : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                           }`}
-                        />
-                        <span className="truncate">{subItem.label}</span>
-                      </Link>
-                    ))}
+                        >
+                          <Icon
+                            name={subItem.icon}
+                            className={`${isRTL ? 'ml-2' : 'mr-2'} h-4 w-4 flex-shrink-0 ${
+                              pathname === subItem.href ? 'text-[#00AC96]' : 'text-gray-400'
+                            }`}
+                          />
+                          <span className="truncate">{subItem.label}</span>
+                        </Link>
+                      );
+                    })}
                   </div>
                 )}
               </div>
 
               {/* Super Admin Section - Only visible to SuperAdmin */}
-              {console.log('Layout Debug:', { isSuperAdmin, roles, rolesLoading, user })}
               {(isSuperAdmin || user?.isSuperAdmin) && (
                 <div className="mt-4 pt-4 border-t border-gray-200">
                   <div className="px-2 mb-2">

@@ -51,13 +51,9 @@ export default function AdminCourses() {
     to: '',
     sessionsNotesEn: '',
     sessionsNotesAr: '',
-    instructorNameAr: '', // Deprecated - using instructors table
-    instructorNameEn: '', // Deprecated - using instructors table
     instructorIds: [],
     photo: [],
     tags: '',
-    instructorsBioAr: '', // Deprecated - using instructors table
-    instructorsBioEn: '', // Deprecated - using instructors table
     courseTopicsAr: '',
     courseTopicsEn: '',
     isActive: true,
@@ -216,13 +212,9 @@ export default function AdminCourses() {
       to: course.to || '',
       sessionsNotesEn: course.sessionsNotesEn || '',
       sessionsNotesAr: course.sessionsNotesAr || '',
-      instructorNameAr: '', // Deprecated - using instructors table
-      instructorNameEn: '', // Deprecated - using instructors table
       instructorIds: course.instructors?.map(i => i.id) || [],
       photo: course.photo || [],
       tags: course.tags || '',
-      instructorsBioAr: '', // Deprecated - using instructors table
-      instructorsBioEn: '', // Deprecated - using instructors table
       courseTopicsAr: course.courseTopicsAr || '',
       courseTopicsEn: course.courseTopicsEn || '',
       isActive: course.isActive,
@@ -258,13 +250,9 @@ export default function AdminCourses() {
       to: '',
       sessionsNotesEn: '',
       sessionsNotesAr: '',
-      instructorNameAr: '', // Deprecated - using instructors table
-      instructorNameEn: '', // Deprecated - using instructors table
       instructorIds: [],
       photo: [],
       tags: '',
-      instructorsBioAr: '', // Deprecated - using instructors table
-      instructorsBioEn: '', // Deprecated - using instructors table
       courseTopicsAr: '',
       courseTopicsEn: '',
       isActive: true,

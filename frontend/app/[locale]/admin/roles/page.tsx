@@ -59,7 +59,7 @@ export default function AdminRoles() {
         // Fallback data if API returns empty
         console.log('No users returned, using fallback data');
         setUsers([]);
-        toast.info(locale === 'ar' ? 'لا توجد مستخدمين في النظام' : 'No users found in the system');
+        toast(locale === 'ar' ? 'لا توجد مستخدمين في النظام' : 'No users found in the system');
       }
     } catch (error: any) {
       console.error('Error fetching users:', error);

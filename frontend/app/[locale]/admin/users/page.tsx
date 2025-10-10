@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Icon } from '@/components/ui/icon';
 import { adminApi, AdminUser, PagedResult, CreateUserRequest, RoleInfo } from '@/lib/admin-api';
-import { RoleNames, getRoleDisplayName } from '@/lib/roles';
+import { UserRole, getRoleDisplayName } from '@/lib/roles';
 import { useAuthStore } from '@/lib/auth-store';
 import { useHydration } from '@/hooks/useHydration';
 import toast from 'react-hot-toast';
