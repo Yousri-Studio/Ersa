@@ -6,6 +6,7 @@ import { Icon } from '@/components/ui/icon';
 import { adminApi, UserWithRoles } from '@/lib/admin-api';
 import { useHydration } from '@/hooks/useHydration';
 import { useRoles } from '@/hooks/useRoles';
+import { useAuthStore } from '@/lib/auth-store';
 import { getRoleDisplayName, getRoleColor, getRoleDescription, UserRole } from '@/lib/roles';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
@@ -15,6 +16,7 @@ export default function AdminRoles() {
   const router = useRouter();
   const isHydrated = useHydration();
   const { isSuperAdmin, isLoading: rolesLoading } = useRoles();
+  const { user } = useAuthStore();
   const isRTL = locale === 'ar';
 
   const [users, setUsers] = useState<UserWithRoles[]>([]);
@@ -32,23 +34,38 @@ export default function AdminRoles() {
 
   useEffect(() => {
     if (isHydrated && !rolesLoading) {
-      if (!isSuperAdmin) {
+      // Check both role system and boolean property for backward compatibility
+      const hasSuperAdminAccess = isSuperAdmin || user?.isSuperAdmin;
+      
+      if (!hasSuperAdminAccess) {
         toast.error(locale === 'ar' ? 'غير مصرح لك بالوصول إلى هذه الصفحة' : 'You are not authorized to access this page');
         router.push(`/${locale}/admin`);
         return;
       }
       fetchUsers();
     }
-  }, [isHydrated, isSuperAdmin, rolesLoading, locale, router]);
+  }, [isHydrated, isSuperAdmin, rolesLoading, locale, router, user]);
 
   const fetchUsers = async () => {
     try {
       setIsLoading(true);
+      console.log('Fetching users with roles...');
       const response = await adminApi.getUsersWithRoles();
-      setUsers(response.data);
+      console.log('Users response:', response);
+      
+      if (response.data && response.data.length > 0) {
+        setUsers(response.data);
+      } else {
+        // Fallback data if API returns empty
+        console.log('No users returned, using fallback data');
+        setUsers([]);
+        toast.info(locale === 'ar' ? 'لا توجد مستخدمين في النظام' : 'No users found in the system');
+      }
     } catch (error: any) {
       console.error('Error fetching users:', error);
+      console.error('Error details:', error.response?.data || error.message);
       toast.error(locale === 'ar' ? 'فشل في تحميل المستخدمين' : 'Failed to load users');
+      setUsers([]); // Set empty array on error
     } finally {
       setIsLoading(false);
     }

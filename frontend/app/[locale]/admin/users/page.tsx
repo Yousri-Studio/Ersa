@@ -557,29 +557,33 @@ export default function AdminUsers() {
                 Update User Role
               </h3>
               <div className="space-y-4">
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="isAdmin"
-                    checked={roleForm.isAdmin}
-                    onChange={(e) => setRoleForm(prev => ({ ...prev, isAdmin: e.target.checked }))}
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                  />
-                  <label htmlFor="isAdmin" className="ml-2 block text-sm text-gray-900">
-                    Admin
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    {locale === 'ar' ? 'الدور' : 'Role'}
                   </label>
-                </div>
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="isSuperAdmin"
-                    checked={roleForm.isSuperAdmin}
-                    onChange={(e) => setRoleForm(prev => ({ ...prev, isSuperAdmin: e.target.checked }))}
-                    className="h-4 w-4 text-red-600 focus:ring-red-500 border-gray-300 rounded"
-                  />
-                  <label htmlFor="isSuperAdmin" className="ml-2 block text-sm text-gray-900">
-                    Super Admin
-                  </label>
+                  <select
+                    value={roleForm.isSuperAdmin ? 'SuperAdmin' : roleForm.isAdmin ? 'Admin' : 'PublicUser'}
+                    onChange={(e) => {
+                      const role = e.target.value;
+                      setRoleForm({
+                        isAdmin: role === 'Admin',
+                        isSuperAdmin: role === 'SuperAdmin'
+                      });
+                    }}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {availableRoles.map((role) => (
+                      <option key={role.id} value={role.name}>
+                        {getRoleDisplayName(role.name, locale)}
+                      </option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {locale === 'ar' 
+                      ? 'اختر الدور الجديد للمستخدم' 
+                      : 'Select the new role for the user'
+                    }
+                  </p>
                 </div>
               </div>
               <div className="flex justify-end space-x-3 mt-6">

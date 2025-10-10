@@ -28,7 +28,7 @@ export default function AdminLayout({
   const [activeTab, setActiveTab] = useState('dashboard');
   const [courseSettingsOpen, setCourseSettingsOpen] = useState(false);
   const isHydrated = useHydration();
-  const { isSuperAdmin, isAdmin: hasAdminRole } = useRoles();
+  const { isSuperAdmin, isAdmin: hasAdminRole, roles, isLoading: rolesLoading } = useRoles();
   const router = useRouter();
   const pathname = usePathname();
   const locale = useLocale();
@@ -237,7 +237,8 @@ export default function AdminLayout({
               </div>
 
               {/* Super Admin Section - Only visible to SuperAdmin */}
-              {isSuperAdmin && (
+              {console.log('Layout Debug:', { isSuperAdmin, roles, rolesLoading, user })}
+              {(isSuperAdmin || user?.isSuperAdmin) && (
                 <div className="mt-4 pt-4 border-t border-gray-200">
                   <div className="px-2 mb-2">
                     <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
