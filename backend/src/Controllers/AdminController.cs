@@ -276,7 +276,8 @@ public class AdminController : ControllerBase
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20,
         [FromQuery] string? search = null,
-        [FromQuery] bool? isActive = null)
+        [FromQuery] bool? isActive = null,
+        [FromQuery] string? categoryId = null)
     {
         try
         {
@@ -299,6 +300,11 @@ public class AdminController : ControllerBase
             if (isActive.HasValue)
             {
                 query = query.Where(c => c.IsActive == isActive.Value);
+            }
+
+            if (!string.IsNullOrEmpty(categoryId) && Guid.TryParse(categoryId, out var categoryGuid))
+            {
+                query = query.Where(c => c.CategoryId == categoryGuid);
             }
 
             var totalCount = await query.CountAsync();
@@ -341,9 +347,24 @@ public class AdminController : ControllerBase
                         CreatedAt = m.SubCategory.CreatedAt,
                         UpdatedAt = m.SubCategory.UpdatedAt
                     }).ToList(),
+                    Instructors = c.CourseInstructors.Select(ci => new AdminInstructorDto
+                    {
+                        Id = ci.Instructor.Id,
+                        InstructorNameEn = ci.Instructor.InstructorNameEn,
+                        InstructorNameAr = ci.Instructor.InstructorNameAr,
+                        InstructorBioEn = ci.Instructor.InstructorBioEn ?? "",
+                        InstructorBioAr = ci.Instructor.InstructorBioAr ?? "",
+                        CreatedAt = ci.Instructor.CreatedAt,
+                        UpdatedAt = ci.Instructor.UpdatedAt,
+                        CourseIds = new List<Guid> { c.Id }
+                    }).ToList(),
                     VideoUrl = c.VideoUrl,
                     DurationEn = c.DurationEn,
                     DurationAr = c.DurationAr,
+                    From = c.From,
+                    To = c.To,
+                    SessionsNotesEn = c.SessionsNotesEn,
+                    SessionsNotesAr = c.SessionsNotesAr,
                     InstructorNameAr = c.InstructorNameAr,
                     InstructorNameEn = c.InstructorNameEn,
                     Photo = c.Photo,
@@ -921,11 +942,40 @@ public class AdminController : ControllerBase
                 await _context.SaveChangesAsync();
             }
 
+            // Add instructor mappings
+            if (request.InstructorIds != null && request.InstructorIds.Any())
+            {
+                // Validate instructor IDs
+                var validInstructorIds = await _context.Instructors
+                    .Where(i => request.InstructorIds.Contains(i.Id))
+                    .Select(i => i.Id)
+                    .ToListAsync();
+
+                if (validInstructorIds.Count != request.InstructorIds.Count)
+                {
+                    var invalidIds = request.InstructorIds.Except(validInstructorIds).ToList();
+                    _logger.LogWarning($"Invalid instructor IDs provided when creating course: {string.Join(", ", invalidIds)}");
+                    return BadRequest(new { error = $"Invalid instructor IDs: {string.Join(", ", invalidIds)}" });
+                }
+
+                var instructorMappings = request.InstructorIds.Select(instructorId => new CourseInstructor
+                {
+                    CourseId = course.Id,
+                    InstructorId = instructorId,
+                    CreatedAt = DateTime.UtcNow
+                }).ToList();
+
+                _context.CourseInstructors.AddRange(instructorMappings);
+                await _context.SaveChangesAsync();
+            }
+
             // Reload course with related data
             var createdCourse = await _context.Courses
                 .Include(c => c.Category)
                 .Include(c => c.CourseSubCategoryMappings)
                     .ThenInclude(m => m.SubCategory)
+                .Include(c => c.CourseInstructors)
+                    .ThenInclude(ci => ci.Instructor)
                 .FirstOrDefaultAsync(c => c.Id == course.Id);
 
             var courseDto = new AdminCourseDto
@@ -962,6 +1012,17 @@ public class AdminController : ControllerBase
                     IsActive = m.SubCategory.IsActive,
                     CreatedAt = m.SubCategory.CreatedAt,
                     UpdatedAt = m.SubCategory.UpdatedAt
+                }).ToList(),
+                Instructors = createdCourse.CourseInstructors.Select(ci => new AdminInstructorDto
+                {
+                    Id = ci.Instructor.Id,
+                    InstructorNameEn = ci.Instructor.InstructorNameEn,
+                    InstructorNameAr = ci.Instructor.InstructorNameAr,
+                    InstructorBioEn = ci.Instructor.InstructorBioEn ?? "",
+                    InstructorBioAr = ci.Instructor.InstructorBioAr ?? "",
+                    CreatedAt = ci.Instructor.CreatedAt,
+                    UpdatedAt = ci.Instructor.UpdatedAt,
+                    CourseIds = new List<Guid> { createdCourse.Id }
                 }).ToList(),
                 VideoUrl = createdCourse.VideoUrl,
                 DurationEn = createdCourse.DurationEn,
@@ -1000,6 +1061,7 @@ public class AdminController : ControllerBase
         {
             var course = await _context.Courses
                 .Include(c => c.CourseSubCategoryMappings)
+                .Include(c => c.CourseInstructors)
                 .FirstOrDefaultAsync(c => c.Id == courseId);
             
             if (course == null)
@@ -1084,6 +1146,34 @@ public class AdminController : ControllerBase
                 }
             }
 
+            // Update instructor mappings
+            _context.CourseInstructors.RemoveRange(course.CourseInstructors);
+
+            if (request.InstructorIds != null && request.InstructorIds.Any())
+            {
+                // Validate instructor IDs
+                var validInstructorIds = await _context.Instructors
+                    .Where(i => request.InstructorIds.Contains(i.Id))
+                    .Select(i => i.Id)
+                    .ToListAsync();
+
+                if (validInstructorIds.Count != request.InstructorIds.Count)
+                {
+                    var invalidIds = request.InstructorIds.Except(validInstructorIds).ToList();
+                    _logger.LogWarning($"Invalid instructor IDs provided for course {courseId}: {string.Join(", ", invalidIds)}");
+                    return BadRequest(new { error = $"Invalid instructor IDs: {string.Join(", ", invalidIds)}" });
+                }
+
+                var instructorMappings = request.InstructorIds.Select(instructorId => new CourseInstructor
+                {
+                    CourseId = course.Id,
+                    InstructorId = instructorId,
+                    CreatedAt = DateTime.UtcNow
+                }).ToList();
+
+                _context.CourseInstructors.AddRange(instructorMappings);
+            }
+
             await _context.SaveChangesAsync();
             
             // Debug logging after save
@@ -1094,6 +1184,8 @@ public class AdminController : ControllerBase
                 .Include(c => c.Category)
                 .Include(c => c.CourseSubCategoryMappings)
                     .ThenInclude(m => m.SubCategory)
+                .Include(c => c.CourseInstructors)
+                    .ThenInclude(ci => ci.Instructor)
                 .FirstOrDefaultAsync(c => c.Id == courseId);
 
             var courseDto = new AdminCourseDto
@@ -1130,6 +1222,17 @@ public class AdminController : ControllerBase
                     IsActive = m.SubCategory.IsActive,
                     CreatedAt = m.SubCategory.CreatedAt,
                     UpdatedAt = m.SubCategory.UpdatedAt
+                }).ToList(),
+                Instructors = updatedCourse.CourseInstructors.Select(ci => new AdminInstructorDto
+                {
+                    Id = ci.Instructor.Id,
+                    InstructorNameEn = ci.Instructor.InstructorNameEn,
+                    InstructorNameAr = ci.Instructor.InstructorNameAr,
+                    InstructorBioEn = ci.Instructor.InstructorBioEn ?? "",
+                    InstructorBioAr = ci.Instructor.InstructorBioAr ?? "",
+                    CreatedAt = ci.Instructor.CreatedAt,
+                    UpdatedAt = ci.Instructor.UpdatedAt,
+                    CourseIds = new List<Guid> { updatedCourse.Id }
                 }).ToList(),
                 VideoUrl = updatedCourse.VideoUrl,
                 DurationEn = updatedCourse.DurationEn,

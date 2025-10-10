@@ -6,6 +6,7 @@ import { Icon } from '@/components/ui/icon';
 import { motion } from 'framer-motion';
 import { adminApi, Instructor, CreateInstructorRequest, AdminCourse } from '@/lib/admin-api';
 import { useHydration } from '@/hooks/useHydration';
+import { InstructorForm } from '@/components/admin/instructor-form';
 import toast from 'react-hot-toast';
 
 export default function AdminInstructors() {
@@ -183,14 +184,6 @@ export default function AdminInstructors() {
     setShowDeleteModal(true);
   };
 
-  const toggleCourse = (courseId: string) => {
-    setInstructorForm(prev => ({
-      ...prev,
-      courseIds: prev.courseIds?.includes(courseId)
-        ? prev.courseIds.filter(id => id !== courseId)
-        : [...(prev.courseIds || []), courseId],
-    }));
-  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString(
@@ -357,7 +350,7 @@ export default function AdminInstructors() {
       {/* Add/Edit Modal */}
       {(showAddModal || showEditModal) && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border max-w-4xl w-full shadow-lg rounded-md bg-white" dir={isRTL ? 'rtl' : 'ltr'}>
+          <div className="relative top-20 mx-auto p-5 border max-w-4xl w-full shadow-lg rounded-md bg-white">
             <div className="mt-3">
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-lg font-medium text-gray-900">
@@ -377,113 +370,17 @@ export default function AdminInstructors() {
                 </button>
               </div>
 
-              <div className="space-y-4">
-                {/* Name English */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {isRTL ? 'الاسم (إنجليزي) *' : 'Name (English) *'}
-                  </label>
-                  <input
-                    type="text"
-                    value={instructorForm.instructorNameEn}
-                    onChange={(e) => setInstructorForm({ ...instructorForm, instructorNameEn: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    required
-                  />
-                </div>
-
-                {/* Name Arabic */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {isRTL ? 'الاسم (عربي) *' : 'Name (Arabic) *'}
-                  </label>
-                  <input
-                    type="text"
-                    value={instructorForm.instructorNameAr}
-                    onChange={(e) => setInstructorForm({ ...instructorForm, instructorNameAr: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    required
-                    dir="rtl"
-                  />
-                </div>
-
-                {/* Bio English */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {isRTL ? 'السيرة الذاتية (إنجليزي)' : 'Bio (English)'}
-                  </label>
-                  <textarea
-                    value={instructorForm.instructorBioEn}
-                    onChange={(e) => setInstructorForm({ ...instructorForm, instructorBioEn: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    rows={4}
-                    maxLength={2500}
-                  />
-                </div>
-
-                {/* Bio Arabic */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {isRTL ? 'السيرة الذاتية (عربي)' : 'Bio (Arabic)'}
-                  </label>
-                  <textarea
-                    value={instructorForm.instructorBioAr}
-                    onChange={(e) => setInstructorForm({ ...instructorForm, instructorBioAr: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-                    rows={4}
-                    maxLength={2500}
-                    dir="rtl"
-                  />
-                </div>
-
-                {/* Courses Selection */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {isRTL ? 'الدورات' : 'Courses'}
-                  </label>
-                  <div className="border border-gray-300 rounded-lg p-4 max-h-60 overflow-y-auto space-y-2">
-                    {courses.length === 0 ? (
-                      <p className="text-gray-500 text-sm">
-                        {isRTL ? 'لا توجد دورات متاحة' : 'No courses available'}
-                      </p>
-                    ) : (
-                      courses.map((course) => (
-                        <label key={course.id} className="flex items-center space-x-3 cursor-pointer hover:bg-gray-50 p-2 rounded">
-                          <input
-                            type="checkbox"
-                            checked={instructorForm.courseIds?.includes(course.id) || false}
-                            onChange={() => toggleCourse(course.id)}
-                            className="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
-                          />
-                          <span className="text-sm text-gray-700">
-                            {locale === 'ar' ? course.titleAr : course.titleEn}
-                          </span>
-                        </label>
-                      ))
-                    )}
-                  </div>
-                </div>
-
-                {/* Buttons */}
-                <div className="flex justify-end gap-4 mt-6">
-                  <button
-                    onClick={() => {
-                      setShowAddModal(false);
-                      setShowEditModal(false);
-                      resetForm();
-                    }}
-                    className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
-                  >
-                    {isRTL ? 'إلغاء' : 'Cancel'}
-                  </button>
-                  <button
-                    onClick={showAddModal ? handleAddInstructor : handleUpdateInstructor}
-                    className="px-6 py-2 bg-gradient-to-r from-purple-600 to-teal-500 text-white rounded-lg hover:opacity-90"
-                  >
-                    {showAddModal ? (isRTL ? 'إضافة' : 'Add') : (isRTL ? 'تحديث' : 'Update')}
-                  </button>
-                </div>
-              </div>
+              <InstructorForm
+                initialData={instructorForm}
+                onSubmit={showAddModal ? handleAddInstructor : handleUpdateInstructor}
+                onCancel={() => {
+                  setShowAddModal(false);
+                  setShowEditModal(false);
+                  resetForm();
+                }}
+                isEdit={showEditModal}
+                isLoading={false}
+              />
             </div>
           </div>
         </div>

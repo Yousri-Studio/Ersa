@@ -23,6 +23,7 @@ The application will be available at `http://localhost:3000`
 
 - **[DEPLOYMENT_INSTRUCTIONS.md](./DEPLOYMENT_INSTRUCTIONS.md)** - Complete deployment guide
 - **[BACKEND_CONNECTION_GUIDE.md](./BACKEND_CONNECTION_GUIDE.md)** - Backend connection details
+- **[CHUNKERROR_FIX_DEPLOYMENT.md](./CHUNKERROR_FIX_DEPLOYMENT.md)** - Fix for ChunkLoadError (Oct 2025)
 
 ## ⚙️ Configuration
 
@@ -69,8 +70,18 @@ See **DEPLOYMENT_INSTRUCTIONS.md** for detailed help.
 
 ---
 
-**Build Date:** October 5, 2025  
-**Version:** Production Ready  
+## 🔧 Recent Updates
+
+### October 9, 2025 - ChunkLoadError Fix
+- **Fresh Build Generated:** BUILD_ID `Ch721H3E1gyDRUbZYA3GV`
+- **Issue Fixed:** Static chunk 500 errors
+- **web.config Updated:** Improved error handling
+- **Deployment Guide:** See `CHUNKERROR_FIX_DEPLOYMENT.md`
+
+---
+
+**Build Date:** October 9, 2025  
+**Version:** Production Ready (ChunkError Fixed)  
 **Backend Connection:** Proxy ✅
 
 

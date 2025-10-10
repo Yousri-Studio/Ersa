@@ -61,6 +61,10 @@ function transformApiCourse(apiCourse: BackendCourse, locale: string = 'ar'): Co
     summary: apiCourse.summary,
     // IMPORTANT: Keep the raw photo array for binary conversion in components
     photo: apiCourse.photo,
+    // Preserve course dates and session notes from backend
+    from: apiCourse.from,
+    to: apiCourse.to,
+    sessionsNotes: apiCourse.sessionsNotes,
     // Use blob image if available, otherwise fallback to placeholder
     thumbnailUrl: getImageUrl(),
     imageUrl: getImageUrl(),
@@ -105,16 +109,11 @@ function transformApiCourse(apiCourse: BackendCourse, locale: string = 'ar'): Co
           en: apiCourse.summary || 'Course description'
         },
     lessons: apiCourse.sessions?.length || apiCourse.attachments?.length || 1,
-    instructor: (apiCourse.instructors && apiCourse.instructors.length > 0) || 
-                 (apiCourse.instructorName && (typeof apiCourse.instructorName === 'string' ? apiCourse.instructorName.trim() !== '' : (apiCourse.instructorName.ar?.trim() !== '' || apiCourse.instructorName.en?.trim() !== ''))) ||
-                 apiCourse.instructor?.name ? {
-      name: apiCourse.instructors && apiCourse.instructors.length > 0
-        ? (locale === 'ar' ? apiCourse.instructors[0].instructorName.ar : apiCourse.instructors[0].instructorName.en)
-        : (typeof apiCourse.instructorName === 'string' 
-            ? apiCourse.instructorName 
-            : (apiCourse.instructorName?.ar || apiCourse.instructor?.name || (locale === 'ar' ? 'مدرب محترف' : 'Professional Instructor'))),
+    // Only create instructor object if there are actual instructors assigned
+    instructor: (apiCourse.instructors && apiCourse.instructors.length > 0) ? {
+      name: locale === 'ar' ? apiCourse.instructors[0].instructorName.ar : apiCourse.instructors[0].instructorName.en,
       title: locale === 'ar' ? 'مدرب معتمد' : 'Certified Instructor',
-      avatar: apiCourse.instructor?.avatar || '/api/placeholder/60/60',
+      avatar: '/api/placeholder/60/60',
       rating: 4.8,
       studentsCount: Math.floor(Math.random() * 5000) + 1000,
       coursesCount: Math.floor(Math.random() * 20) + 5

@@ -41,13 +41,13 @@ export function CourseForm({ initialData, onSubmit, onCancel, isEdit = false, is
     to: initialData?.to || '',
     sessionsNotesEn: initialData?.sessionsNotesEn || '',
     sessionsNotesAr: initialData?.sessionsNotesAr || '',
-    instructorNameAr: initialData?.instructorNameAr || '',
-    instructorNameEn: initialData?.instructorNameEn || '',
+    instructorNameAr: '', // Deprecated - using instructors table
+    instructorNameEn: '', // Deprecated - using instructors table
     instructorIds: initialData?.instructorIds || [],
     photo: initialData?.photo || [],
     tags: initialData?.tags || '',
-    instructorsBioAr: initialData?.instructorsBioAr || '',
-    instructorsBioEn: initialData?.instructorsBioEn || '',
+    instructorsBioAr: '', // Deprecated - using instructors table
+    instructorsBioEn: '', // Deprecated - using instructors table
     courseTopicsAr: initialData?.courseTopicsAr || '',
     courseTopicsEn: initialData?.courseTopicsEn || '',
     isActive: initialData?.isActive ?? true,
@@ -57,6 +57,45 @@ export function CourseForm({ initialData, onSubmit, onCancel, isEdit = false, is
   useEffect(() => {
     fetchCategoriesAndSubCategories();
   }, []);
+
+  // Update form data when initialData changes (for edit mode)
+  useEffect(() => {
+    if (initialData && isEdit) {
+      setFormData({
+        slug: initialData.slug || '',
+        titleAr: initialData.titleAr || '',
+        titleEn: initialData.titleEn || '',
+        summaryAr: initialData.summaryAr || '',
+        summaryEn: initialData.summaryEn || '',
+        descriptionAr: initialData.descriptionAr || '',
+        descriptionEn: initialData.descriptionEn || '',
+        price: initialData.price || 0,
+        currency: initialData.currency || 'SAR',
+        type: initialData.type || 1,
+        level: initialData.level || 1,
+        categoryId: initialData.categoryId || null,
+        subCategoryIds: initialData.subCategoryIds || [],
+        videoUrl: initialData.videoUrl || '',
+        durationEn: initialData.durationEn || '',
+        durationAr: initialData.durationAr || '',
+        from: initialData.from || '',
+        to: initialData.to || '',
+        sessionsNotesEn: initialData.sessionsNotesEn || '',
+        sessionsNotesAr: initialData.sessionsNotesAr || '',
+        instructorNameAr: '', // Deprecated - using instructors table
+        instructorNameEn: '', // Deprecated - using instructors table
+        instructorIds: initialData.instructorIds || [],
+        photo: initialData.photo || [],
+        tags: initialData.tags || '',
+        instructorsBioAr: '', // Deprecated - using instructors table
+        instructorsBioEn: '', // Deprecated - using instructors table
+        courseTopicsAr: initialData.courseTopicsAr || '',
+        courseTopicsEn: initialData.courseTopicsEn || '',
+        isActive: initialData.isActive ?? true,
+        isFeatured: initialData.isFeatured ?? false,
+      });
+    }
+  }, [initialData, isEdit]);
 
   const fetchCategoriesAndSubCategories = async () => {
     try {
@@ -191,7 +230,7 @@ export function CourseForm({ initialData, onSubmit, onCancel, isEdit = false, is
         </div>
 
         {/* Description Fields */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               {locale === 'ar' ? 'الوصف (إنجليزي)' : 'Description (English)'}
@@ -216,6 +255,35 @@ export function CourseForm({ initialData, onSubmit, onCancel, isEdit = false, is
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder={locale === 'ar' ? 'وصف مفصل للدورة (حد أقصى 5000 حرف)' : 'Detailed course description (max 5000 characters)'}
               maxLength={5000}
+            />
+          </div>
+        </div>
+
+        {/* Course Topics Fields - Moved here after Description */}
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {locale === 'ar' ? 'مواضيع الدورة (إنجليزي)' : 'Course Topics (English)'}
+            </label>
+            <textarea
+              rows={3}
+              value={formData.courseTopicsEn}
+              onChange={(e) => handleChange('courseTopicsEn', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder={locale === 'ar' ? 'مواضيع الدورة بالإنجليزية، مفصولة بفواصل' : 'Course topics in English, comma separated'}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              {locale === 'ar' ? 'مواضيع الدورة (عربي)' : 'Course Topics (Arabic)'}
+            </label>
+            <textarea
+              rows={3}
+              value={formData.courseTopicsAr}
+              onChange={(e) => handleChange('courseTopicsAr', e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder={locale === 'ar' ? 'مواضيع الدورة بالعربية، مفصولة بفواصل' : 'Course topics in Arabic, comma separated'}
+              dir="rtl"
             />
           </div>
         </div>
@@ -348,7 +416,7 @@ export function CourseForm({ initialData, onSubmit, onCancel, isEdit = false, is
             </label>
             <input
               type="date"
-              value={formData.from ? new Date(formData.from).toISOString().split('T')[0] : ''}
+              value={formData.from ? formData.from.split('T')[0] : ''}
               onChange={(e) => handleChange('from', e.target.value ? new Date(e.target.value).toISOString() : '')}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -359,7 +427,7 @@ export function CourseForm({ initialData, onSubmit, onCancel, isEdit = false, is
             </label>
             <input
               type="date"
-              value={formData.to ? new Date(formData.to).toISOString().split('T')[0] : ''}
+              value={formData.to ? formData.to.split('T')[0] : ''}
               onChange={(e) => handleChange('to', e.target.value ? new Date(e.target.value).toISOString() : '')}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
@@ -428,38 +496,6 @@ export function CourseForm({ initialData, onSubmit, onCancel, isEdit = false, is
           <p className="text-xs text-gray-500 mt-1">
             {(formData.subCategoryIds || []).length} {locale === 'ar' ? 'محددة' : 'selected'}
           </p>
-        </div>
-
-        {/* Instructor Name Fields */}
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {locale === 'ar' ? 'اسم المدرب (إنجليزي) *' : 'Instructor Name (English) *'}
-            </label>
-            <input
-              type="text"
-              value={formData.instructorNameEn}
-              onChange={(e) => handleChange('instructorNameEn', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder={locale === 'ar' ? 'أدخل اسم المدرب بالإنجليزية' : 'Enter instructor name in English'}
-              required
-              maxLength={255}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {locale === 'ar' ? 'اسم المدرب (عربي) *' : 'Instructor Name (Arabic) *'}
-            </label>
-            <input
-              type="text"
-              value={formData.instructorNameAr}
-              onChange={(e) => handleChange('instructorNameAr', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder={locale === 'ar' ? 'أدخل اسم المدرب بالعربية' : 'Enter instructor name in Arabic'}
-              required
-              maxLength={255}
-            />
-          </div>
         </div>
 
         {/* Instructors Multi-Select */}
@@ -532,7 +568,7 @@ export function CourseForm({ initialData, onSubmit, onCancel, isEdit = false, is
         </div>
 
         {/* Tags */}
-        <div className="mb-4">
+        <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             {locale === 'ar' ? 'العلامات' : 'Tags'}
           </label>
@@ -545,67 +581,6 @@ export function CourseForm({ initialData, onSubmit, onCancel, isEdit = false, is
             maxLength={2000}
           />
           <p className="text-xs text-gray-500 mt-1">{(formData.tags || '').length}/2000 {locale === 'ar' ? 'حرف' : 'characters'}</p>
-        </div>
-
-        {/* Course Topics Fields */}
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {locale === 'ar' ? 'مواضيع الدورة (إنجليزي)' : 'Course Topics (English)'}
-            </label>
-            <textarea
-              rows={3}
-              value={formData.courseTopicsEn}
-              onChange={(e) => handleChange('courseTopicsEn', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder={locale === 'ar' ? 'مواضيع الدورة بالإنجليزية، مفصولة بفواصل' : 'Course topics in English, comma separated'}
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {locale === 'ar' ? 'مواضيع الدورة (عربي)' : 'Course Topics (Arabic)'}
-            </label>
-            <textarea
-              rows={3}
-              value={formData.courseTopicsAr}
-              onChange={(e) => handleChange('courseTopicsAr', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder={locale === 'ar' ? 'مواضيع الدورة بالعربية، مفصولة بفواصل' : 'Course topics in Arabic, comma separated'}
-              dir="rtl"
-            />
-          </div>
-        </div>
-
-        {/* Instructor Bio Fields */}
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {locale === 'ar' ? 'السيرة الذاتية للمدرب (إنجليزي)' : 'Instructor Bio (English)'}
-            </label>
-            <textarea
-              rows={4}
-              value={formData.instructorsBioEn}
-              onChange={(e) => handleChange('instructorsBioEn', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder={locale === 'ar' ? 'السيرة الذاتية للمدرب (حد أقصى 2500 حرف)' : 'Instructor biography (max 2500 characters)'}
-              maxLength={2500}
-            />
-            <p className="text-xs text-gray-500 mt-1">{(formData.instructorsBioEn || '').length}/2500 {locale === 'ar' ? 'حرف' : 'characters'}</p>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              {locale === 'ar' ? 'السيرة الذاتية للمدرب (عربي)' : 'Instructor Bio (Arabic)'}
-            </label>
-            <textarea
-              rows={4}
-              value={formData.instructorsBioAr}
-              onChange={(e) => handleChange('instructorsBioAr', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              placeholder={locale === 'ar' ? 'السيرة الذاتية للمدرب (حد أقصى 2500 حرف)' : 'Instructor biography (max 2500 characters)'}
-              maxLength={2500}
-            />
-            <p className="text-xs text-gray-500 mt-1">{(formData.instructorsBioAr || '').length}/2500 {locale === 'ar' ? 'حرف' : 'characters'}</p>
-          </div>
         </div>
       </div>
 

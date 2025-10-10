@@ -97,6 +97,7 @@ public class AdminCourseDto
     public string? SessionsNotesAr { get; set; }
     public string? InstructorNameAr { get; set; }
     public string? InstructorNameEn { get; set; }
+    public List<AdminInstructorDto> Instructors { get; set; } = new();
     public byte[]? Photo { get; set; }
     public string? Tags { get; set; }
     public string? InstructorsBioAr { get; set; }
@@ -200,6 +201,7 @@ public class AdminCreateCourseRequest
     public int? Level { get; set; }
     public Guid? CategoryId { get; set; }
     public List<Guid> SubCategoryIds { get; set; } = new();
+    public List<Guid> InstructorIds { get; set; } = new();
     public string? VideoUrl { get; set; }
     public string? DurationEn { get; set; }
     public string? DurationAr { get; set; }
@@ -234,6 +236,7 @@ public class AdminUpdateCourseRequest
     public int? Level { get; set; }
     public Guid? CategoryId { get; set; }
     public List<Guid> SubCategoryIds { get; set; } = new();
+    public List<Guid> InstructorIds { get; set; } = new();
     public string? VideoUrl { get; set; }
     public string? DurationEn { get; set; }
     public string? DurationAr { get; set; }

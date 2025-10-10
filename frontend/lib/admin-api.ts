@@ -660,6 +660,7 @@ export const adminApi = {
     pageSize?: number;
     search?: string;
     isActive?: boolean;
+    categoryId?: string;
   }) => {
     const result = await apiCallWithFallback(
       () => api.get<PagedResult<AdminCourse>>('/api/admin/courses', { params: { ...params } }),

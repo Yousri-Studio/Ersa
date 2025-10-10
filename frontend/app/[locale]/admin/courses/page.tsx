@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { Icon } from '@/components/ui/icon';
 import { motion } from 'framer-motion';
-import { adminApi, AdminCreateCourseRequest, AdminUpdateCourseRequest, AdminCourse } from '@/lib/admin-api';
+import { adminApi, AdminCreateCourseRequest, AdminUpdateCourseRequest, AdminCourse, CourseCategory } from '@/lib/admin-api';
 import { useHydration } from '@/hooks/useHydration';
 import { CourseForm } from '@/components/admin/course-form';
 import toast from 'react-hot-toast';
@@ -13,15 +13,17 @@ export default function AdminCourses() {
   const t = useTranslations('admin');
   const locale = useLocale();
   const [courses, setCourses] = useState<AdminCourse[]>([]);
+  const [categories, setCategories] = useState<CourseCategory[]>([]);
   const [pagination, setPagination] = useState({
     page: 1,
-    pageSize: 20,
+    pageSize: 10,
     totalCount: 0,
     totalPages: 0,
   });
   const [filters, setFilters] = useState({
     search: '',
     isActive: '',
+    categoryId: '',
   });
   const [isLoading, setIsLoading] = useState(true);
   const [selectedCourse, setSelectedCourse] = useState<AdminCourse | null>(null);
@@ -49,13 +51,13 @@ export default function AdminCourses() {
     to: '',
     sessionsNotesEn: '',
     sessionsNotesAr: '',
-    instructorNameAr: '',
-    instructorNameEn: '',
+    instructorNameAr: '', // Deprecated - using instructors table
+    instructorNameEn: '', // Deprecated - using instructors table
     instructorIds: [],
     photo: [],
     tags: '',
-    instructorsBioAr: '',
-    instructorsBioEn: '',
+    instructorsBioAr: '', // Deprecated - using instructors table
+    instructorsBioEn: '', // Deprecated - using instructors table
     courseTopicsAr: '',
     courseTopicsEn: '',
     isActive: true,
@@ -64,11 +66,26 @@ export default function AdminCourses() {
   const isHydrated = useHydration();
   const isRTL = locale === 'ar';
 
+  const fetchCategories = async () => {
+    try {
+      const response = await adminApi.getCourseCategories({ activeOnly: false });
+      setCategories(response.data || []);
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+    }
+  };
+
+  useEffect(() => {
+    if (isHydrated) {
+      fetchCategories();
+    }
+  }, [isHydrated]);
+
   useEffect(() => {
     if (isHydrated) {
       fetchCourses();
     }
-  }, [isHydrated, pagination.page, filters]);
+  }, [isHydrated, pagination.page, pagination.pageSize, filters]);
 
   if (!isHydrated) {
     return (
@@ -83,9 +100,10 @@ export default function AdminCourses() {
       setIsLoading(true);
       const response = await adminApi.getCourses({
         page: pagination.page,
-        pageSize: pagination.pageSize,
+        pageSize: pagination.pageSize >= 1000 ? 10000 : pagination.pageSize, // Use large number for 'all'
         search: filters.search || undefined,
         isActive: filters.isActive !== '' ? filters.isActive === 'true' : undefined,
+        categoryId: filters.categoryId !== '' ? filters.categoryId : undefined,
       });
       
       setCourses(response.data.items);
@@ -104,6 +122,14 @@ export default function AdminCourses() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handlePageSizeChange = (newPageSize: number | 'all') => {
+    setPagination(prev => ({
+      ...prev,
+      page: 1, // Reset to first page when changing page size
+      pageSize: newPageSize === 'all' ? 1000 : newPageSize, // Use large number for 'all'
+    }));
   };
 
   const handleAddCourse = async (data: AdminCreateCourseRequest) => {
@@ -186,12 +212,17 @@ export default function AdminCourses() {
       videoUrl: course.videoUrl || '',
       durationEn: course.durationEn || '',
       durationAr: course.durationAr || '',
-      instructorNameAr: course.instructorNameAr || '',
-      instructorNameEn: course.instructorNameEn || '',
+      from: course.from || '',
+      to: course.to || '',
+      sessionsNotesEn: course.sessionsNotesEn || '',
+      sessionsNotesAr: course.sessionsNotesAr || '',
+      instructorNameAr: '', // Deprecated - using instructors table
+      instructorNameEn: '', // Deprecated - using instructors table
+      instructorIds: course.instructors?.map(i => i.id) || [],
       photo: course.photo || [],
       tags: course.tags || '',
-      instructorsBioAr: course.instructorsBioAr || '',
-      instructorsBioEn: course.instructorsBioEn || '',
+      instructorsBioAr: '', // Deprecated - using instructors table
+      instructorsBioEn: '', // Deprecated - using instructors table
       courseTopicsAr: course.courseTopicsAr || '',
       courseTopicsEn: course.courseTopicsEn || '',
       isActive: course.isActive,
@@ -223,12 +254,17 @@ export default function AdminCourses() {
       videoUrl: '',
       durationEn: '',
       durationAr: '',
-      instructorNameAr: '',
-      instructorNameEn: '',
-      photo: '',
+      from: '',
+      to: '',
+      sessionsNotesEn: '',
+      sessionsNotesAr: '',
+      instructorNameAr: '', // Deprecated - using instructors table
+      instructorNameEn: '', // Deprecated - using instructors table
+      instructorIds: [],
+      photo: [],
       tags: '',
-      instructorsBioAr: '',
-      instructorsBioEn: '',
+      instructorsBioAr: '', // Deprecated - using instructors table
+      instructorsBioEn: '', // Deprecated - using instructors table
       courseTopicsAr: '',
       courseTopicsEn: '',
       isActive: true,
@@ -276,7 +312,7 @@ export default function AdminCourses() {
 
       {/* Filters */}
       <div className="bg-white shadow rounded-lg p-6">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               {locale === 'ar' ? 'بحث' : 'Search'}
@@ -306,6 +342,25 @@ export default function AdminCourses() {
                 <option value="">{locale === 'ar' ? 'جميع الحالات' : 'All Statuses'}</option>
                 <option value="true">{locale === 'ar' ? 'نشط' : 'Active'}</option>
                 <option value="false">{locale === 'ar' ? 'غير نشط' : 'Inactive'}</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              {locale === 'ar' ? 'الفئة' : 'Category'}
+            </label>
+            <div className="select-wrapper w-full">
+              <select
+                value={filters.categoryId}
+                onChange={(e) => setFilters(prev => ({ ...prev, categoryId: e.target.value }))}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">{locale === 'ar' ? 'جميع الفئات' : 'All Categories'}</option>
+                {categories.map((category) => (
+                  <option key={category.id} value={category.id}>
+                    {locale === 'ar' ? category.titleAr : category.titleEn}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -342,6 +397,9 @@ export default function AdminCourses() {
                   </th>
                   <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
                     {locale === 'ar' ? 'الدورة' : 'Course'}
+                  </th>
+                  <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
+                    {locale === 'ar' ? 'الفئة' : 'Category'}
                   </th>
                   <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${isRTL ? 'text-right' : 'text-left'}`}>
                     {locale === 'ar' ? 'التصنيفات الفرعية' : 'Sub-Categories'}
@@ -397,6 +455,15 @@ export default function AdminCourses() {
                           )}
                         </div>
                       </div>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-500">
+                      {course.category ? (
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          {locale === 'ar' ? course.category.titleAr : course.category.titleEn}
+                        </span>
+                      ) : (
+                        <span className="text-gray-400 italic">{locale === 'ar' ? 'لا يوجد' : 'None'}</span>
+                      )}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-500">
                       {course.subCategories && course.subCategories.length > 0 ? (
@@ -456,8 +523,37 @@ export default function AdminCourses() {
           </div>
         )}
 
+        {/* Page Size Selector */}
+        <div className="bg-white px-4 py-3 border-t border-gray-200">
+          <div className={`flex items-center justify-between ${isRTL ? 'flex-row-reverse' : ''}`}>
+            <div className={`flex items-center ${isRTL ? 'space-x-reverse space-x-2' : 'space-x-2'}`}>
+              <span className="text-sm text-gray-700">
+                {locale === 'ar' ? 'عرض' : 'Show'}{' '}
+              </span>
+              <select
+                value={pagination.pageSize}
+                onChange={(e) => handlePageSizeChange(parseInt(e.target.value))}
+                className="border border-gray-300 rounded-md px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+                <option value={100}>100</option>
+                <option value={1000}>{locale === 'ar' ? 'الكل' : 'All'}</option>
+              </select>
+              <span className="text-sm text-gray-700">
+                {locale === 'ar' ? 'من العناصر' : 'entries'}
+              </span>
+            </div>
+            <div className="text-sm text-gray-700">
+              {locale === 'ar' ? 'إجمالي العناصر:' : 'Total:'}{' '}
+              <span className="font-medium">{pagination.totalCount.toLocaleString()}</span>
+            </div>
+          </div>
+        </div>
+
         {/* Pagination */}
-        {pagination.totalPages > 1 && (
+        {pagination.totalPages > 1 && pagination.pageSize < 1000 && (
           <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
             <div className="flex-1 flex justify-between sm:hidden">
               <button
