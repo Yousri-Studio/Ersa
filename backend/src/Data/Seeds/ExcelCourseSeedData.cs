@@ -1,0 +1,403 @@
+// Auto-generated Course Seed Data from Excel
+// Generated on: 2025-10-10
+// Source: Products Details.xlsx
+
+using ErsaTraining.API.Data.Entities;
+
+namespace ErsaTraining.API.Data.Seeds;
+
+public static class ExcelCourseSeedData
+{
+    public static List<Course> GetCoursesFromExcel()
+    {
+        // Category IDs - These should match the seeded categories
+        var professionalCertsCategory = new Guid("11111111-1111-1111-1111-111111111111");
+        var customProgramsCategory = new Guid("22222222-2222-2222-2222-222222222222");
+        var generalCoursesCategory = new Guid("33333333-3333-3333-3333-333333333333");
+
+        var courses = new List<Course>
+        {
+            // Course 1: Competency-Based Interviews
+            new Course
+            {
+                Id = Guid.NewGuid(),
+                Slug = "competency-based-interviews",
+                TitleEn = "Competency-Based Interviews",
+                TitleAr = "المقابلات المبنية على الجدارات",
+                SummaryEn = "The Competency-Based Interviews program aims to enhance participants' ability to design and conduct effective interviews based on behavioral and functional competencies. The program ensures fair and transparent hiring decisions that improve talent selection and align with organizational goals.",
+                SummaryAr = "يهدف برنامج المقابلات المبنية على الجدارات إلى تزويد المشاركين بالمعرفة والمهارات اللازمة لتصميم وإجراء مقابلات توظيف فعّالة ترتكز على تحديد الجدارات (Competencies) المطلوبة للوظيفة. يساعد البرنامج مسؤولي التوظيف والقادة في اتخاذ قرارات دقيقة وعادلة قائمة على معايير سلوكية ومهنية واضحة، بعيدًا عن الانطباعات الشخصية.",
+                DescriptionEn = "Objectives: Understand the concept and role of competencies in recruitment. Acquire skills to prepare and conduct competency-based interviews. Develop the ability to evaluate candidates' responses using objective criteria. Improve hiring decisions in alignment with organizational values.",
+                DescriptionAr = "الأهداف: التعرف على مفهوم الجدارات ودورها في اختيار الكفاءات. اكتساب مهارات إعداد وإدارة المقابلات المبنية على الجدارات. تطوير القدرة على تقييم إجابات المرشحين باستخدام معايير موضوعية. تعزيز جودة عملية التوظيف بما يتماشى مع أهداف المنظمة.",
+                Price = 1200m,
+                Currency = "SAR",
+                Type = CourseType.Live,
+                Level = CourseLevel.Biginner,
+                CategoryId = customProgramsCategory,
+                DurationEn = "3 Days",
+                DurationAr = "3 أيام",
+                SessionsNotesEn = "From Sunday to Tuesday",
+                SessionsNotesAr = "من الأحد إلى الثلاثاء",
+                From = new DateTime(2025, 10, 19),
+                To = new DateTime(2025, 10, 21),
+                IsActive = true,
+                IsFeatured = false,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            // Course 2: Project Management - Preparatory Program
+            new Course
+            {
+                Id = Guid.NewGuid(),
+                Slug = "project-management-preparatory-program",
+                TitleEn = "Project Management – Preparatory Program",
+                TitleAr = "البرنامج التحضيري لإدارة المشاريع",
+                SummaryEn = "The Professional Project Management Program is one of the most distinguished and leading courses worldwide, as it is considered an essential requirement for entrepreneurs and professionals in both the public and private sectors.",
+                SummaryAr = "دورة إدارة المشاريع الاحترافية من الدورات الرائدة والمتميزة على مستوى العالم، كونها تعتبر متطلب أساسي لرواد الأعمال والعاملين في القطاعين العام والخاص.",
+                DescriptionEn = "This program provides a well-structured and globally tested professional model for the optimal approach to managing and executing projects while ensuring they achieve their intended objectives.",
+                DescriptionAr = "يقدم هذا البرنامج نموذج احترافي مدروس ومجرب حول العالم للآلية المثلى في إدارة المشاريع وتنفيذها وضمان تحقيقها لأهدافها التي وضعت لأجلها.",
+                Price = 1300m,
+                Currency = "SAR",
+                Type = CourseType.Live,
+                Level = CourseLevel.Biginner,
+                CategoryId = customProgramsCategory,
+                DurationEn = "5 Days",
+                DurationAr = "5 أيام",
+                SessionsNotesEn = "From Sunday to Thursday",
+                SessionsNotesAr = "من الأحد إلى الخميس",
+                From = new DateTime(2025, 10, 26),
+                To = new DateTime(2025, 10, 30),
+                IsActive = true,
+                IsFeatured = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            // Course 3: Certified Business Professional – Leadership (CBP)
+            new Course
+            {
+                Id = Guid.NewGuid(),
+                Slug = "certified-business-professional-leadership",
+                TitleEn = "Certified Business Professional – Leadership (CBP)",
+                TitleAr = "شهادة محترف أعمال معتمد في القيادة (CBP)",
+                SummaryEn = "The Certified Business Professional (CBP™) Leadership Certification is designed to equip business professionals with essential leadership skills and characteristics.",
+                SummaryAr = "شهادة القيادة للمحترف المعتمد في الأعمال (CBP™) مصممة لتزويد المهنيين في مجال الأعمال بالمهارات والصفات القيادية الأساسية.",
+                DescriptionEn = "This interactive course employs real-life scenarios to develop practical leadership abilities. Recognized as a vital component for corporate success.",
+                DescriptionAr = "دورة تفاعلية تعتمد على سيناريوهات واقعية، وتُعَدّ عنصراً أساسياً لتحقيق النجاح المؤسسي.",
+                Price = 1840m,
+                Currency = "SAR",
+                Type = CourseType.Live,
+                Level = CourseLevel.Biginner,
+                CategoryId = professionalCertsCategory,
+                DurationEn = "3 Days",
+                DurationAr = "3 أيام",
+                SessionsNotesEn = "From Sunday to Tuesday",
+                SessionsNotesAr = "من الأحد إلى الثلاثاء",
+                From = new DateTime(2025, 11, 2),
+                To = new DateTime(2025, 11, 4),
+                IsActive = true,
+                IsFeatured = false,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            // Course 4: Train-the-Trainer (TOT)
+            new Course
+            {
+                Id = Guid.NewGuid(),
+                Slug = "train-the-trainer-tot",
+                TitleEn = "Certified Business Professional – Train-the-Trainer (TOT)",
+                TitleAr = "شهادة محترف أعمال معتمد في إعداد المدربين (TOT)",
+                SummaryEn = "A professional certification program designed to equip participants with the essential knowledge and practical skills required to become certified trainers.",
+                SummaryAr = "برنامج تدريبي احترافي يهدف إلى تزويد المشاركين بالمعارف والمهارات الأساسية اللازمة لإعداد مدربين معتمدين قادرين على تصميم وتنفيذ برامج تدريبية فعّالة.",
+                DescriptionEn = "The program emphasizes interactive training techniques, training design, effective presentation delivery, classroom management, and continuous evaluation of trainees' performance.",
+                DescriptionAr = "مع التركيز على أساليب التدريب التفاعلية، وإدارة قاعة التدريب، والتقييم المستمر لأداء المتدربين.",
+                Price = 4000m,
+                Currency = "SAR",
+                Type = CourseType.Live,
+                Level = CourseLevel.Biginner,
+                CategoryId = professionalCertsCategory,
+                DurationEn = "5 Days",
+                DurationAr = "5 أيام",
+                SessionsNotesEn = "From Sunday to Thursday",
+                SessionsNotesAr = "من الأحد إلى الخميس",
+                From = new DateTime(2025, 11, 9),
+                To = new DateTime(2025, 11, 13),
+                IsActive = true,
+                IsFeatured = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            // Course 5: Transforming Creative Ideas into Actionable Plans
+            new Course
+            {
+                Id = Guid.NewGuid(),
+                Slug = "transforming-creative-ideas-into-actionable-plans",
+                TitleEn = "Transforming Creative Ideas into Actionable Plans",
+                TitleAr = "تحويل الأفكار الإبداعية إلى خطط تنفيذية",
+                SummaryEn = "In light of the ambitious national transformation driven by Saudi Arabia's Vision 2030, innovation has become an integral part of the language of work and development within Saudi institutions.",
+                SummaryAr = "في ظل التحول الوطني الطموح الذي تقوده رؤية المملكة 2030، أصبح الابتكار جزءًا لا يتجزأ من لغة العمل والتطوير داخل المؤسسات السعودية.",
+                DescriptionEn = "This program serves as a bold call to think outside the box, break away from monotony, and embrace practical tools and methods for both thinking and execution.",
+                DescriptionAr = "يمثل هذا البرنامج دعوة جريئة نحو الخروج من الصندوق، وكسر الرتابة، وتبنّي أدوات وأساليب عملية في التفكير والتنفيذ.",
+                Price = 900m,
+                Currency = "SAR",
+                Type = CourseType.Live,
+                Level = CourseLevel.Biginner,
+                CategoryId = generalCoursesCategory,
+                DurationEn = "3 Days",
+                DurationAr = "3 أيام",
+                SessionsNotesEn = "From Sunday to Tuesday",
+                SessionsNotesAr = "من الأحد إلى الثلاثاء",
+                From = new DateTime(2025, 11, 16),
+                To = new DateTime(2025, 11, 18),
+                IsActive = true,
+                IsFeatured = false,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            // Course 6: Strategic Human Resources Management
+            new Course
+            {
+                Id = Guid.NewGuid(),
+                Slug = "strategic-human-resources-management",
+                TitleEn = "Strategic Human Resources Management",
+                TitleAr = "الإدارة الإستراتيجية للموارد البشرية",
+                SummaryEn = "This course provides participants with a deep understanding of how to align human resources strategies with the overall organizational strategy.",
+                SummaryAr = "تركّز هذه الدورة على تمكين المشاركين من فهم دور إدارة الموارد البشرية كعنصر استراتيجي في تحقيق أهداف المنظمة.",
+                DescriptionEn = "It focuses on developing HR professionals' abilities to act as strategic partners, ensuring that human capital contributes directly to achieving business goals.",
+                DescriptionAr = "تتناول كيفية مواءمة إستراتيجية الموارد البشرية مع إستراتيجية المؤسسة العامة، بما يعزز من كفاءة الأداء المؤسسي.",
+                Price = 2650m,
+                Currency = "SAR",
+                Type = CourseType.Live,
+                Level = CourseLevel.Biginner,
+                CategoryId = customProgramsCategory,
+                DurationEn = "5 Days",
+                DurationAr = "5 أيام",
+                SessionsNotesEn = "From Sunday to Thursday",
+                SessionsNotesAr = "من الأحد إلى الخميس",
+                From = new DateTime(2025, 11, 23),
+                To = new DateTime(2025, 11, 27),
+                IsActive = true,
+                IsFeatured = false,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            // Course 7: Customer Service (CBP)
+            new Course
+            {
+                Id = Guid.NewGuid(),
+                Slug = "certified-business-professional-customer-service",
+                TitleEn = "Certified Business Professional – Customer Service (CBP)",
+                TitleAr = "شهادة محترف أعمال معتمد في خدمة العملاء (CBP)",
+                SummaryEn = "The CBP™ Customer Service Certification provides a comprehensive curriculum that covers key aspects of customer service.",
+                SummaryAr = "تقدم شهادة خدمة العملاء CBP™ منهجًا شاملاً يغطي الجوانب الأساسية في مجال خدمة العملاء.",
+                DescriptionEn = "Including effective communication, customer analysis, handling difficult situations, and leveraging digital platforms for customer interactions.",
+                DescriptionAr = "بما في ذلك التواصل الفعّال، وتحليل سلوك العملاء، والتعامل مع المواقف الصعبة.",
+                Price = 1840m,
+                Currency = "SAR",
+                Type = CourseType.Live,
+                Level = CourseLevel.Biginner,
+                CategoryId = professionalCertsCategory,
+                DurationEn = "3 Days",
+                DurationAr = "3 أيام",
+                SessionsNotesEn = "From Sunday to Tuesday",
+                SessionsNotesAr = "من الأحد إلى الثلاثاء",
+                From = new DateTime(2025, 11, 30),
+                To = new DateTime(2025, 12, 2),
+                IsActive = true,
+                IsFeatured = false,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            // Course 8: Sales (CBP)
+            new Course
+            {
+                Id = Guid.NewGuid(),
+                Slug = "certified-business-professional-sales",
+                TitleEn = "Certified Business Professional – Sales (CBP)",
+                TitleAr = "شهادة محترف أعمال معتمد في المبيعات (CBP)",
+                SummaryEn = "The Certified Business Professional (CBP™) Sales Certification is designed to establish a strong foundation in professional selling by teaching effective sales methodologies.",
+                SummaryAr = "تركز دورة شهادة محترف الأعمال المعتمد في المبيعات (CBP™) على تنمية المهارات الاحترافية في إدارة دورة البيع الكاملة.",
+                DescriptionEn = "It covers all major stages of the sales process, including prospecting, first contact, qualification, presentation, objection handling, closing, and follow-up strategies.",
+                DescriptionAr = "بدءًا من استهداف العملاء المحتملين وحتى الإغلاق والمتابعة.",
+                Price = 1840m,
+                Currency = "SAR",
+                Type = CourseType.Live,
+                Level = CourseLevel.Biginner,
+                CategoryId = professionalCertsCategory,
+                DurationEn = "3 Days",
+                DurationAr = "3 أيام",
+                SessionsNotesEn = "From Sunday to Tuesday",
+                SessionsNotesAr = "من الأحد إلى الثلاثاء",
+                From = new DateTime(2025, 12, 7),
+                To = new DateTime(2025, 12, 9),
+                IsActive = true,
+                IsFeatured = false,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            // Course 9: Power BI
+            new Course
+            {
+                Id = Guid.NewGuid(),
+                Slug = "power-bi",
+                TitleEn = "Power BI",
+                TitleAr = "باور بي آي",
+                SummaryEn = "This course introduces participants to Microsoft Power BI as a powerful tool for transforming raw data into meaningful insights.",
+                SummaryAr = "تهدف هذه الدورة إلى تمكين المشاركين من استخدام برنامج Microsoft Power BI لتحويل البيانات الخام إلى تقارير ولوحات تفاعلية.",
+                DescriptionEn = "Participants will learn how to connect, model, visualize, and share data to support data-driven decision-making.",
+                DescriptionAr = "يتعرف المشاركون على كيفية جمع البيانات من مصادر متعددة، وتنظيفها، وتحليلها، وعرضها بطريقة بصرية احترافية.",
+                Price = 1700m,
+                Currency = "SAR",
+                Type = CourseType.Live,
+                Level = CourseLevel.Biginner,
+                CategoryId = customProgramsCategory,
+                DurationEn = "3 Days",
+                DurationAr = "3 أيام",
+                SessionsNotesEn = "From Sunday to Tuesday",
+                SessionsNotesAr = "من الأحد إلى الثلاثاء",
+                From = new DateTime(2025, 12, 14),
+                To = new DateTime(2025, 12, 16),
+                IsActive = true,
+                IsFeatured = false,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            // Course 10: HR Fundamentals
+            new Course
+            {
+                Id = Guid.NewGuid(),
+                Slug = "hr-fundamentals",
+                TitleEn = "HR Fundamentals",
+                TitleAr = "أساسيات الموارد البشرية",
+                SummaryEn = "This course provides participants with a comprehensive overview of the essential functions and principles of Human Resources Management.",
+                SummaryAr = "تهدف هذه الدورة إلى تزويد المشاركين بفهم شامل لأساسيات ومهام إدارة الموارد البشرية داخل المؤسسات.",
+                DescriptionEn = "It introduces the main HR processes, including recruitment, training, performance management, compensation, and employee relations.",
+                DescriptionAr = "تتناول أهم الوظائف مثل الاستقطاب، التدريب، إدارة الأداء، التعويضات، وعلاقات الموظفين.",
+                Price = 1500m,
+                Currency = "SAR",
+                Type = CourseType.Live,
+                Level = CourseLevel.Biginner,
+                CategoryId = customProgramsCategory,
+                DurationEn = "3 Days",
+                DurationAr = "3 أيام",
+                SessionsNotesEn = "From Sunday to Tuesday",
+                SessionsNotesAr = "من الأحد إلى الثلاثاء",
+                From = new DateTime(2025, 12, 21),
+                To = new DateTime(2025, 12, 23),
+                IsActive = true,
+                IsFeatured = false,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            // Course 11: Business English Certificate
+            new Course
+            {
+                Id = Guid.NewGuid(),
+                Slug = "business-english-certificate",
+                TitleEn = "Business English Certificate",
+                TitleAr = "شهادة اللغة الإنجليزية للأعمال",
+                SummaryEn = "This course is designed to develop participants' English communication skills in professional and business contexts.",
+                SummaryAr = "تهدف هذه الدورة إلى تطوير مهارات التواصل باللغة الإنجليزية في بيئات العمل والأنشطة المهنية المختلفة.",
+                DescriptionEn = "It focuses on improving vocabulary, writing, speaking, and listening skills necessary for the modern workplace.",
+                DescriptionAr = "تركّز على تحسين مهارات المفردات، الكتابة، التحدث، والاستماع، من خلال مواقف عملية تحاكي الحياة الواقعية.",
+                Price = 4800m,
+                Currency = "SAR",
+                Type = CourseType.Live,
+                Level = CourseLevel.Biginner,
+                CategoryId = generalCoursesCategory,
+                DurationEn = "10 days",
+                DurationAr = "10 أيام",
+                SessionsNotesEn = "From Sunday to Tuesday (spans two weeks)",
+                SessionsNotesAr = "من الأحد إلى الثلاثاء (على مدى أسبوعين)",
+                From = new DateTime(2025, 12, 28),
+                To = new DateTime(2026, 1, 6),
+                IsActive = true,
+                IsFeatured = false,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            // Course 12: Saudi Labor Law
+            new Course
+            {
+                Id = Guid.NewGuid(),
+                Slug = "saudi-labor-law-systems-regulations",
+                TitleEn = "Saudi Labor Law: Systems & Regulations",
+                TitleAr = "أنظمة ولوائح مكتب العمل السعودي",
+                SummaryEn = "This course aims to provide a comprehensive understanding of the regulations and laws related to the Saudi Labor Office.",
+                SummaryAr = "تهدف هذه الدورة إلى تقديم فهم شامل للأنظمة واللوائح المتعلقة بمكتب العمل السعودي.",
+                DescriptionEn = "Including the rights and obligations of both employees and employers. Participants will explore the latest updates and legal amendments.",
+                DescriptionAr = "بما في ذلك حقوق وواجبات الموظفين وأصحاب العمل. سيتم التعرف على أحدث التعديلات والقوانين.",
+                Price = 650m,
+                Currency = "SAR",
+                Type = CourseType.Live,
+                Level = CourseLevel.Biginner,
+                CategoryId = customProgramsCategory,
+                DurationEn = "3 Days",
+                DurationAr = "3 أيام",
+                SessionsNotesEn = "From Sunday to Tuesday",
+                SessionsNotesAr = "من الأحد إلى الثلاثاء",
+                From = new DateTime(2025, 12, 28),
+                To = new DateTime(2025, 12, 30),
+                IsActive = true,
+                IsFeatured = false,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            // Course 13: aPHRi
+            new Course
+            {
+                Id = Guid.NewGuid(),
+                Slug = "associate-professional-in-human-resources-international",
+                TitleEn = "Associate Professional in Human Resources – International (aPHRi)",
+                TitleAr = "شهادة محترف مشارك في الموارد البشرية – دولي (aPHRi)",
+                SummaryEn = "This course is designed for individuals beginning their HR career or those looking to strengthen their foundational knowledge.",
+                SummaryAr = "تم تصميم هذه الدورة للأفراد الذين يبدأون حياتهم المهنية في مجال الموارد البشرية أو أولئك الذين يتطلعون إلى تعزيز معرفتهم التأسيسية.",
+                DescriptionEn = "The aPHRi™ course covers essential HR principles, including recruitment, employee relations, and compliance.",
+                DescriptionAr = "تغطي الدورة aPHRi™ المبادئ الأساسية للموارد البشرية، بما في ذلك التوظيف وعلاقات الموظفين والامتثال.",
+                Price = 3200m,
+                Currency = "SAR",
+                Type = CourseType.Live,
+                Level = CourseLevel.Biginner,
+                CategoryId = professionalCertsCategory,
+                DurationEn = "4 Days",
+                DurationAr = "4 أيام",
+                SessionsNotesEn = "From Monday to Thursday",
+                SessionsNotesAr = "من الاثنين إلى الخميس",
+                From = new DateTime(2025, 12, 22),
+                To = new DateTime(2025, 12, 25),
+                IsActive = true,
+                IsFeatured = false,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            },
+            // Course 14: PHRi
+            new Course
+            {
+                Id = Guid.NewGuid(),
+                Slug = "professional-in-human-resources-international",
+                TitleEn = "Professional in Human Resources – International (PHRi)",
+                TitleAr = "شهادة محترف في الموارد البشرية – دولي (PHRi)",
+                SummaryEn = "This course is designed for HR professionals. It focuses on foundational HR principles, including talent acquisition, employee relations, compensation, and HR operations.",
+                SummaryAr = "تم تصميم هذه الدورة المتخصصة للمحترفين في مجال الموارد البشرية خارج الولايات المتحدة.",
+                DescriptionEn = "The PHRi certification validates your expertise and enhances your credibility in the international HR field.",
+                DescriptionAr = "شهادة PHRi تُعزز من مصداقيتك وتؤكد خبرتك في مجال الموارد البشرية الدولية.",
+                Price = 4300m,
+                Currency = "SAR",
+                Type = CourseType.Live,
+                Level = CourseLevel.Intermediate,
+                CategoryId = professionalCertsCategory,
+                DurationEn = "5 Days",
+                DurationAr = "5 أيام",
+                SessionsNotesEn = "From Sunday to Thursday",
+                SessionsNotesAr = "من الأحد إلى الخميس",
+                From = new DateTime(2026, 1, 4),
+                To = new DateTime(2026, 1, 8),
+                IsActive = true,
+                IsFeatured = true,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            }
+        };
+
+        return courses;
+    }
+}
+

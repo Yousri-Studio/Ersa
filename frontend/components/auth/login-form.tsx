@@ -56,7 +56,7 @@ export function LoginForm() {
   };
 
   return (
-    <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+    <form className="space-y-6" onSubmit={handleSubmit(onSubmit)} autoComplete="off">
       <div className="space-y-4">
         {/* Email */}
         <div>
@@ -76,7 +76,7 @@ export function LoginForm() {
               },
             })}
             type="email"
-            autoComplete="email"
+            autoComplete="off"
             className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo"
             placeholder="example@domain.com"
             style={{ fontSize: '14px' }}
@@ -105,7 +105,7 @@ export function LoginForm() {
                 },
               })}
               type={showPassword ? 'text' : 'password'}
-              autoComplete="current-password"
+              autoComplete="off"
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo pr-10"
               placeholder="••••••••"
               style={{ fontSize: '14px' }}
