@@ -37,7 +37,7 @@ if ($confirmation -ne 'y') {
 # Install dependencies
 Write-Host ""
 Write-Host "📦 Installing dependencies..." -ForegroundColor Cyan
-npm install --production
+npm install
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "❌ Failed to install dependencies" -ForegroundColor Red
@@ -45,6 +45,18 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 Write-Host "✅ Dependencies installed" -ForegroundColor Green
+Write-Host ""
+
+# Build the application
+Write-Host "🔨 Building application for production..." -ForegroundColor Cyan
+npm run build
+
+if ($LASTEXITCODE -ne 0) {
+    Write-Host "❌ Failed to build application" -ForegroundColor Red
+    exit 1
+}
+
+Write-Host "✅ Application built successfully" -ForegroundColor Green
 Write-Host ""
 
 # Check if PM2 is installed
@@ -81,6 +93,7 @@ Write-Host "2. Set up SSL certificate" -ForegroundColor White
 Write-Host "3. Configure firewall rules" -ForegroundColor White
 Write-Host ""
 Write-Host "For detailed instructions, see DEPLOYMENT_INSTRUCTIONS.md" -ForegroundColor Yellow
+
 
 
 

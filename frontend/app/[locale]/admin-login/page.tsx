@@ -10,8 +10,8 @@ import { Icon } from '@/components/ui/icon';
 import Image from 'next/image';
 
 export default function AdminLoginPage() {
-  const [email, setEmail] = useState('superadmin@ersatraining.com');
-  const [password, setPassword] = useState('SuperAdmin123!');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -44,16 +44,21 @@ export default function AdminLoginPage() {
     setIsLoading(true);
 
     try {
+      // Use credentials based on selected role if fields are empty
+      const loginEmail = email || accountCredentials[selectedRole].email;
+      const loginPassword = password || accountCredentials[selectedRole].password;
+      
       console.log('Starting login process...');
-      console.log('Email:', email);
-      console.log('Password:', password);
+      console.log('Email:', loginEmail);
+      console.log('Password:', loginPassword);
+      console.log('Selected Role:', selectedRole);
       console.log('API URL:', process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5002/api');
       
       // Try real API first
       try {
         const response = await api.post('/auth/login', {
-          email,
-          password,
+          email: loginEmail,
+          password: loginPassword,
         });
 
         console.log('Login response:', response.data);
@@ -91,7 +96,7 @@ export default function AdminLoginPage() {
         console.log('API login failed, trying mock login...');
         
         // Mock login for development
-        if (email === 'superadmin@ersatraining.com' && password === 'SuperAdmin123!') {
+        if (loginEmail === 'superadmin@ersatraining.com' && loginPassword === 'SuperAdmin123!') {
           const mockUser = {
             id: '1',
             fullName: 'Super Admin',
@@ -113,7 +118,7 @@ export default function AdminLoginPage() {
           return;
         }
         
-        if (email === 'operations@ersatraining.com' && password === 'Operations123!') {
+        if (loginEmail === 'operations@ersatraining.com' && loginPassword === 'Operations123!') {
           const mockUser = {
             id: '2',
             fullName: 'Operations Manager',
@@ -183,8 +188,6 @@ export default function AdminLoginPage() {
                 type="button"
                 onClick={() => {
                   setSelectedRole('operations-manager');
-                  setEmail(accountCredentials['operations-manager'].email);
-                  setPassword(accountCredentials['operations-manager'].password);
                 }}
                 className={`flex-1 px-4 font-cairo transition-all duration-200 ${
                   selectedRole === 'operations-manager'
@@ -204,8 +207,6 @@ export default function AdminLoginPage() {
                 type="button"
                 onClick={() => {
                   setSelectedRole('system-manager');
-                  setEmail(accountCredentials['system-manager'].email);
-                  setPassword(accountCredentials['system-manager'].password);
                 }}
                 className={`flex-1 px-4 font-cairo transition-all duration-200 ${
                   selectedRole === 'system-manager'
@@ -251,7 +252,7 @@ export default function AdminLoginPage() {
         
         {/* Login Form */}
         <div className="bg-white rounded-xl shadow-lg p-8" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
-          <form className="space-y-6" onSubmit={handleLogin}>
+          <form className="space-y-6" onSubmit={handleLogin} autoComplete="off">
             <div className="space-y-4">
               {/* Email */}
               <div>
@@ -270,8 +271,9 @@ export default function AdminLoginPage() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    autoComplete="off"
                     className={`w-full px-4 py-3 ${locale === 'ar' ? 'pr-10 text-right' : 'pl-10 text-left'} border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo`}
-                    placeholder="superadmin@ersatraining.com"
+                    placeholder="Enter your email address"
                     style={{ fontSize: '14px', direction: locale === 'ar' ? 'rtl' : 'ltr' }}
                   />
                   <Icon 
@@ -299,8 +301,9 @@ export default function AdminLoginPage() {
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    autoComplete="off"
                     className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo ${locale === 'ar' ? 'text-right pl-10 pr-10' : 'text-left pl-10 pr-10'}`}
-                    placeholder="••••••••"
+                    placeholder="Enter your password"
                     style={{ fontSize: '14px', direction: locale === 'ar' ? 'rtl' : 'ltr' }}
                   />
                   <Icon 

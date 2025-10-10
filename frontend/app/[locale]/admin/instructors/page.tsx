@@ -89,14 +89,14 @@ export default function AdminInstructors() {
     }
   };
 
-  const handleAddInstructor = async () => {
+  const handleAddInstructor = async (data: CreateInstructorRequest) => {
     try {
       // Filter out any invalid GUIDs (validate format)
       const validGuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      const validCourseIds = instructorForm.courseIds?.filter(id => validGuidRegex.test(id)) || [];
+      const validCourseIds = data.courseIds?.filter(id => validGuidRegex.test(id)) || [];
       
       const payload = {
-        ...instructorForm,
+        ...data,
         courseIds: validCourseIds
       };
       
@@ -112,16 +112,16 @@ export default function AdminInstructors() {
     }
   };
 
-  const handleUpdateInstructor = async () => {
+  const handleUpdateInstructor = async (data: CreateInstructorRequest) => {
     if (!selectedInstructor) return;
     
     try {
       // Filter out any invalid GUIDs (validate format)
       const validGuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-      const validCourseIds = instructorForm.courseIds?.filter(id => validGuidRegex.test(id)) || [];
+      const validCourseIds = data.courseIds?.filter(id => validGuidRegex.test(id)) || [];
       
       const payload = {
-        ...instructorForm,
+        ...data,
         courseIds: validCourseIds
       };
       
