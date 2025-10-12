@@ -162,6 +162,146 @@ public class AuthController : ControllerBase
         }
     }
 
+    [HttpPost("public-login")]
+    public async Task<ActionResult<LoginResponse>> PublicLogin([FromBody] LoginRequest request)
+    {
+        try
+        {
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if (user == null)
+            {
+                return BadRequest(new { error = "Invalid email or password" });
+            }
+
+            // Check if user is an admin - admins cannot log into public site
+            if (user.IsAdmin || user.IsSuperAdmin)
+            {
+                _logger.LogWarning("Admin user {Email} attempted to log into public site", user.Email);
+                return BadRequest(new { error = "Admin users cannot log into the public site. Please use the admin login page." });
+            }
+
+            var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: true);
+            
+            if (!result.Succeeded)
+            {
+                if (result.IsLockedOut)
+                {
+                    return BadRequest(new { error = "Account is locked out" });
+                }
+                
+                return BadRequest(new { error = "Invalid email or password" });
+            }
+
+            if (user.Status == UserStatus.PendingEmailVerification)
+            {
+                return BadRequest(new { error = "Please verify your email address before logging in" });
+            }
+            
+            if (user.Status != UserStatus.Active)
+            {
+                return BadRequest(new { error = "Account is inactive" });
+            }
+
+            // Update last login time
+            user.LastLoginAt = DateTime.UtcNow;
+            await _userManager.UpdateAsync(user);
+
+            var token = await _jwtService.GenerateTokenAsync(user);
+            
+            return Ok(new LoginResponse
+            {
+                Token = token,
+                User = new UserDto
+                {
+                    Id = user.Id,
+                    FullName = user.FullName,
+                    Email = user.Email!,
+                    Phone = user.Phone,
+                    Locale = user.Locale,
+                    CreatedAt = user.CreatedAt,
+                    IsAdmin = user.IsAdmin,
+                    IsSuperAdmin = user.IsSuperAdmin,
+                    LastLoginAt = user.LastLoginAt
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during public user login");
+            return StatusCode(500, new { error = "Internal server error" });
+        }
+    }
+
+    [HttpPost("admin-login")]
+    public async Task<ActionResult<LoginResponse>> AdminLogin([FromBody] LoginRequest request)
+    {
+        try
+        {
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if (user == null)
+            {
+                return BadRequest(new { error = "Invalid email or password" });
+            }
+
+            // Check if user has admin privileges
+            if (!user.IsAdmin && !user.IsSuperAdmin)
+            {
+                _logger.LogWarning("Non-admin user {Email} attempted to log into admin portal", user.Email);
+                return BadRequest(new { error = "Access denied. Admin privileges required." });
+            }
+
+            var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: true);
+            
+            if (!result.Succeeded)
+            {
+                if (result.IsLockedOut)
+                {
+                    return BadRequest(new { error = "Account is locked out" });
+                }
+                
+                return BadRequest(new { error = "Invalid email or password" });
+            }
+
+            if (user.Status == UserStatus.PendingEmailVerification)
+            {
+                return BadRequest(new { error = "Please verify your email address before logging in" });
+            }
+            
+            if (user.Status != UserStatus.Active)
+            {
+                return BadRequest(new { error = "Account is inactive" });
+            }
+
+            // Update last login time
+            user.LastLoginAt = DateTime.UtcNow;
+            await _userManager.UpdateAsync(user);
+
+            var token = await _jwtService.GenerateTokenAsync(user);
+            
+            return Ok(new LoginResponse
+            {
+                Token = token,
+                User = new UserDto
+                {
+                    Id = user.Id,
+                    FullName = user.FullName,
+                    Email = user.Email!,
+                    Phone = user.Phone,
+                    Locale = user.Locale,
+                    CreatedAt = user.CreatedAt,
+                    IsAdmin = user.IsAdmin,
+                    IsSuperAdmin = user.IsSuperAdmin,
+                    LastLoginAt = user.LastLoginAt
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during admin user login");
+            return StatusCode(500, new { error = "Internal server error" });
+        }
+    }
+
     [HttpPost("refresh-token"),HttpGet("refresh-token")]
     public async Task<ActionResult<LoginResponse>> RefreshToken()
     {

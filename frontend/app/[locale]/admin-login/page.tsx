@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { useAuthStore } from '@/lib/auth-store';
-import { api } from '@/lib/api';
+import { authApi } from '@/lib/api';
 import toast from 'react-hot-toast';
 import { Icon } from '@/components/ui/icon';
 import Image from 'next/image';
@@ -54,9 +54,9 @@ export default function AdminLoginPage() {
       console.log('Selected Role:', selectedRole);
       console.log('API URL:', process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5002/api');
       
-      // Try real API first
+      // Try real API first - using admin-login endpoint
       try {
-        const response = await api.post('/auth/login', {
+        const response = await authApi.adminLogin({
           email: loginEmail,
           password: loginPassword,
         });
@@ -64,7 +64,8 @@ export default function AdminLoginPage() {
         console.log('Login response:', response.data);
         const { token, user } = response.data;
         
-        // Check if user is admin
+        // The admin-login endpoint already validates admin privileges on backend
+        // But we keep this check for extra security
         if (!user.isAdmin && !user.isSuperAdmin) {
           console.log('User is not admin:', user);
           toast.error('Access denied. Admin privileges required.');

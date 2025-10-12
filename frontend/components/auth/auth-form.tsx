@@ -49,8 +49,18 @@ export function AuthForm({ defaultMode = 'login' }: AuthFormProps) {
     setIsLoading(true);
     
     try {
-      const response = await authApi.login(data);
+      // Use public-login endpoint which validates user is not an admin on backend
+      const response = await authApi.publicLogin(data);
       const { token, user } = response.data;
+      
+      // The backend already validates this, but we keep this check for extra security
+      if (user.isAdmin || user.isSuperAdmin) {
+        toast.error(locale === 'ar' 
+          ? 'لا يمكن لمستخدمي الإدارة تسجيل الدخول إلى الموقع العام. يرجى استخدام صفحة تسجيل دخول المسؤول.'
+          : 'Admin users cannot log into the public site. Please use the admin login page.');
+        setIsLoading(false);
+        return;
+      }
       
       login(token, user);
       toast.success('تم تسجيل الدخول بنجاح!');

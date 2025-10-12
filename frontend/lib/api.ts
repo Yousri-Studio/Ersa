@@ -242,6 +242,12 @@ export const authApi = {
   login: (data: LoginRequest): Promise<AxiosResponse<LoginResponse>> =>
     api.post('/api/auth/login', data),
 
+  publicLogin: (data: LoginRequest): Promise<AxiosResponse<LoginResponse>> =>
+    api.post('/api/auth/public-login', data),
+
+  adminLogin: (data: LoginRequest): Promise<AxiosResponse<LoginResponse>> =>
+    api.post('/api/auth/admin-login', data),
+
   register: (data: RegisterRequest): Promise<AxiosResponse<RegisterResponse>> =>
     api.post('/api/auth/register', data),
 
