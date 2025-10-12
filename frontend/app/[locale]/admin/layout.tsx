@@ -8,6 +8,7 @@ import { useAuthStore } from '@/lib/auth-store';
 import { Icon } from '@/components/ui/icon';
 import { useHydration } from '@/hooks/useHydration';
 import { useRoles } from '@/hooks/useRoles';
+import { useAdminSession } from '@/hooks/useAdminSession';
 import { adminApi } from '@/lib/admin-api';
 import { LanguageSwitcher } from '@/components/layout/language-switcher';
 import toast from 'react-hot-toast';
@@ -35,6 +36,9 @@ export default function AdminLayout({
   const t = useTranslations('admin');
   const tCommon = useTranslations('common');
   const { user, isAuthenticated, logout, initFromCookie } = useAuthStore();
+  
+  // Admin session management with 30-minute idle timeout
+  useAdminSession();
 
   useEffect(() => {
     const checkAdminAccess = async () => {
