@@ -78,7 +78,51 @@ export const authApi = {
 }
 ```
 
-#### 2. Public Login Form (`frontend/components/auth/auth-form.tsx`)
+#### 2. Public Page Guard (`frontend/components/layout/public-page-guard.tsx`) **NEW**
+
+Created a client-side guard component that automatically detects and blocks admin users from accessing public pages:
+
+```typescript
+export function PublicPageGuard() {
+  // Checks if user is authenticated and has admin privileges
+  if (isAuthenticated && user && (user.isAdmin || user.isSuperAdmin)) {
+    // Shows error message
+    toast.error('Admin users cannot access the public site...');
+    
+    // Logs out the admin user
+    logout();
+    
+    // Redirects to admin login
+    router.push(`/${locale}/admin-login`);
+  }
+}
+```
+
+**Key Features:**
+- ✅ Runs on every public page load
+- ✅ Detects existing admin sessions
+- ✅ Automatically logs out admin users
+- ✅ Redirects to admin login page
+- ✅ Shows user-friendly error message
+- ✅ Bilingual support (Arabic/English)
+
+#### 3. Integrated into Layout (`frontend/components/layout/conditional-layout.tsx`)
+
+Added PublicPageGuard to the public pages layout:
+
+```typescript
+// Regular pages with header and footer
+return (
+  <div className="min-h-screen flex flex-col">
+    <PublicPageGuard />  {/* NEW - Blocks admin users */}
+    <Header />
+    <main>{children}</main>
+    <Footer />
+  </div>
+);
+```
+
+#### 4. Public Login Form (`frontend/components/auth/auth-form.tsx`)
 
 **Before:**
 ```typescript
@@ -102,7 +146,7 @@ if (user.isAdmin || user.isSuperAdmin) {
 login(token, user);
 ```
 
-#### 3. Admin Login Page (`frontend/app/[locale]/admin-login/page.tsx`)
+#### 5. Admin Login Page (`frontend/app/[locale]/admin-login/page.tsx`)
 
 **Before:**
 ```typescript
@@ -147,7 +191,7 @@ if (!user.isAdmin && !user.isSuperAdmin) {
                   │
                   ▼ (If validation passes)
 ┌─────────────────────────────────────────────────────┐
-│  Layer 2: Frontend Validation                       │
+│  Layer 2: Frontend Login Validation                 │
 │  ✓ Double-checks user role                          │
 │  ✓ Shows user-friendly error message                │
 │  ✓ Prevents auth store update                       │
@@ -155,11 +199,29 @@ if (!user.isAdmin && !user.isSuperAdmin) {
                   │
                   ▼ (If both pass)
 ┌─────────────────────────────────────────────────────┐
-│  Layer 3: Layout Protection                         │
+│  Layer 3: Public Page Guard (NEW!)                  │
+│  ✓ Runs on every public page load                   │
+│  ✓ Detects existing admin sessions                  │
+│  ✓ Automatically logs out admin users               │
+│  ✓ Redirects to appropriate login page              │
+└─────────────────┬───────────────────────────────────┘
+                  │
+                  ▼ (For admin pages)
+┌─────────────────────────────────────────────────────┐
+│  Layer 4: Admin Layout Protection                   │
 │  ✓ Admin layout checks for admin role               │
 │  ✓ Redirects if unauthorized                        │
 └─────────────────────────────────────────────────────┘
 ```
+
+**NEW: Layer 3 - Public Page Guard**
+
+This layer solves the problem of **existing admin sessions** accessing public pages:
+
+- **Problem**: Admin users who logged in before the role separation was implemented could still access public pages
+- **Solution**: PublicPageGuard component that runs on every public page and automatically logs out admin users
+- **Triggers**: On any public page load/navigation
+- **Action**: Logout + Redirect to admin login
 
 ---
 
@@ -205,6 +267,17 @@ if (!user.isAdmin && !user.isSuperAdmin) {
 - User redirected to home page
 - Full access to public features
 
+### Test 5: Admin User with Existing Session → Public Page ❌ **NEW**
+
+**Action**: Admin user with active session navigates to a public page (e.g., `/courses`)
+
+**Expected Result**:
+- PublicPageGuard detects admin session
+- Error toast message displayed: "Admin users cannot access the public site..."
+- User is automatically logged out
+- User redirected to `/admin-login`
+- Session cleared from localStorage and cookies
+
 ---
 
 ## 📊 API Response Examples
@@ -242,7 +315,9 @@ if (!user.isAdmin && !user.isSuperAdmin) {
 - [x] Frontend API client updated with new methods
 - [x] Public login form updated to use `publicLogin()`
 - [x] Admin login form updated to use `adminLogin()`
-- [x] Both layers validate user roles
+- [x] **PublicPageGuard component created and integrated**
+- [x] **Existing admin sessions are automatically logged out on public pages**
+- [x] All layers validate user roles
 - [x] Error messages are user-friendly and bilingual
 - [x] Security logging implemented
 - [x] No linting errors
@@ -320,17 +395,24 @@ if (!user.isAdmin && !user.isSuperAdmin) {
 
 ## ✨ Summary
 
-We successfully implemented a **two-layer role-based login separation** system:
+We successfully implemented a **four-layer role-based login separation** system:
 
 1. **Backend Layer**: Separate endpoints (`/api/auth/public-login`, `/api/auth/admin-login`) that validate roles at the API level
-2. **Frontend Layer**: Updated login forms to use appropriate endpoints and validate roles
+2. **Frontend Login Layer**: Updated login forms to use appropriate endpoints and validate roles
+3. **Public Page Guard Layer**: Auto-detects and blocks existing admin sessions from accessing public pages
+4. **Admin Layout Layer**: Validates admin access for all admin routes
 
 This ensures:
-- **Admin users cannot log into the public site**
-- **Public users cannot log into the admin portal**
-- **Clear error messages** guide users to the correct login page
-- **Security logging** tracks unauthorized access attempts
-- **Defense in depth** with multiple validation layers
+- ✅ **Admin users CANNOT log into the public site** (blocked at login)
+- ✅ **Admin users with existing sessions CANNOT access public pages** (auto-logout via guard)
+- ✅ **Public users CANNOT log into the admin portal** (blocked at login)
+- ✅ **Public users CANNOT access admin pages** (blocked at layout)
+- ✅ **Clear error messages** guide users to the correct login page
+- ✅ **Security logging** tracks unauthorized access attempts
+- ✅ **Defense in depth** with four validation layers
+- ✅ **Handles existing sessions** - logs out admin users automatically
+
+**Key Innovation**: The PublicPageGuard component solves the "existing session" problem by automatically detecting and logging out admin users who try to access public pages, even if they logged in before the security updates.
 
 The implementation is complete, tested, and ready for deployment! 🎉
 

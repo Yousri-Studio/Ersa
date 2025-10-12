@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import { useLocale } from 'next-intl';
 import { Header } from './header';
 import { Footer } from './footer';
+import { PublicPageGuard } from './public-page-guard';
 
 interface ConditionalLayoutProps {
   children: React.ReactNode;
@@ -31,6 +32,8 @@ export function ConditionalLayout({ children }: ConditionalLayoutProps) {
   // Regular pages with header and footer
   return (
     <div className="min-h-screen flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
+      {/* Guard to prevent admin users from accessing public pages */}
+      <PublicPageGuard />
       <Header />
       <main className="flex-1 pt-[100px]">
         {children}
