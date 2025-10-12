@@ -102,12 +102,14 @@ function transformApiCourse(apiCourse: BackendCourse, locale: string = 'ar'): Co
         (apiCourse.courseTopics.ar ? apiCourse.courseTopics.ar.split(',').map(t => t.trim()) : []) :
         (apiCourse.courseTopics.en ? apiCourse.courseTopics.en.split(',').map(t => t.trim()) : [])) :
       [],
-    description: typeof apiCourse.summary === 'object' 
-      ? apiCourse.summary
-      : {
-          ar: apiCourse.summary || 'وصف الدورة',
-          en: apiCourse.summary || 'Course description'
-        },
+    description: apiCourse.description && (apiCourse.description.ar || apiCourse.description.en)
+      ? apiCourse.description
+      : (typeof apiCourse.summary === 'object' 
+          ? apiCourse.summary
+          : {
+              ar: apiCourse.summary || 'وصف الدورة',
+              en: apiCourse.summary || 'Course description'
+            }),
     lessons: apiCourse.sessions?.length || apiCourse.attachments?.length || 1,
     // Only create instructor object if there are actual instructors assigned
     instructor: (apiCourse.instructors && apiCourse.instructors.length > 0) ? {

@@ -61,6 +61,7 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>(options =>
 // JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var secretKey = jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey is not configured");
+var clockSkewMinutes = jwtSettings.GetValue<int>("ClockSkewMinutes", 5); // Default 5 minutes tolerance
 
 builder.Services.AddAuthentication(options =>
 {
@@ -78,7 +79,7 @@ builder.Services.AddAuthentication(options =>
         ValidIssuer = jwtSettings["Issuer"],
         ValidAudience = jwtSettings["Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
-        ClockSkew = TimeSpan.Zero
+        ClockSkew = TimeSpan.FromMinutes(clockSkewMinutes) // Allow time tolerance
     };
 });
 

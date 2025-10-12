@@ -37,12 +37,28 @@ export const useAuthStore = create<AuthState>()(
       isAuthenticated: false,
 
       login: (token: string, user: User) => {
+        console.log('🔐 LOGIN: Setting auth token and user');
+        
+        // Set cookie
         Cookies.set('auth-token', token, { 
           expires: 7, 
-          secure: process.env.NODE_ENV === 'production', 
-          sameSite: 'lax' 
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'lax' as const,
+          path: '/'
         });
+        
+        // Set state - this should trigger Zustand persist
         set({ user, token, isAuthenticated: true });
+        
+        // Force persist to localStorage immediately
+        if (typeof window !== 'undefined') {
+          const stateToSave = {
+            state: { user, token, isAuthenticated: true },
+            version: 0
+          };
+          localStorage.setItem('auth-storage', JSON.stringify(stateToSave));
+          console.log('🔐 Forced localStorage save');
+        }
       },
 
       logout: () => {
@@ -58,65 +74,142 @@ export const useAuthStore = create<AuthState>()(
       },
 
       initFromCookie: async () => {
+        console.log('🔄 INIT FROM COOKIE: Starting...');
         const token = Cookies.get('auth-token');
-        if (token && !get().isAuthenticated) {
-          // Set token but don't mark as authenticated until validation succeeds
-          set({ token });
-          
-          try {
-            // Validate token first
-            const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5002/api';
-            const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
+        const currentState = get();
+        
+        console.log('🔄 Current state:', {
+          isAuthenticated: currentState.isAuthenticated,
+          hasUser: !!currentState.user,
+          hasToken: !!currentState.token,
+          cookieExists: !!token
+        });
+        
+        // If already authenticated with user data, no need to validate again
+        if (currentState.isAuthenticated && currentState.user && token) {
+          console.log('✅ Already authenticated from storage, skipping validation');
+          console.log('✅ User:', currentState.user.email);
+          return;
+        }
+        
+        // No token in cookie
+        if (!token || token.trim() === '') {
+          console.warn('⚠️ No token cookie found');
+          // Clear any stale state if no cookie exists
+          if (currentState.isAuthenticated || currentState.user) {
+            console.warn('⚠️ State exists but no cookie, clearing state');
+            set({ user: null, token: null, isAuthenticated: false });
+          }
+          return;
+        }
+        
+        // Basic JWT format validation (should have 3 parts separated by dots)
+        const parts = token.split('.');
+        if (parts.length !== 3) {
+          console.warn('Invalid token format in cookie, clearing');
+          Cookies.remove('auth-token');
+          set({ user: null, token: null, isAuthenticated: false });
+          return;
+        }
+        
+        // We have a token but no user data - restore from localStorage instead of validating
+        console.log('Found token in cookie, checking localStorage...');
+        
+        // Try to restore from localStorage first
+        if (typeof window !== 'undefined') {
+          const stored = localStorage.getItem('auth-storage');
+          if (stored) {
+            try {
+              const parsed = JSON.parse(stored);
+              if (parsed.state?.user && parsed.state?.isAuthenticated) {
+                console.log('✅ Restoring session from localStorage');
+                set({ 
+                  user: parsed.state.user, 
+                  token: parsed.state.token || token, 
+                  isAuthenticated: true 
+                });
+                return;
               }
-            });
-            
-            if (response.ok) {
-              const data = await response.json();
-              set({ user: data.user, token: data.token, isAuthenticated: true });
-            } else {
-              // Token is invalid, clear it
-              Cookies.remove('auth-token');
-              set({ user: null, token: null, isAuthenticated: false });
+            } catch (e) {
+              console.warn('Failed to parse localStorage');
             }
-          } catch (error) {
-            console.error('Token validation failed during initialization:', error);
+          }
+        }
+        
+        // If no localStorage data, we need to validate token
+        console.log('No localStorage data, validating token...');
+        set({ token }); // Set token in state
+        
+        try {
+          // Validate token and get user data
+          const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5002/api';
+          const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            }
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            set({ user: data.user, token: data.token, isAuthenticated: true });
+            console.log('✅ Session restored from token validation');
+          } else {
+            // Token is invalid, clear everything
+            console.warn('Token validation failed, clearing session');
             Cookies.remove('auth-token');
             set({ user: null, token: null, isAuthenticated: false });
           }
+        } catch (error) {
+          // Network or other error during validation
+          console.error('Error validating token:', error);
+          Cookies.remove('auth-token');
+          set({ user: null, token: null, isAuthenticated: false });
         }
       },
 
       // Validate token and get user info
       validateToken: async () => {
         const token = Cookies.get('auth-token');
-        if (token && !get().user) {
-          try {
-            const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5002/api';
-            const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
-              method: 'POST',
-              headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
-              }
-            });
-            
-            if (response.ok) {
-              const data = await response.json();
-              set({ user: data.user, token: data.token, isAuthenticated: true });
-            } else {
-              // Token is invalid, clear it
-              Cookies.remove('auth-token');
-              set({ user: null, token: null, isAuthenticated: false });
+        
+        // Only validate if we have a token AND don't already have user data
+        if (!token || token.trim() === '' || get().user) {
+          return;
+        }
+        
+        // Basic JWT format validation
+        const parts = token.split('.');
+        if (parts.length !== 3) {
+          console.warn('Invalid token format, clearing');
+          Cookies.remove('auth-token');
+          set({ user: null, token: null, isAuthenticated: false });
+          return;
+        }
+        
+        try {
+          const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5002/api';
+          const response = await fetch(`${API_BASE_URL}/auth/refresh-token`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json',
             }
-          } catch (error) {
-            console.error('Token validation failed:', error);
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            set({ user: data.user, token: data.token, isAuthenticated: true });
+            console.log('Token validated successfully');
+          } else {
+            // Token is invalid, clear it silently
             Cookies.remove('auth-token');
             set({ user: null, token: null, isAuthenticated: false });
           }
+        } catch (error) {
+          // Silent fail - this is normal for expired/invalid tokens
+          Cookies.remove('auth-token');
+          set({ user: null, token: null, isAuthenticated: false });
         }
       },
 

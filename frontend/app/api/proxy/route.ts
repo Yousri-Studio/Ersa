@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const API_BASE_URL = process.env.BACKEND_API_URL || 'http://lapi.ersa-training.com/api';
+const API_BASE_URL = process.env.BACKEND_API_URL || 'http://api.ersa-training.com/api';
 
 // Ensure API_BASE_URL ends with /api for local development
 const getBackendUrl = () => {
@@ -93,7 +93,8 @@ export async function POST(request: NextRequest) {
     
     const backendUrl = getBackendUrl();
     const apiUrl = `${backendUrl}/${cleanEndpoint}`;
-    console.log(`[API Proxy] Forwarding to: ${apiUrl}`);
+    console.log(`[API Proxy] Forwarding POST to: ${apiUrl}`);
+    console.log(`[API Proxy] Request body:`, JSON.stringify(body));
     
     // Forward authorization header if present
     const headers: HeadersInit = {
@@ -113,20 +114,38 @@ export async function POST(request: NextRequest) {
       cache: 'no-store',
     });
     
+    console.log(`[API Proxy] Backend response status: ${response.status}`);
+    
     if (!response.ok) {
-      console.error(`[API Proxy] Error: ${response.status} ${response.statusText}`);
+      // Try to get error details from response body
+      let errorDetails = response.statusText;
+      try {
+        const errorBody = await response.text();
+        console.error(`[API Proxy] Error response body:`, errorBody);
+        errorDetails = errorBody || response.statusText;
+      } catch (e) {
+        console.error(`[API Proxy] Could not read error response body`);
+      }
+      
+      console.error(`[API Proxy] Error: ${response.status} ${errorDetails}`);
       return NextResponse.json(
-        { error: `API request failed: ${response.statusText}` },
+        { error: `API request failed: ${response.statusText}`, details: errorDetails },
         { status: response.status }
       );
     }
     
     const data = await response.json();
+    console.log(`[API Proxy] Success! Response received`);
     return NextResponse.json(data);
   } catch (error) {
-    console.error('[API Proxy] Error:', error);
+    console.error('[API Proxy] Exception:', error);
+    console.error('[API Proxy] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     return NextResponse.json(
-      { error: 'API request failed', details: error instanceof Error ? error.message : 'Unknown error' },
+      { 
+        error: 'API request failed', 
+        details: error instanceof Error ? error.message : 'Unknown error',
+        type: error instanceof Error ? error.constructor.name : typeof error
+      },
       { status: 500 }
     );
   }

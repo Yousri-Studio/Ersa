@@ -10,6 +10,7 @@ import { useCartStore } from '@/lib/cart-store';
 import { usePageLoad, useStaggeredAnimation } from '@/lib/use-animations';
 import { ScrollAnimations } from '@/components/scroll-animations';
 import { useCourse } from '@/lib/content-hooks';
+import { HtmlContent } from '@/components/ui/html-content';
 import type { Course, CurriculumSection } from '@/lib/types';
 import type { LocaleString } from '@/lib/common-types';
 
@@ -501,9 +502,10 @@ export default function CourseDetailsPage() {
                       <h2 className="text-xl font-semibold text-gray-900 mb-4 font-cairo">
                         {t('course.about')}
                       </h2>
-                      <p className="text-gray-600 leading-relaxed font-cairo">
-                        {course.description ? (locale === 'ar' ? course.description.ar : course.description.en) : (locale === 'ar' ? course.summary.ar : course.summary.en)}
-                      </p>
+                      <HtmlContent 
+                        html={course.description ? (locale === 'ar' ? course.description.ar : course.description.en) : (locale === 'ar' ? course.summary.ar : course.summary.en)}
+                        className="text-gray-600 leading-relaxed font-cairo"
+                      />
                     </div>
                     
 

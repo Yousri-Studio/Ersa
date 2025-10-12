@@ -46,11 +46,7 @@ export default function AdminLayout({
         return; // Wait for hydration
       }
 
-      // Clear any corrupted storage first
-      if (typeof window !== 'undefined') {
-        const { clearCorruptedStorage } = await import('@/lib/custom-storage');
-        clearCorruptedStorage();
-      }
+      console.log('🔍 Checking admin access...');
       
       // Initialize auth from cookie first and wait for validation
       await initFromCookie();
@@ -58,11 +54,12 @@ export default function AdminLayout({
       const currentState = useAuthStore.getState();
       console.log('Admin layout check:', { 
         isAuthenticated: currentState.isAuthenticated, 
-        user: currentState.user 
+        user: currentState.user,
+        hasToken: !!currentState.token
       });
 
       if (!currentState.isAuthenticated || !currentState.user) {
-        console.log('Not authenticated, redirecting to admin login');
+        console.log('❌ Not authenticated, redirecting to admin login');
         router.push(`/${locale}/admin-login`);
         return;
       }
@@ -72,13 +69,13 @@ export default function AdminLayout({
       const hasAdminAccess = hasAdminRole || currentState.user?.isAdmin || currentState.user?.isSuperAdmin;
       
       if (!hasAdminAccess) {
-        console.log('User does not have admin access, redirecting');
+        console.log('❌ User does not have admin access, redirecting');
         toast.error(t('errors.access-denied'));
         router.push(`/${locale}/`);
         return;
       }
 
-      console.log('Admin access granted');
+      console.log('✅ Admin access granted');
       setIsLoading(false);
     };
 

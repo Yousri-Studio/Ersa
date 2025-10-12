@@ -168,26 +168,46 @@ public class AuthController : ControllerBase
         try
         {
             var authHeader = Request.Headers.Authorization.FirstOrDefault();
-            if (authHeader == null || !authHeader.StartsWith("Bearer "))
+            if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer "))
             {
+                _logger.LogWarning("Refresh token attempted without valid Authorization header");
                 return Unauthorized(new { error = "Invalid token" });
             }
 
-            var token = authHeader.Substring("Bearer ".Length);
+            var token = authHeader.Substring("Bearer ".Length).Trim();
+            
+            // Validate token is not empty or just whitespace
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                _logger.LogWarning("Refresh token attempted with empty token");
+                return Unauthorized(new { error = "Invalid token" });
+            }
+
             var userId = _jwtService.GetUserIdFromToken(token);
             
             if (userId == null)
             {
+                _logger.LogWarning("Refresh token failed: Unable to extract user ID from token");
                 return Unauthorized(new { error = "Invalid token" });
             }
 
             var user = await _userManager.FindByIdAsync(userId.ToString()!);
-            if (user == null || user.Status != UserStatus.Active)
+            if (user == null)
             {
-                return Unauthorized(new { error = "User not found or inactive" });
+                _logger.LogWarning("Refresh token failed: User {UserId} not found", userId);
+                return Unauthorized(new { error = "User not found" });
+            }
+            
+            if (user.Status != UserStatus.Active)
+            {
+                _logger.LogWarning("Refresh token failed: User {UserId} is not active (Status: {Status})", userId, user.Status);
+                return Unauthorized(new { error = "User account is not active" });
             }
 
-            var newToken = _jwtService.GenerateToken(user);
+            // Generate new token
+            var newToken = await _jwtService.GenerateTokenAsync(user);
+            
+            _logger.LogInformation("Token refreshed successfully for user {UserId}", userId);
             
             return Ok(new LoginResponse
             {
@@ -199,14 +219,19 @@ public class AuthController : ControllerBase
                     Email = user.Email!,
                     Phone = user.Phone,
                     Locale = user.Locale,
-                    CreatedAt = user.CreatedAt
+                    CreatedAt = user.CreatedAt,
+                    IsAdmin = user.IsAdmin,
+                    IsSuperAdmin = user.IsSuperAdmin,
+                    LastLoginAt = user.LastLoginAt
                 }
             });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error during token refresh");
-            return StatusCode(500, new { error = "Internal server error" });
+            // Log the actual error but don't expose it to client for security
+            _logger.LogError(ex, "Unexpected error during token refresh");
+            // Return 401 instead of 500 - token refresh failures should be treated as auth failures
+            return Unauthorized(new { error = "Token refresh failed" });
         }
     }
 

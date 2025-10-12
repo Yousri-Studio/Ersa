@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useLocale } from 'next-intl';
 import { AdminCreateCourseRequest, AdminUpdateCourseRequest, adminApi, CourseCategory, CourseSubCategory, Instructor } from '@/lib/admin-api';
 import { FileUpload } from '@/components/ui/file-upload';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
 
 interface CourseFormProps {
   initialData?: Partial<AdminCreateCourseRequest>;
@@ -221,18 +222,17 @@ export function CourseForm({ initialData, onSubmit, onCancel, isEdit = false, is
           </div>
         </div>
 
-        {/* Description Fields */}
+        {/* Description Fields - Rich Text */}
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
               {locale === 'ar' ? 'الوصف (إنجليزي)' : 'Description (English)'}
             </label>
-            <textarea
-              rows={4}
-              value={formData.descriptionEn}
-              onChange={(e) => handleChange('descriptionEn', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            <RichTextEditor
+              value={formData.descriptionEn || ''}
+              onChange={(html) => handleChange('descriptionEn', html)}
               placeholder={locale === 'ar' ? 'وصف مفصل للدورة (حد أقصى 5000 حرف)' : 'Detailed course description (max 5000 characters)'}
+              dir="ltr"
               maxLength={5000}
             />
           </div>
@@ -240,12 +240,11 @@ export function CourseForm({ initialData, onSubmit, onCancel, isEdit = false, is
             <label className="block text-sm font-medium text-gray-700 mb-1">
               {locale === 'ar' ? 'الوصف (عربي)' : 'Description (Arabic)'}
             </label>
-            <textarea
-              rows={4}
-              value={formData.descriptionAr}
-              onChange={(e) => handleChange('descriptionAr', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            <RichTextEditor
+              value={formData.descriptionAr || ''}
+              onChange={(html) => handleChange('descriptionAr', html)}
               placeholder={locale === 'ar' ? 'وصف مفصل للدورة (حد أقصى 5000 حرف)' : 'Detailed course description (max 5000 characters)'}
+              dir="rtl"
               maxLength={5000}
             />
           </div>

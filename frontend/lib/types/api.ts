@@ -10,6 +10,7 @@ export interface Course {
   slug: string;
   title: LocaleString;
   summary: LocaleString;
+  description?: LocaleString;
   price: number;
   currency: string;
   type: CourseType;

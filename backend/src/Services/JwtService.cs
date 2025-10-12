@@ -14,6 +14,7 @@ public class JwtService : IJwtService
     private readonly string _secretKey;
     private readonly string _issuer;
     private readonly string _audience;
+    private readonly int _clockSkewMinutes;
 
     public JwtService(IConfiguration configuration, UserManager<User> userManager)
     {
@@ -22,6 +23,7 @@ public class JwtService : IJwtService
         _secretKey = _configuration["Jwt:SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey is not configured");
         _issuer = _configuration["Jwt:Issuer"] ?? throw new InvalidOperationException("JWT Issuer is not configured");
         _audience = _configuration["Jwt:Audience"] ?? throw new InvalidOperationException("JWT Audience is not configured");
+        _clockSkewMinutes = _configuration.GetValue<int>("Jwt:ClockSkewMinutes", 5);
     }
 
     public async Task<string> GenerateTokenAsync(User user)
@@ -56,10 +58,28 @@ public class JwtService : IJwtService
             claims.Add(new Claim(ClaimTypes.Role, "Admin"));
         }
 
+        // Determine expiration based on user role
+        DateTime expiration;
+        var isAdminUser = user.IsAdmin || user.IsSuperAdmin || 
+                         roles.Contains("Admin") || roles.Contains("SuperAdmin");
+        
+        if (isAdminUser)
+        {
+            // Admin users: Use configured admin expiration (default 8 hours)
+            var adminExpirationHours = _configuration.GetValue<int>("Jwt:AdminExpirationInHours", 8);
+            expiration = DateTime.UtcNow.AddHours(adminExpirationHours);
+        }
+        else
+        {
+            // Regular users: Use configured expiration (default 7 days)
+            var expirationDays = _configuration.GetValue<int>("Jwt:ExpirationInDays", 7);
+            expiration = DateTime.UtcNow.AddDays(expirationDays);
+        }
+
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
-            Expires = DateTime.UtcNow.AddDays(7), // 7 days expiration
+            Expires = expiration,
             Issuer = _issuer,
             Audience = _audience,
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -91,7 +111,7 @@ public class JwtService : IJwtService
                 ValidateAudience = true,
                 ValidAudience = _audience,
                 ValidateLifetime = true,
-                ClockSkew = TimeSpan.Zero
+                ClockSkew = TimeSpan.FromMinutes(_clockSkewMinutes) // Use configured clock skew
             }, out SecurityToken validatedToken);
 
             return true;
