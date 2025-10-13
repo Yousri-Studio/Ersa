@@ -25,6 +25,30 @@ public class PaymentsController : ControllerBase
         _logger = logger;
     }
 
+    [HttpGet("config")]
+    public ActionResult<PaymentConfigResponse> GetPaymentConfig()
+    {
+        try
+        {
+            var availableGateways = _paymentService.GetAvailableGateways();
+            var defaultGateway = _paymentService.GetDefaultGateway();
+            var gatewayMethod = availableGateways.Count > 1 ? 0 : (defaultGateway == "HyperPay" ? 1 : 2);
+
+            return Ok(new PaymentConfigResponse
+            {
+                GatewayMethod = gatewayMethod,
+                AvailableGateways = availableGateways,
+                DefaultGateway = defaultGateway,
+                ShowSelector = availableGateways.Count > 1
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting payment config");
+            return StatusCode(500, new { error = "Internal server error" });
+        }
+    }
+
     [HttpPost("checkout")]
     [Authorize]
     public async Task<ActionResult<CheckoutResponse>> CreateCheckout([FromBody] CheckoutRequest request)
@@ -51,7 +75,7 @@ public class PaymentsController : ControllerBase
                 return BadRequest(new { error = "Order is not in pending status" });
             }
 
-            var redirectUrl = await _paymentService.CreateCheckoutUrlAsync(order, request.ReturnUrl);
+            var redirectUrl = await _paymentService.CreateCheckoutUrlAsync(order, request.ReturnUrl, request.PaymentProvider);
 
             return Ok(new CheckoutResponse
             {
@@ -65,7 +89,60 @@ public class PaymentsController : ControllerBase
         }
     }
 
+    [HttpPost("hyperpay/webhook")]
+    public async Task<IActionResult> HyperPayWebhook()
+    {
+        try
+        {
+            var payload = await new StreamReader(Request.Body).ReadToEndAsync();
+            var signature = Request.Headers["X-Signature"].FirstOrDefault() ?? "";
+
+            var success = await _paymentService.ProcessWebhookAsync(payload, signature, "HyperPay");
+            
+            if (success)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error processing HyperPay webhook");
+            return StatusCode(500);
+        }
+    }
+
+    [HttpPost("clickpay/webhook")]
+    public async Task<IActionResult> ClickPayWebhook()
+    {
+        try
+        {
+            var payload = await new StreamReader(Request.Body).ReadToEndAsync();
+            var signature = Request.Headers["X-Signature"].FirstOrDefault() ?? "";
+
+            var success = await _paymentService.ProcessWebhookAsync(payload, signature, "ClickPay");
+            
+            if (success)
+            {
+                return Ok();
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error processing ClickPay webhook");
+            return StatusCode(500);
+        }
+    }
+
     [HttpPost("webhook")]
+    [Obsolete("Use provider-specific webhook endpoints: /hyperpay/webhook or /clickpay/webhook")]
     public async Task<IActionResult> PaymentWebhook()
     {
         try
@@ -73,7 +150,8 @@ public class PaymentsController : ControllerBase
             var payload = await new StreamReader(Request.Body).ReadToEndAsync();
             var signature = Request.Headers["X-Signature"].FirstOrDefault() ?? "";
 
-            var success = await _paymentService.ProcessWebhookAsync(payload, signature);
+            // Default to HyperPay for backward compatibility
+            var success = await _paymentService.ProcessWebhookAsync(payload, signature, "HyperPay");
             
             if (success)
             {

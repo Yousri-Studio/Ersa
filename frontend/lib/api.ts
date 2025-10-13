@@ -321,11 +321,23 @@ export const ordersApi = {
     api.get(`/orders/${orderId}`),
 };
 
+// Payment Gateway Types
+export interface PaymentConfig {
+  gatewayMethod: number; // 0 = Both, 1 = HyperPay only, 2 = ClickPay only
+  availableGateways: string[];
+  defaultGateway: string;
+  showSelector: boolean;
+}
+
 // Payments API
 export const paymentsApi = {
+  getConfig: (): Promise<AxiosResponse<PaymentConfig>> =>
+    api.get('/payments/config'),
+
   createCheckout: (data: {
     orderId: string;
     returnUrl: string;
+    paymentProvider?: string;
   }): Promise<AxiosResponse<{ redirectUrl: string }>> =>
     api.post('/payments/checkout', data),
 };

@@ -26,11 +26,24 @@ public class CheckoutRequest
     [Required]
     [Url]
     public string ReturnUrl { get; set; } = string.Empty;
+
+    /// <summary>
+    /// Optional payment provider. If null, uses default based on configuration.
+    /// </summary>
+    public string? PaymentProvider { get; set; }
 }
 
 public class CheckoutResponse
 {
     public string RedirectUrl { get; set; } = string.Empty;
+}
+
+public class PaymentConfigResponse
+{
+    public int GatewayMethod { get; set; }
+    public List<string> AvailableGateways { get; set; } = new();
+    public string DefaultGateway { get; set; } = string.Empty;
+    public bool ShowSelector { get; set; }
 }
 
 public class PaymentWebhookRequest

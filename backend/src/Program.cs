@@ -119,8 +119,12 @@ else
     builder.Services.AddScoped<IFileStorageService, LocalFileStorageService>();
 }
 
-// HTTP Client for payment service
-builder.Services.AddHttpClient<IPaymentService, PaymentService>();
+// HTTP Client for payment gateways
+builder.Services.AddHttpClient();
+
+// Payment Gateway Services
+builder.Services.AddScoped<IPaymentGateway, HyperPayGateway>();
+builder.Services.AddScoped<IPaymentGateway, ClickPayGateway>();
 
 // Application Services
 builder.Services.AddScoped<IJwtService, JwtService>();
