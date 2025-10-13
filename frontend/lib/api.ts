@@ -240,25 +240,25 @@ export interface OrderItem {
 // Auth API
 export const authApi = {
   login: (data: LoginRequest): Promise<AxiosResponse<LoginResponse>> =>
-    api.post('/api/auth/login', data),
+    api.post('/auth/login', data),
 
   publicLogin: (data: LoginRequest): Promise<AxiosResponse<LoginResponse>> =>
-    api.post('/api/auth/public-login', data),
+    api.post('/auth/public-login', data),
 
   adminLogin: (data: LoginRequest): Promise<AxiosResponse<LoginResponse>> =>
-    api.post('/api/auth/admin-login', data),
+    api.post('/auth/admin-login', data),
 
   register: (data: RegisterRequest): Promise<AxiosResponse<RegisterResponse>> =>
-    api.post('/api/auth/register', data),
+    api.post('/auth/register', data),
 
   verifyEmail: (data: VerifyEmailRequest): Promise<AxiosResponse<LoginResponse>> =>
-    api.post('/api/auth/verify-email', data),
+    api.post('/auth/verify-email', data),
 
   resendVerificationCode: (data: ResendVerificationRequest): Promise<AxiosResponse<{ message: string }>> =>
-    api.post('/api/auth/resend-verification', data),
+    api.post('/auth/resend-verification', data),
 
   refreshToken: (): Promise<AxiosResponse<LoginResponse>> =>
-    api.post('/api/auth/refresh-token'),
+    api.post('/auth/refresh-token'),
 };
 
 // Courses API

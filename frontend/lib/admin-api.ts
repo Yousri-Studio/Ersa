@@ -634,7 +634,7 @@ export const adminApi = {
   // Dashboard - with fallback support
   getDashboardStats: async () => {
     const result = await apiCallWithFallback(
-      () => api.get<DashboardStats>('/api/admin/dashboard-stats'),
+      () => api.get<DashboardStats>('/admin/dashboard-stats'),
       fallbackDashboardStats,
       { fallbackMessage: 'Backend not available, using demo dashboard data' }
     );
@@ -649,7 +649,7 @@ export const adminApi = {
     status?: string;
   }) => {
     const result = await apiCallWithFallback(
-      () => api.get<PagedResult<AdminUser>>('/api/admin/users', { params: { ...params } }),
+      () => api.get<PagedResult<AdminUser>>('/admin/users', { params: { ...params } }),
       fallbackUsers,
       { fallbackMessage: 'Backend not available, using demo user data' }
     );
@@ -657,13 +657,13 @@ export const adminApi = {
   },
 
   updateUserStatus: (userId: string, data: UpdateUserStatusRequest) =>
-    api.put(`/api/admin/users/${userId}/status`, data),
+    api.put(`/admin/users/${userId}/status`, data),
 
   updateAdminRole: (userId: string, data: UpdateAdminRoleRequest) =>
-    api.put(`/api/admin/users/${userId}/admin-role`, data),
+    api.put(`/admin/users/${userId}/admin-role`, data),
 
   createUser: (data: CreateUserRequest) =>
-    api.post<AdminUser>('/api/admin/users', data),
+    api.post<AdminUser>('/admin/users', data),
 
   // Courses - with fallback support
   getCourses: async (params: {
@@ -674,7 +674,7 @@ export const adminApi = {
     categoryId?: string;
   }) => {
     const result = await apiCallWithFallback(
-      () => api.get<PagedResult<AdminCourse>>('/api/admin/courses', { params: { ...params } }),
+      () => api.get<PagedResult<AdminCourse>>('/admin/courses', { params: { ...params } }),
       fallbackCourses,
       { fallbackMessage: 'Backend not available, using demo course data' }
     );
@@ -689,7 +689,7 @@ export const adminApi = {
         ? btoa(new Uint8Array(data.photo).reduce((acc, byte) => acc + String.fromCharCode(byte), ''))
         : null
     };
-    return api.post<AdminCourse>('/api/admin/courses', requestData);
+    return api.post<AdminCourse>('/admin/courses', requestData);
   },
 
   updateCourse: (courseId: string, data: AdminUpdateCourseRequest) => {
@@ -700,49 +700,49 @@ export const adminApi = {
         ? btoa(new Uint8Array(data.photo).reduce((acc, byte) => acc + String.fromCharCode(byte), ''))
         : null
     };
-    return api.put<AdminCourse>(`/api/admin/courses/${courseId}`, requestData);
+    return api.put<AdminCourse>(`/admin/courses/${courseId}`, requestData);
   },
 
   deleteCourse: (courseId: string) =>
-    api.delete(`/api/admin/courses/${courseId}`),
+    api.delete(`/admin/courses/${courseId}`),
 
   // Course Categories
   getCourseCategories: async (params?: {
     activeOnly?: boolean;
   }) => {
-    return api.get<CourseCategory[]>('/api/admin/course-categories', { params: { ...params } });
+    return api.get<CourseCategory[]>('/admin/course-categories', { params: { ...params } });
   },
 
   getCourseCategory: (categoryId: string) =>
-    api.get<CourseCategory>(`/api/admin/course-categories/${categoryId}`),
+    api.get<CourseCategory>(`/admin/course-categories/${categoryId}`),
 
   createCourseCategory: (data: CreateCourseCategoryRequest) =>
-    api.post<CourseCategory>('/api/admin/course-categories', data),
+    api.post<CourseCategory>('/admin/course-categories', data),
 
   updateCourseCategory: (categoryId: string, data: UpdateCourseCategoryRequest) =>
-    api.put<CourseCategory>(`/api/admin/course-categories/${categoryId}`, data),
+    api.put<CourseCategory>(`/admin/course-categories/${categoryId}`, data),
 
   deleteCourseCategory: (categoryId: string) =>
-    api.delete(`/api/admin/course-categories/${categoryId}`),
+    api.delete(`/admin/course-categories/${categoryId}`),
 
   // Course SubCategories
   getCourseSubCategories: async (params?: {
     activeOnly?: boolean;
   }) => {
-    return api.get<CourseSubCategory[]>('/api/admin/course-subcategories', { params: { ...params } });
+    return api.get<CourseSubCategory[]>('/admin/course-subcategories', { params: { ...params } });
   },
 
   getCourseSubCategory: (subCategoryId: string) =>
-    api.get<CourseSubCategory>(`/api/admin/course-subcategories/${subCategoryId}`),
+    api.get<CourseSubCategory>(`/admin/course-subcategories/${subCategoryId}`),
 
   createCourseSubCategory: (data: CreateCourseSubCategoryRequest) =>
-    api.post<CourseSubCategory>('/api/admin/course-subcategories', data),
+    api.post<CourseSubCategory>('/admin/course-subcategories', data),
 
   updateCourseSubCategory: (subCategoryId: string, data: UpdateCourseSubCategoryRequest) =>
-    api.put<CourseSubCategory>(`/api/admin/course-subcategories/${subCategoryId}`, data),
+    api.put<CourseSubCategory>(`/admin/course-subcategories/${subCategoryId}`, data),
 
   deleteCourseSubCategory: (subCategoryId: string) =>
-    api.delete(`/api/admin/course-subcategories/${subCategoryId}`),
+    api.delete(`/admin/course-subcategories/${subCategoryId}`),
 
   // Orders - with fallback support
   getOrders: async (params: {
@@ -761,7 +761,7 @@ export const adminApi = {
   },
 
   updateOrderStatus: (orderId: string, data: UpdateOrderStatusRequest) =>
-    api.put(`/api/admin/orders/${orderId}/status`, data),
+    api.put(`/admin/orders/${orderId}/status`, data),
 
   getOrderDetail: async (orderId: string) => {
     const fallbackOrderDetail: AdminOrderDetail = {
@@ -815,55 +815,55 @@ export const adminApi = {
   },
     
   // Instructors
-  getInstructors: () => api.get<Instructor[]>('/api/admin/instructors'),
+  getInstructors: () => api.get<Instructor[]>('/admin/instructors'),
 
-  getInstructor: (id: string) => api.get<Instructor>(`/api/admin/instructors/${id}`),
+  getInstructor: (id: string) => api.get<Instructor>(`/admin/instructors/${id}`),
 
   createInstructor: (data: CreateInstructorRequest) =>
-    api.post<Instructor>('/api/admin/instructors', data),
+    api.post<Instructor>('/admin/instructors', data),
 
   updateInstructor: (id: string, data: UpdateInstructorRequest) =>
-    api.put<Instructor>(`/api/admin/instructors/${id}`, data),
+    api.put<Instructor>(`/admin/instructors/${id}`, data),
 
-  deleteInstructor: (id: string) => api.delete(`/api/admin/instructors/${id}`),
+  deleteInstructor: (id: string) => api.delete(`/admin/instructors/${id}`),
 
   // Content Management
-  getContentPages: () => api.get<ContentPage[]>('/api/content/pages'),
+  getContentPages: () => api.get<ContentPage[]>('/content/pages'),
 
   getContentPage: (id: string) =>
-    api.get<ContentPage>(`/api/content/pages/${id}`),
+    api.get<ContentPage>(`/content/pages/${id}`),
 
   createContentPage: (data: CreateContentPage) =>
-    api.post<ContentPage>('/api/content/pages', data),
+    api.post<ContentPage>('/content/pages', data),
 
   updateContentPage: (id: string, data: UpdateContentPage) =>
-    api.put<ContentPage>(`/api/content/pages/${id}`, data),
+    api.put<ContentPage>(`/content/pages/${id}`, data),
 
   deleteContentPage: (id: string) =>
-    api.delete(`/api/content/pages/${id}`),
+    api.delete(`/content/pages/${id}`),
 
   createContentSection: (pageId: string, data: CreateContentSection) =>
-    api.post<ContentSection>(`/api/content/pages/${pageId}/sections`, data),
+    api.post<ContentSection>(`/content/pages/${pageId}/sections`, data),
 
   updateContentSection: (pageId: string, sectionId: string, data: UpdateContentSection) =>
-    api.put<ContentSection>(`/api/content/pages/${pageId}/sections/${sectionId}`, data),
+    api.put<ContentSection>(`/content/pages/${pageId}/sections/${sectionId}`, data),
 
   deleteContentSection: (pageId: string, sectionId: string) =>
-    api.delete(`/api/content/pages/${pageId}/sections/${sectionId}`),
+    api.delete(`/content/pages/${pageId}/sections/${sectionId}`),
 
   createContentBlock: (pageId: string, sectionId: string, data: CreateContentBlock) =>
-    api.post<ContentBlock>(`/api/content/pages/${pageId}/sections/${sectionId}/blocks`, data),
+    api.post<ContentBlock>(`/content/pages/${pageId}/sections/${sectionId}/blocks`, data),
 
   updateContentBlock: (pageId: string, sectionId: string, blockId: string, data: UpdateContentBlock) =>
-    api.put<ContentBlock>(`/api/content/pages/${pageId}/sections/${sectionId}/blocks/${blockId}`, data),
+    api.put<ContentBlock>(`/content/pages/${pageId}/sections/${sectionId}/blocks/${blockId}`, data),
 
   deleteContentBlock: (pageId: string, sectionId: string, blockId: string) =>
-    api.delete(`/api/content/pages/${pageId}/sections/${sectionId}/blocks/${blockId}`),
+    api.delete(`/content/pages/${pageId}/sections/${sectionId}/blocks/${blockId}`),
 
   uploadFile: (file: File) => {
     const formData = new FormData();
     formData.append('file', file);
-    return api.post<FileUploadResponse>('/api/content/upload', formData, {
+    return api.post<FileUploadResponse>('/content/upload', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },
@@ -871,32 +871,32 @@ export const adminApi = {
   },
 
   getPageContent: (pageKey: string) =>
-    api.get<PageContent>(`/api/content/pages/key/${pageKey}`),
+    api.get<PageContent>(`/content/pages/key/${pageKey}`),
 
   getContentVersions: (pageId: string) =>
-    api.get<ContentVersion[]>(`/api/content/pages/${pageId}/versions`),
+    api.get<ContentVersion[]>(`/content/pages/${pageId}/versions`),
 
   createContentVersion: (pageId: string, data: CreateContentVersion) =>
-    api.post<ContentVersion>(`/api/content/pages/${pageId}/versions`, data),
+    api.post<ContentVersion>(`/content/pages/${pageId}/versions`, data),
 
   publishContentVersion: (pageId: string, versionId: string) =>
-    api.post(`/api/content/pages/${pageId}/versions/${versionId}/publish`),
+    api.post(`/content/pages/${pageId}/versions/${versionId}/publish`),
 
   // Role Management (SuperAdmin only)
   getUsersWithRoles: () =>
-    api.get<UserWithRoles[]>('/api/admin/users-with-roles'),
+    api.get<UserWithRoles[]>('/admin/users-with-roles'),
 
   assignRoleToUser: (email: string, roleName: string) =>
-    api.post(`/api/admin/users/${encodeURIComponent(email)}/roles/${roleName}`),
+    api.post(`/admin/users/${encodeURIComponent(email)}/roles/${roleName}`),
 
   removeRoleFromUser: (email: string, roleName: string) =>
-    api.delete(`/api/admin/users/${encodeURIComponent(email)}/roles/${roleName}`),
+    api.delete(`/admin/users/${encodeURIComponent(email)}/roles/${roleName}`),
 
   getAllRoles: () =>
-    api.get<RoleInfo[]>('/api/role/roles'),
+    api.get<RoleInfo[]>('/role/roles'),
 
   getUserRoles: (email: string) =>
-    api.get<string[]>(`/api/role/user/${encodeURIComponent(email)}/roles`),
+    api.get<string[]>(`/role/user/${encodeURIComponent(email)}/roles`),
 };
 
 
