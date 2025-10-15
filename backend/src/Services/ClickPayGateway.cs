@@ -48,7 +48,7 @@ public class ClickPayGateway : IPaymentGateway
                 tran_class = "ecom",
                 cart_id = order.Id.ToString(),
                 cart_description = $"Order {order.Id}",
-                cart_currency = config["Currency"] ?? "SAR",
+                cart_currency = order.Currency ?? "SAR",// config["Currency"] ?? "SAR",
                 cart_amount = order.Amount.ToString("F2"),
                 callback = $"{_configuration["App:BaseUrl"]}/api/payments/clickpay/webhook",
                 @return = returnUrl,

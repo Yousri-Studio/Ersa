@@ -10,7 +10,7 @@ public class Payment
     
     [Required]
     [MaxLength(50)]
-    public string Provider { get; set; } = string.Empty; // HyperPay, Tabby, Tamara
+    public string Provider { get; set; } = string.Empty; // HyperPay, Tabby, Tamara, ClickPay
     
     [MaxLength(255)]
     public string? ProviderRef { get; set; }

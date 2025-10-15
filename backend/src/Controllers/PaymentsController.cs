@@ -177,8 +177,8 @@ public class PaymentsController : ControllerBase
             // Handle payment return from HyperPay
             // This is typically a GET request that redirects the user back to the frontend
             // You can extract order information and redirect to appropriate success/failure page
-            
-            var frontendUrl = "https://your-frontend-domain.com"; // Get from configuration
+
+            var frontendUrl = $"{_configuration["App:Frontend"]}"; //"https://your-frontend-domain.com"; // Get from configuration
             
             if (!string.IsNullOrEmpty(orderId) && Guid.TryParse(orderId, out var orderGuid))
             {
@@ -201,7 +201,7 @@ public class PaymentsController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error handling payment return");
-            return Redirect($"https://your-frontend-domain.com/checkout/failed");
+            return Redirect($"{_configuration["App:Frontend"]}/checkout/failed");//Redirect($"https://your-frontend-domain.com/checkout/failed");
         }
     }
 

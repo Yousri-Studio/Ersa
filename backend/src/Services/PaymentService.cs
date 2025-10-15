@@ -239,7 +239,7 @@ public class PaymentService : IPaymentService
     public string GetDefaultGateway()
     {
         var gatewayMethod = _configuration.GetValue<int>("PaymentGateway:GatewayMethod");
-        var defaultGateway = _configuration["PaymentGateway:DefaultGateway"] ?? "HyperPay";
+        var defaultGateway = _configuration["PaymentGateway:DefaultGateway"] ?? "ClickPay";
         
         return gatewayMethod switch
         {
