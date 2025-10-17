@@ -27,11 +27,11 @@ interface OrderItem {
   qty: number;
 }
 
-interface Order {
+interface MyOrder {
   id: string;
   amount: number;
   currency: string;
-  status: string; // Will be one of: New, PendingPayment, Paid, Failed, Cancelled, UnderProcess, Processed, Expired, Refunded
+  status: string;
   createdAt: string;
   updatedAt: string;
   items: OrderItem[];
@@ -45,7 +45,7 @@ export default function MyOrdersPage() {
   const isHydrated = useHydration();
   const isLoaded = usePageLoad(100);
   
-  const [orders, setOrders] = useState<Order[]>([]);
+  const [orders, setOrders] = useState<MyOrder[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null); // Track which button is loading
@@ -67,7 +67,7 @@ export default function MyOrdersPage() {
       console.log('📦 Fetching user orders...');
       const response = await ordersApi.getUserOrders();
       console.log('✅ Orders fetched:', response.data);
-      setOrders(response.data || []);
+      setOrders((response.data as MyOrder[]) || []);
       setError(null);
     } catch (err: any) {
       console.error('❌ Error fetching orders:', err);
