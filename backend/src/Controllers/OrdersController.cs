@@ -87,15 +87,31 @@ public class OrdersController : ControllerBase
                 UserId = userId.Value,
                 Amount = totalAmount,
                 Currency = currency,
-                Status = OrderStatus.New,
+                Status = OrderStatus.PendingPayment,
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
             };
 
             _context.Orders.Add(order);
             
-            // Store order items (you might want to create an OrderItem entity for this)
-            // For now, we'll keep the cart items linked to the order through a separate mechanism
+            // Create order items from cart items
+            foreach (var cartItem in cart.Items)
+            {
+                var orderItem = new OrderItem
+                {
+                    Id = Guid.NewGuid(),
+                    OrderId = order.Id,
+                    CourseId = cartItem.CourseId,
+                    SessionId = cartItem.SessionId,
+                    CourseTitleEn = cartItem.Course.TitleEn,
+                    CourseTitleAr = cartItem.Course.TitleAr,
+                    Price = cartItem.Course.Price,
+                    Currency = cartItem.Course.Currency,
+                    Qty = cartItem.Qty,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.OrderItems.Add(orderItem);
+            }
             
             await _context.SaveChangesAsync();
 

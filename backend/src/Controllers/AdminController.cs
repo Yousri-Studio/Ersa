@@ -406,6 +406,7 @@ public class AdminController : ControllerBase
         {
             var query = _context.Orders
                 .Include(o => o.User)
+                .Include(o => o.OrderItems)
                 .AsQueryable();
 
             if (status.HasValue)
@@ -436,7 +437,9 @@ public class AdminController : ControllerBase
                     TotalAmount = o.Amount,
                     Status = o.Status,
                     CreatedAt = o.CreatedAt,
-                    UpdatedAt = o.UpdatedAt
+                    UpdatedAt = o.UpdatedAt,
+                    CourseNames = string.Join(", ", o.OrderItems.Select(oi => oi.CourseTitleEn ?? "Unknown Course")),
+                    CourseType = o.OrderItems.Any() ? "Online" : "N/A"
                 })
                 .ToListAsync();
 

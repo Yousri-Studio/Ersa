@@ -63,10 +63,10 @@ export function AuthForm({ defaultMode = 'login' }: AuthFormProps) {
       }
       
       login(token, user);
-      toast.success('تم تسجيل الدخول بنجاح!');
+      toast.success(t('auth.login.success'));
       router.push(`/${locale}/`);
     } catch (error: any) {
-      const message = error.response?.data?.error || 'بيانات تسجيل الدخول غير صحيحة';
+      const message = error.response?.data?.error || t('auth.login.error');
       toast.error(message);
     } finally {
       setIsLoading(false);
@@ -78,13 +78,17 @@ export function AuthForm({ defaultMode = 'login' }: AuthFormProps) {
     
     try {
       const { confirmPassword, ...registerData } = data;
+      // Convert empty phone string to undefined for proper validation
+      if (registerData.phone === '') {
+        registerData.phone = undefined;
+      }
       const response = await authApi.register(registerData);
-      const message = response.data?.message || 'تم إنشاء الحساب بنجاح!';
+      const message = response.data?.message || t('auth.register.success');
       
       toast.success(message);
       router.push(`/${locale}/auth/verify-email?email=${encodeURIComponent(data.email)}`);
     } catch (error: any) {
-      const message = error.response?.data?.error || 'فشل في إنشاء الحساب';
+      const message = error.response?.data?.error || t('auth.register.error');
       toast.error(message);
     } finally {
       setIsLoading(false);
@@ -110,7 +114,7 @@ export function AuthForm({ defaultMode = 'login' }: AuthFormProps) {
       window.location.href = `${apiUrl}/api/auth/google`;
     } catch (error) {
       console.error('Google authentication error:', error);
-      toast.error('فشل في تسجيل الدخول باستخدام Google');
+      toast.error(t('auth.social.google-error'));
       setIsLoading(false);
     }
   };
@@ -140,17 +144,17 @@ export function AuthForm({ defaultMode = 'login' }: AuthFormProps) {
         if (authResponse.ok) {
           const data = await authResponse.json();
           login(data.token, data.user);
-          toast.success('تم تسجيل الدخول بنجاح!');
+          toast.success(t('auth.login.success'));
           router.push(`/${locale}/`);
         } else {
           throw new Error('Apple authentication failed');
         }
       } else {
-        toast.error('Apple Sign-In غير متاح. يرجى استخدام البريد الإلكتروني وكلمة المرور.');
+        toast.error(t('auth.social.apple-unavailable'));
       }
     } catch (error) {
       console.error('Apple authentication error:', error);
-      toast.error('فشل في تسجيل الدخول باستخدام Apple');
+      toast.error(t('auth.social.apple-error'));
     } finally {
       setIsLoading(false);
     }
@@ -178,7 +182,7 @@ export function AuthForm({ defaultMode = 'login' }: AuthFormProps) {
             {/* Welcome Badge */}
             <div className={`mb-6 ${isLoaded ? 'animate-fade-in-up stagger-1' : 'opacity-0'}`}>
               <span className="font-cairo" style={{ color: '#1A1928', fontSize: '16px', fontWeight: 700 }}>
-                مرحباً بك عزيزي 👋
+                {t('auth.welcome')}
               </span>
             </div>
             
@@ -200,7 +204,7 @@ export function AuthForm({ defaultMode = 'login' }: AuthFormProps) {
                     height: '46px'
                   }}
                 >
-                  تسجيل الدخول
+                  {t('auth.tab-login')}
                 </button>
                 <button
                   type="button"
@@ -217,7 +221,7 @@ export function AuthForm({ defaultMode = 'login' }: AuthFormProps) {
                     height: '46px'
                   }}
                 >
-                  إنشاء حساب جديد
+                  {t('auth.tab-register')}
                 </button>
               </div>
             </div>
@@ -231,7 +235,7 @@ export function AuthForm({ defaultMode = 'login' }: AuthFormProps) {
                 fontWeight: 700
               }}
             >
-              {mode === 'login' ? 'تسجيل الدخول' : 'إنشاء حساب جديد'}
+              {mode === 'login' ? t('auth.login.title') : t('auth.register.title')}
             </h1>
             
             {/* Subtitle */}
@@ -243,10 +247,7 @@ export function AuthForm({ defaultMode = 'login' }: AuthFormProps) {
                 fontWeight: 400
               }}
             >
-              {mode === 'login' 
-                ? 'سجل الدخول للوصول إلى منصتك التدريبية المتميزة'
-                : 'أنشئ حساباً جديداً للوصول إلى منصتك التدريبية المتميزة'
-              }
+              {mode === 'login' ? t('auth.login.subtitle') : t('auth.register.subtitle')}
             </p>
           </div>
           
@@ -258,29 +259,29 @@ export function AuthForm({ defaultMode = 'login' }: AuthFormProps) {
                 <div>
                   <label 
                     htmlFor="login-email" 
-                    className="block font-cairo mb-2"
+                    className={`block font-cairo mb-2 ${locale === 'ar' ? 'text-right' : 'text-left'}`}
                     style={{ color: '#292561', fontWeight: 700, fontSize: '12px' }}
                   >
-                    البريد الإلكتروني
+                    {t('auth.login.email')}
                   </label>
                   <div className="relative">
                     <input
                       {...loginForm.register('email', {
-                        required: 'البريد الإلكتروني مطلوب',
+                        required: t('auth.validation.email-required'),
                         pattern: {
                           value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                          message: 'عنوان بريد إلكتروني غير صحيح',
+                          message: t('auth.validation.email-invalid'),
                         },
                       })}
                       type="email"
                       autoComplete="email"
-                      className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo"
-                      placeholder="example@domain.com"
-                      style={{ fontSize: '14px' }}
+                      className={`w-full px-4 py-3 ${locale === 'ar' ? 'pr-10 text-right' : 'pl-10 text-left'} border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo`}
+                      placeholder={t('auth.register.email-placeholder')}
+                      style={{ fontSize: '14px', direction: locale === 'ar' ? 'rtl' : 'ltr' }}
                     />
                     <Icon 
                       name="envelope" 
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4"
+                      className={`absolute ${locale === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 h-4 w-4`}
                       style={{ color: '#00AC96' }} 
                     />
                   </div>
@@ -293,34 +294,34 @@ export function AuthForm({ defaultMode = 'login' }: AuthFormProps) {
                 <div>
                   <label 
                     htmlFor="login-password" 
-                    className="block font-cairo mb-2"
+                    className={`block font-cairo mb-2 ${locale === 'ar' ? 'text-right' : 'text-left'}`}
                     style={{ color: '#292561', fontWeight: 700, fontSize: '12px' }}
                   >
-                    كلمة المرور
+                    {t('auth.login.password')}
                   </label>
                   <div className="relative">
                     <input
                       {...loginForm.register('password', {
-                        required: 'كلمة المرور مطلوبة',
+                        required: t('auth.validation.password-required'),
                         minLength: {
                           value: 6,
-                          message: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل',
+                          message: t('auth.validation.password-min-length'),
                         },
                       })}
                       type={showPassword ? 'text' : 'password'}
                       autoComplete="current-password"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo pl-10 pr-10"
-                      placeholder="••••••••"
-                      style={{ fontSize: '14px' }}
+                      className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo ${locale === 'ar' ? 'pl-10 pr-10 text-right' : 'pl-10 pr-10 text-left'}`}
+                      placeholder={t('auth.register.password-placeholder')}
+                      style={{ fontSize: '14px', direction: locale === 'ar' ? 'rtl' : 'ltr' }}
                     />
                     <Icon 
                       name="lock" 
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4"
+                      className={`absolute ${locale === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 h-4 w-4`}
                       style={{ color: '#00AC96' }} 
                     />
                     <button
                       type="button"
-                      className="absolute inset-y-0 left-0 pl-3 flex items-center"
+                      className={`absolute inset-y-0 ${locale === 'ar' ? 'left-0 pl-3' : 'right-0 pr-3'} flex items-center`}
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? (
@@ -337,15 +338,15 @@ export function AuthForm({ defaultMode = 'login' }: AuthFormProps) {
               </div>
 
               {/* Remember me and Forgot password */}
-              <div className="flex items-center justify-between">
+              <div className={`flex items-center ${locale === 'ar' ? 'justify-between flex-row-reverse' : 'justify-between'}`}>
                 <div className="flex items-center">
                   <input
                     id="remember"
                     type="checkbox"
                     className="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded"
                   />
-                  <label htmlFor="remember" className="mr-2 block text-sm text-gray-900 font-cairo">
-                    تذكرني
+                  <label htmlFor="remember" className={`${locale === 'ar' ? 'mr-2' : 'ml-2'} block text-sm text-gray-900 font-cairo`}>
+                    {t('auth.login.remember')}
                   </label>
                 </div>
 
@@ -354,7 +355,7 @@ export function AuthForm({ defaultMode = 'login' }: AuthFormProps) {
                     href="#"
                     className="font-medium text-teal-600 hover:text-teal-500 font-cairo"
                   >
-                    نسيت كلمة المرور؟
+                    {t('auth.login.forgot')}
                   </a>
                 </div>
               </div>
@@ -374,10 +375,10 @@ export function AuthForm({ defaultMode = 'login' }: AuthFormProps) {
                   {isLoading ? (
                     <div className="flex items-center">
                       <div className="spinner mr-2" />
-                      جارٍ تسجيل الدخول...
+                      {t('auth.login.submitting')}
                     </div>
                   ) : (
-                    'تسجيل الدخول'
+                    t('auth.login.submit')
                   )}
                 </button>
               </div>
@@ -388,7 +389,7 @@ export function AuthForm({ defaultMode = 'login' }: AuthFormProps) {
                   <div className="w-full border-t border-gray-300" />
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500 font-cairo">أو</span>
+                  <span className="px-2 bg-white text-gray-500 font-cairo">{t('auth.or')}</span>
                 </div>
               </div>
 
@@ -402,7 +403,7 @@ export function AuthForm({ defaultMode = 'login' }: AuthFormProps) {
                 >
                   <Image
                     src="/images/Apple Button.svg"
-                    alt="المتابعة بحساب Apple"
+                    alt={t('auth.social.apple-alt')}
                     width={80}
                     height={80}
                     style={{ width: '4rem', height: '4rem' }}
@@ -417,7 +418,7 @@ export function AuthForm({ defaultMode = 'login' }: AuthFormProps) {
                 >
                   <Image
                     src="/images/Google Button.svg"
-                    alt="المتابعة بحساب Google"
+                    alt={t('auth.social.google-alt')}
                     width={80}
                     height={80}
                     style={{ width: '4rem', height: '4rem' }}
@@ -436,29 +437,29 @@ export function AuthForm({ defaultMode = 'login' }: AuthFormProps) {
                 <div>
                   <label 
                     htmlFor="fullName" 
-                    className="block font-cairo mb-2"
+                    className={`block font-cairo mb-2 ${locale === 'ar' ? 'text-right' : 'text-left'}`}
                     style={{ color: '#292561', fontWeight: 700, fontSize: '12px' }}
                   >
-                    الاسم الكامل
+                    {t('auth.register.full-name')}
                   </label>
                   <div className="relative">
                     <input
                       {...registerForm.register('fullName', {
-                        required: 'الاسم الكامل مطلوب',
+                        required: t('auth.validation.full-name-required'),
                         minLength: {
                           value: 2,
-                          message: 'الاسم يجب أن يكون حرفين على الأقل',
+                          message: t('auth.validation.full-name-min-length'),
                         },
                       })}
                       type="text"
                       autoComplete="name"
-                      className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo"
-                      placeholder="أدخل اسمك الكامل"
-                      style={{ fontSize: '14px' }}
+                      className={`w-full px-4 py-3 ${locale === 'ar' ? 'pr-10 text-right' : 'pl-10 text-left'} border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo`}
+                      placeholder={t('auth.register.full-name-placeholder')}
+                      style={{ fontSize: '14px', direction: locale === 'ar' ? 'rtl' : 'ltr' }}
                     />
                     <Icon 
                       name="user" 
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4"
+                      className={`absolute ${locale === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 h-4 w-4`}
                       style={{ color: '#00AC96' }}
                     />
                   </div>
@@ -471,29 +472,29 @@ export function AuthForm({ defaultMode = 'login' }: AuthFormProps) {
                 <div>
                   <label 
                     htmlFor="register-email" 
-                    className="block font-cairo mb-2"
+                    className={`block font-cairo mb-2 ${locale === 'ar' ? 'text-right' : 'text-left'}`}
                     style={{ color: '#292561', fontWeight: 700, fontSize: '12px' }}
                   >
-                    البريد الإلكتروني
+                    {t('auth.register.email')}
                   </label>
                   <div className="relative">
                     <input
                       {...registerForm.register('email', {
-                        required: 'البريد الإلكتروني مطلوب',
+                        required: t('auth.validation.email-required'),
                         pattern: {
                           value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                          message: 'عنوان بريد إلكتروني غير صحيح',
+                          message: t('auth.validation.email-invalid'),
                         },
                       })}
                       type="email"
                       autoComplete="email"
-                      className="w-full px-4 py-3 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo"
-                      placeholder="example@domain.com"
-                      style={{ fontSize: '14px' }}
+                      className={`w-full px-4 py-3 ${locale === 'ar' ? 'pr-10 text-right' : 'pl-10 text-left'} border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo`}
+                      placeholder={t('auth.register.email-placeholder')}
+                      style={{ fontSize: '14px', direction: locale === 'ar' ? 'rtl' : 'ltr' }}
                     />
                     <Icon 
                       name="envelope" 
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4"
+                      className={`absolute ${locale === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 h-4 w-4`}
                       style={{ color: '#00AC96' }} 
                     />
                   </div>
@@ -506,19 +507,19 @@ export function AuthForm({ defaultMode = 'login' }: AuthFormProps) {
                 <div>
                   <label 
                     htmlFor="phone" 
-                    className="block font-cairo mb-2"
+                    className={`block font-cairo mb-2 ${locale === 'ar' ? 'text-right' : 'text-left'}`}
                     style={{ color: '#292561', fontWeight: 700, fontSize: '12px' }}
                   >
-                    رقم الهاتف
+                    {t('auth.register.phone')}
                   </label>
                   <div className="relative">
                     <input
                       {...registerForm.register('phone')}
                       type="tel"
                       autoComplete="tel"
-                      className="w-full px-4 py-3 pr-10 pl-20 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo text-right"
-                      placeholder="أدخل رقم هاتفك"
-                      style={{ fontSize: '14px' }}
+                      className={`w-full px-4 py-3 ${locale === 'ar' ? 'pr-10 pl-20 text-right' : 'pl-10 pr-20 text-left'} border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo`}
+                      placeholder={t('auth.register.phone-placeholder')}
+                      style={{ fontSize: '14px', direction: locale === 'ar' ? 'rtl' : 'ltr' }}
                     />
                     <div className="absolute left-3 top-1/2 transform -translate-y-1/2 flex items-center">
                       <select 
@@ -546,7 +547,7 @@ export function AuthForm({ defaultMode = 'login' }: AuthFormProps) {
                     </div>
                     <Icon 
                       name="mobile-screen" 
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4"
+                      className={`absolute ${locale === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 h-4 w-4`}
                       style={{ color: '#00AC96' }}
                     />
                   </div>
@@ -561,34 +562,34 @@ export function AuthForm({ defaultMode = 'login' }: AuthFormProps) {
                 <div>
                   <label 
                     htmlFor="register-password" 
-                    className="block font-cairo mb-2"
+                    className={`block font-cairo mb-2 ${locale === 'ar' ? 'text-right' : 'text-left'}`}
                     style={{ color: '#292561', fontWeight: 700, fontSize: '12px' }}
                   >
-                    كلمة المرور
+                    {t('auth.register.password')}
                   </label>
                   <div className="relative">
                     <input
                       {...registerForm.register('password', {
-                        required: 'كلمة المرور مطلوبة',
+                        required: t('auth.validation.password-required'),
                         minLength: {
                           value: 6,
-                          message: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل',
+                          message: t('auth.validation.password-min-length'),
                         },
                       })}
                       type={showPassword ? 'text' : 'password'}
                       autoComplete="new-password"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo pl-10 pr-10"
-                      placeholder="••••••••"
-                      style={{ fontSize: '14px' }}
+                      className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo ${locale === 'ar' ? 'pl-10 pr-10 text-right' : 'pl-10 pr-10 text-left'}`}
+                      placeholder={t('auth.register.password-placeholder')}
+                      style={{ fontSize: '14px', direction: locale === 'ar' ? 'rtl' : 'ltr' }}
                     />
                     <Icon 
                       name="lock" 
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4"
+                      className={`absolute ${locale === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 h-4 w-4`}
                       style={{ color: '#00AC96' }} 
                     />
                     <button
                       type="button"
-                      className="absolute inset-y-0 left-0 pl-3 flex items-center"
+                      className={`absolute inset-y-0 ${locale === 'ar' ? 'left-0 pl-3' : 'right-0 pr-3'} flex items-center`}
                       onClick={() => setShowPassword(!showPassword)}
                     >
                       {showPassword ? (
@@ -607,32 +608,32 @@ export function AuthForm({ defaultMode = 'login' }: AuthFormProps) {
                 <div>
                   <label 
                     htmlFor="confirmPassword" 
-                    className="block font-cairo mb-2"
+                    className={`block font-cairo mb-2 ${locale === 'ar' ? 'text-right' : 'text-left'}`}
                     style={{ color: '#292561', fontWeight: 700, fontSize: '12px' }}
                   >
-                    تأكيد كلمة المرور
+                    {t('auth.register.confirm-password')}
                   </label>
                   <div className="relative">
                     <input
                       {...registerForm.register('confirmPassword', {
-                        required: 'تأكيد كلمة المرور مطلوب',
+                        required: t('auth.validation.confirm-password-required'),
                         validate: (value) =>
-                          value === password || 'كلمات المرور غير متطابقة',
+                          value === password || t('auth.validation.passwords-no-match'),
                       })}
                       type={showConfirmPassword ? 'text' : 'password'}
                       autoComplete="new-password"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo pl-10 pr-10"
-                      placeholder="••••••••"
-                      style={{ fontSize: '14px' }}
+                      className={`w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent font-cairo ${locale === 'ar' ? 'pl-10 pr-10 text-right' : 'pl-10 pr-10 text-left'}`}
+                      placeholder={t('auth.register.password-placeholder')}
+                      style={{ fontSize: '14px', direction: locale === 'ar' ? 'rtl' : 'ltr' }}
                     />
                     <Icon 
                       name="lock" 
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4"
+                      className={`absolute ${locale === 'ar' ? 'right-3' : 'left-3'} top-1/2 transform -translate-y-1/2 h-4 w-4`}
                       style={{ color: '#00AC96' }} 
                     />
                     <button
                       type="button"
-                      className="absolute inset-y-0 left-0 pl-3 flex items-center"
+                      className={`absolute inset-y-0 ${locale === 'ar' ? 'left-0 pl-3' : 'right-0 pr-3'} flex items-center`}
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     >
                       {showConfirmPassword ? (
@@ -663,10 +664,10 @@ export function AuthForm({ defaultMode = 'login' }: AuthFormProps) {
                   {isLoading ? (
                     <div className="flex items-center">
                       <div className="spinner mr-2" />
-                      جارٍ إنشاء الحساب...
+                      {t('auth.register.submitting')}
                     </div>
                   ) : (
-                    'إنشاء حساب جديد'
+                    t('auth.register.submit')
                   )}
                 </button>
               </div>
@@ -677,7 +678,7 @@ export function AuthForm({ defaultMode = 'login' }: AuthFormProps) {
                   <div className="w-full border-t border-gray-300" />
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-white text-gray-500 font-cairo">أو</span>
+                  <span className="px-2 bg-white text-gray-500 font-cairo">{t('auth.or')}</span>
                 </div>
               </div>
 
@@ -691,7 +692,7 @@ export function AuthForm({ defaultMode = 'login' }: AuthFormProps) {
                 >
                   <Image
                     src="/images/Apple Button.svg"
-                    alt="المتابعة بحساب Apple"
+                    alt={t('auth.social.apple-alt')}
                     width={80}
                     height={80}
                     style={{ width: '4rem', height: '4rem' }}
@@ -706,7 +707,7 @@ export function AuthForm({ defaultMode = 'login' }: AuthFormProps) {
                 >
                   <Image
                     src="/images/Google Button.svg"
-                    alt="المتابعة بحساب Google"
+                    alt={t('auth.social.google-alt')}
                     width={80}
                     height={80}
                     style={{ width: '4rem', height: '4rem' }}
@@ -723,7 +724,7 @@ export function AuthForm({ defaultMode = 'login' }: AuthFormProps) {
       <div className={`hidden lg:flex flex-1 relative bg-gray-50 ${isLoaded ? 'animate-slide-in-left stagger-6' : 'opacity-0'}`}>
         <Image
           src="/images/login image.png"
-          alt={mode === 'login' ? 'تسجيل الدخول' : 'إنشاء حساب'}
+          alt={mode === 'login' ? t('auth.login.title') : t('auth.register.title')}
           fill
           className="object-cover"
           style={{ borderRadius: '50px' }}

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { CartItem } from './api';
+import { CartItem, cartApi } from './api';
 import { customStorage } from './custom-storage';
 
 interface CartState {
@@ -19,11 +19,12 @@ interface CartState {
   }) => void;
   
   setCartId: (cartId: string, anonymousId?: string) => void;
-  addItem: (item: CartItem) => void;
+  addItem: (item: CartItem) => Promise<void>;
   removeItem: (itemId: string) => void;
   updateItemQuantity: (itemId: string, qty: number) => void;
   clearCart: () => void;
   setLoading: (loading: boolean) => void;
+  initializeCart: () => Promise<void>;
   
   // Computed
   itemCount: () => number;
@@ -53,16 +54,57 @@ export const useCartStore = create<CartState>()(
         set({ cartId, anonymousId });
       },
 
-      addItem: (item: CartItem) => {
-        const { items } = get();
+      initializeCart: async () => {
+        const { cartId } = get();
+        if (cartId) return; // Cart already initialized
+        
+        try {
+          const response = await cartApi.initCart();
+          set({ 
+            cartId: response.data.cartId,
+            anonymousId: response.data.anonymousId 
+          });
+        } catch (error) {
+          console.error('Failed to initialize cart:', error);
+          // Fallback to local cart ID
+          set({ cartId: `local-cart-${Date.now()}` });
+        }
+      },
+
+      addItem: async (item: CartItem) => {
+        const { items, cartId, initializeCart } = get();
         const existingItem = items.find(
           (i) => i.courseId === item.courseId && i.sessionId === item.sessionId
         );
 
-        if (!existingItem) {
-          const newItems = [...items, item];
-          const newTotal = newItems.reduce((sum, i) => sum + i.price * i.qty, 0);
-          set({ items: newItems, total: newTotal });
+        if (existingItem) {
+          return; // Item already in cart
+        }
+
+        // Initialize cart if needed
+        if (!cartId) {
+          await initializeCart();
+        }
+
+        const newItems = [...items, item];
+        const newTotal = newItems.reduce((sum, i) => sum + i.price * i.qty, 0);
+        
+        // Update local state immediately for better UX
+        set({ items: newItems, total: newTotal });
+
+        // Try to sync with backend if we have a valid cartId
+        const currentCartId = get().cartId;
+        if (currentCartId && !currentCartId.startsWith('local-cart-')) {
+          try {
+            await cartApi.addToCart({
+              cartId: currentCartId,
+              courseId: item.courseId,
+              sessionId: item.sessionId
+            });
+          } catch (error) {
+            console.error('Failed to sync cart with backend:', error);
+            // Keep local state even if backend sync fails
+          }
         }
       },
 
@@ -112,7 +154,6 @@ export const useCartStore = create<CartState>()(
     {
       name: 'cart-storage',
       storage: customStorage as any,
-      skipHydration: true,
     }
   )
 );

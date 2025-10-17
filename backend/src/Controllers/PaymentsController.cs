@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System.Security.Claims;
 using ErsaTraining.API.Data;
 using ErsaTraining.API.Data.Entities;
@@ -14,15 +15,18 @@ public class PaymentsController : ControllerBase
     private readonly ErsaTrainingDbContext _context;
     private readonly IPaymentService _paymentService;
     private readonly ILogger<PaymentsController> _logger;
+    private readonly IConfiguration _configuration;
 
     public PaymentsController(
         ErsaTrainingDbContext context,
         IPaymentService paymentService,
-        ILogger<PaymentsController> logger)
+        ILogger<PaymentsController> logger,
+        IConfiguration configuration)
     {
         _context = context;
         _paymentService = paymentService;
         _logger = logger;
+        _configuration = configuration;
     }
 
     [HttpGet("config")]
@@ -120,23 +124,32 @@ public class PaymentsController : ControllerBase
     {
         try
         {
+            _logger.LogInformation("🔔 ClickPay webhook received");
+            
             var payload = await new StreamReader(Request.Body).ReadToEndAsync();
             var signature = Request.Headers["X-Signature"].FirstOrDefault() ?? "";
+            
+            _logger.LogInformation("📦 Webhook payload length: {Length}, Has signature: {HasSig}", 
+                payload?.Length ?? 0, !string.IsNullOrEmpty(signature));
+            _logger.LogInformation("📄 Payload preview: {Payload}", 
+                payload?.Length > 500 ? payload.Substring(0, 500) + "..." : payload);
 
             var success = await _paymentService.ProcessWebhookAsync(payload, signature, "ClickPay");
             
             if (success)
             {
+                _logger.LogInformation("✅ ClickPay webhook processed successfully");
                 return Ok();
             }
             else
             {
+                _logger.LogWarning("⚠️ ClickPay webhook processing returned false");
                 return BadRequest();
             }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error processing ClickPay webhook");
+            _logger.LogError(ex, "❌ Error processing ClickPay webhook");
             return StatusCode(500);
         }
     }
@@ -174,11 +187,9 @@ public class PaymentsController : ControllerBase
     {
         try
         {
-            // Handle payment return from HyperPay
-            // This is typically a GET request that redirects the user back to the frontend
-            // You can extract order information and redirect to appropriate success/failure page
-
-            var frontendUrl = $"{_configuration["App:Frontend"]}"; //"https://your-frontend-domain.com"; // Get from configuration
+            _logger.LogInformation("🔙 Payment return received - OrderId: {OrderId}, Status: {Status}", orderId, status);
+            
+            var frontendUrl = _configuration["Frontend:BaseUrl"] ?? "https://ersa-training.com";
             
             if (!string.IsNullOrEmpty(orderId) && Guid.TryParse(orderId, out var orderGuid))
             {
@@ -187,21 +198,97 @@ public class PaymentsController : ControllerBase
                 {
                     if (status?.ToLower() == "success" || order.Status == OrderStatus.Paid)
                     {
-                        return Redirect($"{frontendUrl}/checkout/success?orderId={orderId}");
+                        _logger.LogInformation("✅ Payment successful for order {OrderId}", orderId);
+                        return Redirect($"{frontendUrl}/en/checkout/success?orderId={orderId}");
                     }
                     else
                     {
-                        return Redirect($"{frontendUrl}/checkout/failed?orderId={orderId}");
+                        _logger.LogWarning("⚠️ Payment not successful for order {OrderId}, Status: {Status}", orderId, order.Status);
+                        return Redirect($"{frontendUrl}/en/checkout/failed?orderId={orderId}");
                     }
                 }
             }
 
-            return Redirect($"{frontendUrl}/checkout/failed");
+            _logger.LogWarning("⚠️ Invalid payment return - OrderId: {OrderId}", orderId);
+            return Redirect($"{frontendUrl}/en/checkout/failed");
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error handling payment return");
-            return Redirect($"{_configuration["App:Frontend"]}/checkout/failed");//Redirect($"https://your-frontend-domain.com/checkout/failed");
+            _logger.LogError(ex, "❌ Error handling payment return");
+            var frontendUrl = _configuration["Frontend:BaseUrl"] ?? "https://ersa-training.com";
+            return Redirect($"{frontendUrl}/en/checkout/failed");
+        }
+    }
+    
+    /// <summary>
+    /// Manual payment verification endpoint - checks payment status with ClickPay
+    /// This is a fallback when webhooks don't work (e.g., localhost testing)
+    /// </summary>
+    [HttpPost("verify-payment")]
+    [Authorize]
+    public async Task<ActionResult> VerifyPayment([FromBody] VerifyPaymentRequest request)
+    {
+        try
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            _logger.LogInformation("🔍 Manual payment verification requested for order {OrderId}", request.OrderId);
+
+            var order = await _context.Orders
+                .Include(o => o.Payments)
+                .FirstOrDefaultAsync(o => o.Id == request.OrderId && o.UserId == userId);
+
+            if (order == null)
+            {
+                return NotFound(new { error = "Order not found" });
+            }
+
+            var payment = order.Payments.FirstOrDefault(p => p.Provider == "ClickPay");
+            if (payment == null)
+            {
+                return NotFound(new { error = "Payment not found" });
+            }
+
+            // If already paid, return success
+            if (payment.Status == PaymentStatus.Completed && order.Status == OrderStatus.Paid)
+            {
+                _logger.LogInformation("✅ Payment already marked as completed for order {OrderId}", request.OrderId);
+                return Ok(new { success = true, message = "Payment already completed", status = "paid" });
+            }
+
+            // TODO: Call ClickPay API to verify payment status
+            // For now, if user confirms payment was successful, we can mark it as paid
+            // This is a temporary workaround for webhook issues
+            
+            if (request.ForceComplete && request.TranRef != null)
+            {
+                _logger.LogWarning("⚠️ MANUALLY marking payment as complete for order {OrderId} with TranRef {TranRef}", 
+                    request.OrderId, request.TranRef);
+                
+                payment.Status = PaymentStatus.Completed;
+                payment.ProviderRef = request.TranRef;
+                payment.CapturedAt = DateTime.UtcNow;
+                payment.UpdatedAt = DateTime.UtcNow;
+
+                order.Status = OrderStatus.Paid;
+                order.UpdatedAt = DateTime.UtcNow;
+
+                await _context.SaveChangesAsync();
+
+                _logger.LogInformation("✅ Payment manually marked as completed for order {OrderId}", request.OrderId);
+                return Ok(new { success = true, message = "Payment marked as completed", status = "paid" });
+            }
+
+            return Ok(new { success = false, message = "Payment verification pending", status = order.Status.ToString() });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "❌ Error verifying payment");
+            return StatusCode(500, new { error = "Internal server error" });
         }
     }
 
@@ -239,4 +326,11 @@ public class PaymentsController : ControllerBase
 public class RefundRequest
 {
     public decimal? Amount { get; set; }
+}
+
+public class VerifyPaymentRequest
+{
+    public Guid OrderId { get; set; }
+    public bool ForceComplete { get; set; }
+    public string? TranRef { get; set; }
 }

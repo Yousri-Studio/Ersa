@@ -63,6 +63,11 @@ public class EmailService : IEmailService
     {
         try
         {
+            var fromEmail = _configuration["SendGrid:FromEmail"];
+            var fromName = _configuration["SendGrid:FromName"];
+            
+            _logger.LogInformation("Attempting to send verification email to {Email} from {FromEmail}", user.Email, fromEmail);
+            
             var subject = user.Locale == "ar" ? "تفعيل الحساب - إرساء للتدريب" : "Email Verification - Ersa Training";
             var bodyHtml = user.Locale == "ar" 
                 ? $@"
@@ -86,16 +91,28 @@ public class EmailService : IEmailService
                         <p>Best regards,<br>Ersa Training Team</p>
                     </div>";
 
-            var from = new EmailAddress(_configuration["SendGrid:FromEmail"], _configuration["SendGrid:FromName"]);
+            var from = new EmailAddress(fromEmail, fromName);
             var to = new EmailAddress(user.Email, user.FullName);
             var msg = MailHelper.CreateSingleEmail(from, to, subject, null, bodyHtml);
 
+            _logger.LogInformation("Sending email via SendGrid...");
             var response = await _sendGridClient.SendEmailAsync(msg);
-            return response.IsSuccessStatusCode;
+            
+            if (response.IsSuccessStatusCode)
+            {
+                _logger.LogInformation("Verification email sent successfully to {Email}. Status: {StatusCode}", user.Email, response.StatusCode);
+                return true;
+            }
+            else
+            {
+                var errorBody = await response.Body.ReadAsStringAsync();
+                _logger.LogError("Failed to send verification email to {Email}. Status: {StatusCode}, Error: {Error}", user.Email, response.StatusCode, errorBody);
+                return false;
+            }
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Failed to send simple verification email to user {UserId}", user.Id);
+            _logger.LogError(ex, "Exception while sending verification email to user {UserId}", user.Id);
             return false;
         }
     }
@@ -200,6 +217,13 @@ public class EmailService : IEmailService
     {
         try
         {
+            // Check if payload is empty (SendGrid verification pings)
+            if (string.IsNullOrWhiteSpace(payload))
+            {
+                _logger.LogInformation("Received empty webhook payload (likely SendGrid verification)");
+                return;
+            }
+
             // Validate SendGrid webhook signature
             if (!ValidateWebhookSignature(payload, signature))
             {
@@ -208,12 +232,21 @@ public class EmailService : IEmailService
             }
 
             var events = JsonSerializer.Deserialize<SendGridEvent[]>(payload);
-            if (events == null) return;
+            if (events == null || events.Length == 0) 
+            {
+                _logger.LogWarning("Webhook payload deserialized to null or empty array");
+                return;
+            }
 
+            _logger.LogInformation("Processing {EventCount} SendGrid webhook events", events.Length);
             foreach (var evt in events)
             {
                 await ProcessSendGridEventAsync(evt);
             }
+        }
+        catch (JsonException jsonEx)
+        {
+            _logger.LogWarning(jsonEx, "Failed to parse SendGrid webhook JSON. Payload: {Payload}", payload);
         }
         catch (Exception ex)
         {

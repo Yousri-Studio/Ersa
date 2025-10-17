@@ -119,6 +119,8 @@ public class AdminOrderDto
     public OrderStatus Status { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
+    public string CourseNames { get; set; } = string.Empty;
+    public string CourseType { get; set; } = string.Empty;
 }
 
 public class AdminOrderDetailDto

@@ -82,13 +82,13 @@ export default function CourseDetailsPage() {
     ? (locale === 'ar' ? course.summary.ar : course.summary.en)
     : course.summary;
 
-  const addToCart = () => {
+  const addToCart = async () => {
     // Extract instructor name as string from instructors relationship
     const instructorName = course.instructors && course.instructors.length > 0
       ? (locale === 'ar' ? course.instructors[0].instructorName.ar : course.instructors[0].instructorName.en)
       : undefined;
     
-    addItem({
+    await addItem({
       id: `cart-${course.id}`,
       courseId: course.id,
       title: typeof course.title === 'object' ? course.title : { ar: course.title, en: course.title },
@@ -408,7 +408,7 @@ export default function CourseDetailsPage() {
                   <div className="space-y-3">
                     {isInCart ? (
                       <Link
-                        href="/cart"
+                        href={`/${locale}/cart`}
                         className="w-full text-white py-3 px-4 rounded-lg font-semibold text-center block transition-colors duration-200 font-cairo course-enroll-btn"
                       >
                         {t('course.view-in-cart')}

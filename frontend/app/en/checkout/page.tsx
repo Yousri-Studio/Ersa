@@ -31,6 +31,12 @@ export default function CheckoutPage() {
       return;
     }
 
+    // Check if it's a local-only cart (not synced with backend)
+    if (cartId.startsWith('local-cart-')) {
+      setError('Unable to process checkout. Please try adding items to cart again.');
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
 
@@ -40,7 +46,7 @@ export default function CheckoutPage() {
       const { orderId } = orderResponse.data;
 
       // 2. Create the checkout session for payment
-      const returnUrl = `${window.location.origin}/checkout/success`;
+      const returnUrl = `${window.location.origin}/en/checkout/success`;
       const checkoutResponse = await paymentsApi.createCheckout({ orderId, returnUrl });
       const { redirectUrl } = checkoutResponse.data;
 

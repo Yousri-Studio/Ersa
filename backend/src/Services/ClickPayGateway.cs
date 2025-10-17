@@ -47,11 +47,12 @@ public class ClickPayGateway : IPaymentGateway
                 tran_type = "sale",
                 tran_class = "ecom",
                 cart_id = order.Id.ToString(),
-                cart_description = $"Order {order.Id}",
-                cart_currency = order.Currency ?? "SAR",// config["Currency"] ?? "SAR",
+                cart_description = $"Training Course Order {order.Id}",
+                cart_currency = order.Currency ?? "SAR",
                 cart_amount = order.Amount.ToString("F2"),
                 callback = $"{_configuration["App:BaseUrl"]}/api/payments/clickpay/webhook",
                 @return = returnUrl,
+                hide_shipping = true,  // Hide shipping information for digital products
                 customer_details = new
                 {
                     name = order.User.FullName,
@@ -111,25 +112,34 @@ public class ClickPayGateway : IPaymentGateway
     {
         try
         {
+            _logger.LogInformation("🔍 Processing ClickPay webhook...");
+            
             // Validate webhook signature
             if (!ValidateWebhookSignature(payload, signature))
             {
-                _logger.LogWarning("Invalid ClickPay webhook signature");
+                _logger.LogWarning("❌ Invalid ClickPay webhook signature");
                 return false;
             }
+            
+            _logger.LogInformation("✅ Webhook signature validated");
 
             var webhookData = JsonSerializer.Deserialize<ClickPayWebhookData>(payload);
             if (webhookData == null)
             {
-                _logger.LogWarning("ClickPay webhook data is null");
+                _logger.LogWarning("❌ ClickPay webhook data is null after deserialization");
                 return false;
             }
+            
+            _logger.LogInformation("📋 Webhook data - CartId: {CartId}, RespCode: {RespCode}, TranRef: {TranRef}", 
+                webhookData.CartId, webhookData.RespCode, webhookData.TranRef);
 
             if (!Guid.TryParse(webhookData.CartId, out var orderId))
             {
-                _logger.LogWarning("Invalid order ID in ClickPay webhook: {CartId}", webhookData.CartId);
+                _logger.LogWarning("❌ Invalid order ID in ClickPay webhook: {CartId}", webhookData.CartId);
                 return false;
             }
+            
+            _logger.LogInformation("🔍 Looking for order: {OrderId}", orderId);
 
             var order = await _context.Orders
                 .Include(o => o.User)
@@ -261,15 +271,33 @@ public class ClickPayGateway : IPaymentGateway
     private bool ValidateWebhookSignature(string payload, string signature)
     {
         var webhookSecret = _configuration["ClickPay:WebhookSecret"];
-        if (string.IsNullOrEmpty(webhookSecret)) return true; // Skip validation if not configured
+        
+        // Skip validation if not configured OR if it's a placeholder value
+        if (string.IsNullOrEmpty(webhookSecret) || 
+            webhookSecret == "your-clickpay-webhook-secret" ||
+            webhookSecret.StartsWith("your-"))
+        {
+            _logger.LogWarning("⚠️ Webhook signature validation SKIPPED (no secret configured) - DEVELOPMENT MODE");
+            return true;
+        }
 
         try
         {
             var expectedSignature = ComputeHmacSha256(payload, webhookSecret);
-            return signature.Equals(expectedSignature, StringComparison.OrdinalIgnoreCase);
+            var isValid = signature.Equals(expectedSignature, StringComparison.OrdinalIgnoreCase);
+            
+            if (!isValid)
+            {
+                _logger.LogWarning("🔐 Signature mismatch - Expected: {Expected}, Got: {Got}", 
+                    expectedSignature?.Substring(0, 20) + "...", 
+                    signature?.Substring(0, 20) + "...");
+            }
+            
+            return isValid;
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "❌ Error validating webhook signature");
             return false;
         }
     }

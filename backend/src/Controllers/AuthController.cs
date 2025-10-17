@@ -76,17 +76,35 @@ public class AuthController : ControllerBase
                 // Don't fail registration if role assignment fails
             }
 
-            // Generate verification token and send verification email
+            // Generate a simple 6-digit verification code
+            var random = new Random();
+            var verificationCode = random.Next(100000, 999999).ToString();
+            
+            // Generate the actual token for backend verification
             var verificationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
             
-            // Send email synchronously to avoid DbContext disposal issues
+            // Store the verification code using UserManager's token storage
+            await _userManager.SetAuthenticationTokenAsync(user, "EmailVerification", "VerificationCode", verificationCode);
+            
+            _logger.LogInformation("Generated verification code {Code} for user {UserId}, attempting to send email", verificationCode, user.Id);
+            
+            // Send email with simple 6-digit code
+            bool emailSent = false;
             try
             {
-                await _emailService.SendEmailVerificationAsync(user, verificationToken);
+                emailSent = await _emailService.SendEmailVerificationAsync(user, verificationCode);
+                if (emailSent)
+                {
+                    _logger.LogInformation("Verification email sent successfully to user {UserId} at {Email}", user.Id, user.Email);
+                }
+                else
+                {
+                    _logger.LogWarning("Email service returned false for user {UserId} at {Email}", user.Id, user.Email);
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to send verification email to user {UserId}", user.Id);
+                _logger.LogError(ex, "Exception while sending verification email to user {UserId}", user.Id);
                 // Don't fail registration if email sending fails
             }
             
@@ -391,11 +409,33 @@ public class AuthController : ControllerBase
                 return BadRequest(new { error = "Email is already verified" });
             }
 
-            var result = await _userManager.ConfirmEmailAsync(user, request.Code);
-            if (!result.Succeeded)
+            // Retrieve the stored verification code
+            var storedCode = await _userManager.GetAuthenticationTokenAsync(user, "EmailVerification", "VerificationCode");
+            
+            if (string.IsNullOrEmpty(storedCode))
             {
+                return BadRequest(new { error = "Verification code not found. Please request a new code." });
+            }
+
+            // Check if the provided code matches the stored simple code
+            if (request.Code != storedCode)
+            {
+                _logger.LogWarning("Invalid verification code attempt for user {Email}. Expected: {Expected}, Got: {Got}", user.Email, storedCode, request.Code);
                 return BadRequest(new { error = "Invalid verification code" });
             }
+
+            // Generate a new token and verify with Identity
+            var verificationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var result = await _userManager.ConfirmEmailAsync(user, verificationToken);
+            
+            if (!result.Succeeded)
+            {
+                _logger.LogError("Email confirmation failed for user {Email}: {Errors}", user.Email, string.Join(", ", result.Errors.Select(e => e.Description)));
+                return BadRequest(new { error = "Email confirmation failed" });
+            }
+            
+            // Remove the verification code after successful verification
+            await _userManager.RemoveAuthenticationTokenAsync(user, "EmailVerification", "VerificationCode");
 
             // Update user status to active
             user.Status = UserStatus.Active;
@@ -441,13 +481,17 @@ public class AuthController : ControllerBase
                 return BadRequest(new { error = "Email is already verified" });
             }
 
-            // Generate new verification token
-            var verificationToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            // Generate a new simple 6-digit verification code
+            var random = new Random();
+            var verificationCode = random.Next(100000, 999999).ToString();
             
-            // Send email synchronously to avoid DbContext disposal issues
+            // Store the verification code using UserManager's token storage
+            await _userManager.SetAuthenticationTokenAsync(user, "EmailVerification", "VerificationCode", verificationCode);
+            
+            // Send email with simple 6-digit code
             try
             {
-                await _emailService.SendEmailVerificationAsync(user, verificationToken);
+                await _emailService.SendEmailVerificationAsync(user, verificationCode);
             }
             catch (Exception ex)
             {
