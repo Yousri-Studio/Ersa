@@ -47,5 +47,6 @@ public enum OrderStatus
     Processed = 4,
     Expired = 5,
     Failed = 6,
-    Refunded = 7
+    Refunded = 7,
+    Cancelled = 8
 }

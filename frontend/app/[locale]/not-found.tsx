@@ -1,19 +1,42 @@
 'use client';
 
 import Link from 'next/link';
-import { useLocale, useTranslations } from 'next-intl';
+import { usePathname } from 'next/navigation';
 import { usePageLoad } from '@/lib/use-animations';
 import { ScrollAnimations } from '@/components/scroll-animations';
 
+// Translations
+const translations = {
+  ar: {
+    title: 'الصفحة المطلوبة غير موجودة',
+    description: 'عذراً، الصفحة التي تبحث عنها غير موجودة. يرجى التحقق من الرابط أو العودة إلى الصفحة الرئيسية.',
+    goHome: 'العودة للرئيسية',
+    browseCourses: 'تصفح الدورات'
+  },
+  en: {
+    title: 'Page Not Found',
+    description: "Sorry, the page you're looking for doesn't exist. Please verify the link or return to the homepage.",
+    goHome: 'Go to Homepage',
+    browseCourses: 'Browse Courses'
+  }
+};
+
 export default function NotFound() {
-  const locale = useLocale();
-  const t = useTranslations('errors.404');
+  const pathname = usePathname();
   const isLoaded = usePageLoad(100);
+  
+  // Detect locale from pathname
+  // Check if pathname contains /ar/ or starts with /ar
+  const locale = (pathname?.includes('/ar/') || pathname?.startsWith('/ar')) ? 'ar' : 'en';
+  const t = translations[locale];
+  
+  // Debug log
+  console.log('404 Page - pathname:', pathname, 'detected locale:', locale);
 
   return (
     <>
       <ScrollAnimations />
-      <div className={`min-h-screen relative page-enter ${isLoaded ? 'loaded' : ''}`}>
+      <div className={`min-h-screen relative page-enter ${isLoaded ? 'loaded' : ''}`} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
         {/* Background that extends to top */}
         <div className="absolute inset-0 hero-background" style={{top: '-5rem'}}></div>
         
@@ -38,7 +61,7 @@ export default function NotFound() {
                 lineHeight: 'normal'
               }}
             >
-              {t('title')}
+              {t.title}
             </h1>
             
             {/* Error Description */}
@@ -52,7 +75,7 @@ export default function NotFound() {
                 textAlign: 'center'
               }}
             >
-              {t('description')}
+              {t.description}
             </p>
 
             {/* Action Buttons */}
@@ -67,7 +90,7 @@ export default function NotFound() {
                   minWidth: '200px'
                 }}
               >
-                {t('go-home')}
+                {t.goHome}
               </Link>
               
               <Link
@@ -80,7 +103,7 @@ export default function NotFound() {
                   minWidth: '200px'
                 }}
               >
-                {t('browse-courses')}
+                {t.browseCourses}
               </Link>
             </div>
           </div>
