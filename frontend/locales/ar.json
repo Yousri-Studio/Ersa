@@ -24,7 +24,9 @@
     "off": "خصم",
     "first-name": "الاسم الأول",
     "last-name": "اسم العائلة",
-    "email": "البريد الإلكتروني"
+    "email": "البريد الإلكتروني",
+    "saving": "جاري الحفظ...",
+    "hours": "ساعات"
   },
   "about": {
     "title": "من نحن",
@@ -983,5 +985,67 @@
     "errorUpdating": "فشل في تحديث التصنيف الفرعي",
     "errorDeleting": "فشل في حذف التصنيف الفرعي",
     "noSubCategories": "لا توجد تصنيفات فرعية"
+  },
+
+  "profile": {
+    "title": "ملفي الشخصي",
+    "subtitle": "إدارة إعدادات حسابك وتفضيلاتك",
+    "basic-info": "المعلومات الأساسية",
+    "full-name": "الاسم الكامل",
+    "email": "البريد الإلكتروني",
+    "phone": "رقم الهاتف",
+    "member-since": "عضو منذ",
+    "last-login": "آخر تسجيل دخول",
+    "account-status": "حالة الحساب",
+    "active": "نشط",
+    "never": "أبداً",
+    "not-provided": "غير محدد",
+    "edit": "تعديل الملف الشخصي",
+    "change": "تغيير",
+    "change-password": "تغيير كلمة المرور",
+    "current-password": "كلمة المرور الحالية",
+    "new-password": "كلمة المرور الجديدة",
+    "confirm-password": "تأكيد كلمة المرور",
+    "password-description": "انقر على زر التغيير لتحديث كلمة المرور الخاصة بك",
+    "email-cannot-change": "لا يمكن تغيير عنوان البريد الإلكتروني",
+    "update-success": "تم تحديث الملف الشخصي بنجاح",
+    "update-error": "فشل تحديث الملف الشخصي",
+    "password-changed": "تم تغيير كلمة المرور بنجاح",
+    "password-change-error": "فشل تغيير كلمة المرور",
+    "password-mismatch": "كلمات المرور غير متطابقة",
+    "password-too-short": "يجب أن تحتوي كلمة المرور على 6 أحرف على الأقل",
+    "quick-links": "روابط سريعة",
+    "my-enrollments": "دوراتي",
+    "my-orders": "طلباتي",
+    "my-wishlist": "قائمة الرغبات",
+    "view-courses": "عرض الدورات المسجلة",
+    "view-orders": "عرض سجل الطلبات",
+    "view-wishlist": "عرض الدورات المحفوظة",
+    "account-stats": "إحصائيات الحساب"
+  },
+
+  "orders": {
+    "title": "طلباتي",
+    "subtitle": "عرض وإدارة سجل طلباتك",
+    "order-number": "طلب رقم #{number}",
+    "placed-on": "تم الطلب في {date}",
+    "items": "عناصر",
+    "session": "جلسة",
+    "view-details": "عرض التفاصيل",
+    "back-to-profile": "العودة للملف الشخصي",
+    "unauthorized": "يجب تسجيل الدخول لعرض الطلبات",
+    "fetch-error": "فشل تحميل الطلبات. يرجى المحاولة مرة أخرى.",
+    "empty": {
+      "title": "لا توجد طلبات بعد",
+      "description": "لم تقم بإجراء أي طلبات بعد. ابدأ باستكشاف دوراتنا!",
+      "browse-courses": "تصفح الدورات"
+    },
+    "status": {
+      "paid": "مدفوع",
+      "completed": "مكتمل",
+      "pending": "قيد الانتظار",
+      "cancelled": "ملغى",
+      "failed": "فشل"
+    }
   }
 }

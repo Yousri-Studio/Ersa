@@ -367,6 +367,39 @@ export const wishlistApi = {
     api.delete(`/wishlist/items/${courseId}`),
 };
 
+// User Profile API
+export interface UserProfile {
+  id: string;
+  fullName: string;
+  email: string;
+  phone?: string;
+  locale: string;
+  createdAt: string;
+  lastLoginAt?: string;
+}
+
+export interface UpdateProfileRequest {
+  fullName?: string;
+  phone?: string;
+  locale?: string;
+}
+
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+}
+
+export const userProfileApi = {
+  getProfile: (): Promise<AxiosResponse<UserProfile>> =>
+    api.get('/userprofile'),
+
+  updateProfile: (data: UpdateProfileRequest): Promise<AxiosResponse<UserProfile>> =>
+    api.put('/userprofile', data),
+
+  changePassword: (data: ChangePasswordRequest): Promise<AxiosResponse<{ message: string }>> =>
+    api.post('/userprofile/change-password', data),
+};
+
 // Instructors API
 export interface Instructor {
   id: string;

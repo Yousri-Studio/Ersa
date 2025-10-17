@@ -24,7 +24,9 @@
     "off": "off",
     "first-name": "First Name",
     "last-name": "Last Name",
-    "email": "Email Address"
+    "email": "Email Address",
+    "saving": "Saving...",
+    "hours": "hours"
   },
   "about": {
     "title": "About Us",
@@ -982,5 +984,67 @@
     "errorUpdating": "Failed to update sub-category",
     "errorDeleting": "Failed to delete sub-category",
     "noSubCategories": "No sub-categories found"
+  },
+
+  "profile": {
+    "title": "My Profile",
+    "subtitle": "Manage your account settings and preferences",
+    "basic-info": "Basic Information",
+    "full-name": "Full Name",
+    "email": "Email Address",
+    "phone": "Phone Number",
+    "member-since": "Member Since",
+    "last-login": "Last Login",
+    "account-status": "Account Status",
+    "active": "Active",
+    "never": "Never",
+    "not-provided": "Not provided",
+    "edit": "Edit Profile",
+    "change": "Change",
+    "change-password": "Change Password",
+    "current-password": "Current Password",
+    "new-password": "New Password",
+    "confirm-password": "Confirm Password",
+    "password-description": "Click the change button to update your password",
+    "email-cannot-change": "Email address cannot be changed",
+    "update-success": "Profile updated successfully",
+    "update-error": "Failed to update profile",
+    "password-changed": "Password changed successfully",
+    "password-change-error": "Failed to change password",
+    "password-mismatch": "Passwords do not match",
+    "password-too-short": "Password must be at least 6 characters",
+    "quick-links": "Quick Links",
+    "my-enrollments": "My Enrollments",
+    "my-orders": "My Orders",
+    "my-wishlist": "My Wishlist",
+    "view-courses": "View your enrolled courses",
+    "view-orders": "View your order history",
+    "view-wishlist": "View your saved courses",
+    "account-stats": "Account Statistics"
+  },
+
+  "orders": {
+    "title": "My Orders",
+    "subtitle": "View and manage your order history",
+    "order-number": "Order #{number}",
+    "placed-on": "Placed on {date}",
+    "items": "items",
+    "session": "Session",
+    "view-details": "View Details",
+    "back-to-profile": "Back to Profile",
+    "unauthorized": "You must be logged in to view orders",
+    "fetch-error": "Failed to load orders. Please try again.",
+    "empty": {
+      "title": "No Orders Yet",
+      "description": "You haven't placed any orders yet. Start exploring our courses!",
+      "browse-courses": "Browse Courses"
+    },
+    "status": {
+      "paid": "Paid",
+      "completed": "Completed",
+      "pending": "Pending",
+      "cancelled": "Cancelled",
+      "failed": "Failed"
+    }
   }
 }

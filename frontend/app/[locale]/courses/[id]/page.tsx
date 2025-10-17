@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Icon } from '@/components/ui/icon';
 import { VideoModal } from '@/components/ui/video-modal';
 import { useCartStore } from '@/lib/cart-store';
+import { useWishlistStore } from '@/lib/wishlist-store';
 import { usePageLoad, useStaggeredAnimation } from '@/lib/use-animations';
 import { ScrollAnimations } from '@/components/scroll-animations';
 import { useCourse } from '@/lib/content-hooks';
@@ -20,12 +21,17 @@ export default function CourseDetailsPage() {
   const routeParams = useParams() as { id: string };
   const locale = useLocale();
   const { addItem, hasItem } = useCartStore();
+  const { addItem: addToWishlist, removeItem: removeFromWishlist, hasItem: hasItemInWishlist, fetchWishlist } = useWishlistStore();
   const [activeTab, setActiveTab] = useState('overview');
   const [expandedSection, setExpandedSection] = useState<string | number | null>(null);
-  const [isInWishlist, setIsInWishlist] = useState(false);
   const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
   const isLoaded = usePageLoad(100);
   const { course, loading: courseLoading, error: courseError } = useCourse(routeParams.id);
+  
+  // Fetch wishlist and check if course is in wishlist
+  useEffect(() => {
+    fetchWishlist();
+  }, []);
   
   // Always call hooks in the same order - use empty array as fallback
   const { visibleItems: curriculumVisible, setRef: setCurriculumRef } = useStaggeredAnimation(
@@ -100,8 +106,15 @@ export default function CourseDetailsPage() {
     });
   };
 
-  const toggleWishlist = () => {
-    setIsInWishlist(!isInWishlist);
+  const toggleWishlist = async () => {
+    if (!course) return;
+    
+    const isInWishlist = hasItemInWishlist(course.id);
+    if (isInWishlist) {
+      await removeFromWishlist(course.id);
+    } else {
+      await addToWishlist(course.id);
+    }
   };
 
   return (
@@ -426,16 +439,16 @@ export default function CourseDetailsPage() {
                     <button
                       onClick={toggleWishlist}
                       className={`w-full py-3 px-4 rounded-lg font-semibold transition-all duration-200 font-cairo ${
-                        isInWishlist
+                        hasItemInWishlist(course?.id || '')
                           ? 'bg-red-50 text-red-600 border border-red-200 hover:bg-red-100'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
                                              <Icon 
                           name="heart" 
-                          className={`h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2 ${isInWishlist ? 'text-red-500' : ''}`}  
+                          className={`h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2 ${hasItemInWishlist(course?.id || '') ? 'text-red-500' : ''}`}  
                       />
-                      {isInWishlist ? t('course.remove-from-wishlist') : t('course.add-to-wishlist')}
+                      {hasItemInWishlist(course?.id || '') ? t('course.remove-from-wishlist') : t('course.add-to-wishlist')}
                     </button>
                   </div>
                   
