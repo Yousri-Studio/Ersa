@@ -147,20 +147,32 @@ public class OrdersController : ControllerBase
             }
 
             var orders = await _context.Orders
+                .Include(o => o.OrderItems)
                 .Where(o => o.UserId == userId)
                 .OrderByDescending(o => o.CreatedAt)
-                .Select(o => new OrderDto
-                {
-                    Id = o.Id,
-                    Amount = o.Amount,
-                    Currency = o.Currency,
-                    Status = o.Status,
-                    CreatedAt = o.CreatedAt,
-                    Items = new List<OrderItemDto>() // TODO: Implement order items
-                })
                 .ToListAsync();
 
-            return Ok(orders);
+            var orderDtos = orders.Select(o => new OrderDto
+            {
+                Id = o.Id,
+                Amount = o.Amount,
+                Currency = o.Currency,
+                Status = o.Status,
+                CreatedAt = o.CreatedAt,
+                UpdatedAt = o.UpdatedAt,
+                Items = o.OrderItems.Select(oi => new OrderItemDto
+                {
+                    CourseId = oi.CourseId,
+                    CourseTitleEn = oi.CourseTitleEn,
+                    CourseTitleAr = oi.CourseTitleAr,
+                    SessionId = oi.SessionId,
+                    Price = oi.Price,
+                    Currency = oi.Currency,
+                    Qty = oi.Qty
+                }).ToList()
+            }).ToList();
+
+            return Ok(orderDtos);
         }
         catch (Exception ex)
         {
@@ -208,6 +220,52 @@ public class OrdersController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving order");
+            return StatusCode(500, new { error = "Internal server error" });
+        }
+    }
+
+    /// <summary>
+    /// Cancels an order if it's still pending payment.
+    /// </summary>
+    /// <param name="id">The ID of the order to cancel.</param>
+    /// <returns>A success or error message.</returns>
+    [HttpPost("{id:guid}/cancel")]
+    public async Task<ActionResult> CancelOrder(Guid id)
+    {
+        try
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            var order = await _context.Orders
+                .FirstOrDefaultAsync(o => o.Id == id && o.UserId == userId);
+
+            if (order == null)
+            {
+                return NotFound(new { error = "Order not found" });
+            }
+
+            // Only allow cancellation of pending payment or new orders
+            if (order.Status != OrderStatus.PendingPayment && order.Status != OrderStatus.New)
+            {
+                return BadRequest(new { error = $"Cannot cancel order with status: {order.Status}" });
+            }
+
+            order.Status = OrderStatus.Cancelled;
+            order.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Order {OrderId} cancelled by user {UserId}", id, userId);
+
+            return Ok(new { message = "Order cancelled successfully" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error cancelling order {OrderId}", id);
             return StatusCode(500, new { error = "Internal server error" });
         }
     }

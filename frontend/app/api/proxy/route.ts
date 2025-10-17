@@ -82,7 +82,9 @@ export async function POST(request: NextRequest) {
   console.log(`[API Proxy POST] ${endpoint}`);
   
   try {
-    const body = await request.json();
+    // Get raw body text first
+    const bodyText = await request.text();
+    
     // Remove leading slash from endpoint if present to avoid double slashes
     let cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
     
@@ -94,7 +96,7 @@ export async function POST(request: NextRequest) {
     const backendUrl = getBackendUrl();
     const apiUrl = `${backendUrl}/${cleanEndpoint}`;
     console.log(`[API Proxy] Forwarding POST to: ${apiUrl}`);
-    console.log(`[API Proxy] Request body:`, JSON.stringify(body));
+    console.log(`[API Proxy] Request body length:`, bodyText.length);
     
     // Forward authorization header if present
     const headers: HeadersInit = {
@@ -110,7 +112,7 @@ export async function POST(request: NextRequest) {
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers,
-      body: JSON.stringify(body),
+      body: bodyText, // Send raw body text
       cache: 'no-store',
     });
     
@@ -134,9 +136,22 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    const data = await response.json();
-    console.log(`[API Proxy] Success! Response received`);
-    return NextResponse.json(data);
+    // Try to parse response as JSON, but handle empty responses
+    const responseText = await response.text();
+    if (responseText) {
+      try {
+        const data = JSON.parse(responseText);
+        console.log(`[API Proxy] Success! JSON response received`);
+        return NextResponse.json(data);
+      } catch (e) {
+        console.log(`[API Proxy] Success! Non-JSON response received`);
+        return new NextResponse(responseText, { status: response.status });
+      }
+    } else {
+      // Empty response body (e.g., 200 OK with no content)
+      console.log(`[API Proxy] Success! Empty response (status ${response.status})`);
+      return new NextResponse(null, { status: response.status });
+    }
   } catch (error) {
     console.error('[API Proxy] Exception:', error);
     console.error('[API Proxy] Error stack:', error instanceof Error ? error.stack : 'No stack trace');

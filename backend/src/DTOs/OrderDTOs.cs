@@ -61,14 +61,19 @@ public class OrderDto
     public string Currency { get; set; } = string.Empty;
     public OrderStatus Status { get; set; }
     public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
     public List<OrderItemDto> Items { get; set; } = new();
 }
 
 public class OrderItemDto
 {
     public Guid CourseId { get; set; }
-    public LocalizedText CourseTitle { get; set; } = new();
+    public string CourseTitleEn { get; set; } = string.Empty;
+    public string CourseTitleAr { get; set; } = string.Empty;
+    public LocalizedText? CourseTitle { get; set; }
     public Guid? SessionId { get; set; }
     public SessionDto? Session { get; set; }
     public decimal Price { get; set; }
+    public string Currency { get; set; } = string.Empty;
+    public int Qty { get; set; }
 }

@@ -9,6 +9,7 @@ import { Icon } from '@/components/ui/icon';
 import Link from 'next/link';
 import { usePageLoad } from '@/lib/use-animations';
 import { ScrollAnimations } from '@/components/scroll-animations';
+import { useHydration } from '@/hooks/useHydration';
 
 export default function CheckoutSuccessPage() {
   const locale = useLocale();
@@ -16,6 +17,7 @@ export default function CheckoutSuccessPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isAuthenticated } = useAuthStore();
+  const isHydrated = useHydration();
   const isLoaded = usePageLoad(100);
   
   const [order, setOrder] = useState<any>(null);
@@ -24,28 +26,65 @@ export default function CheckoutSuccessPage() {
 
   const orderId = searchParams?.get('orderId') || null;
 
+  // Debug: Log URL and parameters
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      console.log('🌐 Current URL:', window.location.href);
+      console.log('📦 URL Search Params:', window.location.search);
+      console.log('🆔 Order ID from params:', orderId);
+    }
+  }, [orderId]);
+
+  useEffect(() => {
+    // Wait for hydration before checking authentication
+    if (!isHydrated) {
+      console.log('⏳ Waiting for hydration...');
+      return;
+    }
+
+    console.log('✅ Hydrated, checking auth...');
+    console.log('🔐 Is Authenticated:', isAuthenticated);
+
     if (!isAuthenticated) {
+      console.log('❌ Not authenticated, redirecting to login...');
       router.push(`/${locale}/auth/login`);
       return;
     }
 
     if (!orderId) {
+      console.log('❌ No order ID in URL');
       setError(t('checkout.success.no-order-id'));
       setIsLoading(false);
       return;
     }
 
+    console.log('✅ All checks passed, fetching order...');
     fetchOrder();
-  }, [isAuthenticated, orderId, locale, router, t]);
+  }, [isHydrated, isAuthenticated, orderId, locale, router, t]);
 
   const fetchOrder = async () => {
     try {
+      console.log('🔍 Fetching order with ID:', orderId);
       const response = await ordersApi.getOrder(orderId!);
+      console.log('✅ Order fetched successfully:', response.data);
       setOrder(response.data);
     } catch (error: any) {
-      console.error('Error fetching order:', error);
-      setError(t('checkout.success.order-not-found'));
+      console.error('❌ Error fetching order:', error);
+      console.error('Error details:', {
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data,
+        message: error.message
+      });
+      
+      // More specific error messages
+      if (error.response?.status === 404) {
+        setError(t('checkout.success.order-not-found'));
+      } else if (error.response?.status === 401 || error.response?.status === 403) {
+        setError('Unauthorized. Please login again.');
+      } else {
+        setError(error.response?.data?.error || error.response?.data?.message || t('checkout.success.order-not-found'));
+      }
     } finally {
       setIsLoading(false);
     }

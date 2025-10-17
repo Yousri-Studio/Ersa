@@ -70,7 +70,7 @@ export default function AdminOrderDetail() {
   };
 
   const getStatusColor = (status: string | number) => {
-    // Handle enum values from backend
+    // Handle enum values from backend (OrderStatus)
     if (typeof status === 'number') {
       switch (status) {
         case 0: return 'bg-gray-100 text-gray-800'; // New
@@ -106,7 +106,7 @@ export default function AdminOrderDetail() {
   };
 
   const getStatusLabel = (status: string | number) => {
-    // Handle enum values from backend
+    // Handle enum values from backend (OrderStatus)
     if (typeof status === 'number') {
       switch (status) {
         case 0: return 'New';
@@ -138,6 +138,95 @@ export default function AdminOrderDetail() {
       case 'cancelled': return 'Cancelled';
       case 'unpaid': return 'Unpaid';
       default: return 'Unknown';
+    }
+  };
+
+  // Payment-specific status functions (PaymentStatus enum: Pending=1, Processing=2, Completed=3, Failed=4, Cancelled=5, Refunded=6)
+  const getPaymentStatusColor = (status: string | number) => {
+    if (typeof status === 'number') {
+      switch (status) {
+        case 1: return 'bg-yellow-100 text-yellow-800'; // Pending
+        case 2: return 'bg-blue-100 text-blue-800'; // Processing
+        case 3: return 'bg-primary-100 text-primary-800'; // Completed
+        case 4: return 'bg-red-100 text-red-800'; // Failed
+        case 5: return 'bg-gray-100 text-gray-800'; // Cancelled
+        case 6: return 'bg-secondary-100 text-secondary-800'; // Refunded
+        default: return 'bg-gray-100 text-gray-800';
+      }
+    }
+    const statusStr = String(status || '').toLowerCase();
+    switch (statusStr) {
+      case 'pending': return 'bg-yellow-100 text-yellow-800';
+      case 'processing': return 'bg-blue-100 text-blue-800';
+      case 'completed': return 'bg-primary-100 text-primary-800';
+      case 'failed': return 'bg-red-100 text-red-800';
+      case 'cancelled': return 'bg-gray-100 text-gray-800';
+      case 'refunded': return 'bg-secondary-100 text-secondary-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getPaymentStatusLabel = (status: string | number) => {
+    if (typeof status === 'number') {
+      switch (status) {
+        case 1: return 'Pending';
+        case 2: return 'Processing';
+        case 3: return 'Completed';
+        case 4: return 'Failed';
+        case 5: return 'Cancelled';
+        case 6: return 'Refunded';
+        default: return 'Unknown';
+      }
+    }
+    const statusStr = String(status || '').toLowerCase();
+    switch (statusStr) {
+      case 'pending': return 'Pending';
+      case 'processing': return 'Processing';
+      case 'completed': return 'Completed';
+      case 'failed': return 'Failed';
+      case 'cancelled': return 'Cancelled';
+      case 'refunded': return 'Refunded';
+      default: return 'Unknown';
+    }
+  };
+
+  const getPaymentProviderIcon = (provider: string) => {
+    const providerLower = provider.toLowerCase();
+    switch (providerLower) {
+      case 'clickpay':
+        return 'credit-card'; // or 'wallet' for payment gateway
+      case 'hyperpay':
+        return 'building-columns'; // or 'credit-card' for bank payment
+      case 'stripe':
+        return 'cc-stripe';
+      case 'paypal':
+        return 'cc-paypal';
+      case 'cash':
+        return 'money-bill';
+      case 'bank':
+        return 'building-columns';
+      default:
+        return 'credit-card'; // default payment icon
+    }
+  };
+
+  const getPaymentProviderColor = (provider: string) => {
+    const providerLower = provider.toLowerCase();
+    switch (providerLower) {
+      case 'clickpay':
+        return 'text-blue-600'; // ClickPay blue
+      case 'hyperpay':
+        return 'text-purple-600'; // HyperPay purple
+      case 'stripe':
+        return 'text-indigo-600'; // Stripe indigo
+      case 'paypal':
+        return 'text-blue-500'; // PayPal blue
+      case 'cash':
+        return 'text-green-600'; // Cash green
+      case 'bank':
+        return 'text-gray-600'; // Bank gray
+      default:
+        return 'text-gray-600'; // default gray
     }
   };
 
@@ -316,10 +405,10 @@ export default function AdminOrderDetail() {
             {orderDetail.payments.map((payment) => (
               <div key={payment.id} className="border border-gray-200 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-3 rtl:space-x-reverse">
                     <div className="flex-shrink-0">
-                      <div className="h-8 w-8 rounded-full bg-blue-100 flex items-center justify-center">
-                        <Icon name="credit-card" className="h-4 w-4 text-blue-600" />
+                      <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center">
+                        <Icon name={getPaymentProviderIcon(payment.provider)} className={`h-4 w-4 ${getPaymentProviderColor(payment.provider)}`} />
                       </div>
                     </div>
                     <div>
@@ -331,8 +420,8 @@ export default function AdminOrderDetail() {
                       </div>
                     </div>
                   </div>
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getStatusColor(payment.status)}`}>
-                    {getStatusLabel(payment.status)}
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getPaymentStatusColor(payment.status)}`}>
+                    {getPaymentStatusLabel(payment.status)}
                   </span>
                 </div>
                 

@@ -37,10 +37,20 @@ public class ClickPayGateway : IPaymentGateway
         try
         {
             var config = _configuration.GetSection("ClickPay");
-            var apiUrl = config["ApiUrl"];
+            var useProxy = config.GetValue<bool>("UseProxy");
+            var apiUrl = config["ApiUrl"]; // Always use ClickPay API directly
             var profileId = config["ProfileId"];
             var serverKey = config["ServerKey"];
+            
+            _logger.LogInformation("🔧 ClickPay InitiatePayment - UseProxy: {UseProxy}, ApiUrl: {ApiUrl}", useProxy, apiUrl);
 
+            // Build webhook callback URL - use proxy format if UseProxy is enabled
+            var webhookUrl = useProxy
+                ? $"{config["ProxyUrl"]}/api/proxy?endpoint=%2Fpayments%2Fclickpay%2Fwebhook"
+                : $"{_configuration["App:BaseUrl"]}/api/payments/clickpay/webhook";
+            
+            _logger.LogInformation("🔗 ClickPay webhook URL: {WebhookUrl}", webhookUrl);
+            
             var requestData = new
             {
                 profile_id = profileId,
@@ -50,7 +60,7 @@ public class ClickPayGateway : IPaymentGateway
                 cart_description = $"Training Course Order {order.Id}",
                 cart_currency = order.Currency ?? "SAR",
                 cart_amount = order.Amount.ToString("F2"),
-                callback = $"{_configuration["App:BaseUrl"]}/api/payments/clickpay/webhook",
+                callback = webhookUrl,
                 @return = returnUrl,
                 hide_shipping = true,  // Hide shipping information for digital products
                 customer_details = new
@@ -113,6 +123,8 @@ public class ClickPayGateway : IPaymentGateway
         try
         {
             _logger.LogInformation("🔍 Processing ClickPay webhook...");
+            _logger.LogInformation("📝 RAW PAYLOAD: {Payload}", payload);
+            _logger.LogInformation("🔑 SIGNATURE: {Signature}", signature ?? "N/A");
             
             // Validate webhook signature
             if (!ValidateWebhookSignature(payload, signature))
@@ -130,8 +142,8 @@ public class ClickPayGateway : IPaymentGateway
                 return false;
             }
             
-            _logger.LogInformation("📋 Webhook data - CartId: {CartId}, RespCode: {RespCode}, TranRef: {TranRef}", 
-                webhookData.CartId, webhookData.RespCode, webhookData.TranRef);
+            _logger.LogInformation("📋 Webhook data - CartId: {CartId}, Status: {Status}, RespCode: {RespCode}, TranRef: {TranRef}", 
+                webhookData.CartId, webhookData.PaymentResult?.ResponseStatus ?? "N/A", webhookData.RespCode, webhookData.TranRef);
 
             if (!Guid.TryParse(webhookData.CartId, out var orderId))
             {
@@ -161,12 +173,14 @@ public class ClickPayGateway : IPaymentGateway
                 return false;
             }
 
-            // Update payment status based on ClickPay response code
-            // Response codes: 00, 000 = Approved, others = Failed/Declined
-            payment.Status = webhookData.RespCode switch
+            // Update payment status based on ClickPay response status
+            // response_status: A = Approved/Authorised, D = Declined, H = Held, V = Void, P = Pending
+            var responseStatus = webhookData.PaymentResult?.ResponseStatus ?? "";
+            payment.Status = responseStatus.ToUpper() switch
             {
-                "00" or "000" => PaymentStatus.Completed,
-                _ => PaymentStatus.Failed
+                "A" => PaymentStatus.Completed, // Authorised/Approved
+                "P" => PaymentStatus.Pending,    // Pending
+                _ => PaymentStatus.Failed        // Declined, Held, Void, or unknown
             };
 
             payment.ProviderRef = webhookData.TranRef;
@@ -203,9 +217,11 @@ public class ClickPayGateway : IPaymentGateway
         try
         {
             var config = _configuration.GetSection("ClickPay");
-            var apiUrl = config["ApiUrl"];
+            var apiUrl = config["ApiUrl"]; // Always use ClickPay API directly
             var profileId = config["ProfileId"];
             var serverKey = config["ServerKey"];
+            
+            _logger.LogInformation("🔧 ClickPay RefundAsync - ApiUrl: {ApiUrl}", apiUrl);
 
             if (payment.Order == null)
             {
@@ -339,17 +355,36 @@ public class ClickPayWebhookData
     [JsonPropertyName("tran_ref")]
     public string TranRef { get; set; } = string.Empty;
 
-    [JsonPropertyName("respCode")]
-    public string RespCode { get; set; } = string.Empty;
-
-    [JsonPropertyName("respMessage")]
-    public string RespMessage { get; set; } = string.Empty;
+    [JsonPropertyName("payment_result")]
+    public ClickPayPaymentResult? PaymentResult { get; set; }
 
     [JsonPropertyName("cart_amount")]
     public string? CartAmount { get; set; }
 
     [JsonPropertyName("cart_currency")]
     public string? CartCurrency { get; set; }
+
+    // Computed properties for backward compatibility
+    public string RespCode => PaymentResult?.ResponseCode ?? string.Empty;
+    public string RespMessage => PaymentResult?.ResponseMessage ?? string.Empty;
+}
+
+/// <summary>
+/// DTO for ClickPay payment result (nested in webhook data).
+/// </summary>
+public class ClickPayPaymentResult
+{
+    [JsonPropertyName("response_status")]
+    public string ResponseStatus { get; set; } = string.Empty;
+
+    [JsonPropertyName("response_code")]
+    public string ResponseCode { get; set; } = string.Empty;
+
+    [JsonPropertyName("response_message")]
+    public string ResponseMessage { get; set; } = string.Empty;
+
+    [JsonPropertyName("acquirer_ref")]
+    public string? AcquirerRef { get; set; }
 }
 
 /// <summary>

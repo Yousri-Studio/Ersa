@@ -18,6 +18,11 @@ export default function CartPage() {
   
   const isEmpty = items.length === 0;
 
+  // Debug logging
+  console.log('🛒 Cart Page - isHydrated:', isHydrated);
+  console.log('🛒 Cart Page - items:', items);
+  console.log('🛒 Cart Page - localStorage:', typeof window !== 'undefined' ? localStorage.getItem('cart-storage') : null);
+
   // Show loading state while hydrating to prevent flash of empty cart
   if (!isHydrated) {
     return (

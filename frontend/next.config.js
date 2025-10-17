@@ -5,7 +5,7 @@ const withNextIntl = createNextIntlPlugin('./i18n.ts');
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   outputFileTracingRoot: __dirname,
-  trailingSlash: true,
+  trailingSlash: false, // Changed to false to fix ClickPay webhook 308 redirect
   webpack: (config) => {
     return config;
   },

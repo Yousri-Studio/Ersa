@@ -11,14 +11,16 @@ import {
   faHome, faDesktop, faTshirt, faDollarSign, faUserShield, faLayerGroup, faCube, faExternalLinkAlt,
   faSave, faQuestionCircle, faCogs, faBriefcase, faRobot, faFileAlt, faPen, faMessage, faGlobe,
   faMagnifyingGlass, faCloudArrowUp, faPrint, faBuilding, faFileContract, faNewspaper, faCopy,
-  faInfinity, faSignal, faDesktop as faMonitor, faCircleCheck, faCircleExclamation
+  faInfinity, faSignal, faDesktop as faMonitor, faCircleCheck, faCircleExclamation,
+  faCreditCard, faWallet, faMoneyBill, faMoneyBill1, faBuildingColumns, faUniversity
 } from '@fortawesome/free-solid-svg-icons';
 import { 
   faHeart as faHeartRegular, faStar as faStarRegular, faBookmark as faBookmarkRegular,
   faUser as faUserRegular, faEnvelope as faEnvelopeRegular
 } from '@fortawesome/free-regular-svg-icons';
 import {
-  faFacebook, faTwitter, faLinkedin, faInstagram, faYoutube, faWhatsapp, faGoogle
+  faFacebook, faTwitter, faLinkedin, faInstagram, faYoutube, faWhatsapp, faGoogle,
+  faCcStripe, faCcPaypal, faStripe, faPaypal
 } from '@fortawesome/free-brands-svg-icons';
 
 interface IconProps {
@@ -136,6 +138,10 @@ const iconMap: Record<string, any> = {
   'youtube': faYoutube,
   'whatsapp': faWhatsapp,
   'google': faGoogle,
+  'cc-stripe': faCcStripe,
+  'cc-paypal': faCcPaypal,
+  'stripe': faStripe,
+  'paypal': faPaypal,
   
   // Additional icons that were being used
   'pen': faPen,
@@ -164,6 +170,14 @@ const iconMap: Record<string, any> = {
   'faStar': faStar,
   'faUsers': faUsers,
   'faGraduationCap': faGraduationCap,
+  
+  // Payment icons
+  'credit-card': faCreditCard,
+  'wallet': faWallet,
+  'money-bill': faMoneyBill,
+  'money-bill-1': faMoneyBill1,
+  'building-columns': faBuildingColumns,
+  'university': faUniversity,
 };
 
 export function Icon({ name, icon, className = '', variant = 'solid', style, color, width }: IconProps) {

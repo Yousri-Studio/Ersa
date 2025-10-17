@@ -314,11 +314,17 @@ export const ordersApi = {
   }>> =>
     api.post('/orders', { cartId }),
 
+  getUserOrders: (): Promise<AxiosResponse<Order[]>> =>
+    api.get('/orders'),
+
   getOrders: (): Promise<AxiosResponse<Order[]>> =>
     api.get('/orders'),
 
   getOrder: (orderId: string): Promise<AxiosResponse<Order>> =>
     api.get(`/orders/${orderId}`),
+
+  cancelOrder: (orderId: string): Promise<AxiosResponse<{ message: string }>> =>
+    api.post(`/orders/${orderId}/cancel`),
 };
 
 // Payment Gateway Types

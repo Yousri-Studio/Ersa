@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import { CartItem, cartApi } from './api';
 import { customStorage } from './custom-storage';
 
@@ -72,39 +72,53 @@ export const useCartStore = create<CartState>()(
       },
 
       addItem: async (item: CartItem) => {
+        console.log('🛒 addItem called with:', item);
         const { items, cartId, initializeCart } = get();
+        console.log('🛒 Current cart state - items:', items, 'cartId:', cartId);
+        
         const existingItem = items.find(
           (i) => i.courseId === item.courseId && i.sessionId === item.sessionId
         );
 
         if (existingItem) {
+          console.log('🛒 Item already in cart, skipping');
           return; // Item already in cart
         }
 
         // Initialize cart if needed
         if (!cartId) {
+          console.log('🛒 No cartId, initializing cart...');
           await initializeCart();
         }
 
         const newItems = [...items, item];
         const newTotal = newItems.reduce((sum, i) => sum + i.price * i.qty, 0);
         
+        console.log('🛒 Setting new state - items:', newItems, 'total:', newTotal);
         // Update local state immediately for better UX
         set({ items: newItems, total: newTotal });
+
+        // Verify the state was updated
+        const updatedState = get();
+        console.log('🛒 State after set - items:', updatedState.items, 'total:', updatedState.total);
 
         // Try to sync with backend if we have a valid cartId
         const currentCartId = get().cartId;
         if (currentCartId && !currentCartId.startsWith('local-cart-')) {
           try {
+            console.log('🛒 Syncing with backend, cartId:', currentCartId);
             await cartApi.addToCart({
               cartId: currentCartId,
               courseId: item.courseId,
               sessionId: item.sessionId
             });
+            console.log('🛒 Backend sync successful');
           } catch (error) {
-            console.error('Failed to sync cart with backend:', error);
+            console.error('🛒 Failed to sync cart with backend:', error);
             // Keep local state even if backend sync fails
           }
+        } else {
+          console.log('🛒 Skipping backend sync - using local cart:', currentCartId);
         }
       },
 
@@ -153,7 +167,14 @@ export const useCartStore = create<CartState>()(
     }),
     {
       name: 'cart-storage',
-      storage: customStorage as any,
+      storage: createJSONStorage(() => customStorage),
+      partialize: (state) => ({
+        cartId: state.cartId,
+        anonymousId: state.anonymousId,
+        items: state.items,
+        total: state.total,
+        currency: state.currency,
+      }),
     }
   )
 );
