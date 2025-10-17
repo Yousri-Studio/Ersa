@@ -347,8 +347,10 @@ export default function EnrollmentsPage() {
                 {locale === 'ar' ? 'تصفح الدورات' : 'Browse Courses'}
               </Link>
             </div>
-          ) : filteredEnrollments.length > 0 && (
-            /* Enrollments Grid */
+          )}
+
+          {/* Enrollments Grid */}
+          {filteredEnrollments.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {filteredEnrollments.map((enrollment, index) => {
                 const courseTitle = locale === 'ar' ? enrollment.courseTitleAr : enrollment.courseTitleEn;
