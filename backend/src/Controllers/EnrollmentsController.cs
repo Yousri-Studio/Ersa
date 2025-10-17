@@ -72,7 +72,7 @@ public class EnrollmentsController : ControllerBase
                 EnrolledAt = e.EnrolledAt,
                 Status = MapEnrollmentStatus(e.Status),
                 Progress = CalculateProgress(e), // You can implement progress tracking later
-                Category = e.Course.Category?.NameEn ?? e.Course.Category?.NameAr
+                Category = e.Course.Category?.TitleEn ?? e.Course.Category?.TitleAr
             }).ToList();
 
             _logger.LogInformation("Found {Count} enrollments for user {UserId}", enrollmentDtos.Count, userId);
@@ -122,7 +122,7 @@ public class EnrollmentsController : ControllerBase
                 EnrolledAt = enrollment.EnrolledAt,
                 Status = MapEnrollmentStatus(enrollment.Status),
                 Progress = CalculateProgress(enrollment),
-                Category = enrollment.Course.Category?.NameEn ?? enrollment.Course.Category?.NameAr
+                Category = enrollment.Course.Category?.TitleEn ?? enrollment.Course.Category?.TitleAr
             };
 
             return Ok(enrollmentDto);
