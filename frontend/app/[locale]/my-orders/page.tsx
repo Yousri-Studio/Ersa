@@ -67,7 +67,7 @@ export default function MyOrdersPage() {
       console.log('📦 Fetching user orders...');
       const response = await ordersApi.getUserOrders();
       console.log('✅ Orders fetched:', response.data);
-      setOrders((response.data as MyOrder[]) || []);
+      setOrders((response.data as unknown as MyOrder[]) || []);
       setError(null);
     } catch (err: any) {
       console.error('❌ Error fetching orders:', err);
