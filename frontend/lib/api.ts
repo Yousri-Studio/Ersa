@@ -221,6 +221,7 @@ export interface Order {
   currency: string;
   status: 'New' | 'PendingPayment' | 'Paid' | 'UnderProcess' | 'Processed' | 'Expired' | 'Failed' | 'Refunded';
   createdAt: string;
+  updatedAt: string;
   items: OrderItem[];
 }
 
