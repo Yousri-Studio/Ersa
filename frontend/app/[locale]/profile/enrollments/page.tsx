@@ -359,7 +359,7 @@ export default function EnrollmentsPage() {
                 return (
                   <div
                     key={enrollment.id}
-                    ref={(el) => setEnrollmentRef(el, index)}
+                    ref={setEnrollmentRef(index)}
                     className={`bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-lg transition-shadow duration-300 ${isVisible ? 'animate-scale-in' : 'opacity-0'}`}
                     style={{ animationDelay: `${index * 100}ms` }}
                   >
