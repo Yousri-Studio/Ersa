@@ -4,6 +4,7 @@ public class EnrollmentDto
 {
     public Guid Id { get; set; }
     public Guid CourseId { get; set; }
+    public string CourseSlug { get; set; } = string.Empty;
     public string CourseTitleEn { get; set; } = string.Empty;
     public string CourseTitleAr { get; set; } = string.Empty;
     public string? CourseImage { get; set; } // Base64 encoded image

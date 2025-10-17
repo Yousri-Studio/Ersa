@@ -12,7 +12,8 @@ import {
   faSave, faQuestionCircle, faCogs, faBriefcase, faRobot, faFileAlt, faPen, faMessage, faGlobe,
   faMagnifyingGlass, faCloudArrowUp, faPrint, faBuilding, faFileContract, faNewspaper, faCopy,
   faInfinity, faSignal, faDesktop as faMonitor, faCircleCheck, faCircleExclamation,
-  faCreditCard, faWallet, faMoneyBill, faMoneyBill1, faBuildingColumns, faUniversity
+  faCreditCard, faWallet, faMoneyBill, faMoneyBill1, faBuildingColumns, faUniversity,
+  faArrowsRotate, faReceipt, faListUl, faCircleQuestion
 } from '@fortawesome/free-solid-svg-icons';
 import { 
   faHeart as faHeartRegular, faStar as faStarRegular, faBookmark as faBookmarkRegular,
@@ -178,6 +179,18 @@ const iconMap: Record<string, any> = {
   'money-bill-1': faMoneyBill1,
   'building-columns': faBuildingColumns,
   'university': faUniversity,
+  
+  // Additional icons
+  'refresh': faArrowsRotate,
+  'arrows-rotate': faArrowsRotate,
+  'receipt': faReceipt,
+  
+  // Success page icons
+  'list-bullet': faListUl,
+  'list-ul': faListUl,
+  'question-mark-circle': faCircleQuestion,
+  'circle-question': faCircleQuestion,
+  'academic-cap': faGraduationCap, // Alias for graduation-cap
 };
 
 export function Icon({ name, icon, className = '', variant = 'solid', style, color, width }: IconProps) {

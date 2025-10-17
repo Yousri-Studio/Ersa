@@ -16,6 +16,7 @@ public class HyperPayGateway : IPaymentGateway
     private readonly HttpClient _httpClient;
     private readonly ILogger<HyperPayGateway> _logger;
     private readonly ErsaTrainingDbContext _context;
+    private readonly IEmailService _emailService;
 
     public string ProviderName => "HyperPay";
 
@@ -23,12 +24,14 @@ public class HyperPayGateway : IPaymentGateway
         IConfiguration configuration,
         HttpClient httpClient,
         ILogger<HyperPayGateway> logger,
-        ErsaTrainingDbContext context)
+        ErsaTrainingDbContext context,
+        IEmailService emailService)
     {
         _configuration = configuration;
         _httpClient = httpClient;
         _logger = logger;
         _context = context;
+        _emailService = emailService;
     }
 
     public async Task<PaymentInitiationResult> InitiatePaymentAsync(Order order, string returnUrl)
@@ -39,6 +42,15 @@ public class HyperPayGateway : IPaymentGateway
             var apiUrl = hyperPayConfig["ApiUrl"];
             var entityId = hyperPayConfig["EntityId"];
             var accessToken = hyperPayConfig["AccessToken"];
+
+            // Append orderId to return URL if not already present
+            var finalReturnUrl = returnUrl;
+            if (!returnUrl.Contains("orderId=", StringComparison.OrdinalIgnoreCase))
+            {
+                var separator = returnUrl.Contains("?") ? "&" : "?";
+                finalReturnUrl = $"{returnUrl}{separator}orderId={order.Id}";
+            }
+            _logger.LogInformation("📍 HyperPay return URL: {ReturnUrl}", finalReturnUrl);
 
             var requestData = new
             {
@@ -56,7 +68,7 @@ public class HyperPayGateway : IPaymentGateway
                 {
                     country = "SA"
                 },
-                shopperResultUrl = returnUrl,
+                shopperResultUrl = finalReturnUrl,
                 notificationUrl = $"{_configuration["App:BaseUrl"]}/api/payments/hyperpay/webhook"
             };
 
@@ -131,6 +143,7 @@ public class HyperPayGateway : IPaymentGateway
             var order = await _context.Orders
                 .Include(o => o.User)
                 .Include(o => o.Bill)
+                .Include(o => o.OrderItems) // ✅ Include OrderItems for email and enrollment
                 .FirstOrDefaultAsync(o => o.Id == orderId);
 
             if (order == null)
@@ -167,15 +180,38 @@ public class HyperPayGateway : IPaymentGateway
                 order.Status = OrderStatus.Paid;
                 order.UpdatedAt = DateTime.UtcNow;
                 _logger.LogInformation("HyperPay payment completed for order {OrderId}", orderId);
+                
+                // Save changes first to ensure order status is updated
+                await _context.SaveChangesAsync();
+                
+                // Send order confirmation email with invoice
+                try
+                {
+                    _logger.LogInformation("Sending order confirmation email for order {OrderId}, locale: {Locale}", orderId, order.User.Locale);
+                    var emailSent = await _emailService.SendOrderConfirmationEmailAsync(order, order.User.Locale);
+                    if (emailSent)
+                    {
+                        _logger.LogInformation("Order confirmation email sent successfully for order {OrderId}", orderId);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Failed to send order confirmation email for order {OrderId}", orderId);
+                    }
+                }
+                catch (Exception emailEx)
+                {
+                    _logger.LogError(emailEx, "Error sending order confirmation email for order {OrderId}", orderId);
+                    // Don't fail the webhook if email fails
+                }
             }
             else if (payment.Status == PaymentStatus.Failed || payment.Status == PaymentStatus.Cancelled)
             {
                 order.Status = OrderStatus.Failed;
                 order.UpdatedAt = DateTime.UtcNow;
                 _logger.LogWarning("HyperPay payment failed for order {OrderId}", orderId);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return true;
         }
         catch (Exception ex)

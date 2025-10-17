@@ -23,6 +23,7 @@ export default function CheckoutSuccessPage() {
   const [order, setOrder] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
 
   const orderId = searchParams?.get('orderId') || null;
 
@@ -35,14 +36,31 @@ export default function CheckoutSuccessPage() {
     }
   }, [orderId]);
 
+  // Initialize auth state on mount
   useEffect(() => {
-    // Wait for hydration before checking authentication
     if (!isHydrated) {
       console.log('⏳ Waiting for hydration...');
       return;
     }
 
-    console.log('✅ Hydrated, checking auth...');
+    console.log('✅ Hydrated, initializing auth...');
+    const initAuth = async () => {
+      await useAuthStore.getState().initFromCookie();
+      setAuthChecked(true);
+      console.log('🔐 Auth initialized, isAuthenticated:', useAuthStore.getState().isAuthenticated);
+    };
+
+    initAuth();
+  }, [isHydrated]);
+
+  // Check authentication and fetch order
+  useEffect(() => {
+    if (!authChecked) {
+      console.log('⏳ Waiting for auth check...');
+      return;
+    }
+
+    console.log('✅ Auth checked, verifying authentication...');
     console.log('🔐 Is Authenticated:', isAuthenticated);
 
     if (!isAuthenticated) {
@@ -60,7 +78,7 @@ export default function CheckoutSuccessPage() {
 
     console.log('✅ All checks passed, fetching order...');
     fetchOrder();
-  }, [isHydrated, isAuthenticated, orderId, locale, router, t]);
+  }, [authChecked, isAuthenticated, orderId, locale, router, t]);
 
   const fetchOrder = async () => {
     try {

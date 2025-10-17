@@ -49,6 +49,10 @@ export default function MyOrdersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null); // Track which button is loading
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   useEffect(() => {
     if (!isHydrated) return;
@@ -176,6 +180,56 @@ export default function MyOrdersPage() {
     return statusLower === 'paid' || statusLower === 'processed';
   };
 
+  // Pagination logic
+  const totalOrders = orders.length;
+  const totalPages = itemsPerPage === -1 ? 1 : Math.ceil(totalOrders / itemsPerPage);
+  const startIndex = itemsPerPage === -1 ? 0 : (currentPage - 1) * itemsPerPage;
+  const endIndex = itemsPerPage === -1 ? totalOrders : startIndex + itemsPerPage;
+  const currentOrders = orders.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleItemsPerPageChange = (value: number) => {
+    setItemsPerPage(value);
+    setCurrentPage(1); // Reset to first page when changing items per page
+  };
+
+  const getPageNumbers = () => {
+    const pages: (number | string)[] = [];
+    const maxVisiblePages = 5;
+
+    if (totalPages <= maxVisiblePages) {
+      // Show all pages if total is small
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Show first page, last page, and pages around current page
+      if (currentPage <= 3) {
+        for (let i = 1; i <= 4; i++) pages.push(i);
+        pages.push('...');
+        pages.push(totalPages);
+      } else if (currentPage >= totalPages - 2) {
+        pages.push(1);
+        pages.push('...');
+        for (let i = totalPages - 3; i <= totalPages; i++) pages.push(i);
+      } else {
+        pages.push(1);
+        pages.push('...');
+        pages.push(currentPage - 1);
+        pages.push(currentPage);
+        pages.push(currentPage + 1);
+        pages.push('...');
+        pages.push(totalPages);
+      }
+    }
+
+    return pages;
+  };
+
   if (!isHydrated || loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -235,9 +289,38 @@ export default function MyOrdersPage() {
               </Link>
             </div>
           ) : (
-            /* Orders List */
-            <div className="space-y-6">
-              {orders.map((order, index) => (
+            <>
+              {/* Pagination Info and Controls */}
+              <div className="bg-white rounded-lg shadow-sm p-4 mb-6">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                  {/* Items per page selector */}
+                  <div className="flex items-center gap-3">
+                    <label className="text-sm font-medium text-gray-700 font-cairo">
+                      {t('pagination.items-per-page')}:
+                    </label>
+                    <select
+                      value={itemsPerPage}
+                      onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+                      className="border border-gray-300 rounded-lg px-3 py-2 text-sm font-cairo focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    >
+                      <option value={10}>10</option>
+                      <option value={25}>25</option>
+                      <option value={50}>50</option>
+                      <option value={100}>100</option>
+                      <option value={-1}>{t('pagination.all')}</option>
+                    </select>
+                  </div>
+
+                  {/* Showing info */}
+                  <div className="text-sm text-gray-600 font-cairo">
+                    {t('pagination.showing')} {startIndex + 1} - {Math.min(endIndex, totalOrders)} {t('pagination.of')} {totalOrders} {t('pagination.orders')}
+                  </div>
+                </div>
+              </div>
+
+              {/* Orders List */}
+              <div className="space-y-6">
+                {currentOrders.map((order, index) => (
                 <div
                   key={order.id}
                   className={`bg-white rounded-lg shadow-sm overflow-hidden ${isLoaded ? 'animate-slide-in-up' : 'opacity-0'}`}
@@ -372,6 +455,67 @@ export default function MyOrdersPage() {
                 </div>
               ))}
             </div>
+
+            {/* Pagination Controls */}
+            {totalPages > 1 && (
+              <div className="bg-white rounded-lg shadow-sm p-4 mt-6">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                  {/* Page info */}
+                  <div className="text-sm text-gray-600 font-cairo">
+                    {t('pagination.page')} {currentPage} {t('pagination.of')} {totalPages}
+                  </div>
+
+                  {/* Page navigation */}
+                  <div className="flex items-center gap-2">
+                    {/* Previous button */}
+                    <button
+                      onClick={() => handlePageChange(currentPage - 1)}
+                      disabled={currentPage === 1}
+                      className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-cairo transition-colors"
+                    >
+                      <Icon name="chevron-left" className="h-4 w-4" />
+                    </button>
+
+                    {/* Page numbers */}
+                    <div className="flex items-center gap-1">
+                      {getPageNumbers().map((page, index) => {
+                        if (page === '...') {
+                          return (
+                            <span key={`ellipsis-${index}`} className="px-2 text-gray-500">
+                              ...
+                            </span>
+                          );
+                        }
+                        
+                        return (
+                          <button
+                            key={page}
+                            onClick={() => handlePageChange(page as number)}
+                            className={`min-w-[40px] px-3 py-2 rounded-lg text-sm font-medium transition-colors font-cairo ${
+                              currentPage === page
+                                ? 'bg-teal-600 text-white'
+                                : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
+                            }`}
+                          >
+                            {page}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Next button */}
+                    <button
+                      onClick={() => handlePageChange(currentPage + 1)}
+                      disabled={currentPage === totalPages}
+                      className="px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed font-cairo transition-colors"
+                    >
+                      <Icon name="chevron-right" className="h-4 w-4" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
           )}
         </div>
       </div>

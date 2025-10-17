@@ -185,6 +185,14 @@ export function Header() {
                       {t('navigation.my-learning')}
                     </Link>
                     <Link
+                      href={`/${locale}/profile/orders`}
+                      className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      <Icon name="receipt" className="h-4 w-4 mr-3 rtl:mr-0 rtl:ml-3" />
+                      {t('navigation.my-orders')}
+                    </Link>
+                    <Link
                       href={`/${locale}/profile/wishlist`}
                       className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors duration-200"
                       onClick={() => setUserMenuOpen(false)}
@@ -361,6 +369,15 @@ export function Header() {
                       >
                         <Icon name="graduation-cap" className="h-5 w-5 mr-3 rtl:mr-0 rtl:ml-3" />
                         {t('navigation.my-learning')}
+                      </Link>
+                      
+                      <Link
+                        href={`/${locale}/profile/orders`}
+                        className="flex items-center px-3 py-3 text-base font-medium text-gray-700 hover:text-primary-600 hover:bg-gray-50 rounded-md transition-colors duration-200"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <Icon name="receipt" className="h-5 w-5 mr-3 rtl:mr-0 rtl:ml-3" />
+                        {t('navigation.my-orders')}
                       </Link>
                       
                       <Link

@@ -219,7 +219,7 @@ export interface Order {
   id: string;
   amount: number;
   currency: string;
-  status: 'New' | 'PendingPayment' | 'Paid' | 'UnderProcess' | 'Processed' | 'Expired' | 'Failed' | 'Refunded';
+  status: 'New' | 'PendingPayment' | 'Paid' | 'UnderProcess' | 'Processed' | 'Expired' | 'Failed' | 'Refunded' | 'Cancelled' | string;
   createdAt: string;
   updatedAt: string;
   items: OrderItem[];

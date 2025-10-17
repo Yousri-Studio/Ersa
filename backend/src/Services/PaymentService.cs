@@ -140,6 +140,7 @@ public class PaymentService : IPaymentService
                     var order = await _context.Orders
                         .Include(o => o.User)
                         .Include(o => o.Bill)
+                        .Include(o => o.OrderItems) // ✅ CRITICAL: Include OrderItems for enrollment creation
                         .FirstOrDefaultAsync(o => o.Id == orderId.Value);
 
                     var payment = await _context.Payments

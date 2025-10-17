@@ -1,10 +1,32 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useLocale, useTranslations } from 'next-intl';
+import { useLocale } from 'next-intl';
 import Link from 'next/link';
 import { usePageLoad } from '@/lib/use-animations';
 import { ScrollAnimations } from '@/components/scroll-animations';
+
+// Fallback translations
+const translations = {
+  en: {
+    'server-error': 'Server Error',
+    'server-error-description': 'An unexpected error occurred on our server. Please check your internet connection or try again later.',
+    'try-again': 'Try Again',
+    'return-home': 'Return to Home',
+    'if-persists': 'If this error persists, you can:',
+    'contact-support': 'Contact Technical Support',
+    'send-email': 'Send Email',
+  },
+  ar: {
+    'server-error': 'خطأ بالسيرفر',
+    'server-error-description': 'حدث خطأ غير متوقع في خادمنا. يرجى التحقق من اتصالك بالإنترنت أو إعادة المحاولة لاحقًا.',
+    'try-again': 'إعادة المحاولة',
+    'return-home': 'العودة للرئيسية',
+    'if-persists': 'إذا استمر هذا الخطأ، يمكنك:',
+    'contact-support': 'تواصل مع الدعم الفني',
+    'send-email': 'إرسال بريد إلكتروني',
+  },
+};
 
 export default function Error({
   error,
@@ -13,9 +35,11 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  const locale = useLocale();
-  const t = useTranslations();
+  const locale = (useLocale() || 'en') as 'en' | 'ar';
   const isLoaded = usePageLoad(100);
+  
+  // Get translation function
+  const t = (key: string) => translations[locale]?.[key as keyof typeof translations.en] || translations.en[key as keyof typeof translations.en] || key;
 
   useEffect(() => {
     console.error(error);
@@ -82,7 +106,7 @@ export default function Error({
                 lineHeight: 'normal'
               }}
             >
-              خطأ بالسيرفر
+              {t('server-error')}
             </h1>
             
             {/* Error Description */}
@@ -96,7 +120,7 @@ export default function Error({
                 textAlign: 'center'
               }}
             >
-              حدث خطأ غير متوقع في خادمنا. يرجى التحقق من اتصالك بالإنترنت أو إعادة المحاولة لاحقًا.
+              {t('server-error-description')}
             </p>
 
             {/* Action Buttons */}
@@ -111,7 +135,7 @@ export default function Error({
                   minWidth: '200px'
                 }}
               >
-                إعادة المحاولة
+                {t('try-again')}
               </button>
               
               <Link
@@ -123,28 +147,28 @@ export default function Error({
                   minWidth: '200px'
                 }}
               >
-                العودة للرئيسية
+                {t('return-home')}
               </Link>
             </div>
 
             {/* Additional Help */}
             <div className={`mt-8 pt-8 border-t border-gray-200 ${isLoaded ? 'animate-fade-in-up stagger-4' : 'opacity-0'}`}>
               <p className="text-sm text-gray-500 font-cairo mb-4">
-                إذا استمر هذا الخطأ، يمكنك:
+                {t('if-persists')}
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center items-center text-sm">
                 <Link
                   href={`/${locale}/contact`}
                   className="text-teal-600 hover:text-teal-700 font-cairo font-medium"
                 >
-                  تواصل مع الدعم الفني
+                  {t('contact-support')}
                 </Link>
                 <span className="hidden sm:inline text-gray-300">|</span>
                 <a
                   href="mailto:support@ersaa.com"
                   className="text-teal-600 hover:text-teal-700 font-cairo font-medium"
                 >
-                  إرسال بريد إلكتروني
+                  {t('send-email')}
                 </a>
               </div>
             </div>

@@ -441,6 +441,18 @@ public class AuthController : ControllerBase
             user.Status = UserStatus.Active;
             await _userManager.UpdateAsync(user);
 
+            // Send welcome email
+            try
+            {
+                await _emailService.SendWelcomeEmailAsync(user);
+                _logger.LogInformation("Welcome email sent to user {UserId} after verification", user.Id);
+            }
+            catch (Exception emailEx)
+            {
+                _logger.LogError(emailEx, "Failed to send welcome email to user {UserId}", user.Id);
+                // Don't fail verification if welcome email fails
+            }
+
             // Generate token and return login response
             var token = await _jwtService.GenerateTokenAsync(user);
             

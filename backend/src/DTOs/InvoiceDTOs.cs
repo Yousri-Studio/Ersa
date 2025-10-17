@@ -10,7 +10,7 @@ public class InvoiceDto
     public Guid OrderId { get; set; }
     public decimal Amount { get; set; }
     public string Currency { get; set; } = string.Empty;
-    public OrderStatus Status { get; set; }
+    public string Status { get; set; } = string.Empty;
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     

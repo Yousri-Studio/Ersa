@@ -19,15 +19,18 @@ public class AdminController : ControllerBase
     private readonly ErsaTrainingDbContext _context;
     private readonly UserManager<User> _userManager;
     private readonly ILogger<AdminController> _logger;
+    private readonly IEnrollmentService _enrollmentService;
 
     public AdminController(
         ErsaTrainingDbContext context,
         UserManager<User> userManager,
-        ILogger<AdminController> logger)
+        ILogger<AdminController> logger,
+        IEnrollmentService enrollmentService)
     {
         _context = context;
         _userManager = userManager;
         _logger = logger;
+        _enrollmentService = enrollmentService;
     }
 
     private async Task<bool> IsAdminOrSuperAdmin()
@@ -579,7 +582,7 @@ public class AdminController : ControllerBase
                 OrderId = order.Id,
                 Amount = order.Amount,
                 Currency = order.Currency,
-                Status = order.Status,
+                Status = order.Status.ToString(),
                 CreatedAt = order.CreatedAt,
                 UpdatedAt = order.UpdatedAt,
                 Customer = new InvoiceCustomerDto
@@ -1906,6 +1909,98 @@ public class AdminController : ControllerBase
         {
             _logger.LogError(ex, "Error removing role {RoleName} from user {Email}", roleName, email);
             return StatusCode(500, new { error = "Internal server error" });
+        }
+    }
+
+    /// <summary>
+    /// Fix missing enrollments for paid orders (Admin diagnostic tool)
+    /// </summary>
+    [HttpPost("fix-missing-enrollments")]
+    public async Task<ActionResult> FixMissingEnrollments()
+    {
+        try
+        {
+            // Find paid orders that don't have enrollments
+            var paidOrdersWithoutEnrollments = await _context.Orders
+                .Include(o => o.OrderItems)
+                .Include(o => o.Enrollments)
+                .Where(o => o.Status == OrderStatus.Paid && !o.Enrollments.Any())
+                .ToListAsync();
+
+            _logger.LogInformation("Found {Count} paid orders without enrollments", paidOrdersWithoutEnrollments.Count);
+
+            var createdCount = 0;
+            var errorCount = 0;
+
+            foreach (var order in paidOrdersWithoutEnrollments)
+            {
+                try
+                {
+                    var enrollments = await _enrollmentService.CreateEnrollmentsFromOrderAsync(order);
+                    createdCount += enrollments.Count;
+                    _logger.LogInformation("Created {Count} enrollments for order {OrderId}", enrollments.Count, order.Id);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Failed to create enrollments for order {OrderId}", order.Id);
+                    errorCount++;
+                }
+            }
+
+            return Ok(new
+            {
+                message = "Enrollment creation completed",
+                ordersProcessed = paidOrdersWithoutEnrollments.Count,
+                enrollmentsCreated = createdCount,
+                errors = errorCount
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in fix-missing-enrollments");
+            return StatusCode(500, new { error = "Internal server error", message = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Get diagnostic information about orders and enrollments
+    /// </summary>
+    [HttpGet("enrollment-diagnostics")]
+    public async Task<ActionResult> GetEnrollmentDiagnostics()
+    {
+        try
+        {
+            var totalOrders = await _context.Orders.CountAsync();
+            var paidOrders = await _context.Orders.CountAsync(o => o.Status == OrderStatus.Paid);
+            var totalEnrollments = await _context.Enrollments.CountAsync();
+            
+            var ordersWithoutEnrollments = await _context.Orders
+                .Include(o => o.Enrollments)
+                .Where(o => o.Status == OrderStatus.Paid && !o.Enrollments.Any())
+                .Select(o => new
+                {
+                    o.Id,
+                    o.UserId,
+                    o.Amount,
+                    o.Status,
+                    o.CreatedAt,
+                    ItemCount = o.OrderItems.Count()
+                })
+                .ToListAsync();
+
+            return Ok(new
+            {
+                totalOrders,
+                paidOrders,
+                totalEnrollments,
+                paidOrdersWithoutEnrollments = ordersWithoutEnrollments.Count,
+                affectedOrders = ordersWithoutEnrollments
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in enrollment-diagnostics");
+            return StatusCode(500, new { error = "Internal server error", message = ex.Message });
         }
     }
 

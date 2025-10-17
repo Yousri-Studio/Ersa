@@ -98,6 +98,7 @@
     "cart": "Cart",
     "wishlist": "Wishlist",
     "my-learning": "My Learning",
+    "my-orders": "My Orders",
     "admin": "Admin"
   },
   "auth": {
@@ -791,6 +792,13 @@
     "load-failed": "Failed to load data",
     "course-not-found": "Course not found",
     "course-not-found-message": "Sorry, we couldn't find the requested course.",
+    "server-error": "Server Error",
+    "server-error-description": "An unexpected error occurred on our server. Please check your internet connection or try again later.",
+    "try-again": "Try Again",
+    "return-home": "Return to Home",
+    "if-persists": "If this error persists, you can:",
+    "contact-support": "Contact Technical Support",
+    "send-email": "Send Email",
     "404": {
       "title": "Page Not Found",
       "description": "Sorry, the page you're looking for doesn't exist. Please verify the link or return to the homepage.",
@@ -895,6 +903,16 @@
       "payment-failed": "Failed to create payment session. Please try again.",
       "cancel-failed": "Failed to cancel order. Please try again."
     }
+  },
+  "pagination": {
+    "items-per-page": "Items per page",
+    "all": "All",
+    "showing": "Showing",
+    "of": "of",
+    "orders": "orders",
+    "page": "Page",
+    "previous": "Previous",
+    "next": "Next"
   },
   "courseCategories": {
     "title": "Course Categories",

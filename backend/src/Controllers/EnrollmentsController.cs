@@ -65,6 +65,7 @@ public class EnrollmentsController : ControllerBase
             {
                 Id = e.Id,
                 CourseId = e.CourseId,
+                CourseSlug = e.Course.Slug,
                 CourseTitleEn = e.Course.TitleEn,
                 CourseTitleAr = e.Course.TitleAr,
                 CourseImage = e.Course.Photo != null ? Convert.ToBase64String(e.Course.Photo) : null,

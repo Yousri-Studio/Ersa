@@ -14,6 +14,7 @@ import { ScrollAnimations } from '@/components/scroll-animations';
 interface Enrollment {
   id: string;
   courseId: string;
+  courseSlug: string;
   courseTitleEn: string;
   courseTitleAr: string;
   courseImage?: string;
@@ -28,7 +29,7 @@ export default function EnrollmentsPage() {
   const locale = useLocale();
   const t = useTranslations();
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, initFromCookie } = useAuthStore();
   const isHydrated = useHydration();
   const isLoaded = usePageLoad(100);
   
@@ -36,6 +37,7 @@ export default function EnrollmentsPage() {
   const [filteredEnrollments, setFilteredEnrollments] = useState<Enrollment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [authChecked, setAuthChecked] = useState(false);
   
   // Filter and search states
   const [searchQuery, setSearchQuery] = useState('');
@@ -45,16 +47,36 @@ export default function EnrollmentsPage() {
 
   const { visibleItems: enrollmentsVisible, setRef: setEnrollmentRef } = useStaggeredAnimation(filteredEnrollments, 150);
 
+  // Initialize auth from cookie on mount
   useEffect(() => {
-    if (!isHydrated) return;
+    const initAuth = async () => {
+      if (!isHydrated) return;
+      
+      console.log('🔐 Enrollments page: Initializing auth from cookie...');
+      await initFromCookie();
+      setAuthChecked(true);
+      console.log('🔐 Enrollments page: Auth check complete');
+    };
+    
+    initAuth();
+  }, [isHydrated, initFromCookie]);
+
+  // Check authentication and fetch enrollments
+  useEffect(() => {
+    if (!isHydrated || !authChecked) return;
+    
+    console.log('🔐 Enrollments page: Auth status:', { isAuthenticated, authChecked });
     
     if (!isAuthenticated) {
+      console.log('🔐 Enrollments page: Not authenticated, redirecting to login');
       router.push(`/${locale}/auth/login?redirect=/${locale}/profile/enrollments`);
       return;
     }
 
+    console.log('🔐 Enrollments page: Authenticated, fetching enrollments');
     fetchEnrollments();
-  }, [isHydrated, isAuthenticated, locale, router]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isHydrated, authChecked, isAuthenticated, locale, router]);
 
   const fetchEnrollments = async () => {
     try {
@@ -138,7 +160,7 @@ export default function EnrollmentsPage() {
 
   const hasActiveFilters = searchQuery || selectedCategory !== 'all' || selectedStatus !== 'all' || sortBy !== 'date';
 
-  if (!isHydrated || loading) {
+  if (!isHydrated || !authChecked || loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -324,7 +346,7 @@ export default function EnrollmentsPage() {
           {enrollments.length === 0 && (
             <div className="bg-white rounded-lg shadow-sm p-12 text-center">
               <div className="mb-6">
-                <Icon name="academic-cap" className="h-20 w-20 text-gray-400 mx-auto" />
+                <Icon name="graduation-cap" className="h-20 w-20 text-gray-400 mx-auto" />
               </div>
               <h3 className="text-2xl font-semibold text-gray-900 font-cairo mb-2">
                 {locale === 'ar' ? 'لم تسجل في أي دورة بعد' : 'No enrollments yet'}
@@ -374,7 +396,7 @@ export default function EnrollmentsPage() {
                       </div>
                     ) : (
                       <div className="h-48 bg-gradient-to-br from-teal-400 to-purple-600 flex items-center justify-center">
-                        <Icon name="academic-cap" className="h-16 w-16 text-white opacity-80" />
+                        <Icon name="graduation-cap" className="h-16 w-16 text-white opacity-80" />
                       </div>
                     )}
 
@@ -423,7 +445,7 @@ export default function EnrollmentsPage() {
                       {/* Action Buttons */}
                       <div className="flex gap-2">
                         <Link
-                          href={`/${locale}/courses/${enrollment.courseId}`}
+                          href={`/${locale}/courses/${enrollment.courseSlug}`}
                           className="flex-1 inline-flex items-center justify-center px-4 py-2 text-white font-semibold rounded-lg btn-animate font-cairo"
                           style={{
                             backgroundColor: '#00AC96',
@@ -436,7 +458,7 @@ export default function EnrollmentsPage() {
                         </Link>
                         
                         <Link
-                          href={`/${locale}/courses/${enrollment.courseId}`}
+                          href={`/${locale}/courses/${enrollment.courseSlug}`}
                           className="inline-flex items-center justify-center px-3 py-2 bg-white text-gray-700 border border-gray-300 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
                         >
                           <Icon name="eye" className="h-4 w-4" />

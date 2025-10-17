@@ -157,7 +157,7 @@ public class OrdersController : ControllerBase
                 Id = o.Id,
                 Amount = o.Amount,
                 Currency = o.Currency,
-                Status = o.Status,
+                Status = o.Status.ToString(),
                 CreatedAt = o.CreatedAt,
                 UpdatedAt = o.UpdatedAt,
                 Items = o.OrderItems.Select(oi => new OrderItemDto
@@ -210,8 +210,9 @@ public class OrdersController : ControllerBase
                 Id = order.Id,
                 Amount = order.Amount,
                 Currency = order.Currency,
-                Status = order.Status,
+                Status = order.Status.ToString(),
                 CreatedAt = order.CreatedAt,
+                UpdatedAt = order.UpdatedAt,
                 Items = new List<OrderItemDto>() // TODO: Implement order items
             };
 
