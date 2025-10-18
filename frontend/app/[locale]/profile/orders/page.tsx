@@ -183,11 +183,11 @@ export default function OrdersPage() {
                           <div key={itemIndex} className="flex items-center justify-between">
                             <div className="flex-1">
                               <p className="font-medium text-gray-900 font-cairo">
-                                {locale === 'ar' ? item.titleAr : item.titleEn}
+                                {locale === 'ar' ? item.title.ar : item.title.en}
                               </p>
                               {item.session && (
                                 <p className="text-sm text-gray-600 font-cairo">
-                                  {t('orders.session')}: {item.session.sessionNumber || item.session.id}
+                                  {t('orders.session')}: {new Date(item.session.startAt).toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric' })}
                                 </p>
                               )}
                             </div>

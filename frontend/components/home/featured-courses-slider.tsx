@@ -187,16 +187,7 @@ export function FeaturedCoursesSlider() {
       removeWishlistItem(courseId);
       toast.success(t('wishlist.item-removed') || 'Removed from wishlist');
     } else {
-      const wishlistItem = {
-        id: courseId,
-        courseId: courseId,
-        title: course.title,
-        price: course.price,
-        currency: course.currency,
-        imageUrl: course.thumbnailUrl,
-        instructor: course.instructor?.name
-      };
-      addWishlistItem(wishlistItem);
+      addWishlistItem(courseId);
       toast.success(t('wishlist.item-added') || 'Added to wishlist');
     }
   };

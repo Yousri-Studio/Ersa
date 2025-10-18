@@ -14,6 +14,7 @@ import { courseToCardProps } from '@/lib/course-adapter';
 import type { Course as ApiCourse } from '@/lib/api';
 import type { Course } from '@/lib/types';
 import { useCartStore } from '@/lib/cart-store';
+import { useWishlistStore } from '@/lib/wishlist-store';
 import { useAuthStore } from '@/lib/auth-store';
 import { toast } from 'react-hot-toast';
 import { usePageLoad, useStaggeredAnimation } from '@/lib/use-animations';
@@ -174,9 +175,10 @@ const mockCourses: Partial<ApiCourse>[] = [
 export default function CoursesPage() {
   const searchParams = useSearchParams();
   const locale = useLocale();
-  const t = useTranslations('consultation');
+  const t = useTranslations();
   const router = useRouter();
   const { addItem, hasItem } = useCartStore();
+  const { addItem: addToWishlist, removeItem: removeFromWishlist, hasItem: hasItemInWishlist, fetchWishlist } = useWishlistStore();
   const { user } = useAuthStore();
 
   const query = searchParams?.get('query') || '';
@@ -239,15 +241,34 @@ export default function CoursesPage() {
     }
   }, [sortBy, apiCourses, isLoading, coursesError]);
 
-  const handleToggleWishlist = (courseId: string) => {
+  const handleToggleWishlist = async (courseId: string) => {
     if (!user) {
-      router.push(`/${locale}/auth/login`);
+      router.push(`/${locale}/auth/login?redirect=/courses`);
       return;
     }
     
-    // In a real app, you would call the wishlist API
-    toast.success(t('wishlist.item-added'));
+    const isInWishlist = hasItemInWishlist(courseId);
+    
+    try {
+      if (isInWishlist) {
+        await removeFromWishlist(courseId);
+        toast.success(t('wishlist.item-removed'));
+      } else {
+        await addToWishlist(courseId);
+        toast.success(t('wishlist.item-added'));
+      }
+    } catch (error) {
+      console.error('Error toggling wishlist:', error);
+      toast.error(t('wishlist.error'));
+    }
   };
+
+  // Fetch wishlist on mount if user is authenticated
+  useEffect(() => {
+    if (user) {
+      fetchWishlist();
+    }
+  }, [user]);
 
   const handleAddToCart = (courseId: string) => {
     const course = apiCourses?.find((c: Course) => c.id === courseId);
@@ -343,7 +364,7 @@ export default function CoursesPage() {
             {/* Tagline */}
             <div className={`mb-6 ${isLoaded ? 'animate-fade-in-down' : 'opacity-0'}`}>
               <div className="inline-flex items-center text-brand text-sm font-semibold font-cairo">
-                🔥 {t('badge')}
+                🔥 {t('courses.badge')}
               </div>
             </div>
             
@@ -356,12 +377,12 @@ export default function CoursesPage() {
               fontStyle: 'normal',
               fontWeight: '700'
             }}>
-              {t('title')}
+              {t('courses.title')}
             </h1>
             
             {/* Description */}
             <p className={`text-lg text-gray-600 leading-relaxed font-cairo ${locale === 'ar' ? 'text-right' : 'text-left'} ${isLoaded ? 'animate-fade-in-up stagger-2' : 'opacity-0'}`}>
-              {t('description')}
+              {t('courses.subtitle')}
             </p>
           </div>
 
@@ -394,7 +415,7 @@ export default function CoursesPage() {
               return featuredCourses.map((course: Course, index: number) => {
                 console.log('Rendering featured course:', course.title, 'isFeatured:', course.isFeatured);
                 const cardProps = courseToCardProps(course, locale as 'ar' | 'en', {
-                  inWishlist: false,
+                  inWishlist: hasItemInWishlist(course.id),
                   inCart: hasItem(course.id),
                   onToggleWishlist: handleToggleWishlist,
                   onAddToCart: handleAddToCart,
@@ -429,7 +450,7 @@ export default function CoursesPage() {
           <div className="text-center py-12">
             <Icon name="alert-circle" className="h-12 w-12 text-red-500 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">
-              {t('errors.load-failed')}
+              {t('courses.errors.load-failed')}
             </h3>
             <p className="text-gray-500">{coursesError.message}</p>
           </div>

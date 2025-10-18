@@ -377,7 +377,7 @@ export default function ProfilePage() {
                         </p>
                       </div>
                     </div>
-                    <Icon name="chevron-right" className="h-5 w-5 text-gray-400 group-hover:text-gray-600" />
+                    <Icon name="chevron-right" className="h-5 w-5 text-gray-400 group-hover:text-gray-600 rtl:rotate-180" />
                   </Link>
 
                   <Link
@@ -386,7 +386,7 @@ export default function ProfilePage() {
                   >
                     <div className="flex items-center">
                       <div className="h-10 w-10 bg-green-500 rounded-lg flex items-center justify-center mr-3 rtl:mr-0 rtl:ml-3">
-                        <Icon name="shopping-bag" className="h-5 w-5 text-white" />
+                        <Icon name="receipt" className="h-5 w-5 text-white" />
                       </div>
                       <div>
                         <h3 className="font-semibold text-gray-900 font-cairo">
@@ -397,7 +397,7 @@ export default function ProfilePage() {
                         </p>
                       </div>
                     </div>
-                    <Icon name="chevron-right" className="h-5 w-5 text-gray-400 group-hover:text-gray-600" />
+                    <Icon name="chevron-right" className="h-5 w-5 text-gray-400 group-hover:text-gray-600 rtl:rotate-180" />
                   </Link>
 
                   <Link
@@ -417,7 +417,7 @@ export default function ProfilePage() {
                         </p>
                       </div>
                     </div>
-                    <Icon name="chevron-right" className="h-5 w-5 text-gray-400 group-hover:text-gray-600" />
+                    <Icon name="chevron-right" className="h-5 w-5 text-gray-400 group-hover:text-gray-600 rtl:rotate-180" />
                   </Link>
                 </div>
               </div>

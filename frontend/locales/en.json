@@ -648,6 +648,7 @@
     "no-topics-available": "No topics available for this course"
   },
   "courses": {
+    "badge": "Training Courses",
     "title": "Our Courses",
     "subtitle": "Discover our comprehensive range of professional development courses",
     "view-all": "View All Courses",
@@ -686,6 +687,9 @@
         "browse-all": "Browse Courses",
         "try-again": "Try Search Again"
       }
+    },
+    "errors": {
+      "load-failed": "Failed to load courses"
     }
   },
   "invoice": {
@@ -751,9 +755,13 @@
   },
   "wishlist": {
     "title": "Wishlist",
+    "subtitle": "Save your favorite courses for later",
     "items-count": "{count} items in wishlist",
     "add-to-cart": "Add to Cart",
     "continue-shopping": "Continue Shopping",
+    "item-added": "Course added to wishlist",
+    "item-removed": "Course removed from wishlist",
+    "error": "Failed to update wishlist",
     "empty": {
       "title": "Your wishlist is empty",
       "description": "You haven't added any courses to your wishlist yet. Start browsing our courses and discover what suits you.",

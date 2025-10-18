@@ -129,8 +129,9 @@ export function Header() {
 
             {/* Wishlist */}
             <Link
-              href={`/${locale}/wishlist`}
+              href={`/${locale}/profile/wishlist`}
               className="relative flex items-center justify-center w-12 h-12 bg-white rounded-full shadow-sm hover:shadow-md transition-all duration-200"
+              title={t('navigation.wishlist')}
             >
               <Icon 
                 icon={['fas', 'heart']} 
@@ -316,7 +317,7 @@ export function Header() {
                 <div className="flex items-center justify-center py-4 border-t border-gray-200 gap-5">
                   {/* Wishlist */}
                   <Link
-                    href={`/${locale}/wishlist`}
+                    href={`/${locale}/profile/wishlist`}
                     className="relative flex items-center justify-center w-12 h-12 bg-gray-50 rounded-full hover:bg-gray-100 transition-all duration-200"
                     onClick={() => setMobileMenuOpen(false)}
                   >

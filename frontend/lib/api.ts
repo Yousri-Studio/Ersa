@@ -357,7 +357,7 @@ export const enrollmentsApi = {
 
 // Wishlist API
 export const wishlistApi = {
-  getWishlist: (): Promise<AxiosResponse<any[]>> =>
+  getWishlist: (): Promise<AxiosResponse<{ items: any[], totalCount: number }>> =>
     api.get('/wishlist/items'),
 
   addToWishlist: (courseId: string): Promise<AxiosResponse<any>> =>

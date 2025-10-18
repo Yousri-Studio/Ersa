@@ -71,11 +71,11 @@ public class WishlistController : ControllerBase
                     En = wi.Course?.DescriptionEn ?? ""
                 },
                 Price = wi.Course?.Price ?? 0,
-                OriginalPrice = wi.Course?.OriginalPrice ?? 0,
-                ImageUrl = wi.Course?.ImageUrl,
-                Rating = wi.Course?.Rating ?? 0,
-                StudentsCount = wi.Course?.StudentsCount ?? 0,
-                Duration = wi.Course?.DurationHours ?? 0,
+                OriginalPrice = wi.Course?.Price ?? 0, // Course doesn't have OriginalPrice, use same as Price
+                ImageUrl = null, // Course uses Photo (byte[]), not ImageUrl
+                Rating = 0, // Course doesn't have Rating property
+                StudentsCount = 0, // Course doesn't have StudentsCount property
+                Duration = 0, // Course doesn't have DurationHours, has DurationEn/DurationAr strings instead
                 Level = wi.Course?.Level.ToString() ?? "Beginner",
                 Instructor = wi.Course?.CourseInstructors?.FirstOrDefault()?.Instructor?.InstructorNameEn ?? "Unknown",
                 CategoryName = new LocalizedString
