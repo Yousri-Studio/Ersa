@@ -116,7 +116,7 @@ export default function WishlistPage() {
                   {/* Course Image */}
                   <div className="relative">
                     <img
-                      src={item.imageUrl || '/api/placeholder/300/200'}
+                      src={item.imageUrl || '/images/Course Place Holder Small.png'}
                       alt={title}
                       className="w-full h-48 object-cover"
                     />
@@ -184,7 +184,7 @@ export default function WishlistPage() {
                         {t('wishlist.add-to-cart')}
                       </button>
                       <Link
-                        href={`/${locale}/courses/${item.courseId}`}
+                        href={`/${locale}/courses/${item.slug}`}
                         className="px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors duration-200 inline-flex items-center justify-center"
                       >
                         <Icon name="eye" className="h-4 w-4 text-gray-600" />

@@ -6,6 +6,7 @@ import { wishlistApi } from './api';
 interface WishlistItem {
   id: string;
   courseId: string;
+  slug: string;
   title: {
     ar: string;
     en: string;
@@ -62,6 +63,7 @@ export const useWishlistStore = create<WishlistState>()(
           const items = response.data.items.map((item: any) => ({
             id: item.id,
             courseId: item.courseId,
+            slug: item.slug,
             title: item.title,
             description: item.description,
             price: item.price,

@@ -60,6 +60,7 @@ public class WishlistController : ControllerBase
             {
                 Id = wi.Id.ToString(),
                 CourseId = wi.CourseId.ToString(),
+                Slug = wi.Course?.Slug ?? "",
                 Title = new LocalizedString
                 {
                     Ar = wi.Course?.TitleAr ?? "",
@@ -297,6 +298,7 @@ public class WishlistItemDto
 {
     public string Id { get; set; } = string.Empty;
     public string CourseId { get; set; } = string.Empty;
+    public string Slug { get; set; } = string.Empty;
     public LocalizedString Title { get; set; } = new();
     public LocalizedString Description { get; set; } = new();
     public decimal Price { get; set; }
