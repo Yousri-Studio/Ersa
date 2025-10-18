@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
+import { useRouter } from 'next/navigation';
 import { Icon } from '@/components/ui/icon';
 import { motion } from 'framer-motion';
 import { adminApi, AdminCreateCourseRequest, AdminUpdateCourseRequest, AdminCourse, CourseCategory } from '@/lib/admin-api';
@@ -12,6 +13,7 @@ import toast from 'react-hot-toast';
 export default function AdminCourses() {
   const t = useTranslations('admin');
   const locale = useLocale();
+  const router = useRouter();
   const [courses, setCourses] = useState<AdminCourse[]>([]);
   const [categories, setCategories] = useState<CourseCategory[]>([]);
   const [pagination, setPagination] = useState({
@@ -488,6 +490,16 @@ export default function AdminCourses() {
                     </td>
                     <td className={`px-6 py-4 whitespace-nowrap text-sm font-medium ${isRTL ? 'text-left' : 'text-right'}`}>
                       <div className={`flex ${isRTL ? 'justify-start' : 'justify-end'} ${isRTL ? 'space-x-reverse' : ''} space-x-2`}>
+                        {/* Only show attachments button for PDF courses (type = 2) */}
+                        {course.type === 2 && (
+                          <button
+                            onClick={() => router.push(`/${locale}/admin/courses/${course.id}/attachments`)}
+                            className="text-purple-600 hover:text-purple-900 p-2 rounded-md hover:bg-purple-50"
+                            title={locale === 'ar' ? 'المرفقات' : 'Attachments'}
+                          >
+                            <Icon name="file-alt" className="h-4 w-4" />
+                          </button>
+                        )}
                         <button
                           onClick={() => openEditModal(course)}
                           className="text-blue-600 hover:text-blue-900 p-2 rounded-md hover:bg-blue-50"

@@ -244,6 +244,7 @@ export interface AdminCourse {
   courseTopicsEn?: string;
   isActive: boolean;
   isFeatured?: boolean;
+  attachmentCount?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -419,6 +420,82 @@ export interface RoleInfo {
   id: string;
   name: string;
   normalizedName?: string;
+}
+
+// Order Fulfillment
+export interface AttachmentDto {
+  id: string;
+  fileName: string;
+  type: number; // AttachmentType enum: PDF=1, Video=2, Document=3
+}
+
+export interface SecureLinkDto {
+  id: string;
+  attachmentFileName: string;
+  token: string;
+  createdAt: string;
+}
+
+export interface SessionDto {
+  id: string;
+  titleAr: string;
+  titleEn: string;
+  descriptionAr?: string;
+  descriptionEn?: string;
+  startAt: string;
+  endAt: string;
+  teamsLink?: string;
+  capacity?: number;
+  availableSpots?: number;
+}
+
+export interface OrderEnrollmentDto {
+  id: string;
+  courseId: string;
+  courseType: number; // CourseType enum: Live=1, PDF=2
+  courseTitle: {
+    ar: string;
+    en: string;
+  };
+  sessionId?: string;
+  session?: SessionDto;
+  courseSessions: SessionDto[]; // All sessions for this course
+  status: number; // EnrollmentStatus enum
+  courseAttachments: AttachmentDto[];
+  secureLinks: SecureLinkDto[];
+}
+
+export interface CreateSecureLinksRequest {
+  attachmentIds: string[];
+  sendEmail: boolean;
+}
+
+export interface CreateEnrollmentSessionRequest {
+  titleAr: string;
+  titleEn: string;
+  descriptionAr?: string;
+  descriptionEn?: string;
+  startAt: string;
+  endAt: string;
+  teamsLink: string;
+  sendEmail: boolean;
+}
+
+export interface UpdateEnrollmentSessionRequest {
+  titleAr: string;
+  titleEn: string;
+  descriptionAr?: string;
+  descriptionEn?: string;
+  startAt: string;
+  endAt: string;
+  teamsLink: string;
+  sendEmail: boolean;
+}
+
+export interface CancelEnrollmentSessionRequest {
+  cancellationReasonEn: string;
+  cancellationReasonAr: string;
+  sendEmail: boolean;
 }
 
 // Fallback data for when backend is not available
@@ -897,6 +974,51 @@ export const adminApi = {
 
   getUserRoles: (email: string) =>
     api.get<string[]>(`/role/user/${encodeURIComponent(email)}/roles`),
+
+  // Course Attachments
+  uploadCourseAttachment: async (courseId: string, file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    // For file uploads, we need to delete the Content-Type header so axios sets it with boundary
+    const response = await api.post<AttachmentDto>(
+      `/admin/courses/${courseId}/attachments`, 
+      formData,
+      {
+        headers: {
+          'Content-Type': false as any, // Tell axios to NOT set content-type, let browser do it
+        },
+      }
+    );
+    return response;
+  },
+
+  getCourseAttachments: (courseId: string) =>
+    api.get<AttachmentDto[]>(`/admin/courses/${courseId}/attachments`),
+
+  deleteCourseAttachment: (attachmentId: string) =>
+    api.delete(`/admin/attachments/${attachmentId}`),
+
+  // Order Fulfillment
+  getOrderEnrollments: (orderId: string) =>
+    api.get<OrderEnrollmentDto[]>(`/admin/orders/${orderId}/enrollments`),
+
+  createSecureLinks: (enrollmentId: string, data: CreateSecureLinksRequest) =>
+    api.post<SecureLinkDto[]>(`/admin/enrollments/${enrollmentId}/secure-links`, data),
+
+  createEnrollmentSession: (enrollmentId: string, data: CreateEnrollmentSessionRequest) =>
+    api.post<SessionDto>(`/admin/enrollments/${enrollmentId}/session`, data),
+
+  updateEnrollmentSession: (enrollmentId: string, data: UpdateEnrollmentSessionRequest) =>
+    api.put<SessionDto>(`/admin/enrollments/${enrollmentId}/session`, data),
+
+  cancelEnrollmentSession: (enrollmentId: string, data: CancelEnrollmentSessionRequest) =>
+    api.post(`/admin/enrollments/${enrollmentId}/session/cancel`, data),
+
+  resendSessionNotification: (enrollmentId: string) =>
+    api.post(`/admin/enrollments/${enrollmentId}/session/resend-notification`),
+
+  completeEnrollment: (enrollmentId: string) =>
+    api.put(`/admin/enrollments/${enrollmentId}/complete`),
 };
 
 

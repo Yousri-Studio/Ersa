@@ -289,6 +289,7 @@ public class AdminController : ControllerBase
                 .Include(c => c.Category)
                 .Include(c => c.CourseSubCategoryMappings)
                     .ThenInclude(m => m.SubCategory)
+                .Include(c => c.Attachments)
                 .AsSplitQuery()
                 .AsQueryable();
 
@@ -375,6 +376,7 @@ public class AdminController : ControllerBase
                     CourseTopicsEn = c.CourseTopicsEn,
                     IsActive = c.IsActive,
                     IsFeatured = c.IsFeatured,
+                    AttachmentCount = c.Attachments.Count(a => !a.IsRevoked),
                     CreatedAt = c.CreatedAt,
                     UpdatedAt = c.UpdatedAt
                 })
@@ -2003,6 +2005,642 @@ public class AdminController : ControllerBase
             return StatusCode(500, new { error = "Internal server error", message = ex.Message });
         }
     }
+
+    #region Course Attachments Management
+
+    /// <summary>
+    /// Upload an attachment to a course
+    /// </summary>
+    [HttpPost("courses/{courseId}/attachments")]
+    [Consumes("multipart/form-data")]
+    public async Task<ActionResult<AttachmentDto>> UploadCourseAttachment(Guid courseId, IFormFile file)
+    {
+        try
+        {
+            var course = await _context.Courses.FindAsync(courseId);
+            if (course == null)
+            {
+                return NotFound(new { error = "Course not found" });
+            }
+
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest(new { error = "No file provided" });
+            }
+
+            // Determine attachment type based on file extension
+            var fileExtension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            AttachmentType attachmentType = fileExtension switch
+            {
+                ".pdf" => AttachmentType.PDF,
+                ".mp4" or ".avi" or ".mov" or ".wmv" => AttachmentType.Video,
+                _ => AttachmentType.Document
+            };
+
+            // Generate unique filename
+            var uniqueFileName = $"{Guid.NewGuid()}{fileExtension}";
+            var storagePath = Path.Combine("storage", "attachments", uniqueFileName);
+            var fullPath = Path.Combine(Directory.GetCurrentDirectory(), storagePath);
+
+            // Ensure directory exists
+            Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
+
+            // Save file
+            using (var stream = new FileStream(fullPath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            var attachment = new Attachment
+            {
+                Id = Guid.NewGuid(),
+                CourseId = courseId,
+                FileName = file.FileName,
+                BlobPath = storagePath,
+                Type = attachmentType,
+                IsRevoked = false,
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.Attachments.Add(attachment);
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Uploaded attachment {FileName} for course {CourseId}", file.FileName, courseId);
+
+            return Ok(new AttachmentDto
+            {
+                Id = attachment.Id,
+                FileName = attachment.FileName,
+                Type = attachment.Type
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error uploading attachment for course {CourseId}", courseId);
+            return StatusCode(500, new { error = "Internal server error" });
+        }
+    }
+
+    /// <summary>
+    /// Get all attachments for a course
+    /// </summary>
+    [HttpGet("courses/{courseId}/attachments")]
+    public async Task<ActionResult<List<AttachmentDto>>> GetCourseAttachments(Guid courseId)
+    {
+        try
+        {
+            var course = await _context.Courses.FindAsync(courseId);
+            if (course == null)
+            {
+                return NotFound(new { error = "Course not found" });
+            }
+
+            var attachments = await _context.Attachments
+                .Where(a => a.CourseId == courseId && !a.IsRevoked)
+                .Select(a => new AttachmentDto
+                {
+                    Id = a.Id,
+                    FileName = a.FileName,
+                    Type = a.Type
+                })
+                .ToListAsync();
+
+            return Ok(attachments);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting attachments for course {CourseId}", courseId);
+            return StatusCode(500, new { error = "Internal server error" });
+        }
+    }
+
+    /// <summary>
+    /// Delete an attachment
+    /// </summary>
+    [HttpDelete("attachments/{attachmentId}")]
+    public async Task<ActionResult> DeleteCourseAttachment(Guid attachmentId)
+    {
+        try
+        {
+            var attachment = await _context.Attachments.FindAsync(attachmentId);
+            if (attachment == null)
+            {
+                return NotFound(new { error = "Attachment not found" });
+            }
+
+            // Mark as revoked instead of deleting
+            attachment.IsRevoked = true;
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Deleted attachment {AttachmentId}", attachmentId);
+
+            return Ok(new { message = "Attachment deleted successfully" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting attachment {AttachmentId}", attachmentId);
+            return StatusCode(500, new { error = "Internal server error" });
+        }
+    }
+
+    #endregion
+
+    #region Order Fulfillment
+
+    /// <summary>
+    /// Get enrollments for an order with course details
+    /// </summary>
+    [HttpGet("orders/{orderId}/enrollments")]
+    public async Task<ActionResult<List<OrderEnrollmentDto>>> GetOrderEnrollments(Guid orderId)
+    {
+        try
+        {
+            var order = await _context.Orders.FindAsync(orderId);
+            if (order == null)
+            {
+                return NotFound(new { error = "Order not found" });
+            }
+
+            var enrollments = await _context.Enrollments
+                .Include(e => e.Course)
+                    .ThenInclude(c => c.Attachments)
+                .Include(e => e.Course)
+                    .ThenInclude(c => c.Sessions)
+                .Include(e => e.Session)
+                .Include(e => e.SecureLinks)
+                    .ThenInclude(sl => sl.Attachment)
+                .Where(e => e.OrderId == orderId)
+                .AsSplitQuery()
+                .ToListAsync();
+
+            var enrollmentDtos = enrollments.Select(e => new OrderEnrollmentDto
+            {
+                Id = e.Id,
+                CourseId = e.CourseId,
+                CourseType = e.Course.Type,
+                CourseTitle = new LocalizedText
+                {
+                    Ar = e.Course.TitleAr,
+                    En = e.Course.TitleEn
+                },
+                SessionId = e.SessionId,
+                Session = e.Session != null ? new SessionDto
+                {
+                    Id = e.Session.Id,
+                    TitleAr = e.Session.TitleAr,
+                    TitleEn = e.Session.TitleEn,
+                    DescriptionAr = e.Session.DescriptionAr,
+                    DescriptionEn = e.Session.DescriptionEn,
+                    StartAt = e.Session.StartAt,
+                    EndAt = e.Session.EndAt,
+                    TeamsLink = e.Session.TeamsLink,
+                    Capacity = e.Session.Capacity,
+                    AvailableSpots = e.Session.Capacity.HasValue 
+                        ? e.Session.Capacity.Value - _context.Enrollments.Count(en => en.SessionId == e.Session.Id && en.Status == EnrollmentStatus.Paid)
+                        : null
+                } : null,
+                CourseSessions = e.Course.Sessions
+                    .OrderBy(s => s.StartAt)
+                    .Select(s => new SessionDto
+                    {
+                        Id = s.Id,
+                        TitleAr = s.TitleAr,
+                        TitleEn = s.TitleEn,
+                        DescriptionAr = s.DescriptionAr,
+                        DescriptionEn = s.DescriptionEn,
+                        StartAt = s.StartAt,
+                        EndAt = s.EndAt,
+                        TeamsLink = s.TeamsLink,
+                        Capacity = s.Capacity,
+                        AvailableSpots = s.Capacity.HasValue 
+                            ? s.Capacity.Value - _context.Enrollments.Count(en => en.SessionId == s.Id && en.Status == EnrollmentStatus.Paid)
+                            : null
+                    }).ToList(),
+                Status = e.Status,
+                CourseAttachments = e.Course.Attachments
+                    .Where(a => !a.IsRevoked)
+                    .Select(a => new AttachmentDto
+                    {
+                        Id = a.Id,
+                        FileName = a.FileName,
+                        Type = a.Type
+                    }).ToList(),
+                SecureLinks = e.SecureLinks
+                    .Where(sl => !sl.IsRevoked)
+                    .Select(sl => new SecureLinkDto
+                    {
+                        Id = sl.Id,
+                        AttachmentFileName = sl.Attachment.FileName,
+                        Token = sl.Token,
+                        CreatedAt = sl.CreatedAt
+                    }).ToList()
+            }).ToList();
+
+            return Ok(enrollmentDtos);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting enrollments for order {OrderId}", orderId);
+            return StatusCode(500, new { error = "Internal server error" });
+        }
+    }
+
+    /// <summary>
+    /// Create secure links for PDF course enrollment
+    /// </summary>
+    [HttpPost("enrollments/{enrollmentId}/secure-links")]
+    public async Task<ActionResult<List<SecureLinkDto>>> CreateSecureLinks(
+        Guid enrollmentId, 
+        [FromBody] CreateSecureLinksRequest request,
+        [FromServices] ISecureLinkService secureLinkService,
+        [FromServices] IEmailService emailService)
+    {
+        try
+        {
+            var enrollment = await _context.Enrollments
+                .Include(e => e.User)
+                .Include(e => e.Course)
+                .FirstOrDefaultAsync(e => e.Id == enrollmentId);
+
+            if (enrollment == null)
+            {
+                return NotFound(new { error = "Enrollment not found" });
+            }
+
+            if (enrollment.Course.Type != CourseType.PDF)
+            {
+                return BadRequest(new { error = "Secure links can only be created for PDF courses" });
+            }
+
+            // Create secure links
+            var secureLinks = await secureLinkService.CreateSecureLinksAsync(enrollmentId, request.AttachmentIds);
+
+            // Update enrollment status to Completed
+            enrollment.Status = EnrollmentStatus.Completed;
+            
+            // Check if all enrollments in the order are completed
+            var allEnrollmentsInOrder = await _context.Enrollments
+                .Where(e => e.OrderId == enrollment.OrderId)
+                .ToListAsync();
+            
+            var allCompleted = allEnrollmentsInOrder.All(e => 
+                e.Id == enrollmentId || // Current enrollment (being marked as completed)
+                e.Status == EnrollmentStatus.Completed || 
+                e.Status == EnrollmentStatus.Cancelled // Don't count cancelled enrollments
+            );
+            
+            if (allCompleted)
+            {
+                var order = await _context.Orders.FindAsync(enrollment.OrderId);
+                if (order != null)
+                {
+                    order.Status = OrderStatus.Processed;
+                    _logger.LogInformation("All enrollments completed, marking order {OrderId} as processed", enrollment.OrderId);
+                }
+            }
+            
+            await _context.SaveChangesAsync();
+
+            // Send email if requested
+            if (request.SendEmail)
+            {
+                var locale = enrollment.User.Locale ?? "en";
+                await emailService.SendMaterialsDeliveryEmailAsync(enrollment, secureLinks, locale);
+            }
+
+            _logger.LogInformation("Created {Count} secure links for enrollment {EnrollmentId}", secureLinks.Count, enrollmentId);
+
+            var secureLinkDtos = secureLinks.Select(sl => new SecureLinkDto
+            {
+                Id = sl.Id,
+                AttachmentFileName = sl.Attachment.FileName,
+                Token = sl.Token,
+                CreatedAt = sl.CreatedAt
+            }).ToList();
+
+            return Ok(secureLinkDtos);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating secure links for enrollment {EnrollmentId}", enrollmentId);
+            return StatusCode(500, new { error = "Internal server error", message = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Create session for Live course enrollment
+    /// </summary>
+    [HttpPost("enrollments/{enrollmentId}/session")]
+    public async Task<ActionResult<SessionDto>> CreateEnrollmentSession(
+        Guid enrollmentId,
+        [FromBody] CreateEnrollmentSessionRequest request,
+        [FromServices] IEmailService emailService)
+    {
+        try
+        {
+            var enrollment = await _context.Enrollments
+                .Include(e => e.User)
+                .Include(e => e.Course)
+                .FirstOrDefaultAsync(e => e.Id == enrollmentId);
+
+            if (enrollment == null)
+            {
+                return NotFound(new { error = "Enrollment not found" });
+            }
+
+            if (enrollment.Course.Type != CourseType.Live)
+            {
+                return BadRequest(new { error = "Sessions can only be created for Live courses" });
+            }
+
+            if (enrollment.Status == EnrollmentStatus.Completed)
+            {
+                return BadRequest(new { error = "Cannot add sessions to completed enrollments" });
+            }
+
+            // Create new session
+            var session = new Session
+            {
+                Id = Guid.NewGuid(),
+                CourseId = enrollment.CourseId,
+                TitleAr = request.TitleAr,
+                TitleEn = request.TitleEn,
+                DescriptionAr = request.DescriptionAr,
+                DescriptionEn = request.DescriptionEn,
+                StartAt = request.StartAt,
+                EndAt = request.EndAt,
+                TeamsLink = request.TeamsLink,
+                Capacity = null, // No capacity limit for custom sessions
+                CreatedAt = DateTime.UtcNow
+            };
+
+            _context.Sessions.Add(session);
+
+            // Link session to enrollment
+            enrollment.SessionId = session.Id;
+            enrollment.Status = EnrollmentStatus.Notified;
+
+            await _context.SaveChangesAsync();
+
+            // Send email if requested
+            if (request.SendEmail)
+            {
+                var locale = enrollment.User.Locale ?? "en";
+                await emailService.SendLiveDetailsEmailAsync(enrollment, locale);
+            }
+
+            _logger.LogInformation("Created session {SessionId} for enrollment {EnrollmentId}", session.Id, enrollmentId);
+
+            return Ok(new SessionDto
+            {
+                Id = session.Id,
+                TitleAr = session.TitleAr,
+                TitleEn = session.TitleEn,
+                DescriptionAr = session.DescriptionAr,
+                DescriptionEn = session.DescriptionEn,
+                StartAt = session.StartAt,
+                EndAt = session.EndAt,
+                TeamsLink = session.TeamsLink,
+                Capacity = session.Capacity,
+                AvailableSpots = null
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating session for enrollment {EnrollmentId}", enrollmentId);
+            return StatusCode(500, new { error = "Internal server error", message = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Update session for enrollment
+    /// </summary>
+    [HttpPut("enrollments/{enrollmentId}/session")]
+    public async Task<ActionResult<SessionDto>> UpdateEnrollmentSession(
+        Guid enrollmentId,
+        [FromBody] UpdateEnrollmentSessionRequest request,
+        [FromServices] IEmailService emailService)
+    {
+        try
+        {
+            var enrollment = await _context.Enrollments
+                .Include(e => e.User)
+                .Include(e => e.Course)
+                .Include(e => e.Session)
+                .FirstOrDefaultAsync(e => e.Id == enrollmentId);
+
+            if (enrollment == null)
+            {
+                return NotFound(new { error = "Enrollment not found" });
+            }
+
+            if (enrollment.Session == null)
+            {
+                return NotFound(new { error = "No session found for this enrollment" });
+            }
+
+            if (enrollment.Status == EnrollmentStatus.Completed)
+            {
+                return BadRequest(new { error = "Cannot update sessions for completed enrollments" });
+            }
+
+            // Update session
+            enrollment.Session.TitleAr = request.TitleAr;
+            enrollment.Session.TitleEn = request.TitleEn;
+            enrollment.Session.DescriptionAr = request.DescriptionAr;
+            enrollment.Session.DescriptionEn = request.DescriptionEn;
+            enrollment.Session.StartAt = request.StartAt;
+            enrollment.Session.EndAt = request.EndAt;
+            enrollment.Session.TeamsLink = request.TeamsLink;
+
+            await _context.SaveChangesAsync();
+
+            // Send update email if requested
+            if (request.SendEmail)
+            {
+                var locale = enrollment.User.Locale ?? "en";
+                await emailService.SendSessionUpdatedEmailAsync(enrollment, locale);
+            }
+
+            _logger.LogInformation("Updated session {SessionId} for enrollment {EnrollmentId}", enrollment.SessionId, enrollmentId);
+
+            return Ok(new SessionDto
+            {
+                Id = enrollment.Session.Id,
+                TitleAr = enrollment.Session.TitleAr,
+                TitleEn = enrollment.Session.TitleEn,
+                DescriptionAr = enrollment.Session.DescriptionAr,
+                DescriptionEn = enrollment.Session.DescriptionEn,
+                StartAt = enrollment.Session.StartAt,
+                EndAt = enrollment.Session.EndAt,
+                TeamsLink = enrollment.Session.TeamsLink,
+                Capacity = enrollment.Session.Capacity,
+                AvailableSpots = null
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating session for enrollment {EnrollmentId}", enrollmentId);
+            return StatusCode(500, new { error = "Internal server error", message = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Cancel session for enrollment
+    /// </summary>
+    [HttpPost("enrollments/{enrollmentId}/session/cancel")]
+    public async Task<ActionResult> CancelEnrollmentSession(
+        Guid enrollmentId,
+        [FromBody] CancelEnrollmentSessionRequest request,
+        [FromServices] IEmailService emailService)
+    {
+        try
+        {
+            var enrollment = await _context.Enrollments
+                .Include(e => e.User)
+                .Include(e => e.Course)
+                .Include(e => e.Session)
+                .FirstOrDefaultAsync(e => e.Id == enrollmentId);
+
+            if (enrollment == null)
+            {
+                return NotFound(new { error = "Enrollment not found" });
+            }
+
+            if (enrollment.Session == null)
+            {
+                return NotFound(new { error = "No session found for this enrollment" });
+            }
+
+            if (enrollment.Status == EnrollmentStatus.Completed)
+            {
+                return BadRequest(new { error = "Cannot cancel sessions for completed enrollments" });
+            }
+
+            // Unlink session from enrollment
+            var sessionId = enrollment.SessionId;
+            enrollment.SessionId = null;
+            enrollment.Status = EnrollmentStatus.Paid; // Revert to paid status
+
+            await _context.SaveChangesAsync();
+
+            // Send cancellation email if requested
+            if (request.SendEmail)
+            {
+                var locale = enrollment.User.Locale ?? "en";
+                var cancellationReason = locale == "ar" ? request.CancellationReasonAr : request.CancellationReasonEn;
+                await emailService.SendSessionCancelledEmailAsync(enrollment, cancellationReason, locale);
+            }
+
+            _logger.LogInformation("Cancelled session {SessionId} for enrollment {EnrollmentId}", sessionId, enrollmentId);
+
+            return Ok(new { message = "Session cancelled successfully" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error cancelling session for enrollment {EnrollmentId}", enrollmentId);
+            return StatusCode(500, new { error = "Internal server error", message = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Resend session notification email
+    /// </summary>
+    [HttpPost("enrollments/{enrollmentId}/session/resend-notification")]
+    public async Task<ActionResult> ResendSessionNotification(
+        Guid enrollmentId,
+        [FromServices] IEmailService emailService)
+    {
+        try
+        {
+            var enrollment = await _context.Enrollments
+                .Include(e => e.User)
+                .Include(e => e.Course)
+                .Include(e => e.Session)
+                .FirstOrDefaultAsync(e => e.Id == enrollmentId);
+
+            if (enrollment == null)
+            {
+                return NotFound(new { error = "Enrollment not found" });
+            }
+
+            if (enrollment.Session == null)
+            {
+                return NotFound(new { error = "No session found for this enrollment" });
+            }
+
+            var locale = enrollment.User.Locale ?? "en";
+            var sent = await emailService.SendLiveDetailsEmailAsync(enrollment, locale);
+
+            if (!sent)
+            {
+                return StatusCode(500, new { error = "Failed to send notification email" });
+            }
+
+            _logger.LogInformation("Resent session notification for enrollment {EnrollmentId}", enrollmentId);
+
+            return Ok(new { message = "Notification email sent successfully" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error resending notification for enrollment {EnrollmentId}", enrollmentId);
+            return StatusCode(500, new { error = "Internal server error", message = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Manually mark enrollment as completed
+    /// </summary>
+    [HttpPut("enrollments/{enrollmentId}/complete")]
+    public async Task<ActionResult> CompleteEnrollment(Guid enrollmentId)
+    {
+        try
+        {
+            var enrollment = await _context.Enrollments
+                .Include(e => e.Order)
+                .FirstOrDefaultAsync(e => e.Id == enrollmentId);
+                
+            if (enrollment == null)
+            {
+                return NotFound(new { error = "Enrollment not found" });
+            }
+
+            enrollment.Status = EnrollmentStatus.Completed;
+            
+            // Check if all enrollments in the order are completed
+            var allEnrollmentsInOrder = await _context.Enrollments
+                .Where(e => e.OrderId == enrollment.OrderId)
+                .ToListAsync();
+            
+            var allCompleted = allEnrollmentsInOrder.All(e => 
+                e.Id == enrollmentId || // Current enrollment (being marked as completed)
+                e.Status == EnrollmentStatus.Completed || 
+                e.Status == EnrollmentStatus.Cancelled // Don't count cancelled enrollments
+            );
+            
+            if (allCompleted && enrollment.Order != null)
+            {
+                enrollment.Order.Status = OrderStatus.Processed;
+                _logger.LogInformation("All enrollments completed, marking order {OrderId} as processed", enrollment.OrderId);
+            }
+            
+            await _context.SaveChangesAsync();
+
+            _logger.LogInformation("Marked enrollment {EnrollmentId} as completed", enrollmentId);
+
+            return Ok(new { 
+                message = "Enrollment marked as completed",
+                orderCompleted = allCompleted 
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error completing enrollment {EnrollmentId}", enrollmentId);
+            return StatusCode(500, new { error = "Internal server error", message = ex.Message, details = ex.InnerException?.Message });
+        }
+    }
+
+    #endregion
 
 }
 

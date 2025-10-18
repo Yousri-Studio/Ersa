@@ -119,6 +119,7 @@ export default function AdminLayout({
     { id: 'categories', label: t('sidebar.courseCategories'), icon: 'folder', href: `/${locale}/admin/course-categories` },
     { id: 'subcategories', label: t('sidebar.courseSubCategories'), icon: 'layer-group', href: `/${locale}/admin/course-subcategories` },
     { id: 'instructors', label: isRTL ? 'المدربون' : 'Instructors', icon: 'users', href: `/${locale}/admin/instructors` },
+    { id: 'attachments', label: isRTL ? 'مرفقات الدورات' : 'Course Attachments', icon: 'file-alt', href: `/${locale}/admin/course-attachments` },
   ];
 
   // Super admin items - only visible to SuperAdmin role

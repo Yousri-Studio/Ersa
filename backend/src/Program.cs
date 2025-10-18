@@ -134,7 +134,11 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IBillService, BillService>();
 builder.Services.AddScoped<IEnrollmentService, EnrollmentService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<ISecureLinkService, SecureLinkService>();
 builder.Services.AddScoped<RoleService>();
+
+// Background Services
+builder.Services.AddHostedService<EmailReminderService>();
 
 // Authorization
 builder.Services.AddRoleAuthorization();

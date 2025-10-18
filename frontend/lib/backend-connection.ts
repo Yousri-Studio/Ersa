@@ -39,7 +39,11 @@ class BackendConnectionManager {
       // Check if backend is reachable by trying the dashboard stats endpoint with auth
       const token = Cookies.get('auth-token');
       
+      console.log('🔍 Backend Check - Token exists:', !!token);
+      console.log('🔍 Backend Check - API URL:', API_BASE_URL);
+      
       if (!token) {
+        console.warn('❌ No auth token found');
         this.status.isAvailable = false;
         this.status.isAuthenticated = false;
         this.status.lastChecked = now;
@@ -54,23 +58,35 @@ class BackendConnectionManager {
         }
       });
 
+      console.log('✅ Backend Check - Response status:', response.status);
+
       if (response.status === 200) {
         this.status.isAvailable = true;
         this.status.isAuthenticated = true;
+        console.log('✅ Backend is available and authenticated');
       } else {
         this.status.isAvailable = false;
         this.status.isAuthenticated = false;
+        console.warn('❌ Backend responded but not OK:', response.status);
       }
     } catch (error: any) {
-      console.warn('Backend connection check failed:', error.message);
+      console.error('❌ Backend connection check failed:', error.message);
+      console.error('Error details:', {
+        code: error.code,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data
+      });
       
       // If it's a 401/403, backend is available but not authenticated
       if (error.response?.status === 401 || error.response?.status === 403) {
         this.status.isAvailable = true;
         this.status.isAuthenticated = false;
+        console.warn('⚠️ Backend available but not authenticated');
       } else {
         this.status.isAvailable = false;
         this.status.isAuthenticated = false;
+        console.error('❌ Backend not available');
       }
     }
 

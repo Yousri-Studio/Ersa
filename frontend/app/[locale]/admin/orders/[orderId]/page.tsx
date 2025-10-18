@@ -7,6 +7,7 @@ import { adminApi } from '@/lib/admin-api';
 import type { AdminOrderDetail } from '@/lib/admin-api';
 import { useHydration } from '@/hooks/useHydration';
 import toast from 'react-hot-toast';
+import EnrollmentFulfillment from '@/components/admin/enrollment-fulfillment';
 
 export default function AdminOrderDetail() {
   const params = useParams();
@@ -446,6 +447,9 @@ export default function AdminOrderDetail() {
           </div>
         )}
       </div>
+
+      {/* Order Fulfillment Section */}
+      <EnrollmentFulfillment orderId={orderId!} orderStatus={orderDetail.status} />
     </div>
   );
 }

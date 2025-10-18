@@ -217,6 +217,74 @@ public class EmailService : IEmailService
         }
     }
 
+    public async Task<bool> SendSessionCancelledEmailAsync(Enrollment enrollment, string cancellationReason, string locale)
+    {
+        try
+        {
+            var template = await GetTemplateAsync("LiveSessionCancelled");
+            if (template == null) return false;
+
+            var user = await _context.Users.FindAsync(enrollment.UserId);
+            var course = await _context.Courses.FindAsync(enrollment.CourseId);
+            var session = enrollment.SessionId.HasValue 
+                ? await _context.Sessions.FindAsync(enrollment.SessionId.Value)
+                : null;
+
+            if (user == null || course == null || session == null) return false;
+
+            var templateData = new EmailTemplateData();
+            templateData.AddVariable("FullName", user.FullName);
+            templateData.AddVariable("CourseTitleAr", course.TitleAr);
+            templateData.AddVariable("CourseTitleEn", course.TitleEn);
+            templateData.AddVariable("SessionTitleAr", session.TitleAr);
+            templateData.AddVariable("SessionTitleEn", session.TitleEn);
+            templateData.AddVariable("StartDate", session.StartAt.ToString("yyyy-MM-dd HH:mm"));
+            templateData.AddVariable("CancellationReason", cancellationReason);
+
+            return await SendEmailAsync(user, template, locale, templateData, enrollment.Id);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send session cancelled email for enrollment {EnrollmentId}", enrollment.Id);
+            return false;
+        }
+    }
+
+    public async Task<bool> SendSessionUpdatedEmailAsync(Enrollment enrollment, string locale)
+    {
+        try
+        {
+            var template = await GetTemplateAsync("LiveSessionUpdated");
+            if (template == null) return false;
+
+            var user = await _context.Users.FindAsync(enrollment.UserId);
+            var course = await _context.Courses.FindAsync(enrollment.CourseId);
+            var session = enrollment.SessionId.HasValue 
+                ? await _context.Sessions.FindAsync(enrollment.SessionId.Value)
+                : null;
+
+            if (user == null || course == null || session == null) return false;
+
+            var templateData = new EmailTemplateData();
+            templateData.AddVariable("FullName", user.FullName);
+            templateData.AddVariable("CourseTitleAr", course.TitleAr);
+            templateData.AddVariable("CourseTitleEn", course.TitleEn);
+            templateData.AddVariable("SessionTitleAr", session.TitleAr);
+            templateData.AddVariable("SessionTitleEn", session.TitleEn);
+            templateData.AddVariable("SessionDescription", locale == "ar" ? session.DescriptionAr ?? "" : session.DescriptionEn ?? "");
+            templateData.AddVariable("StartDate", session.StartAt.ToString("yyyy-MM-dd HH:mm"));
+            templateData.AddVariable("EndDate", session.EndAt.ToString("yyyy-MM-dd HH:mm"));
+            templateData.AddVariable("TeamsLink", session.TeamsLink ?? "");
+
+            return await SendEmailAsync(user, template, locale, templateData, enrollment.Id);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send session updated email for enrollment {EnrollmentId}", enrollment.Id);
+            return false;
+        }
+    }
+
     public async Task ProcessWebhookAsync(string payload, string signature)
     {
         try

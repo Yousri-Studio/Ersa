@@ -106,6 +106,7 @@ public class AdminCourseDto
     public string? CourseTopicsEn { get; set; }
     public bool IsActive { get; set; }
     public bool? IsFeatured { get; set; }
+    public int AttachmentCount { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }
@@ -256,4 +257,105 @@ public class AdminUpdateCourseRequest
     public string? CourseTopicsEn { get; set; }
     public bool IsActive { get; set; }
     public bool? IsFeatured { get; set; }
+}
+
+// Order Fulfillment DTOs
+public class OrderEnrollmentDto
+{
+    public Guid Id { get; set; }
+    public Guid CourseId { get; set; }
+    public CourseType CourseType { get; set; }
+    public LocalizedText CourseTitle { get; set; } = new();
+    public Guid? SessionId { get; set; }
+    public SessionDto? Session { get; set; }
+    public List<SessionDto> CourseSessions { get; set; } = new(); // All sessions for this course
+    public EnrollmentStatus Status { get; set; }
+    public List<AttachmentDto> CourseAttachments { get; set; } = new();
+    public List<SecureLinkDto> SecureLinks { get; set; } = new();
+}
+
+public class SecureLinkDto
+{
+    public Guid Id { get; set; }
+    public string AttachmentFileName { get; set; } = string.Empty;
+    public string Token { get; set; } = string.Empty;
+    public DateTime CreatedAt { get; set; }
+}
+
+public class CreateSecureLinksRequest
+{
+    [Required]
+    public List<Guid> AttachmentIds { get; set; } = new();
+    public bool SendEmail { get; set; }
+}
+
+public class CreateEnrollmentSessionRequest
+{
+    [Required]
+    [MaxLength(200)]
+    public string TitleAr { get; set; } = string.Empty;
+    
+    [Required]
+    [MaxLength(200)]
+    public string TitleEn { get; set; } = string.Empty;
+    
+    [MaxLength(2000)]
+    public string? DescriptionAr { get; set; }
+    
+    [MaxLength(2000)]
+    public string? DescriptionEn { get; set; }
+    
+    [Required]
+    public DateTime StartAt { get; set; }
+    
+    [Required]
+    public DateTime EndAt { get; set; }
+    
+    [Required]
+    [MaxLength(500)]
+    public string TeamsLink { get; set; } = string.Empty;
+    
+    public bool SendEmail { get; set; }
+}
+
+public class UpdateEnrollmentSessionRequest
+{
+    [Required]
+    [MaxLength(200)]
+    public string TitleAr { get; set; } = string.Empty;
+    
+    [Required]
+    [MaxLength(200)]
+    public string TitleEn { get; set; } = string.Empty;
+    
+    [MaxLength(2000)]
+    public string? DescriptionAr { get; set; }
+    
+    [MaxLength(2000)]
+    public string? DescriptionEn { get; set; }
+    
+    [Required]
+    public DateTime StartAt { get; set; }
+    
+    [Required]
+    public DateTime EndAt { get; set; }
+    
+    [Required]
+    [MaxLength(500)]
+    public string TeamsLink { get; set; } = string.Empty;
+    
+    public bool SendEmail { get; set; }
+}
+
+public class CancelEnrollmentSessionRequest
+{
+    [Required]
+    [MaxLength(1000)]
+    public string CancellationReasonEn { get; set; } = string.Empty;
+    
+    [Required]
+    [MaxLength(1000)]
+    public string CancellationReasonAr { get; set; } = string.Empty;
+    
+    public bool SendEmail { get; set; } = true;
 }

@@ -10,6 +10,8 @@ public interface IEmailService
     Task<bool> SendLiveDetailsEmailAsync(Enrollment enrollment, string locale);
     Task<bool> SendMaterialsDeliveryEmailAsync(Enrollment enrollment, List<SecureLink> secureLinks, string locale);
     Task<bool> SendLiveReminderEmailAsync(Enrollment enrollment, string locale, int hoursBeforeStart);
+    Task<bool> SendSessionCancelledEmailAsync(Enrollment enrollment, string cancellationReason, string locale);
+    Task<bool> SendSessionUpdatedEmailAsync(Enrollment enrollment, string locale);
     Task<bool> SendContactFormNotificationAsync(string firstName, string lastName, string email, string phone, string subject, string message, string locale);
     Task<bool> SendContactConfirmationAsync(string firstName, string lastName, string email, string locale);
     Task<bool> SendOrderConfirmationEmailAsync(Order order, string locale);

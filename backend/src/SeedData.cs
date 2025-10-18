@@ -42,6 +42,9 @@ public static class SeedData
             // Seed Content Pages
             await SeedContentPagesAsync(context, logger);
 
+            // Seed Email Templates
+            await SeedEmailTemplatesAsync(context, logger);
+
             // Skip mock users and orders - keeping only essential admin users
 
             await context.SaveChangesAsync();
@@ -574,6 +577,213 @@ public static class SeedData
         context.ContentBlocks.AddRange(heroTitle, heroSubtitle, aboutTitle, aboutDescription, coursesTitle, coursesDescription, contactTitle, contactDescription);
 
         logger.LogInformation("Added content pages with sections and blocks");
+    }
+
+    private static async Task SeedEmailTemplatesAsync(ErsaTrainingDbContext context, ILogger logger)
+    {
+        var templatesToSeed = new[]
+        {
+            new
+            {
+                Key = "MaterialsDelivery",
+                SubjectAr = "تم إرسال مواد الدورة - {{CourseTitleAr}}",
+                SubjectEn = "Course Materials Delivered - {{CourseTitleEn}}",
+                BodyHtmlAr = @"
+                    <div dir='rtl' style='font-family: Arial, sans-serif; padding: 20px;'>
+                        <h2>مرحباً {{FullName}},</h2>
+                        <p>تم إرسال مواد دورة <strong>{{CourseTitleAr}}</strong> إليك بنجاح.</p>
+                        <p>يمكنك تحميل المواد من الروابط التالية:</p>
+                        <div style='margin: 20px 0;'>
+                            {{SecureLinks}}
+                        </div>
+                        <p>شكراً لاختياركم إرساء للتدريب.</p>
+                        <p>مع أطيب التحيات,<br/>فريق إرساء للتدريب</p>
+                    </div>",
+                BodyHtmlEn = @"
+                    <div style='font-family: Arial, sans-serif; padding: 20px;'>
+                        <h2>Hello {{FullName}},</h2>
+                        <p>Your materials for the course <strong>{{CourseTitleEn}}</strong> have been successfully delivered.</p>
+                        <p>You can download the materials from the following links:</p>
+                        <div style='margin: 20px 0;'>
+                            {{SecureLinks}}
+                        </div>
+                        <p>Thank you for choosing Ersa Training.</p>
+                        <p>Best regards,<br/>Ersa Training Team</p>
+                    </div>"
+            },
+            new
+            {
+                Key = "LiveDetails",
+                SubjectAr = "تفاصيل الدورة المباشرة - {{CourseTitleAr}}",
+                SubjectEn = "Live Session Details - {{CourseTitleEn}}",
+                BodyHtmlAr = @"
+                    <div dir='rtl' style='font-family: Arial, sans-serif; padding: 20px;'>
+                        <h2>مرحباً {{FullName}},</h2>
+                        <p>نشكرك على التسجيل في دورة <strong>{{CourseTitleAr}}</strong>.</p>
+                        <h3>تفاصيل الجلسة المباشرة:</h3>
+                        <p><strong>تاريخ البدء:</strong> {{StartDate}}</p>
+                        <p><strong>رابط Microsoft Teams:</strong></p>
+                        <p style='margin: 20px 0;'>
+                            <a href='{{TeamsLink}}' style='background-color: #0078d4; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>
+                                انضم إلى الجلسة
+                            </a>
+                        </p>
+                        <p>سوف تتلقى تذكيراً قبل ساعة واحدة من بدء الجلسة.</p>
+                        <p>شكراً لاختياركم إرساء للتدريب.</p>
+                        <p>مع أطيب التحيات,<br/>فريق إرساء للتدريب</p>
+                    </div>",
+                BodyHtmlEn = @"
+                    <div style='font-family: Arial, sans-serif; padding: 20px;'>
+                        <h2>Hello {{FullName}},</h2>
+                        <p>Thank you for enrolling in <strong>{{CourseTitleEn}}</strong>.</p>
+                        <h3>Live Session Details:</h3>
+                        <p><strong>Start Date:</strong> {{StartDate}}</p>
+                        <p><strong>Microsoft Teams Link:</strong></p>
+                        <p style='margin: 20px 0;'>
+                            <a href='{{TeamsLink}}' style='background-color: #0078d4; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>
+                                Join Session
+                            </a>
+                        </p>
+                        <p>You will receive a reminder 1 hour before the session starts.</p>
+                        <p>Thank you for choosing Ersa Training.</p>
+                        <p>Best regards,<br/>Ersa Training Team</p>
+                    </div>"
+            },
+            new
+            {
+                Key = "LiveReminder1h",
+                SubjectAr = "تذكير: جلستك المباشرة تبدأ خلال ساعة - {{CourseTitleAr}}",
+                SubjectEn = "Reminder: Your Live Session Starts in 1 Hour - {{CourseTitleEn}}",
+                BodyHtmlAr = @"
+                    <div dir='rtl' style='font-family: Arial, sans-serif; padding: 20px;'>
+                        <h2>مرحباً {{FullName}},</h2>
+                        <p>هذا تذكير بأن جلسة <strong>{{CourseTitleAr}}</strong> ستبدأ خلال ساعة واحدة.</p>
+                        <p><strong>وقت البدء:</strong> {{StartDate}}</p>
+                        <p style='margin: 20px 0;'>
+                            <a href='{{TeamsLink}}' style='background-color: #0078d4; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>
+                                انضم الآن
+                            </a>
+                        </p>
+                        <p>نراكم قريباً!</p>
+                        <p>مع أطيب التحيات,<br/>فريق إرساء للتدريب</p>
+                    </div>",
+                BodyHtmlEn = @"
+                    <div style='font-family: Arial, sans-serif; padding: 20px;'>
+                        <h2>Hello {{FullName}},</h2>
+                        <p>This is a reminder that your <strong>{{CourseTitleEn}}</strong> session starts in 1 hour.</p>
+                        <p><strong>Start Time:</strong> {{StartDate}}</p>
+                        <p style='margin: 20px 0;'>
+                            <a href='{{TeamsLink}}' style='background-color: #0078d4; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>
+                                Join Now
+                            </a>
+                        </p>
+                        <p>See you soon!</p>
+                        <p>Best regards,<br/>Ersa Training Team</p>
+                    </div>"
+            },
+            new
+            {
+                Key = "LiveSessionCancelled",
+                SubjectAr = "إلغاء الجلسة: {{SessionTitleAr}} - {{CourseTitleAr}}",
+                SubjectEn = "Session Cancelled: {{SessionTitleEn}} - {{CourseTitleEn}}",
+                BodyHtmlAr = @"
+                    <div dir='rtl' style='font-family: Arial, sans-serif; padding: 20px;'>
+                        <h2>عزيزي {{FullName}},</h2>
+                        <p>نأسف لإبلاغك بأنه تم إلغاء الجلسة المباشرة التالية:</p>
+                        <div style='background-color: #f8f9fa; padding: 15px; border-right: 4px solid #dc3545; margin: 20px 0;'>
+                            <p><strong>الدورة:</strong> {{CourseTitleAr}}</p>
+                            <p><strong>الجلسة:</strong> {{SessionTitleAr}}</p>
+                            <p><strong>كانت مجدولة في:</strong> {{StartDate}}</p>
+                        </div>
+                        <p><strong>سبب الإلغاء:</strong></p>
+                        <p style='background-color: #fff3cd; padding: 15px; border-radius: 5px;'>{{CancellationReason}}</p>
+                        <p>نعتذر عن أي إزعاج قد يسببه هذا. إذا كان لديك أي أسئلة، يرجى التواصل معنا.</p>
+                        <p>مع أطيب التحيات,<br/>فريق إرساء للتدريب</p>
+                    </div>",
+                BodyHtmlEn = @"
+                    <div style='font-family: Arial, sans-serif; padding: 20px;'>
+                        <h2>Dear {{FullName}},</h2>
+                        <p>We regret to inform you that the following live session has been cancelled:</p>
+                        <div style='background-color: #f8f9fa; padding: 15px; border-left: 4px solid #dc3545; margin: 20px 0;'>
+                            <p><strong>Course:</strong> {{CourseTitleEn}}</p>
+                            <p><strong>Session:</strong> {{SessionTitleEn}}</p>
+                            <p><strong>Was scheduled for:</strong> {{StartDate}}</p>
+                        </div>
+                        <p><strong>Reason for cancellation:</strong></p>
+                        <p style='background-color: #fff3cd; padding: 15px; border-radius: 5px;'>{{CancellationReason}}</p>
+                        <p>We apologize for any inconvenience this may cause. If you have any questions, please contact us.</p>
+                        <p>Best regards,<br/>Ersa Training Team</p>
+                    </div>"
+            },
+            new
+            {
+                Key = "LiveSessionUpdated",
+                SubjectAr = "تحديث الجلسة: {{SessionTitleAr}} - {{CourseTitleAr}}",
+                SubjectEn = "Session Updated: {{SessionTitleEn}} - {{CourseTitleEn}}",
+                BodyHtmlAr = @"
+                    <div dir='rtl' style='font-family: Arial, sans-serif; padding: 20px;'>
+                        <h2>مرحباً {{FullName}},</h2>
+                        <p>تم تحديث تفاصيل الجلسة المباشرة التالية:</p>
+                        <div style='background-color: #e8f4f8; padding: 15px; border-right: 4px solid #0078d4; margin: 20px 0;'>
+                            <p><strong>الدورة:</strong> {{CourseTitleAr}}</p>
+                            <p><strong>الجلسة:</strong> {{SessionTitleAr}}</p>
+                            <p><strong>الوصف:</strong> {{SessionDescription}}</p>
+                            <p><strong>وقت البدء:</strong> {{StartDate}}</p>
+                            <p><strong>وقت الانتهاء:</strong> {{EndDate}}</p>
+                        </div>
+                        <p style='margin: 20px 0;'>
+                            <a href='{{TeamsLink}}' style='background-color: #0078d4; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>
+                                رابط الجلسة
+                            </a>
+                        </p>
+                        <p>يرجى التأكد من تحديث تقويمك وفقاً للتغييرات.</p>
+                        <p>مع أطيب التحيات,<br/>فريق إرساء للتدريب</p>
+                    </div>",
+                BodyHtmlEn = @"
+                    <div style='font-family: Arial, sans-serif; padding: 20px;'>
+                        <h2>Hello {{FullName}},</h2>
+                        <p>The details of your live session have been updated:</p>
+                        <div style='background-color: #e8f4f8; padding: 15px; border-left: 4px solid #0078d4; margin: 20px 0;'>
+                            <p><strong>Course:</strong> {{CourseTitleEn}}</p>
+                            <p><strong>Session:</strong> {{SessionTitleEn}}</p>
+                            <p><strong>Description:</strong> {{SessionDescription}}</p>
+                            <p><strong>Start Time:</strong> {{StartDate}}</p>
+                            <p><strong>End Time:</strong> {{EndDate}}</p>
+                        </div>
+                        <p style='margin: 20px 0;'>
+                            <a href='{{TeamsLink}}' style='background-color: #0078d4; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>
+                                Session Link
+                            </a>
+                        </p>
+                        <p>Please make sure to update your calendar accordingly.</p>
+                        <p>Best regards,<br/>Ersa Training Team</p>
+                    </div>"
+            }
+        };
+
+        foreach (var template in templatesToSeed)
+        {
+            var existingTemplate = await context.EmailTemplates.FirstOrDefaultAsync(t => t.Key == template.Key);
+            if (existingTemplate == null)
+            {
+                context.EmailTemplates.Add(new EmailTemplate
+                {
+                    Id = Guid.NewGuid(),
+                    Key = template.Key,
+                    SubjectAr = template.SubjectAr,
+                    SubjectEn = template.SubjectEn,
+                    BodyHtmlAr = template.BodyHtmlAr,
+                    BodyHtmlEn = template.BodyHtmlEn,
+                    CreatedAt = DateTime.UtcNow,
+                    UpdatedAt = DateTime.UtcNow
+                });
+                logger.LogInformation("Added email template: {Key}", template.Key);
+            }
+            else
+            {
+                logger.LogInformation("Email template already exists: {Key}", template.Key);
+            }
+        }
     }
 
     // Mock users and orders seeding removed - keeping only essential admin users

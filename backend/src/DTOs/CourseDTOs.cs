@@ -43,8 +43,13 @@ public class CourseDetailDto : CourseListDto
 public class SessionDto
 {
     public Guid Id { get; set; }
+    public string TitleAr { get; set; } = string.Empty;
+    public string TitleEn { get; set; } = string.Empty;
+    public string? DescriptionAr { get; set; }
+    public string? DescriptionEn { get; set; }
     public DateTime StartAt { get; set; }
     public DateTime EndAt { get; set; }
+    public string? TeamsLink { get; set; }
     public int? Capacity { get; set; }
     public int? AvailableSpots { get; set; }
 }

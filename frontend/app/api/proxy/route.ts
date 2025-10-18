@@ -82,8 +82,15 @@ export async function POST(request: NextRequest) {
   console.log(`[API Proxy POST] ${endpoint}`);
   
   try {
-    // Get raw body text first
-    const bodyText = await request.text();
+    // Check if this is a multipart/form-data request (file upload)
+    const contentType = request.headers.get('content-type') || '';
+    const isMultipart = contentType.includes('multipart/form-data');
+    
+    console.log(`[API Proxy] Content-Type: ${contentType}`);
+    console.log(`[API Proxy] Is multipart: ${isMultipart}`);
+    
+    // For multipart, use formData; for JSON, use text
+    const body = isMultipart ? await request.formData() : await request.text();
     
     // Remove leading slash from endpoint if present to avoid double slashes
     let cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
@@ -96,12 +103,15 @@ export async function POST(request: NextRequest) {
     const backendUrl = getBackendUrl();
     const apiUrl = `${backendUrl}/${cleanEndpoint}`;
     console.log(`[API Proxy] Forwarding POST to: ${apiUrl}`);
-    console.log(`[API Proxy] Request body length:`, bodyText.length);
+    console.log(`[API Proxy] Request body type:`, isMultipart ? 'FormData' : 'text');
     
-    // Forward authorization header if present
-    const headers: HeadersInit = {
-      'Content-Type': 'application/json',
-    };
+    // Build headers - for multipart, don't set Content-Type (let fetch handle it)
+    const headers: HeadersInit = {};
+    
+    // Only set Content-Type for non-multipart requests
+    if (!isMultipart) {
+      headers['Content-Type'] = 'application/json';
+    }
     
     const authHeader = request.headers.get('authorization');
     if (authHeader) {
@@ -112,7 +122,7 @@ export async function POST(request: NextRequest) {
     const response = await fetch(apiUrl, {
       method: 'POST',
       headers,
-      body: bodyText, // Send raw body text
+      body, // Send formData for multipart, text for JSON
       cache: 'no-store',
     });
     
@@ -173,7 +183,17 @@ export async function PUT(request: NextRequest) {
   console.log(`[API Proxy PUT] ${endpoint}`);
   
   try {
-    const body = await request.json();
+    // Try to parse body, but handle empty body gracefully
+    let body = null;
+    const bodyText = await request.text();
+    if (bodyText && bodyText.trim().length > 0) {
+      try {
+        body = JSON.parse(bodyText);
+      } catch (e) {
+        console.warn(`[API Proxy] Failed to parse body as JSON, using empty body`);
+      }
+    }
+    
     // Remove leading slash from endpoint if present to avoid double slashes
     let cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
     
@@ -197,12 +217,18 @@ export async function PUT(request: NextRequest) {
       console.log(`[API Proxy] Forwarding Authorization header`);
     }
     
-    const response = await fetch(apiUrl, {
+    const fetchOptions: RequestInit = {
       method: 'PUT',
       headers,
-      body: JSON.stringify(body),
       cache: 'no-store',
-    });
+    };
+    
+    // Only add body if it exists
+    if (body !== null) {
+      fetchOptions.body = JSON.stringify(body);
+    }
+    
+    const response = await fetch(apiUrl, fetchOptions);
     
     if (!response.ok) {
       console.error(`[API Proxy] Error: ${response.status} ${response.statusText}`);
@@ -212,8 +238,18 @@ export async function PUT(request: NextRequest) {
       );
     }
     
-    const data = await response.json();
-    return NextResponse.json(data);
+    // Handle empty response
+    const responseText = await response.text();
+    if (responseText && responseText.trim().length > 0) {
+      try {
+        const data = JSON.parse(responseText);
+        return NextResponse.json(data);
+      } catch (e) {
+        return new NextResponse(responseText, { status: response.status });
+      }
+    } else {
+      return new NextResponse(null, { status: response.status });
+    }
   } catch (error) {
     console.error('[API Proxy] Error:', error);
     return NextResponse.json(
