@@ -116,11 +116,6 @@ export default function CheckoutPage() {
                   <div key={item.id} className="flex justify-between items-start">
                     <div className="flex-1">
                       <p className="font-medium font-cairo">{title}</p>
-                      {item.instructor && (
-                        <p className="text-sm text-gray-500 font-cairo">
-                          {t('course.instructor')}: {item.instructor}
-                        </p>
-                      )}
                     </div>
                     <div className={`${locale === 'ar' ? 'ml-4' : 'mr-4'} text-right`}>
                       <p className="font-semibold">
@@ -177,25 +172,22 @@ export default function CheckoutPage() {
           <button 
             onClick={handleCheckout} 
             disabled={isLoading || !items || items.length === 0}
-            className="mt-6 w-full bg-teal-600 text-white font-semibold py-4 px-6 rounded-lg hover:bg-teal-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-200 font-cairo text-base shadow-md hover:shadow-lg"
+            className="mt-6 w-full bg-teal-600 text-white font-semibold py-4 px-6 rounded-lg hover:bg-teal-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-all duration-200 font-cairo text-base shadow-md hover:shadow-lg flex items-center justify-center gap-3"
           >
-            <div className="flex items-center justify-center gap-3 w-full">
-              {isLoading ? (
-                <>
-                  <Icon name="spinner" className="h-5 w-5 animate-spin flex-shrink-0" />
-                  <span className="whitespace-nowrap">{t('checkout.processing')}</span>
-                </>
-              ) : (
-                <>
-                  <Icon name="credit-card" className="h-5 w-5 flex-shrink-0" />
-                  <span className="whitespace-nowrap">{t('checkout.proceed-to-payment')}</span>
-                </>
-              )}
-            </div>
+            {isLoading ? (
+              <>
+               <span> <Icon name="spinner" className="h-5 w-5 animate-spin" />
+                {t('checkout.processing')}</span>
+              </>
+            ) : (
+              <>
+                <span><Icon name="credit-card" className="h-5 w-5" />
+                {t('checkout.proceed-to-payment')}</span>
+              </>
+            )}
           </button>
 
-          <div className="mt-4 flex items-center justify-center gap-2 text-sm text-gray-500 font-cairo">
-            <Icon name="shield-alt" className="h-4 w-4 text-yellow-600" />
+          <div className="mt-4 flex items-center justify-center text-sm text-gray-500 font-cairo">
             <span>{t('checkout.secure-payment')}</span>
           </div>
         </div>

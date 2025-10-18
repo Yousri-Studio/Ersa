@@ -14,6 +14,7 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   
   const locale = useLocale();
   const t = useTranslations();
@@ -24,6 +25,11 @@ export function Header() {
 
   // Check if we're on the home page
   const isHomePage = pathname === `/${locale}` || pathname === `/${locale}/`;
+
+  // Handle client-side mounting to prevent hydration mismatch
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Handle scroll effect
   useEffect(() => {
@@ -138,7 +144,7 @@ export function Header() {
                 className="h-5 w-5" 
                 style={{ color: '#00AC96' }}
               />
-              {wishlistCount() > 0 && (
+              {isMounted && wishlistCount() > 0 && (
                 <span className="absolute -top-1 -right-1 rtl:right-auto rtl:left-0 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-semibold">
                   {wishlistCount()}
                 </span>
@@ -155,7 +161,7 @@ export function Header() {
                 className="h-5 w-5" 
                 style={{ color: '#3F3D56' }}
               />
-              {itemCount() > 0 && (
+              {isMounted && itemCount() > 0 && (
                 <span className="absolute -top-1 -right-1 rtl:right-auto rtl:left-0 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-semibold">
                   {itemCount()}
                 </span>
@@ -200,7 +206,7 @@ export function Header() {
                     >
                       <div className="relative mr-3 rtl:mr-0 rtl:ml-3">
                         <Icon icon={['fas', 'heart']} className="h-4 w-4" style={{ color: '#00AC96' }} />
-                        {wishlistCount() > 0 && (
+                        {isMounted && wishlistCount() > 0 && (
                           <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-semibold">
                             {wishlistCount()}
                           </span>
@@ -326,7 +332,7 @@ export function Header() {
                       className="h-5 w-5" 
                       style={{ color: '#00AC96' }}
                     />
-                    {wishlistCount() > 0 && (
+                    {isMounted && wishlistCount() > 0 && (
                       <span className="absolute -top-1 -right-1 rtl:right-auto rtl:left-0 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-semibold">
                         {wishlistCount()}
                       </span>
@@ -344,7 +350,7 @@ export function Header() {
                       className="h-5 w-5" 
                       style={{ color: '#3F3D56' }}
                     />
-                    {itemCount() > 0 && (
+                    {isMounted && itemCount() > 0 && (
                       <span className="absolute -top-1 -right-1 rtl:right-auto rtl:left-0 h-5 w-5 bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-semibold">
                         {itemCount()}
                       </span>

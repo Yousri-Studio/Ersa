@@ -126,15 +126,6 @@ export default function CartPage() {
                         cartItemsVisible.has(index) ? 'visible' : ''
                       }`}
                     >
-                      {/* Course Image */}
-                      <div className="flex-shrink-0">
-                        <img
-                          src={item.imageUrl || '/api/placeholder/120/80'}
-                          alt={typeof item.title === 'object' ? (locale === 'ar' ? item.title.ar : item.title.en) : item.title}
-                          className="h-20 w-30 object-cover rounded-lg"
-                        />
-                      </div>
-                      
                       {/* Course Info */}
                       <div className="flex-1 min-w-0">
                         <h3 className="text-lg font-semibold text-gray-900 truncate font-cairo">
