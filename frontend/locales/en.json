@@ -640,12 +640,12 @@
     "tabs": {
       "overview": "Overview",
       "curriculum": "Curriculum",
-      "topics": "Topics",
+      "topics": "Audience",
       "instructor": "Instructor",
       "reviews": "Reviews"
     },
-    "topics": "Course Topics",
-    "no-topics-available": "No topics available for this course"
+    "topics": "Target Audience",
+    "no-topics-available": "No target audience specified for this course"
   },
   "courses": {
     "badge": "Training Courses",
