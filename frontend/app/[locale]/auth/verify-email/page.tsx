@@ -38,6 +38,26 @@ export default function VerifyEmailPage() {
   }, [searchParams, router, locale]);
 
   const handleCodeChange = (index: number, value: string) => {
+    // Handle pasted content
+    if (value.length > 1) {
+      const pastedCode = value.replace(/\D/g, '').slice(0, 6);
+      const newCode = [...verificationCode];
+      
+      // Fill inputs with pasted digits
+      for (let i = 0; i < pastedCode.length && index + i < 6; i++) {
+        newCode[index + i] = pastedCode[i];
+      }
+      
+      setVerificationCode(newCode);
+      
+      // Focus the next empty input or last input
+      const nextIndex = Math.min(index + pastedCode.length, 5);
+      const nextInput = document.getElementById(`code-${nextIndex}`);
+      nextInput?.focus();
+      return;
+    }
+
+    // Handle single character input
     if (value.length <= 1 && /^\d*$/.test(value)) {
       const newCode = [...verificationCode];
       newCode[index] = value;
@@ -52,9 +72,38 @@ export default function VerifyEmailPage() {
   };
 
   const handleKeyDown = (index: number, e: React.KeyboardEvent) => {
+    // Handle backspace navigation
     if (e.key === 'Backspace' && !verificationCode[index] && index > 0) {
       const prevInput = document.getElementById(`code-${index - 1}`);
       prevInput?.focus();
+    }
+    
+    // Handle left arrow key
+    if (e.key === 'ArrowLeft' && index > 0) {
+      const prevInput = document.getElementById(`code-${index - 1}`);
+      prevInput?.focus();
+    }
+    
+    // Handle right arrow key
+    if (e.key === 'ArrowRight' && index < 5) {
+      const nextInput = document.getElementById(`code-${index + 1}`);
+      nextInput?.focus();
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pastedData = e.clipboardData.getData('text');
+    const pastedCode = pastedData.replace(/\D/g, '').slice(0, 6);
+    
+    if (pastedCode.length > 0) {
+      const newCode = pastedCode.split('').concat(['', '', '', '', '', '']).slice(0, 6);
+      setVerificationCode(newCode);
+      
+      // Focus the last filled input or the 6th input
+      const lastIndex = Math.min(pastedCode.length, 5);
+      const lastInput = document.getElementById(`code-${lastIndex}`);
+      lastInput?.focus();
     }
   };
 
@@ -125,10 +174,13 @@ export default function VerifyEmailPage() {
                   key={index}
                   id={`code-${index}`}
                   type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
                   maxLength={1}
                   value={digit}
                   onChange={(e) => handleCodeChange(index, e.target.value)}
                   onKeyDown={(e) => handleKeyDown(index, e)}
+                  onPaste={handlePaste}
                   className="w-12 h-12 text-center text-xl font-bold border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                   style={{ fontFamily: 'Cairo, sans-serif' }}
                 />

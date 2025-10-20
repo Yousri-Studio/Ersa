@@ -19,6 +19,8 @@ export default function CourseCategoriesPage() {
   const [formData, setFormData] = useState<CreateCourseCategoryRequest>({
     titleAr: '',
     titleEn: '',
+    subtitleAr: '',
+    subtitleEn: '',
     displayOrder: 0,
     isActive: true,
   });
@@ -102,6 +104,8 @@ export default function CourseCategoriesPage() {
     setFormData({
       titleAr: category.titleAr,
       titleEn: category.titleEn,
+      subtitleAr: category.subtitleAr || '',
+      subtitleEn: category.subtitleEn || '',
       displayOrder: category.displayOrder,
       isActive: category.isActive,
     });
@@ -117,6 +121,8 @@ export default function CourseCategoriesPage() {
     setFormData({
       titleAr: '',
       titleEn: '',
+      subtitleAr: '',
+      subtitleEn: '',
       displayOrder: 0,
       isActive: true,
     });
@@ -249,6 +255,29 @@ export default function CourseCategoriesPage() {
                   />
                 </div>
                 <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Subtitle (English)</label>
+                  <textarea
+                    value={formData.subtitleEn || ''}
+                    onChange={(e) => setFormData({...formData, subtitleEn: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows={2}
+                    maxLength={500}
+                    placeholder="Optional subtitle in English (max 500 characters)"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">العنوان الفرعي (عربي)</label>
+                  <textarea
+                    value={formData.subtitleAr || ''}
+                    onChange={(e) => setFormData({...formData, subtitleAr: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows={2}
+                    maxLength={500}
+                    placeholder="عنوان فرعي اختياري بالعربية (بحد أقصى 500 حرف)"
+                    dir="rtl"
+                  />
+                </div>
+                <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">{t('displayOrder')}</label>
                   <input
                     type="number"
@@ -313,6 +342,29 @@ export default function CourseCategoriesPage() {
                     value={formData.titleAr}
                     onChange={(e) => setFormData({...formData, titleAr: e.target.value})}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    dir="rtl"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Subtitle (English)</label>
+                  <textarea
+                    value={formData.subtitleEn || ''}
+                    onChange={(e) => setFormData({...formData, subtitleEn: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows={2}
+                    maxLength={500}
+                    placeholder="Optional subtitle in English (max 500 characters)"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">العنوان الفرعي (عربي)</label>
+                  <textarea
+                    value={formData.subtitleAr || ''}
+                    onChange={(e) => setFormData({...formData, subtitleAr: e.target.value})}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows={2}
+                    maxLength={500}
+                    placeholder="عنوان فرعي اختياري بالعربية (بحد أقصى 500 حرف)"
                     dir="rtl"
                   />
                 </div>

@@ -71,6 +71,16 @@ export interface ResendVerificationRequest {
   email: string;
 }
 
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ResetPasswordRequest {
+  email: string;
+  code: string;
+  newPassword: string;
+}
+
 export interface LoginResponse {
   token: string;
   user: {
@@ -94,6 +104,8 @@ export interface CourseCategoryData {
   id: string;
   titleAr: string;
   titleEn: string;
+  subtitleAr?: string;
+  subtitleEn?: string;
   displayOrder: number;
   isActive: boolean;
   createdAt: string;
@@ -228,10 +240,8 @@ export interface Order {
 export interface OrderItem {
   courseId: string;
   sessionId?: string;
-  title: {
-    ar: string;
-    en: string;
-  };
+  courseTitleEn: string;
+  courseTitleAr: string;
   price: number;
   currency: string;
   qty: number;
@@ -257,6 +267,12 @@ export const authApi = {
 
   resendVerificationCode: (data: ResendVerificationRequest): Promise<AxiosResponse<{ message: string }>> =>
     api.post('/auth/resend-verification', data),
+
+  forgotPassword: (data: ForgotPasswordRequest): Promise<AxiosResponse<{ message: string }>> =>
+    api.post('/auth/forgot-password', data),
+
+  resetPassword: (data: ResetPasswordRequest): Promise<AxiosResponse<{ message: string }>> =>
+    api.post('/auth/reset-password', data),
 
   refreshToken: (): Promise<AxiosResponse<LoginResponse>> =>
     api.post('/auth/refresh-token'),

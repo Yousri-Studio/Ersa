@@ -194,6 +194,8 @@ export interface CourseCategory {
   id: string;
   titleAr: string;
   titleEn: string;
+  subtitleAr?: string;
+  subtitleEn?: string;
   displayOrder: number;
   isActive: boolean;
   createdAt: string;
@@ -370,6 +372,8 @@ export type AdminUpdateCourseRequest = AdminCreateCourseRequest;
 export interface CreateCourseCategoryRequest {
   titleAr: string;
   titleEn: string;
+  subtitleAr?: string;
+  subtitleEn?: string;
   displayOrder: number;
   isActive: boolean;
 }

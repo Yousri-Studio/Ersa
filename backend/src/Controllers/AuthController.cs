@@ -519,4 +519,107 @@ public class AuthController : ControllerBase
             return StatusCode(500, new { error = "Internal server error" });
         }
     }
+
+    [HttpPost("forgot-password")]
+    public async Task<ActionResult<object>> ForgotPassword([FromBody] ForgotPasswordRequest request)
+    {
+        try
+        {
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if (user == null)
+            {
+                // Don't reveal that the user doesn't exist for security
+                return Ok(new { message = "If your email is registered, you will receive a password reset code." });
+            }
+
+            if (!user.EmailConfirmed)
+            {
+                return BadRequest(new { error = "Email is not verified. Please verify your email first." });
+            }
+
+            // Generate a simple 6-digit password reset code
+            var random = new Random();
+            var resetCode = random.Next(100000, 999999).ToString();
+            
+            // Store the reset code using UserManager's token storage
+            await _userManager.SetAuthenticationTokenAsync(user, "PasswordReset", "ResetCode", resetCode);
+            
+            // Send email with reset code
+            try
+            {
+                await _emailService.SendPasswordResetEmailAsync(user, resetCode);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send password reset email to user {UserId}", user.Id);
+                return StatusCode(500, new { error = "Failed to send password reset email. Please try again later." });
+            }
+            
+            return Ok(new { message = "If your email is registered, you will receive a password reset code." });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during forgot password request");
+            return StatusCode(500, new { error = "Internal server error" });
+        }
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<ActionResult<object>> ResetPassword([FromBody] ResetPasswordRequest request)
+    {
+        try
+        {
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if (user == null)
+            {
+                return BadRequest(new { error = "Invalid reset request" });
+            }
+
+            // Retrieve the stored reset code
+            var storedCode = await _userManager.GetAuthenticationTokenAsync(user, "PasswordReset", "ResetCode");
+            
+            if (string.IsNullOrEmpty(storedCode))
+            {
+                return BadRequest(new { error = "No password reset request found. Please request a new reset code." });
+            }
+
+            if (storedCode != request.Code)
+            {
+                return BadRequest(new { error = "Invalid reset code" });
+            }
+
+            // Reset the password
+            var resetToken = await _userManager.GeneratePasswordResetTokenAsync(user);
+            var result = await _userManager.ResetPasswordAsync(user, resetToken, request.NewPassword);
+
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                return BadRequest(new { error = "Failed to reset password", details = errors });
+            }
+
+            // Remove the reset code after successful reset
+            await _userManager.RemoveAuthenticationTokenAsync(user, "PasswordReset", "ResetCode");
+
+            _logger.LogInformation("Password reset successful for user {UserId}", user.Id);
+
+            // Send password reset confirmation email
+            try
+            {
+                await _emailService.SendPasswordResetConfirmationEmailAsync(user);
+            }
+            catch (Exception emailEx)
+            {
+                _logger.LogError(emailEx, "Failed to send password reset confirmation email to user {UserId}", user.Id);
+                // Don't fail the password reset if email fails
+            }
+
+            return Ok(new { message = "Password has been reset successfully. You can now log in with your new password." });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during password reset");
+            return StatusCode(500, new { error = "Internal server error" });
+        }
+    }
 }

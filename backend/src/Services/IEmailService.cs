@@ -7,6 +7,9 @@ public interface IEmailService
 {
     Task<bool> SendWelcomeEmailAsync(User user);
     Task<bool> SendEmailVerificationAsync(User user, string verificationToken);
+    Task<bool> SendPasswordResetEmailAsync(User user, string resetCode);
+    Task<bool> SendPasswordResetConfirmationEmailAsync(User user);
+    Task<bool> SendPasswordChangedNotificationEmailAsync(User user);
     Task<bool> SendLiveDetailsEmailAsync(Enrollment enrollment, string locale);
     Task<bool> SendMaterialsDeliveryEmailAsync(Enrollment enrollment, List<SecureLink> secureLinks, string locale);
     Task<bool> SendLiveReminderEmailAsync(Enrollment enrollment, string locale, int hoursBeforeStart);

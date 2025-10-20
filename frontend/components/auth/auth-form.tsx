@@ -351,12 +351,12 @@ export function AuthForm({ defaultMode = 'login' }: AuthFormProps) {
                 </div>
 
                 <div className="text-sm">
-                  <a
-                    href="#"
+                  <Link
+                    href={`/${locale}/auth/forgot-password`}
                     className="font-medium text-teal-600 hover:text-teal-500 font-cairo"
                   >
                     {t('auth.login.forgot')}
-                  </a>
+                  </Link>
                 </div>
               </div>
 

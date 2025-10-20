@@ -14,6 +14,12 @@ public class CourseCategory
     [MaxLength(255)]
     public string TitleEn { get; set; } = string.Empty;
 
+    [MaxLength(500)]
+    public string? SubtitleAr { get; set; }
+
+    [MaxLength(500)]
+    public string? SubtitleEn { get; set; }
+
     public int DisplayOrder { get; set; } = 0;
 
     public bool IsActive { get; set; } = true;

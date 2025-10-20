@@ -13,7 +13,7 @@ import {
   faMagnifyingGlass, faCloudArrowUp, faPrint, faBuilding, faFileContract, faNewspaper, faCopy,
   faInfinity, faSignal, faDesktop as faMonitor, faCircleCheck, faCircleExclamation,
   faCreditCard, faWallet, faMoneyBill, faMoneyBill1, faBuildingColumns, faUniversity,
-  faArrowsRotate, faReceipt, faListUl, faCircleQuestion
+  faArrowsRotate, faReceipt, faListUl, faCircleQuestion, faKey, faHashtag
 } from '@fortawesome/free-solid-svg-icons';
 import { 
   faHeart as faHeartRegular, faStar as faStarRegular, faBookmark as faBookmarkRegular,
@@ -79,6 +79,8 @@ const iconMap: Record<string, any> = {
   'phone': faPhone,
   'mobile-screen': faMobileScreen,
   'lock': faLock,
+  'key': faKey,
+  'hashtag': faHashtag,
   'user-plus': faUserPlus,
   'sign-in': faSignInAlt,
   'sign-out': faSignOutAlt,

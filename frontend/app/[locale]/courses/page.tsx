@@ -193,9 +193,31 @@ export default function CoursesPage() {
   const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [sortBy, setSortBy] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('');
+  const [categoryFilter, setCategoryFilter] = useState(category);
   const [displayType, setDisplayType] = useState('grid');
   const [categories, setCategories] = useState<CourseCategoryData[]>([]);
+  
+  // Sync categoryFilter with URL parameter
+  useEffect(() => {
+    setCategoryFilter(category);
+  }, [category]);
+  
+  // Handle categoryFilter change and update URL
+  const handleCategoryFilterChange = (newCategory: string) => {
+    setCategoryFilter(newCategory);
+    
+    const searchParams = new URLSearchParams();
+    if (query.trim()) {
+      searchParams.set('query', query.trim());
+    }
+    if (newCategory) {
+      searchParams.set('category', newCategory);
+    }
+    
+    const searchString = searchParams.toString();
+    const url = `/${locale}/courses${searchString ? `?${searchString}` : ''}`;
+    router.push(url);
+  };
 
   // Animation hooks
   const isLoaded = usePageLoad(100);
@@ -526,11 +548,19 @@ export default function CoursesPage() {
             <div className={`mb-6 scroll-item max-w-5xl mx-auto ${isLoaded ? 'animate-slide-in-right stagger-3' : 'opacity-0'}`}>
               <div className="shadow-lg rounded-lg bg-white p-4">
                 <SearchBar 
-                  categories={categories.map(cat => ({
-                    id: cat.id,
-                    name: { ar: cat.titleAr, en: cat.titleEn },
-                    slug: cat.id // Use ID as slug for now
-                  }))} 
+                  categories={categories.map(cat => {
+                    // Generate slug from English title for consistency
+                    const slug = cat.titleEn
+                      .toLowerCase()
+                      .replace(/\s+/g, '-')
+                      .replace(/[^\w\-]+/g, '');
+                    
+                    return {
+                      id: cat.id,
+                      name: { ar: cat.titleAr, en: cat.titleEn },
+                      slug: slug // Use URL-friendly slug
+                    };
+                  })} 
                   compact={true}
                   enableLiveSearch={true}
                 />
@@ -559,12 +589,20 @@ export default function CoursesPage() {
                 <div className="w-full">
                   <FilterDropdown
                     label={locale === 'ar' ? "التصفية حسب" : "Filter By"}
-                    options={categories.map(cat => ({
-                      value: cat.id,
-                      label: locale === 'ar' ? cat.titleAr : cat.titleEn
-                    }))}
+                    options={categories.map(cat => {
+                      // Generate slug from English title for consistency
+                      const slug = cat.titleEn
+                        .toLowerCase()
+                        .replace(/\s+/g, '-')
+                        .replace(/[^\w\-]+/g, '');
+                      
+                      return {
+                        value: slug,
+                        label: locale === 'ar' ? cat.titleAr : cat.titleEn
+                      };
+                    })}
                     value={categoryFilter}
-                    onChange={setCategoryFilter}
+                    onChange={handleCategoryFilterChange}
                     placeholder={locale === 'ar' ? "التصنيف حسب" : "Choose category"}
                     icon="sliders"
                   />

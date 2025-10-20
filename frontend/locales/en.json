@@ -175,6 +175,32 @@
       "code-sent": "Verification code sent to your email",
       "resend-failed": "Failed to resend verification code"
     },
+    "forgot-password": {
+      "title": "Forgot Password",
+      "subtitle": "Enter your email address to receive a password reset code",
+      "email": "Email Address",
+      "submit": "Send Reset Code",
+      "submitting": "Sending...",
+      "back-to-login": "Back to Login",
+      "success": "Reset code sent to your email!",
+      "error": "Failed to send reset code"
+    },
+    "reset-password": {
+      "title": "Reset Password",
+      "subtitle": "Enter the code sent to your email and your new password",
+      "email": "Email Address",
+      "code": "Reset Code",
+      "code-placeholder": "Enter 6-digit code",
+      "new-password": "New Password",
+      "confirm-password": "Confirm New Password",
+      "submit": "Reset Password",
+      "submitting": "Resetting...",
+      "back-to-login": "Back to Login",
+      "success": "Password reset successfully! You can now login.",
+      "error": "Failed to reset password",
+      "code-required": "Reset code is required",
+      "code-invalid": "Invalid reset code"
+    },
     "errors": {
       "invalid-credentials": "Invalid email or password",
       "email-exists": "Email already exists",

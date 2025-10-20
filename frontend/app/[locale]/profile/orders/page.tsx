@@ -179,30 +179,37 @@ export default function OrdersPage() {
                   {order.items && order.items.length > 0 && (
                     <div className="border-t border-gray-200 pt-4 mt-4">
                       <div className="space-y-3">
-                        {order.items.map((item, itemIndex) => (
-                          <div key={itemIndex} className="flex items-center justify-between">
-                            <div className="flex-1">
-                              <p className="font-medium text-gray-900 font-cairo">
-                                {locale === 'ar' ? item.title.ar : item.title.en}
-                              </p>
-                              {item.session && (
-                                <p className="text-sm text-gray-600 font-cairo">
-                                  {t('orders.session')}: {new Date(item.session.startAt).toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric' })}
+                        {order.items.map((item, itemIndex) => {
+                          // Safe title retrieval with fallback
+                          const courseTitle = locale === 'ar' 
+                            ? (item.courseTitleAr || item.courseTitleEn || 'Course') 
+                            : (item.courseTitleEn || item.courseTitleAr || 'Course');
+                          
+                          return (
+                            <div key={itemIndex} className="flex items-center justify-between">
+                              <div className="flex-1">
+                                <p className="font-medium text-gray-900 font-cairo">
+                                  {courseTitle}
                                 </p>
-                              )}
-                            </div>
-                            <div className="text-right ml-4 rtl:ml-0 rtl:mr-4">
-                              <p className="font-semibold text-gray-900 font-cairo">
-                                {item.price} {item.currency}
-                              </p>
-                              {item.qty > 1 && (
-                                <p className="text-sm text-gray-600 font-cairo">
-                                  x{item.qty}
+                                {item.session && (
+                                  <p className="text-sm text-gray-600 font-cairo">
+                                    {t('orders.session')}: {new Date(item.session.startAt).toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric' })}
+                                  </p>
+                                )}
+                              </div>
+                              <div className="text-right ml-4 rtl:ml-0 rtl:mr-4">
+                                <p className="font-semibold text-gray-900 font-cairo">
+                                  {item.price} {item.currency}
                                 </p>
-                              )}
+                                {item.qty > 1 && (
+                                  <p className="text-sm text-gray-600 font-cairo">
+                                    x{item.qty}
+                                  </p>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   )}

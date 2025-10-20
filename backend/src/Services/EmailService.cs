@@ -82,6 +82,136 @@ public class EmailService : IEmailService
         }
     }
 
+    public async Task<bool> SendPasswordResetEmailAsync(User user, string resetCode)
+    {
+        try
+        {
+            return await SendSimplePasswordResetEmailAsync(user, resetCode);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send password reset email to user {UserId}", user.Id);
+            return false;
+        }
+    }
+
+    public async Task<bool> SendPasswordResetConfirmationEmailAsync(User user)
+    {
+        try
+        {
+            var fromEmail = _configuration["SendGrid:FromEmail"];
+            var fromName = _configuration["SendGrid:FromName"];
+            var isArabic = user.Locale == "ar";
+            
+            _logger.LogInformation("Attempting to send password reset confirmation email to {Email}", user.Email);
+            
+            var subject = isArabic ? "تم تغيير كلمة المرور بنجاح - إرساء للتدريب" : "Password Reset Successful - Ersa Training";
+            var bodyHtml = GeneratePasswordResetConfirmationTemplate(user, isArabic);
+
+            var from = new EmailAddress(fromEmail, fromName);
+            var to = new EmailAddress(user.Email, user.FullName);
+            var msg = MailHelper.CreateSingleEmail(from, to, subject, null, bodyHtml);
+
+            _logger.LogInformation("Sending password reset confirmation email via SendGrid...");
+            var response = await _sendGridClient.SendEmailAsync(msg);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                _logger.LogInformation("Password reset confirmation email sent successfully to {Email}. Status: {StatusCode}", user.Email, response.StatusCode);
+                return true;
+            }
+            else
+            {
+                var errorBody = await response.Body.ReadAsStringAsync();
+                _logger.LogError("Failed to send password reset confirmation email. Status: {StatusCode}, Body: {ErrorBody}", response.StatusCode, errorBody);
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Exception while sending password reset confirmation email to user {UserId}", user.Id);
+            return false;
+        }
+    }
+
+    public async Task<bool> SendPasswordChangedNotificationEmailAsync(User user)
+    {
+        try
+        {
+            var fromEmail = _configuration["SendGrid:FromEmail"];
+            var fromName = _configuration["SendGrid:FromName"];
+            var isArabic = user.Locale == "ar";
+            
+            _logger.LogInformation("Attempting to send password changed notification email to {Email}", user.Email);
+            
+            var subject = isArabic ? "تم تغيير كلمة المرور - إرساء للتدريب" : "Password Changed - Ersa Training";
+            var bodyHtml = GeneratePasswordChangedNotificationTemplate(user, isArabic);
+
+            var from = new EmailAddress(fromEmail, fromName);
+            var to = new EmailAddress(user.Email, user.FullName);
+            var msg = MailHelper.CreateSingleEmail(from, to, subject, null, bodyHtml);
+
+            _logger.LogInformation("Sending password changed notification email via SendGrid...");
+            var response = await _sendGridClient.SendEmailAsync(msg);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                _logger.LogInformation("Password changed notification email sent successfully to {Email}. Status: {StatusCode}", user.Email, response.StatusCode);
+                return true;
+            }
+            else
+            {
+                var errorBody = await response.Body.ReadAsStringAsync();
+                _logger.LogError("Failed to send password changed notification email. Status: {StatusCode}, Body: {ErrorBody}", response.StatusCode, errorBody);
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Exception while sending password changed notification email to user {UserId}", user.Id);
+            return false;
+        }
+    }
+
+    private async Task<bool> SendSimplePasswordResetEmailAsync(User user, string resetCode)
+    {
+        try
+        {
+            var fromEmail = _configuration["SendGrid:FromEmail"];
+            var fromName = _configuration["SendGrid:FromName"];
+            var isArabic = user.Locale == "ar";
+            
+            _logger.LogInformation("Attempting to send password reset email to {Email} from {FromEmail}", user.Email, fromEmail);
+            
+            var subject = isArabic ? "إعادة تعيين كلمة المرور - إرساء للتدريب" : "Password Reset - Ersa Training";
+            var bodyHtml = GeneratePasswordResetEmailTemplate(user, resetCode, isArabic);
+
+            var from = new EmailAddress(fromEmail, fromName);
+            var to = new EmailAddress(user.Email, user.FullName);
+            var msg = MailHelper.CreateSingleEmail(from, to, subject, null, bodyHtml);
+
+            _logger.LogInformation("Sending password reset email via SendGrid...");
+            var response = await _sendGridClient.SendEmailAsync(msg);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                _logger.LogInformation("Password reset email sent successfully to {Email}. Status: {StatusCode}", user.Email, response.StatusCode);
+                return true;
+            }
+            else
+            {
+                var errorBody = await response.Body.ReadAsStringAsync();
+                _logger.LogError("Failed to send password reset email. Status: {StatusCode}, Body: {ErrorBody}", response.StatusCode, errorBody);
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Exception while sending password reset email to user {UserId}", user.Id);
+            return false;
+        }
+    }
+
     private async Task<bool> SendSimpleVerificationEmailAsync(User user, string verificationToken)
     {
         try
@@ -1875,6 +2005,825 @@ public class EmailService : IEmailService
             <h3>{footerTitle}</h3>
             <p>{footerTagline}</p>
             <p style=""margin-top: 15px;"">{emailLabel} support@ersa-training.com</p>
+            <p>{websiteLabel} www.ersa-training.com</p>
+        </div>
+    </div>
+</body>
+</html>";
+    }
+
+    private string GeneratePasswordResetEmailTemplate(User user, string resetCode, bool isArabic)
+    {
+        var firstName = user.FullName.Split(' ')[0];
+        var greeting = isArabic ? $"مرحباً {firstName}!" : $"Hello {firstName}!";
+        var tagline = isArabic ? "طلب إعادة تعيين كلمة المرور" : "Password Reset Request";
+        var dear = isArabic ? $"عزيزي/عزيزتي {user.FullName}،" : $"Dear {user.FullName},";
+        var intro = isArabic ? "لقد تلقينا طلباً لإعادة تعيين كلمة المرور لحسابك في منصة إرساء للتدريب." : "We received a request to reset your password for your Ersa Training account.";
+        var instructions = isArabic ? "لإعادة تعيين كلمة المرور الخاصة بك، يرجى استخدام رمز إعادة التعيين أدناه:" : "To reset your password, please use the reset code below:";
+        var codeLabel = isArabic ? "رمز إعادة التعيين" : "Your Reset Code";
+        var expiryNotice = isArabic ? "هذا الرمز صالح لمدة 1 ساعة فقط" : "This code is valid for 1 hour only";
+        var howToReset = isArabic ? "كيفية إعادة تعيين كلمة المرور" : "How to Reset Your Password";
+        var step1 = isArabic ? "انسخ رمز إعادة التعيين المكون من 6 أرقام أعلاه" : "Copy the 6-digit reset code above";
+        var step2 = isArabic ? "ارجع إلى صفحة إعادة تعيين كلمة المرور" : "Return to the password reset page";
+        var step3 = isArabic ? "الصق الرمز وأدخل كلمة المرور الجديدة" : "Paste the code and enter your new password";
+        var step4 = isArabic ? "اضغط على زر تأكيد" : "Click the Confirm button";
+        var securityTitle = isArabic ? "⚠️ ملاحظة أمنية هامة:" : "⚠️ Important Security Notice:";
+        var securityNote = isArabic ? "إذا لم تطلب إعادة تعيين كلمة المرور، يرجى تجاهل هذا البريد الإلكتروني. حسابك آمن ولن يتم إجراء أي تغييرات." : "If you didn't request a password reset, please ignore this email. Your account is secure and no changes will be made.";
+        var tip = isArabic ? "نصيحة: اختر كلمة مرور قوية تحتوي على أحرف كبيرة وصغيرة وأرقام ورموز خاصة." : "Tip: Choose a strong password with uppercase, lowercase letters, numbers, and special characters.";
+        var helpTitle = isArabic ? "هل تحتاج إلى مساعدة؟" : "Need Help?";
+        var helpText = isArabic ? "إذا كنت تواجه أي مشكلة، لا تتردد في التواصل مع فريق الدعم الفني:" : "If you're having any issues, don't hesitate to contact our support team:";
+        var footerTitle = isArabic ? "إرساء للتدريب والاستشارات" : "Ersa Training & Consulting";
+        var footerTagline = isArabic ? "منصتك المتكاملة للتدريب والتطوير المهني" : "Your comprehensive platform for training and professional development";
+        var emailLabel = isArabic ? "البريد الإلكتروني:" : "Email:";
+        var websiteLabel = isArabic ? "الموقع الإلكتروني:" : "Website:";
+
+        return $@"
+<!DOCTYPE html>
+<html lang=""{(isArabic ? "ar" : "en")}"" dir=""{(isArabic ? "rtl" : "ltr")}"">
+<head>
+    <meta charset=""UTF-8"">
+    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+    <title>{(isArabic ? "إعادة تعيين كلمة المرور" : "Password Reset")}</title>
+    <style>
+        body {{
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }}
+        .container {{
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }}
+        .header {{
+            background: linear-gradient(135deg, #00AC96 0%, #292561 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }}
+        .header h1 {{
+            margin: 0 0 10px 0;
+            font-size: 28px;
+            font-weight: bold;
+        }}
+        .header p {{
+            margin: 0;
+            font-size: 16px;
+            opacity: 0.95;
+        }}
+        .icon-circle {{
+            width: 80px;
+            height: 80px;
+            background-color: white;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+        }}
+        .content {{
+            padding: 40px 30px;
+        }}
+        .greeting {{
+            font-size: 20px;
+            color: #292561;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }}
+        .message {{
+            font-size: 16px;
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 30px;
+        }}
+        .reset-box {{
+            background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+            border: 3px solid #ffc107;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            margin: 30px 0;
+        }}
+        .reset-label {{
+            font-size: 14px;
+            color: #856404;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }}
+        .reset-code {{
+            font-size: 42px;
+            font-weight: bold;
+            color: #856404;
+            letter-spacing: 8px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            display: inline-block;
+        }}
+        .expiry-notice {{
+            font-size: 13px;
+            color: #d32f2f;
+            margin-top: 15px;
+            font-weight: bold;
+        }}
+        .instructions {{
+            background-color: #e7f3ff;
+            border-left: 4px solid #00AC96;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }}
+        .instructions h3 {{
+            margin: 0 0 15px 0;
+            color: #292561;
+            font-size: 18px;
+        }}
+        .instructions ol {{
+            margin: 10px 0;
+            padding-{(isArabic ? "right" : "left")}: 20px;
+        }}
+        .instructions li {{
+            margin-bottom: 10px;
+            color: #555;
+        }}
+        .security-notice {{
+            background-color: #fff3cd;
+            border: 2px solid #ffc107;
+            color: #856404;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 14px;
+        }}
+        .security-notice strong {{
+            display: block;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }}
+        .help-section {{
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: center;
+        }}
+        .help-section h3 {{
+            color: #292561;
+            margin: 0 0 15px 0;
+        }}
+        .help-section p {{
+            color: #666;
+            margin: 5px 0;
+        }}
+        .help-section a {{
+            color: #00AC96;
+            text-decoration: none;
+            font-weight: bold;
+        }}
+        .footer {{
+            background-color: #292561;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }}
+        .footer h3 {{
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }}
+        .footer p {{
+            margin: 5px 0;
+            opacity: 0.9;
+            font-size: 14px;
+        }}
+    </style>
+</head>
+<body>
+    <div class=""container"">
+        <div class=""header"">
+            <div class=""icon-circle"">
+                🔐
+            </div>
+            <h1>{greeting}</h1>
+            <p>{tagline}</p>
+        </div>
+        
+        <div class=""content"">
+            <div class=""greeting"">
+                {dear}
+            </div>
+            
+            <div class=""message"">
+                <p>{intro}</p>
+                <p style=""margin-top: 15px;"">{instructions}</p>
+            </div>
+            
+            <div class=""reset-box"">
+                <div class=""reset-label"">
+                    🔑 {codeLabel}
+                </div>
+                <div class=""reset-code"">
+                    {resetCode}
+                </div>
+                <div class=""expiry-notice"">
+                    ⏰ {expiryNotice}
+                </div>
+            </div>
+            
+            <div class=""instructions"">
+                <h3>📋 {howToReset}</h3>
+                <ol>
+                    <li>{step1}</li>
+                    <li>{step2}</li>
+                    <li>{step3}</li>
+                    <li>{step4}</li>
+                </ol>
+            </div>
+            
+            <div class=""security-notice"">
+                <strong>{securityTitle}</strong>
+                {securityNote}
+            </div>
+            
+            <div style=""margin: 30px 0; padding: 20px; background-color: #e7f3ff; border-radius: 8px; border-left: 4px solid #00AC96;"">
+                <p style=""margin: 0; color: #666; font-size: 15px;"">
+                    💡 <strong>{tip}</strong>
+                </p>
+            </div>
+            
+            <div class=""help-section"">
+                <h3>🆘 {helpTitle}</h3>
+                <p>{helpText}</p>
+                <p><a href=""mailto:support@ersa-training.com"">support@ersa-training.com</a></p>
+            </div>
+        </div>
+        
+        <div class=""footer"">
+            <h3>{footerTitle}</h3>
+            <p>{footerTagline}</p>
+            <p>{emailLabel} support@ersa-training.com</p>
+            <p>{websiteLabel} www.ersa-training.com</p>
+        </div>
+    </div>
+</body>
+</html>";
+    }
+
+    private string GeneratePasswordResetConfirmationTemplate(User user, bool isArabic)
+    {
+        var firstName = user.FullName.Split(' ')[0];
+        var greeting = isArabic ? $"مرحباً {firstName}!" : $"Hello {firstName}!";
+        var tagline = isArabic ? "تم تغيير كلمة المرور بنجاح" : "Password Reset Successful";
+        var dear = isArabic ? $"عزيزي/عزيزتي {user.FullName}،" : $"Dear {user.FullName},";
+        var mainMessage = isArabic 
+            ? "نود إعلامك بأنه تم إعادة تعيين كلمة المرور لحسابك في منصة إرساء للتدريب بنجاح." 
+            : "We're writing to confirm that your password for Ersa Training platform has been successfully reset.";
+        var detailsTitle = isArabic ? "تفاصيل العملية" : "Reset Details";
+        var dateLabel = isArabic ? "التاريخ والوقت:" : "Date & Time:";
+        var resetDate = DateTime.UtcNow.ToString(isArabic ? "dd/MM/yyyy HH:mm" : "MM/dd/yyyy hh:mm tt");
+        var ipLabel = isArabic ? "العنوان:" : "IP Address:";
+        var ipAddress = "N/A"; // Can be enhanced to get actual IP
+        var whatNextTitle = isArabic ? "ماذا بعد؟" : "What's Next?";
+        var whatNext1 = isArabic ? "يمكنك الآن تسجيل الدخول باستخدام كلمة المرور الجديدة" : "You can now log in using your new password";
+        var whatNext2 = isArabic ? "تأكد من حفظ كلمة المرور الجديدة في مكان آمن" : "Make sure to save your new password in a secure place";
+        var whatNext3 = isArabic ? "يُنصح بتفعيل المصادقة الثنائية لحماية أفضل" : "We recommend enabling two-factor authentication for better security";
+        var securityTitle = isArabic ? "⚠️ تنبيه أمني" : "⚠️ Security Alert";
+        var securityNote = isArabic 
+            ? "إذا لم تقم أنت بإعادة تعيين كلمة المرور، يرجى التواصل معنا فوراً على:" 
+            : "If you didn't reset your password, please contact us immediately at:";
+        var helpTitle = isArabic ? "هل تحتاج إلى مساعدة؟" : "Need Help?";
+        var helpText = isArabic 
+            ? "فريق الدعم الفني جاهز لمساعدتك على مدار الساعة." 
+            : "Our support team is ready to help you 24/7.";
+        var footerTitle = isArabic ? "إرساء للتدريب والاستشارات" : "Ersa Training & Consulting";
+        var footerTagline = isArabic ? "منصتك المتكاملة للتدريب والتطوير المهني" : "Your comprehensive platform for training and professional development";
+        var emailLabel = isArabic ? "البريد الإلكتروني:" : "Email:";
+        var websiteLabel = isArabic ? "الموقع الإلكتروني:" : "Website:";
+
+        return $@"
+<!DOCTYPE html>
+<html lang=""{(isArabic ? "ar" : "en")}"" dir=""{(isArabic ? "rtl" : "ltr")}"">
+<head>
+    <meta charset=""UTF-8"">
+    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+    <title>{tagline}</title>
+    <style>
+        body {{
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }}
+        .container {{
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }}
+        .header {{
+            background: linear-gradient(135deg, #00AC96 0%, #292561 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }}
+        .header h1 {{
+            margin: 0 0 10px 0;
+            font-size: 28px;
+            font-weight: bold;
+        }}
+        .header p {{
+            margin: 0;
+            font-size: 16px;
+            opacity: 0.95;
+        }}
+        .icon-circle {{
+            width: 80px;
+            height: 80px;
+            background-color: white;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+        }}
+        .content {{
+            padding: 40px 30px;
+        }}
+        .greeting {{
+            font-size: 20px;
+            color: #292561;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }}
+        .message {{
+            font-size: 16px;
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 30px;
+        }}
+        .success-box {{
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border: 3px solid #28a745;
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+            margin: 30px 0;
+        }}
+        .success-icon {{
+            font-size: 60px;
+            margin-bottom: 15px;
+        }}
+        .details-box {{
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+        }}
+        .details-box h3 {{
+            color: #292561;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }}
+        .detail-row {{
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }}
+        .detail-label {{
+            font-weight: bold;
+            color: #666;
+        }}
+        .detail-value {{
+            color: #333;
+        }}
+        .next-steps {{
+            background-color: #e7f3ff;
+            border-left: 4px solid #00AC96;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }}
+        .next-steps h3 {{
+            margin: 0 0 15px 0;
+            color: #292561;
+            font-size: 18px;
+        }}
+        .next-steps ul {{
+            margin: 10px 0;
+            padding-{(isArabic ? "right" : "left")}: 20px;
+        }}
+        .next-steps li {{
+            margin-bottom: 10px;
+            color: #555;
+        }}
+        .security-notice {{
+            background-color: #fff3cd;
+            border: 2px solid #ffc107;
+            color: #856404;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 14px;
+        }}
+        .security-notice strong {{
+            display: block;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }}
+        .help-section {{
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: center;
+        }}
+        .help-section h3 {{
+            color: #292561;
+            margin: 0 0 15px 0;
+        }}
+        .help-section p {{
+            color: #666;
+            margin: 5px 0;
+        }}
+        .help-section a {{
+            color: #00AC96;
+            text-decoration: none;
+            font-weight: bold;
+        }}
+        .footer {{
+            background-color: #292561;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }}
+        .footer h3 {{
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }}
+        .footer p {{
+            margin: 5px 0;
+            opacity: 0.9;
+            font-size: 14px;
+        }}
+    </style>
+</head>
+<body>
+    <div class=""container"">
+        <div class=""header"">
+            <div class=""icon-circle"">
+                ✅
+            </div>
+            <h1>{greeting}</h1>
+            <p>{tagline}</p>
+        </div>
+        
+        <div class=""content"">
+            <div class=""greeting"">
+                {dear}
+            </div>
+            
+            <div class=""message"">
+                <p>{mainMessage}</p>
+            </div>
+            
+            <div class=""success-box"">
+                <div class=""success-icon"">🔐</div>
+                <h2 style=""color: #28a745; margin: 10px 0;"">{(isArabic ? "نجحت العملية!" : "Success!")}</h2>
+                <p style=""margin: 5px 0; color: #155724;"">{(isArabic ? "يمكنك الآن تسجيل الدخول بكلمة المرور الجديدة" : "You can now log in with your new password")}</p>
+            </div>
+            
+            <div class=""details-box"">
+                <h3>📋 {detailsTitle}</h3>
+                <div class=""detail-row"">
+                    <span class=""detail-label"">{dateLabel}</span>
+                    <span class=""detail-value"">{resetDate}</span>
+                </div>
+                <div class=""detail-row"" style=""border-bottom: none;"">
+                    <span class=""detail-label"">{ipLabel}</span>
+                    <span class=""detail-value"">{ipAddress}</span>
+                </div>
+            </div>
+            
+            <div class=""next-steps"">
+                <h3>🚀 {whatNextTitle}</h3>
+                <ul>
+                    <li>{whatNext1}</li>
+                    <li>{whatNext2}</li>
+                    <li>{whatNext3}</li>
+                </ul>
+            </div>
+            
+            <div class=""security-notice"">
+                <strong>{securityTitle}</strong>
+                {securityNote}
+                <br><br>
+                <a href=""mailto:support@ersa-training.com"" style=""color: #856404; text-decoration: underline; font-weight: bold;"">support@ersa-training.com</a>
+            </div>
+            
+            <div class=""help-section"">
+                <h3>🆘 {helpTitle}</h3>
+                <p>{helpText}</p>
+                <p><a href=""mailto:support@ersa-training.com"">support@ersa-training.com</a></p>
+            </div>
+        </div>
+        
+        <div class=""footer"">
+            <h3>{footerTitle}</h3>
+            <p>{footerTagline}</p>
+            <p>{emailLabel} support@ersa-training.com</p>
+            <p>{websiteLabel} www.ersa-training.com</p>
+        </div>
+    </div>
+</body>
+</html>";
+    }
+
+    private string GeneratePasswordChangedNotificationTemplate(User user, bool isArabic)
+    {
+        var firstName = user.FullName.Split(' ')[0];
+        var greeting = isArabic ? $"مرحباً {firstName}!" : $"Hello {firstName}!";
+        var tagline = isArabic ? "تم تغيير كلمة المرور" : "Password Changed";
+        var dear = isArabic ? $"عزيزي/عزيزتي {user.FullName}،" : $"Dear {user.FullName},";
+        var mainMessage = isArabic 
+            ? "نود إعلامك بأنه تم تغيير كلمة المرور لحسابك في منصة إرساء للتدريب بنجاح." 
+            : "We're writing to inform you that your password for Ersa Training platform has been successfully changed.";
+        var detailsTitle = isArabic ? "تفاصيل العملية" : "Change Details";
+        var dateLabel = isArabic ? "التاريخ والوقت:" : "Date & Time:";
+        var changeDate = DateTime.UtcNow.ToString(isArabic ? "dd/MM/yyyy HH:mm" : "MM/dd/yyyy hh:mm tt");
+        var ipLabel = isArabic ? "العنوان:" : "IP Address:";
+        var ipAddress = "N/A"; // Can be enhanced to get actual IP
+        var securityTipsTitle = isArabic ? "نصائح أمنية" : "Security Tips";
+        var tip1 = isArabic ? "لا تشارك كلمة المرور الخاصة بك مع أي شخص" : "Never share your password with anyone";
+        var tip2 = isArabic ? "استخدم كلمة مرور قوية ومعقدة" : "Use a strong and complex password";
+        var tip3 = isArabic ? "قم بتغيير كلمة المرور بشكل دوري" : "Change your password regularly";
+        var tip4 = isArabic ? "لا تستخدم نفس كلمة المرور لمواقع متعددة" : "Don't use the same password for multiple websites";
+        var securityTitle = isArabic ? "⚠️ تنبيه أمني" : "⚠️ Security Alert";
+        var securityNote = isArabic 
+            ? "إذا لم تقم أنت بتغيير كلمة المرور، يرجى التواصل معنا فوراً على:" 
+            : "If you didn't change your password, please contact us immediately at:";
+        var helpTitle = isArabic ? "هل تحتاج إلى مساعدة؟" : "Need Help?";
+        var helpText = isArabic 
+            ? "فريق الدعم الفني جاهز لمساعدتك على مدار الساعة." 
+            : "Our support team is ready to help you 24/7.";
+        var footerTitle = isArabic ? "إرساء للتدريب والاستشارات" : "Ersa Training & Consulting";
+        var footerTagline = isArabic ? "منصتك المتكاملة للتدريب والتطوير المهني" : "Your comprehensive platform for training and professional development";
+        var emailLabel = isArabic ? "البريد الإلكتروني:" : "Email:";
+        var websiteLabel = isArabic ? "الموقع الإلكتروني:" : "Website:";
+
+        return $@"
+<!DOCTYPE html>
+<html lang=""{(isArabic ? "ar" : "en")}"" dir=""{(isArabic ? "rtl" : "ltr")}"">
+<head>
+    <meta charset=""UTF-8"">
+    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+    <title>{tagline}</title>
+    <style>
+        body {{
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }}
+        .container {{
+            max-width: 600px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }}
+        .header {{
+            background: linear-gradient(135deg, #00AC96 0%, #292561 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }}
+        .header h1 {{
+            margin: 0 0 10px 0;
+            font-size: 28px;
+            font-weight: bold;
+        }}
+        .header p {{
+            margin: 0;
+            font-size: 16px;
+            opacity: 0.95;
+        }}
+        .icon-circle {{
+            width: 80px;
+            height: 80px;
+            background-color: white;
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 50px;
+        }}
+        .content {{
+            padding: 40px 30px;
+        }}
+        .greeting {{
+            font-size: 20px;
+            color: #292561;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }}
+        .message {{
+            font-size: 16px;
+            line-height: 1.8;
+            color: #555;
+            margin-bottom: 30px;
+        }}
+        .info-box {{
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border: 2px solid #2196f3;
+            border-radius: 10px;
+            padding: 25px;
+            text-align: center;
+            margin: 30px 0;
+        }}
+        .info-icon {{
+            font-size: 60px;
+            margin-bottom: 15px;
+        }}
+        .details-box {{
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+        }}
+        .details-box h3 {{
+            color: #292561;
+            margin-top: 0;
+            margin-bottom: 15px;
+        }}
+        .detail-row {{
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }}
+        .detail-label {{
+            font-weight: bold;
+            color: #666;
+        }}
+        .detail-value {{
+            color: #333;
+        }}
+        .security-tips {{
+            background-color: #e7f3ff;
+            border-left: 4px solid #00AC96;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }}
+        .security-tips h3 {{
+            margin: 0 0 15px 0;
+            color: #292561;
+            font-size: 18px;
+        }}
+        .security-tips ul {{
+            margin: 10px 0;
+            padding-{(isArabic ? "right" : "left")}: 20px;
+        }}
+        .security-tips li {{
+            margin-bottom: 10px;
+            color: #555;
+        }}
+        .security-notice {{
+            background-color: #fff3cd;
+            border: 2px solid #ffc107;
+            color: #856404;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 14px;
+        }}
+        .security-notice strong {{
+            display: block;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }}
+        .help-section {{
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+            text-align: center;
+        }}
+        .help-section h3 {{
+            color: #292561;
+            margin: 0 0 15px 0;
+        }}
+        .help-section p {{
+            color: #666;
+            margin: 5px 0;
+        }}
+        .help-section a {{
+            color: #00AC96;
+            text-decoration: none;
+            font-weight: bold;
+        }}
+        .footer {{
+            background-color: #292561;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }}
+        .footer h3 {{
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }}
+        .footer p {{
+            margin: 5px 0;
+            opacity: 0.9;
+            font-size: 14px;
+        }}
+    </style>
+</head>
+<body>
+    <div class=""container"">
+        <div class=""header"">
+            <div class=""icon-circle"">
+                🔒
+            </div>
+            <h1>{greeting}</h1>
+            <p>{tagline}</p>
+        </div>
+        
+        <div class=""content"">
+            <div class=""greeting"">
+                {dear}
+            </div>
+            
+            <div class=""message"">
+                <p>{mainMessage}</p>
+            </div>
+            
+            <div class=""info-box"">
+                <div class=""info-icon"">🔐</div>
+                <h2 style=""color: #1976d2; margin: 10px 0;"">{(isArabic ? "تم التغيير بنجاح" : "Successfully Changed")}</h2>
+                <p style=""margin: 5px 0; color: #0d47a1;"">{(isArabic ? "كلمة المرور الخاصة بك محمية الآن" : "Your password is now protected")}</p>
+            </div>
+            
+            <div class=""details-box"">
+                <h3>📋 {detailsTitle}</h3>
+                <div class=""detail-row"">
+                    <span class=""detail-label"">{dateLabel}</span>
+                    <span class=""detail-value"">{changeDate}</span>
+                </div>
+                <div class=""detail-row"" style=""border-bottom: none;"">
+                    <span class=""detail-label"">{ipLabel}</span>
+                    <span class=""detail-value"">{ipAddress}</span>
+                </div>
+            </div>
+            
+            <div class=""security-tips"">
+                <h3>🛡️ {securityTipsTitle}</h3>
+                <ul>
+                    <li>{tip1}</li>
+                    <li>{tip2}</li>
+                    <li>{tip3}</li>
+                    <li>{tip4}</li>
+                </ul>
+            </div>
+            
+            <div class=""security-notice"">
+                <strong>{securityTitle}</strong>
+                {securityNote}
+                <br><br>
+                <a href=""mailto:support@ersa-training.com"" style=""color: #856404; text-decoration: underline; font-weight: bold;"">support@ersa-training.com</a>
+            </div>
+            
+            <div class=""help-section"">
+                <h3>🆘 {helpTitle}</h3>
+                <p>{helpText}</p>
+                <p><a href=""mailto:support@ersa-training.com"">support@ersa-training.com</a></p>
+            </div>
+        </div>
+        
+        <div class=""footer"">
+            <h3>{footerTitle}</h3>
+            <p>{footerTagline}</p>
+            <p>{emailLabel} support@ersa-training.com</p>
             <p>{websiteLabel} www.ersa-training.com</p>
         </div>
     </div>

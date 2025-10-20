@@ -1323,6 +1323,8 @@ public class AdminController : ControllerBase
                 Id = c.Id,
                 TitleAr = c.TitleAr,
                 TitleEn = c.TitleEn,
+                SubtitleAr = c.SubtitleAr,
+                SubtitleEn = c.SubtitleEn,
                 DisplayOrder = c.DisplayOrder,
                 IsActive = c.IsActive,
                 CreatedAt = c.CreatedAt,
@@ -1348,6 +1350,8 @@ public class AdminController : ControllerBase
             Id = category.Id,
             TitleAr = category.TitleAr,
             TitleEn = category.TitleEn,
+            SubtitleAr = category.SubtitleAr,
+            SubtitleEn = category.SubtitleEn,
             DisplayOrder = category.DisplayOrder,
             IsActive = category.IsActive,
             CreatedAt = category.CreatedAt,
@@ -1363,6 +1367,8 @@ public class AdminController : ControllerBase
             Id = Guid.NewGuid(),
             TitleAr = request.TitleAr,
             TitleEn = request.TitleEn,
+            SubtitleAr = request.SubtitleAr,
+            SubtitleEn = request.SubtitleEn,
             DisplayOrder = request.DisplayOrder,
             IsActive = request.IsActive,
             CreatedAt = DateTime.UtcNow,
@@ -1377,6 +1383,8 @@ public class AdminController : ControllerBase
             Id = category.Id,
             TitleAr = category.TitleAr,
             TitleEn = category.TitleEn,
+            SubtitleAr = category.SubtitleAr,
+            SubtitleEn = category.SubtitleEn,
             DisplayOrder = category.DisplayOrder,
             IsActive = category.IsActive,
             CreatedAt = category.CreatedAt,
@@ -1398,6 +1406,8 @@ public class AdminController : ControllerBase
 
         category.TitleAr = request.TitleAr;
         category.TitleEn = request.TitleEn;
+        category.SubtitleAr = request.SubtitleAr;
+        category.SubtitleEn = request.SubtitleEn;
         category.DisplayOrder = request.DisplayOrder;
         category.IsActive = request.IsActive;
         category.UpdatedAt = DateTime.UtcNow;
@@ -1409,6 +1419,8 @@ public class AdminController : ControllerBase
             Id = category.Id,
             TitleAr = category.TitleAr,
             TitleEn = category.TitleEn,
+            SubtitleAr = category.SubtitleAr,
+            SubtitleEn = category.SubtitleEn,
             DisplayOrder = category.DisplayOrder,
             IsActive = category.IsActive,
             CreatedAt = category.CreatedAt,

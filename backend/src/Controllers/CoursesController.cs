@@ -25,7 +25,9 @@ public class CoursesController : ControllerBase
         [FromQuery] bool activeOnly = true,
         [FromQuery] string? query = null,
         [FromQuery] Guid? categoryId = null,
-        [FromQuery] Guid? subCategoryId = null)
+        [FromQuery] string? category = null,
+        [FromQuery] Guid? subCategoryId = null,
+        [FromQuery] string? subCategory = null)
     {
         try
         {
@@ -41,12 +43,50 @@ public class CoursesController : ControllerBase
                 coursesQuery = coursesQuery.Where(c => c.Type == type.Value);
             }
 
-            if (categoryId.HasValue)
+            // Handle category filtering by slug/name
+            if (!string.IsNullOrEmpty(category))
+            {
+                // Normalize the slug: replace dashes with spaces for comparison
+                var categoryName = category.Replace("-", " ").Trim().ToLower();
+                
+                _logger.LogInformation("Filtering courses by category slug: {CategorySlug}, normalized: {CategoryName}", 
+                    category, categoryName);
+                
+                // Match against both English and Arabic category titles
+                coursesQuery = coursesQuery.Where(c => 
+                    c.Category != null && (
+                        c.Category.TitleEn.ToLower() == categoryName ||
+                        c.Category.TitleAr.ToLower() == categoryName
+                    )
+                );
+            }
+            // Fallback: If categoryId is provided (backward compatibility)
+            else if (categoryId.HasValue)
             {
                 coursesQuery = coursesQuery.Where(c => c.CategoryId == categoryId.Value);
             }
 
-            if (subCategoryId.HasValue)
+            // Handle subcategory filtering by slug/name
+            if (!string.IsNullOrEmpty(subCategory))
+            {
+                // Normalize the slug: replace dashes with spaces for comparison
+                var subCategoryName = subCategory.Replace("-", " ").Trim().ToLower();
+                
+                _logger.LogInformation("Filtering courses by subcategory slug: {SubCategorySlug}, normalized: {SubCategoryName}", 
+                    subCategory, subCategoryName);
+                
+                // Match against both English and Arabic subcategory titles
+                coursesQuery = coursesQuery.Where(c => 
+                    c.CourseSubCategoryMappings.Any(m => 
+                        m.SubCategory != null && (
+                            m.SubCategory.TitleEn.ToLower() == subCategoryName ||
+                            m.SubCategory.TitleAr.ToLower() == subCategoryName
+                        )
+                    )
+                );
+            }
+            // Fallback: If subCategoryId is provided (backward compatibility)
+            else if (subCategoryId.HasValue)
             {
                 coursesQuery = coursesQuery.Where(c => c.CourseSubCategoryMappings.Any(m => m.SubCategoryId == subCategoryId.Value));
             }

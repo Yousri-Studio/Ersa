@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ErsaTraining.API.Data.Entities;
 using ErsaTraining.API.DTOs;
+using ErsaTraining.API.Services;
 using System.Security.Claims;
 
 namespace ErsaTraining.API.Controllers;
@@ -13,13 +14,16 @@ namespace ErsaTraining.API.Controllers;
 public class UserProfileController : ControllerBase
 {
     private readonly UserManager<User> _userManager;
+    private readonly IEmailService _emailService;
     private readonly ILogger<UserProfileController> _logger;
 
     public UserProfileController(
         UserManager<User> userManager,
+        IEmailService emailService,
         ILogger<UserProfileController> logger)
     {
         _userManager = userManager;
+        _emailService = emailService;
         _logger = logger;
     }
 
@@ -159,6 +163,17 @@ public class UserProfileController : ControllerBase
             }
 
             _logger.LogInformation("User {UserId} changed their password", userId);
+
+            // Send password changed notification email
+            try
+            {
+                await _emailService.SendPasswordChangedNotificationEmailAsync(user);
+            }
+            catch (Exception emailEx)
+            {
+                _logger.LogError(emailEx, "Failed to send password changed notification email to user {UserId}", user.Id);
+                // Don't fail the password change if email fails
+            }
 
             return Ok(new { message = "Password changed successfully" });
         }
