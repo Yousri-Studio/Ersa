@@ -14,7 +14,7 @@ import {
   faInfinity, faSignal, faDesktop as faMonitor, faCircleCheck, faCircleExclamation,
   faCreditCard, faWallet, faMoneyBill, faMoneyBill1, faBuildingColumns, faUniversity,
   faArrowsRotate, faReceipt, faListUl, faCircleQuestion, faKey, faHashtag, faLink, faFilePdf,
-  faBan, faPaperclip
+  faBan, faPaperclip, faBookOpen, faUserCircle, faUserGroup, faComments
 } from '@fortawesome/free-solid-svg-icons';
 import { 
   faHeart as faHeartRegular, faStar as faStarRegular, faBookmark as faBookmarkRegular,
@@ -65,8 +65,10 @@ const iconMap: Record<string, any> = {
   // Course & Learning
   'video': faVideo,
   'book': faBook,
+  'book-open': faBookOpen,
   'clock': faClock,
   'users': faUsers,
+  'user-group': faUserGroup,
   'calendar': faCalendar,
   'star': faStar,
   'play': faPlay,
@@ -83,6 +85,7 @@ const iconMap: Record<string, any> = {
   'key': faKey,
   'hashtag': faHashtag,
   'user-plus': faUserPlus,
+  'user-circle': faUserCircle,
   'sign-in': faSignInAlt,
   'sign-out': faSignOutAlt,
   'shield-alt': faShieldAlt,
@@ -157,6 +160,8 @@ const iconMap: Record<string, any> = {
   'cloud-upload-alt': faCloudArrowUp,
   'printer': faPrint,
   'print': faPrint,
+  'chat-bubble-left-right': faComments,
+  'comments': faComments,
   
   // Missing icons for admin content management
   'building': faBuilding,
