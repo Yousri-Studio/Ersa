@@ -240,25 +240,38 @@ function EnrollmentCard({ enrollment, onRefresh, isProcessing, setProcessing }: 
       {isPdfCourse && (
         <div>
           {hasFulfilledPdf ? (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-              <div className="flex items-start">
-                <Icon name="check-circle" className="text-green-600 mt-1 mr-3" />
-                <div className="flex-1">
-                  <h4 className="text-sm font-semibold text-green-900 mb-2">Materials Delivered</h4>
-                  <div className="space-y-1">
-                    {enrollment.secureLinks.map((link) => (
-                      <div key={link.id} className="text-sm text-green-700">
-                        <Icon name="file" className="inline mr-1" />
-                        {link.attachmentFileName}
-                        <span className="text-xs text-green-600 ml-2">
-                          (Created: {new Date(link.createdAt).toLocaleDateString()})
-                        </span>
-                      </div>
-                    ))}
+            <>
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                <div className="flex items-start">
+                  <Icon name="check-circle" className="text-green-600 mt-1 mr-3" />
+                  <div className="flex-1">
+                    <h4 className="text-sm font-semibold text-green-900 mb-2">Materials Delivered</h4>
+                    <div className="space-y-1">
+                      {enrollment.secureLinks.map((link) => (
+                        <div key={link.id} className="text-sm text-green-700">
+                          <Icon name="file" className="inline mr-1" />
+                          {link.attachmentFileName}
+                          <span className="text-xs text-green-600 ml-2">
+                            (Created: {new Date(link.createdAt).toLocaleDateString()})
+                          </span>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
+              
+              {/* Mark as Completed button for PDF courses if not already completed */}
+              {!isCompleted && (
+                <button
+                  onClick={handleMarkCompleted}
+                  disabled={isProcessing}
+                  className="mt-4 w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isProcessing ? 'Processing...' : 'Mark Enrollment as Completed'}
+                </button>
+              )}
+            </>
           ) : (
             <div>
               <h4 className="text-sm font-semibold text-gray-900 mb-3">Select Course Materials</h4>
