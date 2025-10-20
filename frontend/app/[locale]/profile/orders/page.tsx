@@ -2,15 +2,18 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Icon } from '@/components/ui/icon';
 import { ordersApi, type Order } from '@/lib/api';
 import { usePageLoad } from '@/lib/use-animations';
 import { ScrollAnimations } from '@/components/scroll-animations';
+import toast from 'react-hot-toast';
 
 export default function OrdersPage() {
   const t = useTranslations();
   const locale = useLocale();
+  const router = useRouter();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -215,10 +218,34 @@ export default function OrdersPage() {
                   )}
 
                   {/* Actions */}
-                  <div className="border-t border-gray-200 pt-4 mt-4 flex justify-end space-x-3 rtl:space-x-reverse">
+                  <div className="border-t border-gray-200 pt-4 mt-4 flex flex-col sm:flex-row gap-3 justify-end">
+                    {/* Show payment actions for pending orders */}
+                    {(order.status.toLowerCase() === 'pending' || order.status.toLowerCase() === 'pendingpayment') && (
+                      <>
+                        <button
+                          onClick={() => {
+                            if (confirm(t('orders.confirm-cancel'))) {
+                              toast.success(t('orders.order-cancelled'));
+                              fetchOrders();
+                            }
+                          }}
+                          className="inline-flex items-center justify-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors duration-200 font-cairo font-semibold"
+                        >
+                          <Icon name="times-circle" className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                          {t('orders.cancel-order')}
+                        </button>
+                        <button
+                          onClick={() => router.push(`/${locale}/checkout?orderId=${order.id}`)}
+                          className="inline-flex items-center justify-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors duration-200 font-cairo font-semibold"
+                        >
+                          <Icon name="credit-card" className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
+                          {t('orders.continue-payment')}
+                        </button>
+                      </>
+                    )}
                     <Link
                       href={`/${locale}/profile/orders/${order.id}`}
-                      className="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 font-cairo font-semibold"
+                      className="inline-flex items-center justify-center px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200 font-cairo font-semibold"
                     >
                       <Icon name="eye" className="h-4 w-4 mr-2 rtl:mr-0 rtl:ml-2" />
                       {t('orders.view-details')}
