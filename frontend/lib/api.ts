@@ -239,6 +239,7 @@ export interface Order {
 
 export interface OrderItem {
   courseId: string;
+  courseSlug?: string;
   sessionId?: string;
   courseTitleEn: string;
   courseTitleAr: string;
@@ -339,6 +340,9 @@ export const ordersApi = {
 
   getOrder: (orderId: string): Promise<AxiosResponse<Order>> =>
     api.get(`/orders/${orderId}`),
+
+  getOrderEnrollments: (orderId: string) =>
+    api.get(`/orders/${orderId}/enrollments`),
 
   cancelOrder: (orderId: string): Promise<AxiosResponse<{ message: string }>> =>
     api.post(`/orders/${orderId}/cancel`),

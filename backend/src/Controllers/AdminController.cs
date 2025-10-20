@@ -2238,12 +2238,12 @@ public class AdminController : ControllerBase
                         Type = a.Type
                     }).ToList(),
                 SecureLinks = e.SecureLinks
-                    .Where(sl => !sl.IsRevoked)
                     .Select(sl => new SecureLinkDto
                     {
                         Id = sl.Id,
                         AttachmentFileName = sl.Attachment.FileName,
                         Token = sl.Token,
+                        IsRevoked = sl.IsRevoked,
                         CreatedAt = sl.CreatedAt
                     }).ToList()
             }).ToList();

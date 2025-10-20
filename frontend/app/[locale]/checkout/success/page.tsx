@@ -209,26 +209,29 @@ export default function CheckoutSuccessPage() {
                     {t('checkout.success.courses')}
                   </h3>
                   <div className="space-y-3">
-                    {order.items.map((item: any, index: number) => (
-                      <div key={index} className="flex justify-between items-center">
-                        <div>
-                          <p className="font-semibold text-gray-900 font-cairo">
-                            {typeof item.courseTitle === 'object' 
-                              ? (locale === 'ar' ? item.courseTitle.ar : item.courseTitle.en)
-                              : item.courseTitle
-                            }
-                          </p>
+                    {order.items.map((item: any, index: number) => {
+                      const courseTitle = locale === 'ar' 
+                        ? (item.courseTitleAr || item.courseTitleEn || 'Course')
+                        : (item.courseTitleEn || item.courseTitleAr || 'Course');
+                      
+                      return (
+                        <div key={index} className="flex justify-between items-center">
+                          <div>
+                            <p className="font-semibold text-gray-900 font-cairo">
+                              {courseTitle}
+                            </p>
                           {item.session && (
                             <p className="text-sm text-gray-600 font-cairo">
                               {t('checkout.success.session')}: {new Date(item.session.startAt).toLocaleDateString()}
                             </p>
                           )}
                         </div>
-                        <span className="font-semibold text-gray-900 font-cairo">
-                          {item.price} {order.currency}
-                        </span>
-                      </div>
-                    ))}
+                          <span className="font-semibold text-gray-900 font-cairo">
+                            {item.price} {order.currency}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}

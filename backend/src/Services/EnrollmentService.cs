@@ -247,16 +247,11 @@ public class EnrollmentService : IEnrollmentService
             }
             else if (course.Type == CourseType.PDF)
             {
-                // For PDF courses, automatically deliver all materials
-                var attachments = await _context.Attachments
-                    .Where(a => a.CourseId == course.Id && !a.IsRevoked)
-                    .Select(a => a.Id)
-                    .ToListAsync();
-
-                if (attachments.Any())
-                {
-                    await DeliverMaterialsAsync(enrollment.Id, attachments);
-                }
+                // PDF courses require manual fulfillment by admin
+                // Admin will select and deliver materials via admin dashboard
+                _logger.LogInformation(
+                    "PDF course enrollment {EnrollmentId} created for course {CourseId}. Awaiting admin fulfillment.", 
+                    enrollment.Id, course.Id);
             }
         }
         catch (Exception ex)

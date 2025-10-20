@@ -13,7 +13,8 @@ import {
   faMagnifyingGlass, faCloudArrowUp, faPrint, faBuilding, faFileContract, faNewspaper, faCopy,
   faInfinity, faSignal, faDesktop as faMonitor, faCircleCheck, faCircleExclamation,
   faCreditCard, faWallet, faMoneyBill, faMoneyBill1, faBuildingColumns, faUniversity,
-  faArrowsRotate, faReceipt, faListUl, faCircleQuestion, faKey, faHashtag
+  faArrowsRotate, faReceipt, faListUl, faCircleQuestion, faKey, faHashtag, faLink, faFilePdf,
+  faBan, faPaperclip
 } from '@fortawesome/free-solid-svg-icons';
 import { 
   faHeart as faHeartRegular, faStar as faStarRegular, faBookmark as faBookmarkRegular,
@@ -119,6 +120,7 @@ const iconMap: Record<string, any> = {
   'layer-group': faLayerGroup,
   'cube': faCube,
   'external-link-alt': faExternalLinkAlt,
+  'external-link': faExternalLinkAlt, // Alias
   'save': faSave,
   'question-circle': faQuestionCircle,
   'cogs': faCogs,
@@ -193,6 +195,16 @@ const iconMap: Record<string, any> = {
   'question-mark-circle': faCircleQuestion,
   'circle-question': faCircleQuestion,
   'academic-cap': faGraduationCap, // Alias for graduation-cap
+  
+  // Link icon
+  'link': faLink,
+  
+  // File types
+  'file-pdf': faFilePdf,
+  
+  // Status icons
+  'ban': faBan,
+  'paperclip': faPaperclip,
 };
 
 export function Icon({ name, icon, className = '', variant = 'solid', style, color, width }: IconProps) {

@@ -869,6 +869,7 @@
       "empty-cart": "Your cart is empty.",
       "cart-id-missing": "Cart ID is missing. Please try adding items to cart again.",
       "local-cart": "Unable to process checkout. Please try adding items to cart again.",
+      "order-not-found": "Order not found or you don't have permission to access it.",
       "unexpected": "An unexpected error occurred. Please try again."
     },
     "success": {
@@ -892,6 +893,7 @@
       "error-title": "Something went wrong",
       "status-paid": "Paid",
       "status-pending": "Pending",
+      "status-pendingpayment": "Pending Payment",
       "status-failed": "Failed",
       "status-new": "New",
       "status-underprocess": "Under Process",
@@ -1061,6 +1063,7 @@
     "title": "My Orders",
     "subtitle": "View and manage your order history",
     "order-number": "Order Number",
+    "order-id": "Order ID",
     "order-details": "Order Details",
     "order-date": "Order Date",
     "total-amount": "Total Amount",
@@ -1070,6 +1073,7 @@
     "quantity": "Quantity",
     "session": "Session",
     "view-details": "View Details",
+    "view-invoice": "View Invoice",
     "back-to-profile": "Back to Profile",
     "back-to-orders": "Back to Orders",
     "cancel-order": "Cancel Order",
@@ -1080,6 +1084,11 @@
     "not-found": "Order not found",
     "unauthorized": "You must be logged in to view orders",
     "fetch-error": "Failed to load orders. Please try again.",
+    "enrollments": "Your Enrollments",
+    "enrolled": "Enrolled",
+    "no-enrollments": "No enrollments found for this order",
+    "course-materials": "Course Materials",
+    "invoice-error": "Failed to load invoice. Please try again.",
     "empty": {
       "title": "No Orders Yet",
       "description": "You haven't placed any orders yet. Start exploring our courses!",

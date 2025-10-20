@@ -148,8 +148,10 @@ public class OrdersController : ControllerBase
 
             var orders = await _context.Orders
                 .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Course)
                 .Where(o => o.UserId == userId)
                 .OrderByDescending(o => o.CreatedAt)
+                .AsSplitQuery()
                 .ToListAsync();
 
             var orderDtos = orders.Select(o => new OrderDto
@@ -163,6 +165,7 @@ public class OrdersController : ControllerBase
                 Items = o.OrderItems.Select(oi => new OrderItemDto
                 {
                     CourseId = oi.CourseId,
+                    CourseSlug = oi.Course.Slug,
                     CourseTitleEn = oi.CourseTitleEn,
                     CourseTitleAr = oi.CourseTitleAr,
                     SessionId = oi.SessionId,
@@ -198,6 +201,9 @@ public class OrdersController : ControllerBase
             }
 
             var order = await _context.Orders
+                .Include(o => o.OrderItems)
+                    .ThenInclude(oi => oi.Course)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(o => o.Id == id && o.UserId == userId);
 
             if (order == null)
@@ -213,7 +219,17 @@ public class OrdersController : ControllerBase
                 Status = order.Status.ToString(),
                 CreatedAt = order.CreatedAt,
                 UpdatedAt = order.UpdatedAt,
-                Items = new List<OrderItemDto>() // TODO: Implement order items
+                Items = order.OrderItems.Select(oi => new OrderItemDto
+                {
+                    CourseId = oi.CourseId,
+                    CourseSlug = oi.Course.Slug,
+                    CourseTitleEn = oi.CourseTitleEn,
+                    CourseTitleAr = oi.CourseTitleAr,
+                    SessionId = oi.SessionId,
+                    Price = oi.Price,
+                    Currency = oi.Currency,
+                    Qty = oi.Qty
+                }).ToList()
             };
 
             return Ok(orderDto);
@@ -221,6 +237,103 @@ public class OrdersController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error retrieving order");
+            return StatusCode(500, new { error = "Internal server error" });
+        }
+    }
+
+    /// <summary>
+    /// Gets enrollments for a specific order (user's own orders only).
+    /// </summary>
+    /// <param name="id">The ID of the order.</param>
+    /// <returns>List of enrollments for the order.</returns>
+    [HttpGet("{id:guid}/enrollments")]
+    public async Task<ActionResult<List<OrderEnrollmentDto>>> GetOrderEnrollments(Guid id)
+    {
+        try
+        {
+            var userId = GetCurrentUserId();
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            // Verify the order belongs to the current user
+            var order = await _context.Orders
+                .FirstOrDefaultAsync(o => o.Id == id && o.UserId == userId);
+
+            if (order == null)
+            {
+                return NotFound(new { error = "Order not found" });
+            }
+
+            // Only show enrollments for paid/processed orders
+            if (order.Status != OrderStatus.Paid && 
+                order.Status != OrderStatus.Processed && 
+                order.Status != OrderStatus.UnderProcess)
+            {
+                return Ok(new List<OrderEnrollmentDto>()); // Return empty list for unpaid orders
+            }
+
+            var enrollments = await _context.Enrollments
+                .Include(e => e.Course)
+                    .ThenInclude(c => c.Attachments)
+                .Include(e => e.Session)
+                .Include(e => e.SecureLinks)
+                    .ThenInclude(sl => sl.Attachment)
+                .Where(e => e.OrderId == id)
+                .ToListAsync();
+
+            var enrollmentDtos = enrollments.Select(e => new OrderEnrollmentDto
+            {
+                Id = e.Id,
+                CourseId = e.CourseId,
+                CourseType = e.Course.Type,
+                CourseTitle = new LocalizedText
+                {
+                    Ar = e.Course.TitleAr,
+                    En = e.Course.TitleEn
+                },
+                SessionId = e.SessionId,
+                Session = e.Session != null ? new ErsaTraining.API.DTOs.SessionDto
+                {
+                    Id = e.Session.Id,
+                    TitleAr = e.Session.TitleAr,
+                    TitleEn = e.Session.TitleEn,
+                    DescriptionAr = e.Session.DescriptionAr,
+                    DescriptionEn = e.Session.DescriptionEn,
+                    StartAt = e.Session.StartAt,
+                    EndAt = e.Session.EndAt,
+                    TeamsLink = e.Session.TeamsLink,
+                    Capacity = e.Session.Capacity,
+                    AvailableSpots = e.Session.Capacity.HasValue 
+                        ? e.Session.Capacity.Value - _context.Enrollments.Count(en => en.SessionId == e.Session.Id && en.Status == EnrollmentStatus.Paid)
+                        : null
+                } : null,
+                CourseSessions = new List<ErsaTraining.API.DTOs.SessionDto>(), // Can be populated if needed
+                Status = e.Status,
+                CourseAttachments = e.Course.Attachments.Select(ca => new AttachmentDto
+                {
+                    Id = ca.Id,
+                    FileName = ca.FileName,
+                    Type = ca.Type
+                }).ToList(),
+                SecureLinks = e.SecureLinks
+                    .Where(sl => sl.Attachment != null) // Only include links with attachments
+                    .Select(sl => new ErsaTraining.API.DTOs.SecureLinkDto
+                    {
+                        Id = sl.Id,
+                        AttachmentFileName = sl.Attachment!.FileName,
+                        Token = sl.Token,
+                        IsRevoked = sl.IsRevoked,
+                        CreatedAt = sl.CreatedAt
+                    }).ToList()
+            }).ToList();
+
+            return Ok(enrollmentDtos);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving enrollments for order {OrderId}", id);
             return StatusCode(500, new { error = "Internal server error" });
         }
     }

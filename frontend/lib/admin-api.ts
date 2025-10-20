@@ -437,6 +437,7 @@ export interface SecureLinkDto {
   id: string;
   attachmentFileName: string;
   token: string;
+  isRevoked: boolean;
   createdAt: string;
 }
 
@@ -467,6 +468,51 @@ export interface OrderEnrollmentDto {
   status: number; // EnrollmentStatus enum
   courseAttachments: AttachmentDto[];
   secureLinks: SecureLinkDto[];
+}
+
+export interface InvoiceDto {
+  id: string;
+  invoiceNumber: string;
+  orderId: string;
+  amount: number;
+  currency: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  customer: InvoiceCustomerDto;
+  items: InvoiceItemDto[];
+  payments: InvoicePaymentDto[];
+}
+
+export interface InvoiceCustomerDto {
+  id: string;
+  fullName: string;
+  email: string;
+  phone?: string;
+  country?: string;
+  locale?: string;
+  createdAt: string;
+}
+
+export interface InvoiceItemDto {
+  id: string;
+  courseId: string;
+  sessionId?: string;
+  courseTitleEn: string;
+  courseTitleAr: string;
+  price: number;
+  currency: string;
+  qty: number;
+}
+
+export interface InvoicePaymentDto {
+  id: string;
+  provider: string;
+  providerRef?: string;
+  status: string;
+  capturedAt?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CreateSecureLinksRequest {
@@ -1005,6 +1051,9 @@ export const adminApi = {
   // Order Fulfillment
   getOrderEnrollments: (orderId: string) =>
     api.get<OrderEnrollmentDto[]>(`/admin/orders/${orderId}/enrollments`),
+
+  getOrderInvoice: (orderId: string) =>
+    api.get<InvoiceDto>(`/admin/orders/${orderId}/invoice`),
 
   createSecureLinks: (enrollmentId: string, data: CreateSecureLinksRequest) =>
     api.post<SecureLinkDto[]>(`/admin/enrollments/${enrollmentId}/secure-links`, data),

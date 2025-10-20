@@ -279,6 +279,7 @@ public class SecureLinkDto
     public Guid Id { get; set; }
     public string AttachmentFileName { get; set; } = string.Empty;
     public string Token { get; set; } = string.Empty;
+    public bool IsRevoked { get; set; }
     public DateTime CreatedAt { get; set; }
 }
 

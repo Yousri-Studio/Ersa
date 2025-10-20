@@ -68,6 +68,7 @@ public class OrderDto
 public class OrderItemDto
 {
     public Guid CourseId { get; set; }
+    public string? CourseSlug { get; set; }
     public string CourseTitleEn { get; set; } = string.Empty;
     public string CourseTitleAr { get; set; } = string.Empty;
     public LocalizedText? CourseTitle { get; set; }
