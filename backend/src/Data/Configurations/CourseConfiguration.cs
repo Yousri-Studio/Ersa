@@ -87,7 +87,7 @@ public class CourseConfiguration : IEntityTypeConfiguration<Course>
 
         // New field configurations
         builder.Property(c => c.Photo)
-            .HasMaxLength(1000);
+            .HasColumnType("varbinary(max)");
 
         builder.Property(c => c.Tags)
             .HasMaxLength(2000);

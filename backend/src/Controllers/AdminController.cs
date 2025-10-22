@@ -1134,6 +1134,7 @@ public class AdminController : ControllerBase
             
             // Debug logging
             _logger.LogInformation($"Updating course {courseId} with From: {request.From}, To: {request.To}, SessionsNotesEn: {request.SessionsNotesEn}, SessionsNotesAr: {request.SessionsNotesAr}");
+            
             course.Photo = !string.IsNullOrEmpty(request.Photo) ? Convert.FromBase64String(request.Photo) : null;
             course.Tags = request.Tags;
             course.CourseTopicsAr = request.CourseTopicsAr;

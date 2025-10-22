@@ -58,7 +58,7 @@ namespace ErsaTraining.API.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("Attachments");
+                    b.ToTable("Attachments", (string)null);
                 });
 
             modelBuilder.Entity("ErsaTraining.API.Data.Entities.Bill", b =>
@@ -108,7 +108,7 @@ namespace ErsaTraining.API.Migrations
                     b.HasIndex("OrderId")
                         .IsUnique();
 
-                    b.ToTable("Bills");
+                    b.ToTable("Bills", (string)null);
                 });
 
             modelBuilder.Entity("ErsaTraining.API.Data.Entities.Cart", b =>
@@ -140,7 +140,7 @@ namespace ErsaTraining.API.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Carts");
+                    b.ToTable("Carts", (string)null);
                 });
 
             modelBuilder.Entity("ErsaTraining.API.Data.Entities.CartItem", b =>
@@ -178,7 +178,7 @@ namespace ErsaTraining.API.Migrations
                         .IsUnique()
                         .HasFilter("[SessionId] IS NOT NULL");
 
-                    b.ToTable("CartItems");
+                    b.ToTable("CartItems", (string)null);
                 });
 
             modelBuilder.Entity("ErsaTraining.API.Data.Entities.ContactMessage", b =>
@@ -316,7 +316,7 @@ namespace ErsaTraining.API.Migrations
                     b.HasIndex("ContentSectionId", "BlockKey")
                         .IsUnique();
 
-                    b.ToTable("ContentBlocks");
+                    b.ToTable("ContentBlocks", (string)null);
                 });
 
             modelBuilder.Entity("ErsaTraining.API.Data.Entities.ContentPage", b =>
@@ -355,7 +355,7 @@ namespace ErsaTraining.API.Migrations
                     b.HasIndex("PageKey")
                         .IsUnique();
 
-                    b.ToTable("ContentPages");
+                    b.ToTable("ContentPages", (string)null);
 
                     b.HasData(
                         new
@@ -484,7 +484,7 @@ namespace ErsaTraining.API.Migrations
                     b.HasIndex("ContentPageId", "SectionKey")
                         .IsUnique();
 
-                    b.ToTable("ContentSections");
+                    b.ToTable("ContentSections", (string)null);
                 });
 
             modelBuilder.Entity("ErsaTraining.API.Data.Entities.ContentVersion", b =>
@@ -521,7 +521,7 @@ namespace ErsaTraining.API.Migrations
 
                     b.HasIndex("IsPublished");
 
-                    b.ToTable("ContentVersions");
+                    b.ToTable("ContentVersions", (string)null);
                 });
 
             modelBuilder.Entity("ErsaTraining.API.Data.Entities.Course", b =>
@@ -654,7 +654,7 @@ namespace ErsaTraining.API.Migrations
                     b.HasIndex("Slug")
                         .IsUnique();
 
-                    b.ToTable("Courses");
+                    b.ToTable("Courses", (string)null);
                 });
 
             modelBuilder.Entity("ErsaTraining.API.Data.Entities.CourseCategory", b =>
@@ -705,7 +705,7 @@ namespace ErsaTraining.API.Migrations
 
                     b.HasIndex("DisplayOrder");
 
-                    b.ToTable("CourseCategories");
+                    b.ToTable("CourseCategories", (string)null);
                 });
 
             modelBuilder.Entity("ErsaTraining.API.Data.Entities.CourseInstructor", b =>
@@ -725,7 +725,7 @@ namespace ErsaTraining.API.Migrations
 
                     b.HasIndex("InstructorId");
 
-                    b.ToTable("CourseInstructors");
+                    b.ToTable("CourseInstructors", (string)null);
                 });
 
             modelBuilder.Entity("ErsaTraining.API.Data.Entities.CourseSubCategory", b =>
@@ -768,7 +768,7 @@ namespace ErsaTraining.API.Migrations
 
                     b.HasIndex("DisplayOrder");
 
-                    b.ToTable("CourseSubCategories");
+                    b.ToTable("CourseSubCategories", (string)null);
                 });
 
             modelBuilder.Entity("ErsaTraining.API.Data.Entities.CourseSubCategoryMapping", b =>
@@ -788,7 +788,7 @@ namespace ErsaTraining.API.Migrations
 
                     b.HasIndex("SubCategoryId");
 
-                    b.ToTable("CourseSubCategoryMappings");
+                    b.ToTable("CourseSubCategoryMappings", (string)null);
                 });
 
             modelBuilder.Entity("ErsaTraining.API.Data.Entities.EmailLog", b =>
@@ -847,7 +847,7 @@ namespace ErsaTraining.API.Migrations
 
                     b.HasIndex("UserId", "TemplateKey", "CreatedAt");
 
-                    b.ToTable("EmailLogs");
+                    b.ToTable("EmailLogs", (string)null);
                 });
 
             modelBuilder.Entity("ErsaTraining.API.Data.Entities.EmailTemplate", b =>
@@ -894,7 +894,7 @@ namespace ErsaTraining.API.Migrations
                     b.HasIndex("Key")
                         .IsUnique();
 
-                    b.ToTable("EmailTemplates");
+                    b.ToTable("EmailTemplates", (string)null);
 
                     b.HasData(
                         new
@@ -972,7 +972,7 @@ namespace ErsaTraining.API.Migrations
                         .IsUnique()
                         .HasFilter("[SessionId] IS NOT NULL");
 
-                    b.ToTable("Enrollments");
+                    b.ToTable("Enrollments", (string)null);
                 });
 
             modelBuilder.Entity("ErsaTraining.API.Data.Entities.Instructor", b =>
@@ -1011,7 +1011,7 @@ namespace ErsaTraining.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Instructors");
+                    b.ToTable("Instructors", (string)null);
                 });
 
             modelBuilder.Entity("ErsaTraining.API.Data.Entities.Order", b =>
@@ -1052,7 +1052,7 @@ namespace ErsaTraining.API.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Orders");
+                    b.ToTable("Orders", (string)null);
                 });
 
             modelBuilder.Entity("ErsaTraining.API.Data.Entities.OrderItem", b =>
@@ -1157,7 +1157,7 @@ namespace ErsaTraining.API.Migrations
 
                     b.HasIndex("OrderId");
 
-                    b.ToTable("Payments");
+                    b.ToTable("Payments", (string)null);
                 });
 
             modelBuilder.Entity("ErsaTraining.API.Data.Entities.SecureLink", b =>
@@ -1205,7 +1205,7 @@ namespace ErsaTraining.API.Migrations
                     b.HasIndex("EnrollmentId", "AttachmentId")
                         .IsUnique();
 
-                    b.ToTable("SecureLinks");
+                    b.ToTable("SecureLinks", (string)null);
                 });
 
             modelBuilder.Entity("ErsaTraining.API.Data.Entities.Session", b =>
@@ -1257,7 +1257,7 @@ namespace ErsaTraining.API.Migrations
 
                     b.HasIndex("CourseId");
 
-                    b.ToTable("Sessions");
+                    b.ToTable("Sessions", (string)null);
                 });
 
             modelBuilder.Entity("ErsaTraining.API.Data.Entities.User", b =>
@@ -1394,7 +1394,7 @@ namespace ErsaTraining.API.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Wishlists");
+                    b.ToTable("Wishlists", (string)null);
                 });
 
             modelBuilder.Entity("ErsaTraining.API.Data.Entities.WishlistItem", b =>
@@ -1421,7 +1421,7 @@ namespace ErsaTraining.API.Migrations
                     b.HasIndex("WishlistId", "CourseId")
                         .IsUnique();
 
-                    b.ToTable("WishlistItems");
+                    b.ToTable("WishlistItems", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
