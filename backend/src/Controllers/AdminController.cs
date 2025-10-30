@@ -288,7 +288,7 @@ public class AdminController : ControllerBase
             var query = _context.Courses
                 .Include(c => c.Category)
                 .Include(c => c.CourseSubCategoryMappings)
-                    .ThenInclude(m => m.SubCategory)
+                .ThenInclude(m => m.SubCategory)
                 .Include(c => c.Attachments)
                 .AsSplitQuery()
                 .AsQueryable();

@@ -108,7 +108,7 @@ public class CoursesController : ControllerBase
                 .Include(c => c.CourseInstructors)
                     .ThenInclude(ci => ci.Instructor)
                 .AsSplitQuery()
-                .OrderBy(c => c.TitleEn)
+                .OrderBy(c => c.From).OrderBy(c => c.TitleEn).OrderBy(c => c.TitleAr)
                 .ToListAsync();
 
             var courseDtos = courses.Select(c => new CourseListDto

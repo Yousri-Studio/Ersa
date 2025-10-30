@@ -102,8 +102,8 @@ export default function PrivacyPolicyPage() {
                     إذا كان لديك أي أسئلة حول سياسة الخصوصية هذه، يرجى الاتصال بنا:
                   </p>
                   <div className="bg-gray-50 p-6 rounded-lg">
-                    <p className="text-gray-700 mb-2"><strong>البريد الإلكتروني:</strong> privacy@ersa-consultancy.com</p>
-                    <p className="text-gray-700 mb-2"><strong>الهاتف:</strong> +966 XX XXX XXXX</p>
+                    <p className="text-gray-700 mb-2"><strong>البريد الإلكتروني:</strong> <a href='mailto:info@ersa-training.com:'>info@ersa-training.com</a></p>
+                    <p className="text-gray-700 mb-2"><strong>رقم التواصل والواتساب:</strong> +966 55 877 9487</p>
                     <p className="text-gray-700"><strong>العنوان:</strong> المملكة العربية السعودية</p>
                   </div>
                 </>
@@ -179,8 +179,8 @@ export default function PrivacyPolicyPage() {
                     If you have any questions about this Privacy Policy, please contact us:
                   </p>
                   <div className="bg-gray-50 p-6 rounded-lg">
-                    <p className="text-gray-700 mb-2"><strong>Email:</strong> privacy@ersa-consultancy.com</p>
-                    <p className="text-gray-700 mb-2"><strong>Phone:</strong> +966 XX XXX XXXX</p>
+                    <p className="text-gray-700 mb-2"><strong>Email:</strong> <a href='mailto:info@ersa-training.com:'>info@ersa-training.com</a></p>
+                    <p className="text-gray-700 mb-2"><strong>Phone & Whats APP:</strong> +966 55 877 9487</p>
                     <p className="text-gray-700"><strong>Address:</strong> Saudi Arabia</p>
                   </div>
                 </>

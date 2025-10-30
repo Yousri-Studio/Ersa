@@ -234,12 +234,12 @@
   },
   
   "join-us": {
-    "title": "Join Many Trainees",
-    "subtitle": "We make it easy for trainees to choose what suits their needs, helping these categories organize training content and present it clearly and distinctly for each category separately.",
+    "title": "Join a community of ambitious learners",
+    "subtitle": "Enjoy a flexible learning experience tailored to your goals.",
     "benefits": [
-      "Easy learning and achieving the best results with the best methods",
-      "Easy learning and achieving the best results with the best methods",
-      "Continuous support to meet needs"
+      "Choose your path with confidence: Find the right program to match your professional aspirations.",
+      "Learn easily. Achieve more:Experience quality, practical, and interactive training.",
+      "Ongoing support every step of the way:  Our team is here to help you succeed."
     ],
     "cta": "Start with Us"
   },
@@ -370,13 +370,13 @@
     "addUser": "Add User",
     "achievements": {
       "badge": "Our Numbers",
-      "title": "Our Achievements Since Establishment",
-      "subtitle": "We make it easy for trainees to choose what suits their needs, helping these categories organize training content and present it clearly and distinctly for each category separately.",
+      "title": "Our Journey of Excellence",
+      "subtitle": "Since our inception, we have achieved remarkable milestones by delivering an exceptional training experience that empowers learners to choose programs that best suit their needs while ensuring clarity, quality, and relevance for every category.",
       "stats": {
-        "trainees": "Trainees",
-        "government_courses": "Government Courses",
-        "clients": "Clients",
-        "satisfaction": "Client Satisfaction"
+        "trainees": "2,000+ Trainees",
+        "government_courses": "100+ Training Programs",
+        "clients": "120+ Clients",
+        "satisfaction": "95% Customer Satisfaction Rate"
       }
     },
     "faq": {
@@ -430,8 +430,8 @@
       }
     },
     "ai-consultation": {
-      "title": "AI-Powered Consultation",
-      "subtitle": "Get personalized training recommendations using AI",
+      "title": "Our Training Solutions",
+      "subtitle": "We deliver integrated training solutions tailored to the needs of individuals and organizations, focusing on skill development, performance enhancement, and sustainable professional growth.",
       "badge": "AI Consultation",
       "cards": {
         "ai-solutions": {
@@ -440,8 +440,8 @@
           "cta": "Learn More"
         },
         "admin-consultation": {
-          "title": "Admin Consultation",
-          "description": "Expert advice for your training administration needs",
+          "title": "Consultancy Services",
+          "description": "We provide tailored consulting solutions that help organizations enhance performance and improve administrative efficiency.",
           "cta": "Get Started"
         }
       }
@@ -633,7 +633,7 @@
   "hero": {
     "title": "Transform Your Future with",
     "company": "Ersa Training",
-    "subtitle": "Professional development courses designed to elevate your career and unlock your potential",
+    "subtitle": "Innovative training programs to elevate your capabilities and open new paths to success.",
     "cta": "Explore Courses",
     "stats": {
       "students": "Students Trained",
@@ -852,7 +852,7 @@
     "help-center": "Help Center",
     "technical-support": "Technical Support",
     "all-rights-reserved": "All rights reserved",
-    "made-with-love": "Made with ❤️ in Saudi Arabia"
+    "made-with-love": "Made in Saudi Arabia"
   },
 
   "checkout": {
