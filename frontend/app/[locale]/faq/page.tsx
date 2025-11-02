@@ -1,61 +1,192 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { usePageLoad, useStaggeredAnimation } from '@/lib/use-animations';
 import { ScrollAnimations } from '@/components/scroll-animations';
 import { Icon } from '@/components/ui/icon';
+import { contentApi } from '@/lib/content-api';
+
+interface FAQItem {
+  question: string;
+  answer: string;
+}
 
 export default function FAQPage() {
   const locale = useLocale();
   const t = useTranslations();
   const [openItem, setOpenItem] = useState<number | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [faqItems, setFaqItems] = useState<FAQItem[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const isLoaded = usePageLoad(100);
+
+  useEffect(() => {
+    const fetchFAQs = async () => {
+      try {
+        setIsLoading(true);
+        // Fetch content templates from the API
+        const templates = await contentApi.getContentTemplates();
+        
+        // Get the FAQ section
+        const faqSection = templates.faq;
+        let fetchedFAQs: FAQItem[] = [];
+        
+        if (faqSection && faqSection.fields) {
+          // Find FAQ items field (either faq-items-en/ar or merged faq-items)
+          let faqItemsField = faqSection.fields.find(f => f.id === 'faq-items-en');
+          
+          // Check if we have separate en/ar fields
+          if (faqItemsField) {
+            const faqItemsArField = faqSection.fields.find(f => f.id === 'faq-items-ar');
+            
+            if (faqItemsArField && faqItemsField.value && Array.isArray(faqItemsField.value)) {
+              // Merge English and Arabic FAQs
+              const englishItems = faqItemsField.value as any[];
+              const arabicItems = faqItemsArField.value as any[];
+              const maxLength = Math.max(englishItems.length, arabicItems.length);
+              
+              const mergedFAQs = Array.from({ length: maxLength }, (_, index) => {
+                const itemEn = englishItems[index] || {};
+                const itemAr = arabicItems[index] || {};
+                
+                return {
+                  question: locale === 'ar' ? (itemAr.question || '') : (itemEn.question || ''),
+                  answer: locale === 'ar' ? (itemAr.answer || '') : (itemEn.answer || '')
+                };
+              });
+              
+              // Get ALL items (no slice limit for FAQ page)
+              fetchedFAQs = mergedFAQs.filter(item => item.question && item.answer);
+            } else if (faqItemsField.value && Array.isArray(faqItemsField.value)) {
+              // Fall back to English only
+              fetchedFAQs = (faqItemsField.value as any[]).map((item: any) => ({
+                question: item.question || '',
+                answer: item.answer || ''
+              })).filter((item: any) => item.question && item.answer);
+            }
+          } else {
+            // Try finding merged bilingual field
+            faqItemsField = faqSection.fields.find(f => f.id === 'faq-items');
+            
+            if (faqItemsField && faqItemsField.value && Array.isArray(faqItemsField.value)) {
+              const bilingualItems = faqItemsField.value as any[];
+              
+              const mergedFAQs = bilingualItems.map((item: any) => {
+                if (locale === 'ar') {
+                  return {
+                    question: item.questionAr || '',
+                    answer: item.answerAr || ''
+                  };
+                } else {
+                  return {
+                    question: item.questionEn || '',
+                    answer: item.answerEn || ''
+                  };
+                }
+              });
+              
+              // Get ALL items (no slice limit for FAQ page)
+              fetchedFAQs = mergedFAQs.filter(item => item.question && item.answer);
+            }
+          }
+        }
+        
+        // Fallback to default FAQs if no data from API
+        if (fetchedFAQs.length === 0) {
+          fetchedFAQs = [
+            {
+              question: locale === 'ar' ? 'ما هي أفضل طريقة لتعلم البرمجة؟' : 'What is the best way to learn programming?',
+              answer: locale === 'ar' ? 'أفضل طريقة لتعلم البرمجة هي الممارسة المستمرة والعمل على مشاريع حقيقية. ابدأ بلغة برمجة واحدة وتعلمها جيداً قبل الانتقال إلى لغات أخرى.' : 'The best way to learn programming is through consistent practice and working on real projects. Start with one programming language and master it well before moving to others.'
+            },
+            {
+              question: locale === 'ar' ? 'كم من الوقت يحتاج المبتدئ لتعلم التطوير؟' : 'How long does it take for a beginner to learn development?',
+              answer: locale === 'ar' ? 'يختلف الوقت حسب الشخص والمجهود المبذول، لكن عادة يحتاج المبتدئ من 6 إلى 12 شهر للحصول على أساس قوي في البرمجة مع الممارسة اليومية.' : 'The time varies depending on the person and effort invested, but typically a beginner needs 6 to 12 months to build a strong foundation in programming with daily practice.'
+            },
+            {
+              question: locale === 'ar' ? 'هل يمكنني تعلم البرمجة بدون خلفية تقنية؟' : 'Can I learn programming without a technical background?',
+              answer: locale === 'ar' ? 'نعم، بالطبع! البرمجة مهارة يمكن لأي شخص تعلمها بغض النظر عن خلفيته. المهم هو الصبر والمثابرة والممارسة المستمرة.' : 'Yes, absolutely! Programming is a skill that anyone can learn regardless of their background. What matters is patience, persistence, and continuous practice.'
+            },
+            {
+              question: locale === 'ar' ? 'ما هي أهم النصائح للمطورين الجدد؟' : 'What are the most important tips for new developers?',
+              answer: locale === 'ar' ? 'اقرأ الكود بكثرة، اكتب الكود يومياً، لا تخف من الأخطاء، اطلب المساعدة عند الحاجة، وابق مطلعاً على التقنيات الجديدة.' : 'Read code frequently, write code daily, don\'t be afraid of making mistakes, ask for help when needed, and stay updated with new technologies.'
+            },
+            {
+              question: locale === 'ar' ? 'كيف أختار لغة البرمجة المناسبة لي؟' : 'How do I choose the right programming language for me?',
+              answer: locale === 'ar' ? 'اختر لغة البرمجة بناءً على أهدافك: تطوير المواقع (JavaScript)، تطوير التطبيقات (Swift/Kotlin)، الذكاء الاصطناعي (Python)، أو التطوير العام (Java/C#).' : 'Choose a programming language based on your goals: web development (JavaScript), mobile apps (Swift/Kotlin), AI (Python), or general development (Java/C#).'
+            },
+            {
+              question: locale === 'ar' ? 'هل البرمجة مهنة مربحة؟' : 'Is programming a profitable career?',
+              answer: locale === 'ar' ? 'نعم، البرمجة من أكثر المهن طلباً ومن أعلاها أجراً في العالم. مع التطور التكنولوجي المستمر، الطلب على المطورين في ازدياد مستمر.' : 'Yes, programming is one of the most in-demand and highest-paying careers in the world. With continuous technological advancement, the demand for developers keeps growing.'
+            },
+            {
+              question: locale === 'ar' ? 'ما هي أفضل الموارد لتعلم البرمجة مجاناً؟' : 'What are the best free resources for learning programming?',
+              answer: locale === 'ar' ? 'هناك العديد من المصادر المجانية مثل: فري كود كامب، كورسيرا، يوتيوب، جيت هاب، وستاك أوفرفلو. المهم هو اختيار مصدر والالتزام به.' : 'There are many free resources like: FreeCodeCamp, Coursera, YouTube, GitHub, and Stack Overflow. The key is to choose one source and stick with it.'
+            },
+            {
+              question: locale === 'ar' ? 'كيف أبني مشروع برمجي ناجح؟' : 'How do I build a successful programming project?',
+              answer: locale === 'ar' ? 'ابدأ بفكرة بسيطة، خطط جيداً، اكتب كود نظيف، اختبر مشروعك باستمرار، واطلب آراء المستخدمين. لا تحاول بناء شيء معقد من البداية.' : 'Start with a simple idea, plan well, write clean code, test your project continuously, and seek user feedback. Don\'t try to build something complex from the beginning.'
+            },
+            {
+              question: locale === 'ar' ? 'ما الفرق بين تطوير الواجهات الأمامية والخلفية؟' : 'What is the difference between frontend and backend development?',
+              answer: locale === 'ar' ? 'تطوير الواجهات الأمامية يركز على ما يراه المستخدم (التصميم والتفاعل)، بينما تطوير الواجهات الخلفية يركز على الخوادم وقواعد البيانات والمنطق.' : 'Frontend development focuses on what users see (design and interaction), while backend development focuses on servers, databases, and business logic.'
+            }
+          ];
+        }
+        
+        setFaqItems(fetchedFAQs);
+      } catch (error) {
+        console.error('Error fetching FAQ data:', error);
+        // Use fallback FAQs on error
+        setFaqItems([
+          {
+            question: locale === 'ar' ? 'ما هي أفضل طريقة لتعلم البرمجة؟' : 'What is the best way to learn programming?',
+            answer: locale === 'ar' ? 'أفضل طريقة لتعلم البرمجة هي الممارسة المستمرة والعمل على مشاريع حقيقية. ابدأ بلغة برمجة واحدة وتعلمها جيداً قبل الانتقال إلى لغات أخرى.' : 'The best way to learn programming is through consistent practice and working on real projects. Start with one programming language and master it well before moving to others.'
+          },
+          {
+            question: locale === 'ar' ? 'كم من الوقت يحتاج المبتدئ لتعلم التطوير؟' : 'How long does it take for a beginner to learn development?',
+            answer: locale === 'ar' ? 'يختلف الوقت حسب الشخص والمجهود المبذول، لكن عادة يحتاج المبتدئ من 6 إلى 12 شهر للحصول على أساس قوي في البرمجة مع الممارسة اليومية.' : 'The time varies depending on the person and effort invested, but typically a beginner needs 6 to 12 months to build a strong foundation in programming with daily practice.'
+          },
+          {
+            question: locale === 'ar' ? 'هل يمكنني تعلم البرمجة بدون خلفية تقنية؟' : 'Can I learn programming without a technical background?',
+            answer: locale === 'ar' ? 'نعم، بالطبع! البرمجة مهارة يمكن لأي شخص تعلمها بغض النظر عن خلفيته. المهم هو الصبر والمثابرة والممارسة المستمرة.' : 'Yes, absolutely! Programming is a skill that anyone can learn regardless of their background. What matters is patience, persistence, and continuous practice.'
+          },
+          {
+            question: locale === 'ar' ? 'ما هي أهم النصائح للمطورين الجدد؟' : 'What are the most important tips for new developers?',
+            answer: locale === 'ar' ? 'اقرأ الكود بكثرة، اكتب الكود يومياً، لا تخف من الأخطاء، اطلب المساعدة عند الحاجة، وابق مطلعاً على التقنيات الجديدة.' : 'Read code frequently, write code daily, don\'t be afraid of making mistakes, ask for help when needed, and stay updated with new technologies.'
+          },
+          {
+            question: locale === 'ar' ? 'كيف أختار لغة البرمجة المناسبة لي؟' : 'How do I choose the right programming language for me?',
+            answer: locale === 'ar' ? 'اختر لغة البرمجة بناءً على أهدافك: تطوير المواقع (JavaScript)، تطوير التطبيقات (Swift/Kotlin)، الذكاء الاصطناعي (Python)، أو التطوير العام (Java/C#).' : 'Choose a programming language based on your goals: web development (JavaScript), mobile apps (Swift/Kotlin), AI (Python), or general development (Java/C#).'
+          },
+          {
+            question: locale === 'ar' ? 'هل البرمجة مهنة مربحة؟' : 'Is programming a profitable career?',
+            answer: locale === 'ar' ? 'نعم، البرمجة من أكثر المهن طلباً ومن أعلاها أجراً في العالم. مع التطور التكنولوجي المستمر، الطلب على المطورين في ازدياد مستمر.' : 'Yes, programming is one of the most in-demand and highest-paying careers in the world. With continuous technological advancement, the demand for developers keeps growing.'
+          },
+          {
+            question: locale === 'ar' ? 'ما هي أفضل الموارد لتعلم البرمجة مجاناً؟' : 'What are the best free resources for learning programming?',
+            answer: locale === 'ar' ? 'هناك العديد من المصادر المجانية مثل: فري كود كامب، كورسيرا، يوتيوب، جيت هاب، وستاك أوفرفلو. المهم هو اختيار مصدر والالتزام به.' : 'There are many free resources like: FreeCodeCamp, Coursera, YouTube, GitHub, and Stack Overflow. The key is to choose one source and stick with it.'
+          },
+          {
+            question: locale === 'ar' ? 'كيف أبني مشروع برمجي ناجح؟' : 'How do I build a successful programming project?',
+            answer: locale === 'ar' ? 'ابدأ بفكرة بسيطة، خطط جيداً، اكتب كود نظيف، اختبر مشروعك باستمرار، واطلب آراء المستخدمين. لا تحاول بناء شيء معقد من البداية.' : 'Start with a simple idea, plan well, write clean code, test your project continuously, and seek user feedback. Don\'t try to build something complex from the beginning.'
+          },
+          {
+            question: locale === 'ar' ? 'ما الفرق بين تطوير الواجهات الأمامية والخلفية؟' : 'What is the difference between frontend and backend development?',
+            answer: locale === 'ar' ? 'تطوير الواجهات الأمامية يركز على ما يراه المستخدم (التصميم والتفاعل)، بينما تطوير الواجهات الخلفية يركز على الخوادم وقواعد البيانات والمنطق.' : 'Frontend development focuses on what users see (design and interaction), while backend development focuses on servers, databases, and business logic.'
+          }
+        ]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchFAQs();
+  }, [locale]); // Re-fetch when locale changes
 
   const toggleItem = (index: number) => {
     setOpenItem(openItem === index ? null : index);
   };
-
-  // Random FAQ items for demonstration
-  const faqItems = [
-    {
-      question: locale === 'ar' ? 'ما هي أفضل طريقة لتعلم البرمجة؟' : 'What is the best way to learn programming?',
-      answer: locale === 'ar' ? 'أفضل طريقة لتعلم البرمجة هي الممارسة المستمرة والعمل على مشاريع حقيقية. ابدأ بلغة برمجة واحدة وتعلمها جيداً قبل الانتقال إلى لغات أخرى.' : 'The best way to learn programming is through consistent practice and working on real projects. Start with one programming language and master it well before moving to others.'
-    },
-    {
-      question: locale === 'ar' ? 'كم من الوقت يحتاج المبتدئ لتعلم التطوير؟' : 'How long does it take for a beginner to learn development?',
-      answer: locale === 'ar' ? 'يختلف الوقت حسب الشخص والمجهود المبذول، لكن عادة يحتاج المبتدئ من 6 إلى 12 شهر للحصول على أساس قوي في البرمجة مع الممارسة اليومية.' : 'The time varies depending on the person and effort invested, but typically a beginner needs 6 to 12 months to build a strong foundation in programming with daily practice.'
-    },
-    {
-      question: locale === 'ar' ? 'هل يمكنني تعلم البرمجة بدون خلفية تقنية؟' : 'Can I learn programming without a technical background?',
-      answer: locale === 'ar' ? 'نعم، بالطبع! البرمجة مهارة يمكن لأي شخص تعلمها بغض النظر عن خلفيته. المهم هو الصبر والمثابرة والممارسة المستمرة.' : 'Yes, absolutely! Programming is a skill that anyone can learn regardless of their background. What matters is patience, persistence, and continuous practice.'
-    },
-    {
-      question: locale === 'ar' ? 'ما هي أهم النصائح للمطورين الجدد؟' : 'What are the most important tips for new developers?',
-      answer: locale === 'ar' ? 'اقرأ الكود بكثرة، اكتب الكود يومياً، لا تخف من الأخطاء، اطلب المساعدة عند الحاجة، وابق مطلعاً على التقنيات الجديدة.' : 'Read code frequently, write code daily, don\'t be afraid of making mistakes, ask for help when needed, and stay updated with new technologies.'
-    },
-    {
-      question: locale === 'ar' ? 'كيف أختار لغة البرمجة المناسبة لي؟' : 'How do I choose the right programming language for me?',
-      answer: locale === 'ar' ? 'اختر لغة البرمجة بناءً على أهدافك: تطوير المواقع (JavaScript)، تطوير التطبيقات (Swift/Kotlin)، الذكاء الاصطناعي (Python)، أو التطوير العام (Java/C#).' : 'Choose a programming language based on your goals: web development (JavaScript), mobile apps (Swift/Kotlin), AI (Python), or general development (Java/C#).'
-    },
-    {
-      question: locale === 'ar' ? 'هل البرمجة مهنة مربحة؟' : 'Is programming a profitable career?',
-      answer: locale === 'ar' ? 'نعم، البرمجة من أكثر المهن طلباً ومن أعلاها أجراً في العالم. مع التطور التكنولوجي المستمر، الطلب على المطورين في ازدياد مستمر.' : 'Yes, programming is one of the most in-demand and highest-paying careers in the world. With continuous technological advancement, the demand for developers keeps growing.'
-    },
-    {
-      question: locale === 'ar' ? 'ما هي أفضل الموارد لتعلم البرمجة مجاناً؟' : 'What are the best free resources for learning programming?',
-      answer: locale === 'ar' ? 'هناك العديد من المصادر المجانية مثل: فري كود كامب، كورسيرا، يوتيوب، جيت هاب، وستاك أوفرفلو. المهم هو اختيار مصدر والالتزام به.' : 'There are many free resources like: FreeCodeCamp, Coursera, YouTube, GitHub, and Stack Overflow. The key is to choose one source and stick with it.'
-    },
-    {
-      question: locale === 'ar' ? 'كيف أبني مشروع برمجي ناجح؟' : 'How do I build a successful programming project?',
-      answer: locale === 'ar' ? 'ابدأ بفكرة بسيطة، خطط جيداً، اكتب كود نظيف، اختبر مشروعك باستمرار، واطلب آراء المستخدمين. لا تحاول بناء شيء معقد من البداية.' : 'Start with a simple idea, plan well, write clean code, test your project continuously, and seek user feedback. Don\'t try to build something complex from the beginning.'
-    },
-    {
-      question: locale === 'ar' ? 'ما الفرق بين تطوير الواجهات الأمامية والخلفية؟' : 'What is the difference between frontend and backend development?',
-      answer: locale === 'ar' ? 'تطوير الواجهات الأمامية يركز على ما يراه المستخدم (التصميم والتفاعل)، بينما تطوير الواجهات الخلفية يركز على الخوادم وقواعد البيانات والمنطق.' : 'Frontend development focuses on what users see (design and interaction), while backend development focuses on servers, databases, and business logic.'
-    }
-  ];
 
   // Filter FAQ items based on search query
   const filteredFaqItems = faqItems.filter(item => 
@@ -144,7 +275,12 @@ export default function FAQPage() {
 
         {/* FAQ Items */}
         <div className="space-y-4 mb-16">
-          {filteredFaqItems.length === 0 && searchQuery ? (
+          {isLoading ? (
+            <div className="text-center py-12">
+              <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-[#00AC96]"></div>
+              <p className="mt-4 text-gray-600">{locale === 'ar' ? 'جاري التحميل...' : 'Loading...'}</p>
+            </div>
+          ) : filteredFaqItems.length === 0 && searchQuery ? (
             <div className={`text-center py-12 scroll-item ${isLoaded ? 'animate-scale-in stagger-3' : 'opacity-0'}`}>
               <p 
                 className="font-cairo"

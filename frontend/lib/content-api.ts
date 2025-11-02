@@ -441,8 +441,27 @@ class ContentAPI {
       if (content.fields && Array.isArray(content.fields)) {
         content.fields.forEach((field: any) => {
           if (field.id && field.value !== undefined) {
+            // Special handling for FAQ items: split bilingual array back into separate en/ar arrays
+            if (field.id === 'faq-items' && Array.isArray(field.value)) {
+              console.log('🔄 Splitting faq-items back into faq-items-en and faq-items-ar');
+              const bilingualItems = field.value as any[];
+              
+              const englishItems = bilingualItems.map((item: any) => ({
+                question: item.questionEn || '',
+                answer: item.answerEn || ''
+              }));
+              
+              const arabicItems = bilingualItems.map((item: any) => ({
+                question: item.questionAr || '',
+                answer: item.answerAr || ''
+              }));
+              
+              transformedContent['faq-items-en'] = englishItems;
+              transformedContent['faq-items-ar'] = arabicItems;
+              console.log('✅ Split FAQ items:', { englishItems, arabicItems });
+            }
             // Handle separate English/Arabic fields by combining them into bilingual objects
-            if (field.id.endsWith('-en')) {
+            else if (field.id.endsWith('-en')) {
               const baseId = field.id.replace('-en', '');
               const arField = content.fields.find((f: any) => f.id === `${baseId}-ar`);
               
@@ -465,8 +484,8 @@ class ContentAPI {
                 // If no English counterpart, store as Arabic only
                 transformedContent[field.id] = field.value;
               }
-            } else {
-              // For regular fields (non-bilingual), store as-is
+            } else if (field.id !== 'faq-items') {
+              // For regular fields (non-bilingual and not faq-items), store as-is
               transformedContent[field.id] = field.value;
             }
           }
@@ -489,7 +508,9 @@ class ContentAPI {
         }
       });
       console.log('✅ ContentAPI: Update successful:', response.status, response.data);
-      return response.data;
+      
+      // Transform the response to match the frontend format (merge faq-items if needed)
+      return this.transformResponseFields(response.data);
     } catch (error: any) {
       console.error('❌ Error updating section content:', error);
       console.error('Error details:', {
@@ -529,11 +550,63 @@ class ContentAPI {
     }
   }
 
+  // Helper function to transform response fields
+  private transformResponseFields(responseData: any): any {
+    if (responseData.fields && Array.isArray(responseData.fields)) {
+      // Use sectionKey from response, or fallback to inferring from pageKey/title
+      let sectionKeyFromResponse = responseData.sectionKey || '';
+      
+      if (!sectionKeyFromResponse && responseData.pageKey) {
+        // Try to match pageKey to section keys we know
+        const pageKeyMap: Record<string, string> = {
+          'home': 'hero',
+          'about': 'about',
+          'faq': 'faq',
+          'contact': 'contact',
+          'courses': 'courses'
+        };
+        sectionKeyFromResponse = pageKeyMap[responseData.pageKey] || '';
+      }
+      
+      // If we still can't determine, try to infer from title
+      if (!sectionKeyFromResponse && responseData.title) {
+        const titleLower = responseData.title.toLowerCase();
+        if (titleLower.includes('faq') || titleLower.includes('question')) {
+          sectionKeyFromResponse = 'faq';
+        } else if (titleLower.includes('about')) {
+          sectionKeyFromResponse = 'about';
+        } else if (titleLower.includes('hero') || titleLower.includes('home')) {
+          sectionKeyFromResponse = 'hero';
+        } else if (titleLower.includes('contact')) {
+          sectionKeyFromResponse = 'contact';
+        } else if (titleLower.includes('course')) {
+          sectionKeyFromResponse = 'courses';
+        }
+      }
+      
+      if (sectionKeyFromResponse) {
+        console.log('🔄 Transforming response fields for section:', sectionKeyFromResponse);
+        // Transform the fields
+        const transformedFields = this.transformFieldsToOptimizedStructure(
+          responseData.fields,
+          sectionKeyFromResponse
+        );
+        
+        return {
+          ...responseData,
+          fields: transformedFields
+        };
+      }
+    }
+    
+    return responseData;
+  }
+
   // Publish content section
   async publishSection(sectionId: string): Promise<ContentSection> {
     try {
       const response = await axios.post(`${this.baseURL}/content/sections/${sectionId}/publish`);
-      return response.data;
+      return this.transformResponseFields(response.data);
     } catch (error: any) {
       console.error('❌ Error publishing section:', error);
       console.error('Error details:', {
@@ -763,6 +836,44 @@ class ContentAPI {
 
   // Transform fields from backend format to optimized bilingual structure
   private transformFieldsToOptimizedStructure(fields: ContentField[], sectionKey: string): ContentField[] {
+    // First, handle FAQ section: merge faq-items-en and faq-items-ar into single bilingual array
+    if (sectionKey === 'faq') {
+      const faqItemsEnField = fields.find(f => f.id === 'faq-items-en');
+      const faqItemsArField = fields.find(f => f.id === 'faq-items-ar');
+      
+      if (faqItemsEnField && faqItemsArField && faqItemsEnField.type === 'array' && faqItemsArField.type === 'array') {
+        console.log('🔄 Merging faq-items-en and faq-items-ar into single bilingual array');
+        
+        const englishItems = (faqItemsEnField.value as any[]) || [];
+        const arabicItems = (faqItemsArField.value as any[]) || [];
+        const maxLength = Math.max(englishItems.length, arabicItems.length);
+        
+        // Merge into bilingual structure
+        const bilingualItems = Array.from({ length: maxLength }, (_, index) => ({
+          questionEn: englishItems[index]?.question || '',
+          questionAr: arabicItems[index]?.question || '',
+          answerEn: englishItems[index]?.answer || '',
+          answerAr: arabicItems[index]?.answer || ''
+        }));
+        
+        console.log('✅ Merged FAQ items:', bilingualItems);
+        
+        // Remove the separate en/ar fields and add merged field
+        const otherFields = fields.filter(f => f.id !== 'faq-items-en' && f.id !== 'faq-items-ar');
+        
+        return [
+          ...otherFields,
+          {
+            id: 'faq-items',
+            label: 'FAQ Items',
+            type: 'array' as const,
+            value: bilingualItems,
+            required: faqItemsEnField.required || faqItemsArField.required
+          }
+        ];
+      }
+    }
+    
     const transformedFields = fields.map(field => {
       // Transform any bilingual object fields to separate English/Arabic fields
       if (field.value && typeof field.value === 'object' && field.value.en !== undefined && field.value.ar !== undefined) {

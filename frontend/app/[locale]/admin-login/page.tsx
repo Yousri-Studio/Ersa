@@ -94,6 +94,57 @@ export default function AdminLoginPage() {
         router.push(`/${locale}/admin`);
         return;
       } catch (apiError: any) {
+        console.error('API login error:', apiError);
+        console.error('Error response:', apiError.response?.data);
+        console.error('Error status:', apiError.response?.status);
+        
+        // Extract error message - handle both error object and ModelState errors
+        let errorMessage = 'Login failed';
+        
+        if (apiError.response?.status === 400) {
+          const errorData = apiError.response?.data;
+          
+          // Check for direct error message
+          if (errorData?.error) {
+            errorMessage = errorData.error;
+          }
+          // Check for ModelState validation errors (ASP.NET Core format)
+          else if (errorData && typeof errorData === 'object') {
+            const modelStateErrors: string[] = [];
+            
+            // Check for common ModelState error formats
+            Object.keys(errorData).forEach(key => {
+              const errorValue = errorData[key];
+              if (Array.isArray(errorValue)) {
+                modelStateErrors.push(...errorValue);
+              } else if (typeof errorValue === 'string') {
+                modelStateErrors.push(errorValue);
+              } else if (errorValue && typeof errorValue === 'object') {
+                // Nested errors (e.g., Email: ["The Email field is required"])
+                Object.keys(errorValue).forEach(subKey => {
+                  if (Array.isArray(errorValue[subKey])) {
+                    modelStateErrors.push(...errorValue[subKey]);
+                  }
+                });
+              }
+            });
+            
+            if (modelStateErrors.length > 0) {
+              errorMessage = modelStateErrors[0]; // Show first error
+            }
+          }
+          
+          // Fallback to generic message
+          if (!errorMessage || errorMessage === 'Login failed') {
+            errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+          }
+          
+          console.log('Error message:', errorMessage);
+          toast.error(errorMessage);
+          setIsLoading(false);
+          return;
+        }
+        
         console.log('API login failed, trying mock login...');
         
         // Mock login for development
@@ -146,7 +197,10 @@ export default function AdminLoginPage() {
       
     } catch (error: any) {
       console.error('Login error:', error);
-      toast.error('Invalid email or password. Please try again.');
+      
+      // Show specific error message if available
+      const errorMessage = error.response?.data?.error || error.message || 'Invalid email or password. Please try again.';
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
