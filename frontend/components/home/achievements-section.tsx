@@ -9,10 +9,10 @@ export function AchievementsSection() {
 
 
   const stats = [
-    { value: t('stats.trainees-value'), label: t('stats.trainees'), suffix: '+' },
-    { value: t('stats.government_courses-value'), label: t('stats.government_courses'), suffix: '+' },
-    { value: t('stats.clients-value'), label: t('stats.clients'), suffix: '+' },
-    { value: t('stats.satisfaction-value'), label: t('stats.satisfaction'), suffix: '%' },
+    { value: parseInt(t('stats.trainees-value')), label: t('stats.trainees'), suffix: '+' },
+    { value: parseInt(t('stats.government_courses-value')), label: t('stats.government_courses'), suffix: '+' },
+    { value: parseInt(t('stats.clients-value')), label: t('stats.clients'), suffix: '+' },
+    { value: parseInt(t('stats.satisfaction-value')), label: t('stats.satisfaction'), suffix: '%' },
   ];
 
   // Call hooks at the component level, not inside map
