@@ -58,18 +58,19 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
     // Fallback to default content if API fails
     aboutContent = {
       title: locale === 'ar' ? 'من نحن' : 'About Us',
-      subtitle: locale === 'ar' ? 'تعرف على مهمتنا وقيمنا' : 'Learn more about our mission and values',
+      subtitle: locale === 'ar' ? 'شركة محلية وخبرات عالمية تعمل على تقديم حلول تدريبية متخصصة وخدمات استشارية إدارية مبتكرة، وبأعلى معايير الجودة، وأفضل الممارسات؛ لتعزيز كفاءة المنظمات، وتحقيق أهدافها الاستراتيجية بفاعلية.' 
+      : 'A local company with global expertise that provides specialized training solutions and innovative management consulting services, with the highest quality standards and best practices, to enhance the efficiency of organizations and effectively achieve their strategic goals.',
       vision: {
-        title: locale === 'ar' ? 'رؤيتنا' : 'Our Vision',
+        title: locale === 'ar' ? 'هدفنا' : 'Our Vision',
         description: locale === 'ar' 
-          ? 'أن نكون مزود التدريب الرائد في المنطقة'
-          : 'To be the leading training provider in the region'
+          ? 'أن نصبـح الشريـك الأول للمنظمـــــات فــي تحقيــق التميـــز المستـــدام.'
+          : 'To become the first partner of organizations in achieving sustainable excellence.'
       },
       mission: {
         title: locale === 'ar' ? 'مهمتنا' : 'Our Mission',
         description: locale === 'ar'
-          ? 'تمكين الأفراد والمنظمات من خلال برامج التدريب والتطوير عالية الجودة'
-          : 'To empower individuals and organizations through high-quality training and development programs'
+          ? 'تمكيـــن المنظمــــات وتطويــــر الكفــــاءات لتحقيـــق أقصى إمكاناتهـــا والوصــــول إلــى الأهـداف الاستراتيجيــة بفعاليـة وكفــاءة.'
+          : 'Empowering organizations and developing competencies to achieve their maximum potential and reach strategic goals effectively and efficiently.'
       },
       values: [
         {
@@ -186,6 +187,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
         </div>
 
         {/* Team Section */}
+        {/*}
         {aboutContent.team.members.length > 0 && (
           <div className="mt-20">
             <div className="text-center mb-12">
@@ -221,6 +223,7 @@ export default async function AboutPage({ params }: { params: Promise<{ locale: 
             </div>
           </div>
         )}
+        */}
       </div>
     </div>
   );

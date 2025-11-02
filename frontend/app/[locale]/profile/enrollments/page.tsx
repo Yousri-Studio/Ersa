@@ -183,20 +183,7 @@ export default function EnrollmentsPage() {
           {/* Header */}
           <div className={`mb-8 ${isLoaded ? 'animate-fade-in-up' : 'opacity-0'}`}>
             <h1 
-              className="text-center font-bold mb-6"
-              style={{
-                background: 'linear-gradient(270deg, #27E8B1 31.94%, #693EB0 59.68%)',
-                backgroundClip: 'text',
-                WebkitBackgroundClip: 'text',
-                WebkitTextFillColor: 'transparent',
-                textAlign: 'center',
-                fontFamily: '"The Year of Handicrafts"',
-                fontSize: '44px',
-                fontStyle: 'normal',
-                fontWeight: 700,
-                lineHeight: 'normal'
-              }}
-            >
+              className="mx-auto max-w-4xl mb-6 font-cairo hero-heading">
               {locale === 'ar' ? 'دوراتي التدريبية' : 'My Enrollments'}
             </h1>
             <p className="mt-2 text-gray-600 font-cairo text-center text-lg">

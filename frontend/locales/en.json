@@ -30,14 +30,14 @@
   },
   "about": {
     "title": "About Us",
-    "subtitle": "Learn more about our mission, vision, and the team behind Ersa Training",
+    "subtitle": "A local company with global expertise that provides specialized training solutions and innovative management consulting services, with the highest quality standards and best practices, to enhance the efficiency of organizations and effectively achieve their strategic goals.",
     "vision": {
-      "title": "Our Vision",
-      "description": "To be the leading provider of professional training and development programs in the region."
+      "title": "Our Objective",
+      "description": "To become the first partner of organizations in achieving sustainable excellence."
     },
     "mission": {
       "title": "Our Mission",
-      "description": "Empowering individuals and organizations through high-quality, accessible, and innovative training solutions."
+      "description": "Empowering organizations and developing competencies to achieve their maximum potential and reach strategic goals effectively and efficiently."
     },
     "team": {
       "title": "Our Team",
@@ -547,14 +547,18 @@
   },
   "achievements": {
     "badge": "Our Numbers",
-    "title": "Our Achievements Since Establishment",
-    "subtitle": "We make it easy for trainees to choose what suits their needs, helping these categories organize training content and present it clearly and distinctly for each category separately.",
-    "stats": {
-      "trainees": "Trainees",
-      "government_courses": "Government Courses",
-      "clients": "Clients",
-      "satisfaction": "Client Satisfaction"
-    }
+      "title": "Our Journey of Excellence",
+      "subtitle": "Since our inception, we have achieved remarkable milestones by delivering an exceptional training experience that empowers learners to choose programs that best suit their needs while ensuring clarity, quality, and relevance for every category.",
+      "stats": {
+        "trainees": "Trainees",
+        "trainees-value": "2000",
+        "government_courses": "Training Programs",
+        "government_courses-value": "100",
+        "clients": "Clients",
+        "clients-value": "120",
+        "satisfaction": "Customer Satisfaction Rate",
+        "satisfaction-value": "95"
+      }
   },
   "faq": {
     "title": "Frequently Asked Questions",
@@ -846,7 +850,8 @@
     "company": "Company",
     "learning": "Learning",
     "support": "Support",
-    "privacy-policy": "Privacy Policy",
+    "privacy-policy": "Privacy Policy",    
+    "privacy-policy-title": "Registration and Cancellation Policies for Public Training Programs – Ersa Institute",
     "terms-of-service": "Terms of Service",
     "certificates": "Certificates",
     "help-center": "Help Center",

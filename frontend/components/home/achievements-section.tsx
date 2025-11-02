@@ -7,11 +7,12 @@ export function AchievementsSection() {
   const locale = useLocale();
   const t = useTranslations('achievements');
 
+
   const stats = [
-    { value: 1500, label: t('stats.trainees'), suffix: '+' },
-    { value: 30, label: t('stats.government_courses'), suffix: '+' },
-    { value: 30, label: t('stats.clients'), suffix: '+' },
-    { value: 95, label: t('stats.satisfaction'), suffix: '%' },
+    { value: t('stats.trainees-value'), label: t('stats.trainees'), suffix: '+' },
+    { value: t('stats.government_courses-value'), label: t('stats.government_courses'), suffix: '+' },
+    { value: t('stats.clients-value'), label: t('stats.clients'), suffix: '+' },
+    { value: t('stats.satisfaction-value'), label: t('stats.satisfaction'), suffix: '%' },
   ];
 
   // Call hooks at the component level, not inside map

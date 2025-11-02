@@ -46,10 +46,11 @@ export default function HomePage() {
         </div>
         
         {/* Testimonials Section - Scale animation */}
+        {/*
         <div className="scroll-item-scale">
           <TestimonialsSection />
         </div>
-        
+        */}
         {/* Join Us Section - Fade up animation */}
         <div className="scroll-item">
           <JoinUsSection />

@@ -96,7 +96,7 @@ export function JoinUsSection() {
           <div className="order-1 lg:order-2">
             <div className="relative flex justify-center">
               <img
-                src="/images/Join us Image.png"
+                src="/images/Join Us Image.jpg"
                 alt={t('title')}
                 className="w-full h-auto max-w-sm lg:max-w-lg mx-auto"
               />

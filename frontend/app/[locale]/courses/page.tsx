@@ -562,7 +562,7 @@ export default function CoursesPage() {
                     };
                   })} 
                   compact={true}
-                  enableLiveSearch={true}
+                  enableLiveSearch={false}
                 />
               </div>
             </div>

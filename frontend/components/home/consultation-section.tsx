@@ -29,7 +29,7 @@ export function ConsultationSection() {
             {/* Main consultation image */}
             <div className="relative rounded-2xl overflow-hidden">
               <img
-                src="/images/Hero Image.png"
+                src="/images/Hero Image.jpg"
                 alt={t('consultation.image-alt')}
                 className="w-full h-96 object-cover"
               />

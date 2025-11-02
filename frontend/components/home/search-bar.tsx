@@ -60,7 +60,7 @@ export function SearchBar({ categories = [], compact = false, enableLiveSearch =
       if (currentPath !== `/${locale}/courses` || currentSearch !== newSearch) {
         router.push(url);
       }
-    }, 500),
+    }, 5000),
     [enableLiveSearch, locale, router]
   );
 

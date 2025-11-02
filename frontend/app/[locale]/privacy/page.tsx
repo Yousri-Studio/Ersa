@@ -17,12 +17,12 @@ export default function PrivacyPolicyPage() {
           {/* Header */}
           <div className="mb-8">
             <h1 className={`text-3xl font-bold text-gray-900 font-cairo ${isLoaded ? 'animate-fade-in-down' : 'opacity-0'}`}>
-              {t('footer.privacy-policy')}
+            {t('footer.privacy-policy-title')}
             </h1>
             <p className={`mt-2 text-gray-600 font-cairo ${isLoaded ? 'animate-fade-in-up stagger-1' : 'opacity-0'}`}>
               {locale === 'ar' 
-                ? 'آخر تحديث: يناير 2025'
-                : 'Last updated: January 2025'
+                ? 'آخر تحديث: ديسمبر 2025'
+                : 'Last updated: Decamber 2025'
               }
             </p>
           </div>
@@ -34,68 +34,80 @@ export default function PrivacyPolicyPage() {
                 <>
                   <h2 className="text-2xl font-bold text-gray-900 mb-6">مقدمة</h2>
                   <p className="text-gray-700 mb-6 leading-relaxed">
-                    نحن في إرسة للتدريب والاستشارات نلتزم بحماية خصوصيتك وضمان أمان معلوماتك الشخصية. 
-                    تشرح سياسة الخصوصية هذه كيفية جمعنا واستخدامنا وحمايتنا لمعلوماتك عند استخدام موقعنا الإلكتروني وخدماتنا.
+                  حرصًا من معهد إرساء للتدريب والاستشارات على توفير تجربة تعليمية احترافية، وضمان الشفافية الكاملة في التعامل مع
+جميع المتدربين، فقد وُضعت هذه السياسات لتكون مرجعًا رسميًا ينظّم إجراءات التسجيل، الدفع، الإلغاء، والاسترجاع. إن
+الهدف منها هو تحقيق التوازن بين حقوق المتدرب وحقوق المعهد، بما ينسجم مع أفضل الممارسات المعتمدة لدى الجهات
+التدريبية الرائدة في المملكة العربية السعودية.
                   </p>
 
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">المعلومات التي نجمعها</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">أولًا: آلية التسجيل</h2>
                   <p className="text-gray-700 mb-4 leading-relaxed">
-                    نجمع أنواع مختلفة من المعلومات لتحسين خدماتنا وتقديم تجربة أفضل لك:
+                  يمكن للمتدربين التسجيل عبر:
                   </p>
                   <ul className="list-disc list-inside text-gray-700 mb-6 space-y-2">
-                    <li>المعلومات الشخصية (الاسم، البريد الإلكتروني، رقم الهاتف)</li>
-                    <li>معلومات الحساب (اسم المستخدم، كلمة المرور)</li>
-                    <li>معلومات الدفع (للمعاملات المالية)</li>
-                    <li>معلومات الاستخدام (الصفحات التي تزورها، الوقت الذي تقضيه)</li>
+                    <li>الموقع الإلكتروني الرسمي للمعهد.</li>
+                    <li>قنوات التواصل المعتمدة (الهاتف، الواتساب، البريد الإلكتروني).</li>
+                    <li>زيارات مباشرة لمقر المعهد عند الحاجة.</li>
+                    <li>ند إتمام التسجيل، يتلقى المتدرب رسالة تأكيد مبدئية تحتوي على تفاصيل الدورة، متبوعة بتعليمات.</li>
+                    <li>لا يُعتبر التسجيل نهائيًا إلا بعد إتمام عملية الدفع وتأكيده من قسم المالية.</li>
                   </ul>
 
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">كيف نستخدم معلوماتك</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">ثانيًا: آلية الدفع</h2>
                   <p className="text-gray-700 mb-4 leading-relaxed">
-                    نستخدم معلوماتك للأغراض التالية:
+                  يقبل المعهد وسائل الدفع التالية:
                   </p>
                   <ul className="list-disc list-inside text-gray-700 mb-6 space-y-2">
-                    <li>تقديم وتطوير خدماتنا</li>
-                    <li>معالجة طلباتك والمدفوعات</li>
-                    <li>إرسال التحديثات والإشعارات المهمة</li>
-                    <li>تحسين تجربة المستخدم</li>
-                    <li>الامتثال للالتزامات القانونية</li>
+                    <li>بطاقات الدفع البنكية (مدى/فيزا/ماستر).</li>
+                    <li>التحويل البنكي المباشر.</li>
+                    <li>بوابات الدفع الإلكتروني المعتمدة.</li>
+                    <li>في حالة التحويل البنكي، يجب إرسال صورة من إيصال التحويل إلى قسم التسجيل لتأكيد الحجز.</li>
+                    <li>يُشترط سداد كامل الرسوم قبل موعد إغلاق التسجيل، وأي تأخير في السداد قد يؤدي إلى إلغاء الحجز تلقائيًا.</li>
+                    <li>جميع الرسوم تشمل تكلفة التدريب والمواد الأساسية، ولا تشمل – ما لم يُذكر صراحة – أي اختبارات دولية أو رسوم شهادات خارجية.</li>
                   </ul>
 
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">حماية معلوماتك</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">ثالثًا: سياسة الإلغاء والاسترجاع (من قبل المتدرب)</h2>
                   <p className="text-gray-700 mb-6 leading-relaxed">
-                    نستخدم تقنيات أمان متقدمة لحماية معلوماتك من الوصول غير المصرح به أو التغيير أو الكشف. 
-                    جميع البيانات الحساسة مشفرة ونتبع أفضل الممارسات في أمان المعلومات.
-                  </p>
-
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">مشاركة المعلومات</h2>
-                  <p className="text-gray-700 mb-6 leading-relaxed">
-                    لا نبيع أو نؤجر أو نشارك معلوماتك الشخصية مع أطراف ثالثة إلا في الحالات التالية:
+                  يُسمح للمتدرب – بدلًا من الإلغاء – بطلب تحويل تسجيله إلى موعد لاحق أو إلى دورة بديلة، بناءً على توفر المقاعد وموافقة الإدارة.
                   </p>
                   <ul className="list-disc list-inside text-gray-700 mb-6 space-y-2">
-                    <li>بموافقتك الصريحة</li>
-                    <li>للموردين الذين يساعدوننا في تقديم الخدمات</li>
-                    <li>للامتثال للقوانين واللوائح</li>
-                    <li>لحماية حقوقنا ومصالحنا القانونية</li>
+                    <li>إلغاء قبل 7 أيام أو أكثر من بداية الدورة: يحق للمتدرب استرداد 100% من الرسوم المدفوعة.</li>
+                    <li>إلغاء بين 6 و3 أيام من بداية الدورة: يحق استرداد 50% من الرسوم.</li>
+                    <li>إلغاء قبل أقل من 3 أيام أو بعد بدء الدورة: لا يحق استرداد أي رسوم.</li>
+                    <li>تتم عملية الاسترجاع خلال مدة أقصاها 7 أيام عمل عبر وسيلة الدفع الأصلية متى ما أمكن.</li>                    
                   </ul>
 
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">حقوقك</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">رابعًا: سياسة الإلغاء أو التأجيل (من قبل المعهد)</h2>
+                  <p className="text-gray-700 mb-6 leading-relaxed">
+                  يحتفظ معهد إرساء بالحق في إلغاء أو تأجيل أي دورة في الحالات التالية:
+                  </p>
+                  <ul className="list-disc list-inside text-gray-700 mb-6 space-y-2">
+                    <li>عدم اكتمال الحد الأدنى من عدد المسجلين (5 مشاركين).</li>
+                    <li>ظروف طارئة أو قوة قاهرة تمنع انعقاد الدورة.</li>
+                    <li>في حال الإلغاء أو التأجيل، يخيَّر المتدرب بين:</li>
+                    <li>استرداد 100% من الرسوم المدفوعة.</li>
+                    <li>أو تحويل التسجيل إلى موعد لاحق أو دورة أخرى دون أي رسوم إضافية.</li>
+                    <li>يلتزم المعهد بإبلاغ جميع المسجلين بقرار الإلغاء أو التأجيل قبل الموعد المحدد للدورة بوقت مناسب (لا يقل عن 48 ساعة).</li>
+                  </ul>
+
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">خامسًا: تحويل التسجيل</h2>
                   <p className="text-gray-700 mb-4 leading-relaxed">
-                    لديك الحقوق التالية فيما يتعلق بمعلوماتك الشخصية:
+                  يحق للمتدرب تحويل تسجيله إلى شخص آخر بشرط:
                   </p>
                   <ul className="list-disc list-inside text-gray-700 mb-6 space-y-2">
-                    <li>الوصول إلى معلوماتك الشخصية</li>
-                    <li>تصحيح المعلومات غير الدقيقة</li>
-                    <li>حذف معلوماتك الشخصية</li>
-                    <li>تقييد معالجة معلوماتك</li>
-                    <li>نقل بياناتك</li>
-                    <li>الاعتراض على معالجة معلوماتك</li>
+                    <li>تقديم إخطار خطي رسمي للمعهد قبل 3 أيام على الأقل من تاريخ بدء الدورة.</li>
+                    <li>التزام المتدرب الجديد بكافة الشروط والسياسات ذاتها.</li>
+                    <li>لا يُسمح بتحويل التسجيل بعد بدء الدورة.</li>
+                  </ul>
+                <h2 className="text-2xl font-bold text-gray-900 mb-6">سادسًا: الأحكام العامة</h2>
+                  <p className="text-gray-700 mb-6 leading-relaxed">
+                  يرجى الإشارة إلى أن هذه السياسات ملزمة ويجب الالتزام بها عند تسجيل الدورة. لا يُسمح بإلغاء التسجيل أو الاسترجاع بعد بدء الدورة.
+                  </p>
+                  <ul className="list-disc list-inside text-gray-700 mb-6 space-y-2">
+                    <li>التسجيل في أي دورة يعني إقرار المتدرب بقراءة هذه السياسات والموافقة عليها.</li>                 
+                    <li>لمعهد إرساء الحق في تحديث هذه السياسات بما يتماشى مع الأنظمة المحلية والممارسات التدريبية الحديثة، وتعتبر النسخة المنشورة عبر القنوات الرسمية هي المرجع المعتمد.</li>
+                    <li>في حال وجود أي نزاع، يتم اللجوء إلى الأنظمة والقوانين السارية في المملكة العربية السعودية.</li>
                   </ul>
 
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">التحديثات على هذه السياسة</h2>
-                  <p className="text-gray-700 mb-6 leading-relaxed">
-                    قد نقوم بتحديث سياسة الخصوصية هذه من وقت لآخر. سنقوم بإشعارك بأي تغييرات مهمة 
-                    عبر البريد الإلكتروني أو من خلال إشعار على موقعنا الإلكتروني.
-                  </p>
 
                   <h2 className="text-2xl font-bold text-gray-900 mb-6">اتصل بنا</h2>
                   <p className="text-gray-700 mb-6 leading-relaxed">
@@ -111,68 +123,83 @@ export default function PrivacyPolicyPage() {
                 <>
                   <h2 className="text-2xl font-bold text-gray-900 mb-6">Introduction</h2>
                   <p className="text-gray-700 mb-6 leading-relaxed">
-                    At Ersa Training & Consultancy, we are committed to protecting your privacy and ensuring the security of your personal information. 
-                    This Privacy Policy explains how we collect, use, and protect your information when you use our website and services.
+                  In line with Ersa Institute for Training and Consulting’s commitment to providing
+professional learning experience and ensuring full transparency in dealings with all
+trainees, these policies have been established as an official reference governing
+registration, payment, cancellation, and refund procedures. The purpose of these
+policies is to maintain a fair balance between the rights of trainees and the Institute’s
+rights, in accordance with best practices adopted by leading training providers in the
+Kingdom of Saudi Arabia.
                   </p>
 
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Information We Collect</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">1. Registration Process</h2>
                   <p className="text-gray-700 mb-4 leading-relaxed">
-                    We collect different types of information to improve our services and provide you with a better experience:
+                  Trainees may register through any of the following channels:
                   </p>
                   <ul className="list-disc list-inside text-gray-700 mb-6 space-y-2">
-                    <li>Personal information (name, email, phone number)</li>
-                    <li>Account information (username, password)</li>
-                    <li>Payment information (for financial transactions)</li>
-                    <li>Usage information (pages you visit, time spent)</li>
+                    <li>The Institute’s official website.</li>
+                    <li>Authorized communication channels (phone, WhatsApp, or email).</li>
+                    <li>Direct visits to the Institute’s premises when necessary.</li>
+                    <li>Upon completing the registration, the trainee receives a preliminary confirmation message containing course details, followed by payment instructions.</li>
+                    <li>Registration is not considered final until full payment has been received and verified by the Finance Department.</li>
                   </ul>
 
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">How We Use Your Information</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">2. Payment Process</h2>
                   <p className="text-gray-700 mb-4 leading-relaxed">
-                    We use your information for the following purposes:
+                  The Institute accepts the following payment methods:
                   </p>
                   <ul className="list-disc list-inside text-gray-700 mb-6 space-y-2">
-                    <li>Providing and developing our services</li>
-                    <li>Processing your orders and payments</li>
-                    <li>Sending important updates and notifications</li>
-                    <li>Improving user experience</li>
-                    <li>Complying with legal obligations</li>
+                    <li>Debit and credit cards (Mada / Visa / MasterCard).</li>
+                    <li>Direct bank transfer.</li>
+                    <li>Approved electronic payment gateways.</li>
+                    <li>For bank transfers, a copy of the transfer receipt must be sent to the Registration Department to confirm the booking.</li>
+                    <li>Full payment must be made before the registration closing date. Any delay in payment may result in automatic cancellation of the booking.</li>
+                    <li>All fees include training costs and basic materials unless otherwise stated. They do not include international exam fees or external certification costs unless explicitly mentioned.</li>
                   </ul>
 
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Protecting Your Information</h2>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">3. Cancellation and Refund Policy (by the Trainee)</h2>
                   <p className="text-gray-700 mb-6 leading-relaxed">
-                    We use advanced security technologies to protect your information from unauthorized access, alteration, or disclosure. 
-                    All sensitive data is encrypted and we follow best practices in information security.
-                  </p>
-
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Information Sharing</h2>
-                  <p className="text-gray-700 mb-6 leading-relaxed">
-                    We do not sell, rent, or share your personal information with third parties except in the following cases:
+                  Instead of cancellation, trainees may request to transfer their registration to a later session or an alternative course, subject to seat availability and management approval.
                   </p>
                   <ul className="list-disc list-inside text-gray-700 mb-6 space-y-2">
-                    <li>With your explicit consent</li>
-                    <li>With vendors who help us provide services</li>
-                    <li>To comply with laws and regulations</li>
-                    <li>To protect our rights and legal interests</li>
+                    <li>Cancellation 7 days or more before the course start date: 100% refund of paid fees.</li>
+                    <li>Cancellation between 6 and 3 days before the start date: 50% refund of paid fees.</li>
+                    <li>Cancellation less than 3 days before or after the course starts: No refund will be issued.</li>                    
+                    <li>Refunds will be processed within a maximum of 7 working days using the original payment method whenever possible.</li>
                   </ul>
 
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Your Rights</h2>
+
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">4. Cancellation or Postponement Policy (by the Institute)</h2>
+                  <p className="text-gray-700 mb-6 leading-relaxed">
+                  Ersa Institute reserves the right to cancel or postpone any course under the following circumstances:
+                  </p>
+                  <ul className="list-disc list-inside text-gray-700 mb-6 space-y-2">
+                    <li>The minimum number of participants required (5) has not been met.</li>
+                    <li>Unforeseen circumstances or force majeure prevent the course from being conducted.</li>  
+                    <li>In case of cancellation or postponement, the trainee will be offered the choice between:</li>
+                    <li>100% refund of paid fees.</li>
+                    <li>Or transferring the registration to a later date or another course **at no additional cost.</li>
+                    <li>The Institute is committed to notifying all registered trainees of any cancellation or postponement at least 48 hours prior to the scheduled start date.</li>
+                  </ul>
+
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">5. Registration Transfer</h2>
                   <p className="text-gray-700 mb-4 leading-relaxed">
-                    You have the following rights regarding your personal information:
+                  Trainees may transfer their registration to another individual provided that:
                   </p>
                   <ul className="list-disc list-inside text-gray-700 mb-6 space-y-2">
-                    <li>Access to your personal information</li>
-                    <li>Correction of inaccurate information</li>
-                    <li>Deletion of your personal information</li>
-                    <li>Restriction of processing your information</li>
-                    <li>Data portability</li>
-                    <li>Objection to processing your information</li>
+                    <li>A formal written notice is submitted to the Institute **at least 3 days** before the course start date.</li>
+                    <li>The new trainee agrees to all applicable terms and policies.</li>
+                    <li>No transfer is permitted after the course has started.</li>
                   </ul>
 
-                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Updates to This Policy</h2>
-                  <p className="text-gray-700 mb-6 leading-relaxed">
-                    We may update this Privacy Policy from time to time. We will notify you of any significant changes 
-                    via email or through a notice on our website.
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">6. General Provisions</h2>
+                  <p className="text-gray-700 mb-4 leading-relaxed">
+                  By registering for any course, the trainee acknowledges having read, understood, and agreed to these policies.
                   </p>
+                  <ul className="list-disc list-inside text-gray-700 mb-6 space-y-2">
+                    <li>Ersa Institute reserves the right to update these policies in line with local regulations and current training best practices. The version published through the Institute’s official channels shall be deemed the authoritative reference.</li>
+                    <li>In the event of any dispute, applicable laws and regulations of the Kingdom of  Saudi Arabia shall prevail.</li>
+                  </ul>
 
                   <h2 className="text-2xl font-bold text-gray-900 mb-6">Contact Us</h2>
                   <p className="text-gray-700 mb-6 leading-relaxed">
