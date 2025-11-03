@@ -35,38 +35,59 @@ class ContentAPI {
   private baseURL: string;
 
   constructor() {
-    this.baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5002/api';
-    
-    // Add axios interceptor for authentication
-    axios.interceptors.request.use(
-      (config) => {
-        const token = Cookies.get('auth-token');
-        if (token) {
-          config.headers.set('Authorization', `Bearer ${token}`);
+    // On server-side, use absolute backend URL; on client, use proxy if configured
+    if (typeof window === 'undefined') {
+      // Server-side: use direct backend URL
+      let serverBaseURL = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5002';
+      // Ensure it ends with /api if it's a direct backend URL (not a proxy)
+      if (serverBaseURL.startsWith('http') && !serverBaseURL.includes('/api/proxy')) {
+        if (!serverBaseURL.endsWith('/api') && !serverBaseURL.endsWith('/api/')) {
+          serverBaseURL = serverBaseURL.endsWith('/') ? `${serverBaseURL}api` : `${serverBaseURL}/api`;
         }
-        return config;
-      },
-      (error) => Promise.reject(error)
-    );
-    
-    // Add axios interceptor for better error handling
-    axios.interceptors.response.use(
-      (response) => response,
-      (error) => {
-        if (error.code === 'ERR_NETWORK' || error.message === 'Network Error') {
-          console.warn('Network error detected, falling back to mock data');
-          error.isMockFallback = true;
-        }
-        return Promise.reject(error);
       }
-    );
+      this.baseURL = serverBaseURL;
+      console.log(`🔧 ContentAPI constructor (server): baseURL=${this.baseURL}`);
+    } else {
+      // Client-side: use proxy URL if configured, otherwise direct backend URL
+      const clientBaseURL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5002/api';
+      // If it's a relative URL (proxy), we'll handle it in the get method
+      this.baseURL = clientBaseURL;
+      console.log(`🔧 ContentAPI constructor (client): baseURL=${this.baseURL}`);
+    }
+    
+    // Only set up interceptors on client-side (browser)
+    if (typeof window !== 'undefined') {
+      // Add axios interceptor for authentication
+      axios.interceptors.request.use(
+        (config) => {
+          const token = Cookies.get('auth-token');
+          if (token) {
+            config.headers.set('Authorization', `Bearer ${token}`);
+          }
+          return config;
+        },
+        (error) => Promise.reject(error)
+      );
+      
+      // Add axios interceptor for better error handling
+      axios.interceptors.response.use(
+        (response) => response,
+        (error) => {
+          if (error.code === 'ERR_NETWORK' || error.message === 'Network Error') {
+            console.warn('Network error detected, falling back to mock data');
+            error.isMockFallback = true;
+          }
+          return Promise.reject(error);
+        }
+      );
+    }
   }
   // Get About page content from database
   async getAboutContent(locale: string = 'en') {
     try {
       // Fetch data from the correct API endpoint
       console.log('🔄 Fetching about content from API...');
-      const response = await this.get<any>(`/Content/templates`);
+      const response = await this.get<any>(`/content/templates`);
       
       console.log('📦 API Response:', response);
       
@@ -276,7 +297,51 @@ class ContentAPI {
 
  // Add the get method if it doesn't exist
   async get<T>(url: string): Promise<{ data: T }> {
-    const response = await axios.get<T>(`${this.baseURL}${url}`);
+    // Ensure baseURL is set
+    if (!this.baseURL) {
+      if (typeof window === 'undefined') {
+        // Server-side
+        let serverBaseURL = process.env.BACKEND_API_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5002';
+        // Ensure it ends with /api if it's a direct backend URL (not a proxy)
+        if (serverBaseURL.startsWith('http') && !serverBaseURL.includes('/api/proxy')) {
+          if (!serverBaseURL.endsWith('/api') && !serverBaseURL.endsWith('/api/')) {
+            serverBaseURL = serverBaseURL.endsWith('/') ? `${serverBaseURL}api` : `${serverBaseURL}/api`;
+          }
+        }
+        this.baseURL = serverBaseURL;
+      } else {
+        // Client-side
+        this.baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5002/api';
+      }
+    }
+    
+    // Handle proxy URL format for client-side
+    let fullUrl: string;
+    if (url.startsWith('http')) {
+      fullUrl = url;
+    } else if (this.baseURL.includes('/api/proxy?endpoint=')) {
+      // Client-side proxy format
+      const cleanUrl = url.startsWith('/') ? url.slice(1) : url;
+      fullUrl = `${this.baseURL}${cleanUrl}`;
+    } else {
+      // Direct backend URL - ensure proper path construction
+      const cleanUrl = url.startsWith('/') ? url : '/' + url;
+      fullUrl = `${this.baseURL}${cleanUrl}`;
+    }
+    
+    // Log for debugging
+    console.log(`🔗 ContentAPI.get: baseURL=${this.baseURL}, url=${url}, fullUrl=${fullUrl}`);
+    
+    // Validate URL - only if it's an absolute URL
+    if (fullUrl.startsWith('http')) {
+      try {
+        new URL(fullUrl);
+      } catch (error) {
+        throw new Error(`Invalid URL: ${fullUrl}. baseURL: ${this.baseURL}, url: ${url}`);
+      }
+    }
+    
+    const response = await axios.get<T>(fullUrl);
     return { data: response.data };
   }
 

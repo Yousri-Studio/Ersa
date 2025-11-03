@@ -1045,6 +1045,16 @@ public class EmailService : IEmailService
             if (response.StatusCode == System.Net.HttpStatusCode.Accepted || response.StatusCode == System.Net.HttpStatusCode.OK)
             {
                 _logger.LogInformation("Order confirmation email sent successfully to {Email}", order.User.Email);
+
+                //Send email to admin
+                var adminEmail = _configuration["Admin:Email"];
+                var adminName = _configuration["Admin:Name"];
+                var adminSubject = isArabic ? "تأكيد الطلب #{invoiceNumber} - إرساء للتدريب" : "Order Confirmation #{invoiceNumber} - Ersa Training";
+                var adminBody = GenerateOrderConfirmationTemplate(order, invoiceNumber, isArabic);
+                var adminFrom = new EmailAddress(adminEmail, adminName);
+                var adminTo = new EmailAddress(adminEmail, adminName);
+                var adminMsg = MailHelper.CreateSingleEmail(adminFrom, adminTo, adminSubject, null, adminBody);
+                var adminResponse = await _sendGridClient.SendEmailAsync(adminMsg);
                 return true;
             }
             else
@@ -1335,13 +1345,13 @@ public class EmailService : IEmailService
                 <ul>
                     <li>{(isArabic ? "يمكنك الآن الوصول إلى دوراتك من لوحة التحكم الخاصة بك" : "You can now access your courses from your dashboard")}</li>
                     <li>{(isArabic ? "ستتلقى بريداً إلكترونياً إضافياً مع تفاصيل الدورات والجلسات" : "You will receive additional emails with course and session details")}</li>
-                    <li>{(isArabic ? "تحقق من صفحة \"دوراتي\" للبدء في التعلم" : "Check your \"My Courses\" page to start learning")}</li>
+                    <li>{(isArabic ? "تحقق من صفحة \"تعليمي\" للبدء في التعلم" : "Check your \"My Learning\" page to start learning")}</li>
                 </ul>
             </div>
             
             <div class=""btn-container"">
                 <a href=""{_configuration["Frontend:BaseUrl"]}/{(isArabic ? "ar" : "en")}/profile/enrollments"" class=""btn"">
-                    {(isArabic ? "عرض دوراتي" : "View My Courses")}
+                    {(isArabic ? "عرض تعليمي" : "View My Enrollments")}
                 </a>
             </div>
             

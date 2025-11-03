@@ -101,7 +101,7 @@ export function FeaturedCourses() {
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {courses?.map((course) => {
+              {courses?.slice(0, 6).map((course) => {
                 const cardProps = courseToCardProps(course, locale as 'ar' | 'en', {
                   inWishlist: false, // TODO: Get from wishlist API
                   inCart: hasItem(course.id),

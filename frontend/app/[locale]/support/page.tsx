@@ -398,11 +398,11 @@ export default function SupportPage() {
                 <div className="space-y-3">
                   <div className="flex items-center font-cairo">
                     <Icon name="envelope" className="h-5 w-5 mr-2" />
-                    <span style={{ fontSize: '14px' }}>support@ersa-training.com</span>
+                    <span style={{ fontSize: '14px' }}><a href='mailto:info@ersa-training.com:'>info@ersa-training.com</a></span>
                   </div>
                   <div className="flex items-center font-cairo">
                     <Icon name="phone" className="h-5 w-5 mr-2" />
-                    <span style={{ fontSize: '14px' }}>+966 XX XXX XXXX</span>
+                    <span style={{ fontSize: '14px' }}>+966 557 7878 49</span>
                   </div>
                 </div>
               </div>

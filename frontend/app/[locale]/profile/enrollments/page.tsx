@@ -147,6 +147,22 @@ export default function EnrollmentsPage() {
     );
   };
 
+  // Convert base64 image string to data URL
+  const getImageUrl = (base64Image?: string): string => {
+    if (!base64Image) {
+      return '';
+    }
+    
+    // Check if it's already a data URL
+    if (base64Image.startsWith('data:')) {
+      return base64Image;
+    }
+    
+    // Convert base64 string to data URL
+    // Backend returns JPEG images as base64 strings
+    return `data:image/jpeg;base64,${base64Image}`;
+  };
+
   // Get unique categories from enrollments
   const categories = Array.from(new Set(enrollments.map(e => e.category).filter(Boolean)));
 
@@ -376,9 +392,15 @@ export default function EnrollmentsPage() {
                     {enrollment.courseImage ? (
                       <div className="h-48 bg-gradient-to-br from-teal-400 to-purple-600 relative overflow-hidden">
                         <img 
-                          src={enrollment.courseImage} 
+                          src={getImageUrl(enrollment.courseImage)} 
                           alt={courseTitle}
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            console.error('Image failed to load:', enrollment.courseImage?.substring(0, 50));
+                            e.currentTarget.style.display = 'none';
+                            e.currentTarget.parentElement?.classList.add('flex', 'items-center', 'justify-center');
+                            e.currentTarget.parentElement?.classList.remove('relative', 'overflow-hidden');
+                          }}
                         />
                       </div>
                     ) : (
@@ -455,7 +477,7 @@ export default function EnrollmentsPage() {
           {enrollments.length > 0 && (
             <div className={`mt-12 text-center ${isLoaded ? 'animate-fade-in-up stagger-3' : 'opacity-0'}`}>
               <Link
-                href={`/${locale}/my-orders`}
+                href={`/${locale}/profile/orders`}
                 className="inline-flex items-center text-teal-600 hover:text-teal-700 font-semibold font-cairo"
               >
                 <Icon name="receipt" className="h-5 w-5 mr-2 rtl:mr-0 rtl:ml-2" />

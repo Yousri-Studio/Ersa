@@ -119,9 +119,9 @@ export default function TermsOfServicePage() {
                     إذا كان لديك أي أسئلة حول شروط الخدمة هذه، يرجى الاتصال بنا:
                   </p>
                   <div className="bg-gray-50 p-6 rounded-lg">
-                    <p className="text-gray-700 mb-2"><strong>البريد الإلكتروني:</strong> legal@ersa-consultancy.com</p>
-                    <p className="text-gray-700 mb-2"><strong>الهاتف:</strong> +966 XX XXX XXXX</p>
-                    <p className="text-gray-700"><strong>العنوان:</strong> المملكة العربية السعودية</p>
+                    <p className="text-gray-700 mb-2"><strong>البريد الإلكتروني:</strong> <a href='mailto:info@ersa-training.com:'>info@ersa-training.com</a></p>
+                    <p className="text-gray-700 mb-2"><strong>الهاتف:</strong> +966 557 7878 49</p>
+                    <p className="text-gray-700"><strong>العنوان:</strong> المملكة العربية السعودية، الرياض،العليا، طريق مكة المكرمة</p>
                   </div>
                 </>
               ) : (
@@ -213,9 +213,9 @@ export default function TermsOfServicePage() {
                     If you have any questions about these Terms of Service, please contact us:
                   </p>
                   <div className="bg-gray-50 p-6 rounded-lg">
-                    <p className="text-gray-700 mb-2"><strong>Email:</strong> legal@ersa-consultancy.com</p>
-                    <p className="text-gray-700 mb-2"><strong>Phone:</strong> +966 XX XXX XXXX</p>
-                    <p className="text-gray-700"><strong>Address:</strong> Saudi Arabia</p>
+                    <p className="text-gray-700 mb-2"><strong>Email:</strong> <a href='mailto:info@ersa-training.com:'>info@ersa-training.com</a></p>
+                    <p className="text-gray-700 mb-2"><strong>Phone:</strong> +966 557 7878 49</p>
+                    <p className="text-gray-700"><strong>Address:</strong> Saudi Arabia, Riyadh, Olaya District, Makkah Al-Mukarramah Road</p>
                   </div>
                 </>
               )}
