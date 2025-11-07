@@ -295,6 +295,224 @@ class ContentAPI {
     };
   }
 
+  // Get Privacy page content from database
+  async getPrivacyContent(locale: string = 'en') {
+    try {
+      console.log('🔄 Fetching privacy content from API...');
+      const templates = await this.getContentTemplates();
+      
+      const privacySection = templates.privacy;
+      
+      if (!privacySection) {
+        console.warn('❌ Privacy section not found in templates, using default content');
+        return this.getDefaultPrivacyContent(locale);
+      }
+
+      // Helper function to get field value
+      const getFieldValue = (key: string, defaultValue: string = ''): string => {
+        const field = privacySection.fields.find((f: any) => f.id === key || f.key === key);
+        if (!field) {
+          return defaultValue;
+        }
+        
+        // Handle bilingual content - check if value is an object with en/ar properties
+        if (field.value && typeof field.value === 'object' && (field.value.en !== undefined || field.value.ar !== undefined)) {
+          return field.value[locale] || field.value.en || field.value.ar || defaultValue;
+        }
+        
+        // Handle separate English/Arabic fields (e.g., page-title-en, page-title-ar)
+        if (field.id.endsWith('-en') || field.id.endsWith('-ar')) {
+          return field.value || defaultValue;
+        }
+        
+        // Handle regular content
+        return field.value || defaultValue;
+      };
+
+      // Get bilingual field value
+      // Note: Fields are transformed to separate -en/-ar fields by transformFieldsToOptimizedStructure
+      const getBilingualField = (baseKey: string, defaultValue: string = ''): string => {
+        console.log(`🔍 Looking for field: ${baseKey} in privacy section`);
+        console.log(`📋 Available fields:`, privacySection.fields.map((f: any) => f.id));
+        
+        // First check for separate en/ar fields (after transformation)
+        const enField = privacySection.fields.find((f: any) => f.id === `${baseKey}-en`);
+        const arField = privacySection.fields.find((f: any) => f.id === `${baseKey}-ar`);
+        
+        if (locale === 'ar' && arField) {
+          console.log(`✅ Found ${baseKey}-ar field:`, arField.value);
+          return arField.value || defaultValue;
+        }
+        if (enField) {
+          console.log(`✅ Found ${baseKey}-en field:`, enField.value);
+          return enField.value || defaultValue;
+        }
+        
+        // Fallback: check for original bilingual object field (before transformation)
+        const field = privacySection.fields.find((f: any) => f.id === baseKey);
+        if (field) {
+          console.log(`✅ Found original field ${baseKey}:`, field);
+          // Handle bilingual object structure {en: "...", ar: "..."}
+          if (field.value && typeof field.value === 'object' && (field.value.en !== undefined || field.value.ar !== undefined)) {
+            const result = field.value[locale] || field.value.en || field.value.ar || defaultValue;
+            console.log(`🌐 Extracted ${locale} value from object:`, result);
+            return result;
+          }
+          // Handle regular string value
+          const result = field.value || defaultValue;
+          console.log(`📝 Using string value:`, result);
+          return result;
+        }
+        
+        console.log(`❌ Field ${baseKey} not found`);
+        return defaultValue;
+      };
+
+      // Format last modified date
+      const formatLastUpdated = (dateString: string): string => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        if (locale === 'ar') {
+          return date.toLocaleDateString('ar-SA', { year: 'numeric', month: 'long' });
+        }
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                       'July', 'August', 'September', 'October', 'November', 'December'];
+        return `${months[date.getMonth()]} ${date.getFullYear()}`;
+      };
+
+      return {
+        title: getBilingualField('privacy-title', locale === 'ar' ? 'سياسة الخصوصية' : 'Privacy Policy'),
+        lastUpdated: formatLastUpdated(privacySection.lastModified),
+        content: getBilingualField('privacy-content', ''),
+        contact: getBilingualField('privacy-contact-info', '')
+      };
+
+    } catch (error) {
+      console.error('❌ Error fetching privacy content:', error);
+      console.error('🔄 Falling back to default content');
+      return this.getDefaultPrivacyContent(locale);
+    }
+  }
+
+  // Get Terms page content from database
+  async getTermsContent(locale: string = 'en') {
+    try {
+      console.log('🔄 Fetching terms content from API...');
+      const templates = await this.getContentTemplates();
+      
+      const termsSection = templates.terms;
+      
+      if (!termsSection) {
+        console.warn('❌ Terms section not found in templates, using default content');
+        return this.getDefaultTermsContent(locale);
+      }
+
+      // Helper function to get field value
+      const getFieldValue = (key: string, defaultValue: string = ''): string => {
+        const field = termsSection.fields.find((f: any) => f.id === key || f.key === key);
+        if (!field) {
+          return defaultValue;
+        }
+        
+        // Handle bilingual content - check if value is an object with en/ar properties
+        if (field.value && typeof field.value === 'object' && (field.value.en !== undefined || field.value.ar !== undefined)) {
+          return field.value[locale] || field.value.en || field.value.ar || defaultValue;
+        }
+        
+        // Handle separate English/Arabic fields (e.g., page-title-en, page-title-ar)
+        if (field.id.endsWith('-en') || field.id.endsWith('-ar')) {
+          return field.value || defaultValue;
+        }
+        
+        // Handle regular content
+        return field.value || defaultValue;
+      };
+
+      // Get bilingual field value
+      // Note: Fields are transformed to separate -en/-ar fields by transformFieldsToOptimizedStructure
+      const getBilingualField = (baseKey: string, defaultValue: string = ''): string => {
+        console.log(`🔍 Looking for field: ${baseKey} in terms section`);
+        console.log(`📋 Available fields:`, termsSection.fields.map((f: any) => f.id));
+        
+        // First check for separate en/ar fields (after transformation)
+        const enField = termsSection.fields.find((f: any) => f.id === `${baseKey}-en`);
+        const arField = termsSection.fields.find((f: any) => f.id === `${baseKey}-ar`);
+        
+        if (locale === 'ar' && arField) {
+          console.log(`✅ Found ${baseKey}-ar field:`, arField.value);
+          return arField.value || defaultValue;
+        }
+        if (enField) {
+          console.log(`✅ Found ${baseKey}-en field:`, enField.value);
+          return enField.value || defaultValue;
+        }
+        
+        // Fallback: check for original bilingual object field (before transformation)
+        const field = termsSection.fields.find((f: any) => f.id === baseKey);
+        if (field) {
+          console.log(`✅ Found original field ${baseKey}:`, field);
+          // Handle bilingual object structure {en: "...", ar: "..."}
+          if (field.value && typeof field.value === 'object' && (field.value.en !== undefined || field.value.ar !== undefined)) {
+            const result = field.value[locale] || field.value.en || field.value.ar || defaultValue;
+            console.log(`🌐 Extracted ${locale} value from object:`, result);
+            return result;
+          }
+          // Handle regular string value
+          const result = field.value || defaultValue;
+          console.log(`📝 Using string value:`, result);
+          return result;
+        }
+        
+        console.log(`❌ Field ${baseKey} not found`);
+        return defaultValue;
+      };
+
+      // Format last modified date
+      const formatLastUpdated = (dateString: string): string => {
+        if (!dateString) return '';
+        const date = new Date(dateString);
+        if (locale === 'ar') {
+          return date.toLocaleDateString('ar-SA', { year: 'numeric', month: 'long' });
+        }
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 
+                       'July', 'August', 'September', 'October', 'November', 'December'];
+        return `${months[date.getMonth()]} ${date.getFullYear()}`;
+      };
+
+      return {
+        title: getBilingualField('terms-title', locale === 'ar' ? 'شروط الخدمة' : 'Terms of Service'),
+        lastUpdated: formatLastUpdated(termsSection.lastModified),
+        content: getBilingualField('terms-content', ''),
+        contact: getBilingualField('terms-contact-info', '')
+      };
+
+    } catch (error) {
+      console.error('❌ Error fetching terms content:', error);
+      console.error('🔄 Falling back to default content');
+      return this.getDefaultTermsContent(locale);
+    }
+  }
+
+  // Default privacy content fallback
+  private getDefaultPrivacyContent(locale: string) {
+    return {
+      title: locale === 'ar' ? 'سياسة الخصوصية' : 'Privacy Policy',
+      lastUpdated: locale === 'ar' ? 'ديسمبر 2025' : 'December 2025',
+      content: '',
+      contact: ''
+    };
+  }
+
+  // Default terms content fallback
+  private getDefaultTermsContent(locale: string) {
+    return {
+      title: locale === 'ar' ? 'شروط الخدمة' : 'Terms of Service',
+      lastUpdated: locale === 'ar' ? 'يناير 2025' : 'January 2025',
+      content: '',
+      contact: ''
+    };
+  }
+
  // Add the get method if it doesn't exist
   async get<T>(url: string): Promise<{ data: T }> {
     // Ensure baseURL is set
