@@ -1058,6 +1058,9 @@ public class ContentController : ControllerBase
                     case "company-name":
                         block.ContentAr = "\u0625\u0631\u0633\u0627\u0621 \u0644\u0644\u062a\u062f\u0631\u064a\u0628"; // إرساء للتدريب
                         break;
+                    case "content":
+                        block.ContentAr = "\u0625\u0631\u0633\u0627\u0621 \u0644\u0644\u062a\u062f\u0631\u064a\u0628"; // إرساء للتدريب
+                        break;
                     case "mission":
                         block.ContentAr = "\u062a\u0645\u0643\u064a\u0646 \u0627\u0644\u0623\u0641\u0631\u0627\u062f \u0648\u0627\u0644\u0645\u0646\u0638\u0645\u0627\u062a \u0645\u0646 \u062e\u0644\u0627\u0644 \u062d\u0644\u0648\u0644 \u062a\u062f\u0631\u064a\u0628\u064a\u0629 \u0639\u0627\u0644\u0645\u064a\u0629 \u0627\u0644\u0645\u0633\u062a\u0648\u0649"; // تمكين الأفراد والمنظمات من خلال حلول تدريبية عالمية المستوى
                         break;
@@ -1634,10 +1637,11 @@ public class ContentController : ControllerBase
 
             case "about":
                 // Handle bilingual fields with {en, ar} structure
-                await UpdateOrCreateBlockFromBilingualField(section.Id, "company-name", "Company Name", "text", contentDict, "company-name");
+                await UpdateOrCreateBlockFromBilingualField(section.Id, "company-name", "Title", "text", contentDict, "company-name");
+                await UpdateOrCreateBlockFromBilingualField(section.Id, "content", "Sub-Title", "textarea", contentDict, "content");
                 await UpdateOrCreateBlockFromBilingualField(section.Id, "mission", "Mission Statement", "textarea", contentDict, "mission-statement");
                 await UpdateOrCreateBlockFromBilingualField(section.Id, "vision", "Vision Statement", "textarea", contentDict, "vision-statement");
-
+                
                 // Handle team array with bilingual fields per member (nameEn, nameAr, positionEn, positionAr, etc.)
                 await HandleTeamMembersArray(section.Id, contentDict);
                 break;
@@ -1822,9 +1826,11 @@ public class ContentController : ControllerBase
             },
             "about" => new List<DefaultBlockData>
             {
-                new() { Key = "company-name", Name = "Company Name", Type = "text", ContentEn = "Ersa Training", ContentAr = "إرساء للتدريب", SortOrder = 1 },
+                new() { Key = "company-name", Name = "Title", Type = "text", ContentEn = "Ersa Training", ContentAr = "إرساء للتدريب", SortOrder = 0 },
+                new() { Key = "content", Name = "Sub-Title", Type = "textarea", ContentEn = "A local company with global expertise that provides specialized training solutions and innovative management consulting services, with the highest quality standards and best practices, to enhance the efficiency of organizations and effectively achieve their strategic goals.", ContentAr = "شركة محلية وخبرات عالمية تعمل على تقديم حلول تدريبية متخصصة وخدمات استشارية إدارية مبتكرة، وبأعلى معايير الجودة، وأفضل الممارسات؛ لتعزيز كفاءة المنظمات، وتحقيق أهدافها الاستراتيجية بفاعلية.", SortOrder = 1 },
                 new() { Key = "mission", Name = "Mission", Type = "textarea", ContentEn = "Empowering individuals and organizations through world-class training solutions", ContentAr = "تمكين الأفراد والمنظمات من خلال حلول تدريبية عالمية المستوى", SortOrder = 2 },
                 new() { Key = "vision", Name = "Vision", Type = "textarea", ContentEn = "To be the preferred training partner in the region", ContentAr = "أن نكون الشريك التدريبي المفضل في المنطقة", SortOrder = 3 }
+                
             },
             "privacy" => new List<DefaultBlockData>
             {
@@ -2047,7 +2053,7 @@ public class ContentController : ControllerBase
                 fields.Add(new
                 {
                     id = "company-name",
-                    label = "Company Name",
+                    label = "Title",
                     type = "text",
                     value = new
                     {
@@ -2055,7 +2061,20 @@ public class ContentController : ControllerBase
                         ar = blocks.FirstOrDefault(b => b.BlockKey == "company-name")?.ContentAr ?? "إرساء للتدريب"
                     },
                     required = true,
-                    placeholder = "Enter company name"
+                    placeholder = "Enter title"
+                });
+                fields.Add(new
+                {
+                    id = "content",
+                    label = "Sub-Title",
+                    type = "textarea",
+                    value = new
+                    {
+                        en = blocks.FirstOrDefault(b => b.BlockKey == "content")?.ContentEn ?? "A local company with global expertise that provides specialized training solutions and innovative management consulting services, with the highest quality standards and best practices, to enhance the efficiency of organizations and effectively achieve their strategic goals.",
+                        ar = blocks.FirstOrDefault(b => b.BlockKey == "content")?.ContentAr ?? " الجودة، وأفضل الممارسات؛ لتعزيز كفاءة المنظمات، وتحقيق أهدافها الاستراتيجية بفاعلية."
+                    },
+                    required = true,
+                    placeholder = "Enter sub title"
                 });
                 fields.Add(new
                 {
@@ -2083,7 +2102,7 @@ public class ContentController : ControllerBase
                     required = true,
                     placeholder = "Enter company vision"
                 });
-
+                
                 // Team array with bilingual fields per member
                 fields.Add(new
                 {
@@ -2107,7 +2126,7 @@ public class ContentController : ControllerBase
                         ar = blocks.FirstOrDefault(b => b.BlockKey == "privacy-title")?.ContentAr ?? "سياسات التسجيل والإلغاء للدورات العامة – معهد إرساء"
                     },
                     required = true,
-                    placeholder = "Enter company name"
+                    placeholder = "Enter privacy title"
                 });
                 var privacyContentBlock = blocks.FirstOrDefault(b => b.BlockKey == "privacy-content");
                 fields.Add(new
@@ -2121,7 +2140,7 @@ public class ContentController : ControllerBase
                         ar = privacyContentBlock?.ContentAr ?? ""
                     },
                     required = true,
-                    placeholder = "Enter company mission"
+                    placeholder = "Enter privacy content"
                 });
                 var privacyContactBlock = blocks.FirstOrDefault(b => b.BlockKey == "privacy-contact-info");
                 fields.Add(new
@@ -2135,7 +2154,7 @@ public class ContentController : ControllerBase
                         ar = privacyContactBlock?.ContentAr ?? ""
                     },
                     required = true,
-                    placeholder = "Enter company vision"
+                    placeholder = "Enter contact info"
                 });
 
                 break;
@@ -2153,7 +2172,7 @@ public class ContentController : ControllerBase
                         ar = blocks.FirstOrDefault(b => b.BlockKey == "terms-title")?.ContentAr ?? "شروط الخدمة"
                     },
                     required = true,
-                    placeholder = "Enter company name"
+                    placeholder = "Enter terms title"
                 });
                 var termsContentBlock = blocks.FirstOrDefault(b => b.BlockKey == "terms-content");
                 fields.Add(new
@@ -2167,7 +2186,7 @@ public class ContentController : ControllerBase
                         ar = termsContentBlock?.ContentAr ?? ""
                     },
                     required = true,
-                    placeholder = "Enter company mission"
+                    placeholder = "Enter terms content"
                 });
                 var termsContactBlock = blocks.FirstOrDefault(b => b.BlockKey == "terms-contact-info");
                 fields.Add(new
@@ -2181,7 +2200,7 @@ public class ContentController : ControllerBase
                         ar = termsContactBlock?.ContentAr ?? ""
                     },
                     required = true,
-                    placeholder = "Enter company vision"
+                    placeholder = "Enter contact info"
                 });
 
                 break;

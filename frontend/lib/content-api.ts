@@ -107,51 +107,64 @@ class ContentAPI {
       console.log('✅ Found about section:', aboutSection);
       console.log('📝 Available fields:', aboutSection.fields?.map((f: any) => f.id || f.key));
 
-      // Helper function to get field value
+      // Helper function to get bilingual field value
+      // Note: Fields are transformed to separate -en/-ar fields by transformFieldsToOptimizedStructure
+      const getBilingualField = (baseKey: string, defaultValue: string = ''): string => {
+        // First check for separate en/ar fields (after transformation)
+        const enField = aboutSection.fields.find((f: any) => f.id === `${baseKey}-en`);
+        const arField = aboutSection.fields.find((f: any) => f.id === `${baseKey}-ar`);
+        
+        if (locale === 'ar' && arField) {
+          return arField.value || defaultValue;
+        }
+        if (enField) {
+          return enField.value || defaultValue;
+        }
+        
+        // Fallback: check for original bilingual object field (before transformation)
+        const field = aboutSection.fields.find((f: any) => f.id === baseKey);
+        if (field) {
+          // Handle bilingual object structure {en: "...", ar: "..."}
+          if (field.value && typeof field.value === 'object' && (field.value.en !== undefined || field.value.ar !== undefined)) {
+            return field.value[locale] || field.value.en || field.value.ar || defaultValue;
+          }
+          // Handle regular string value
+          return field.value || defaultValue;
+        }
+        
+        return defaultValue;
+      };
+
+      // Helper function to get field value (for backward compatibility)
       const getFieldValue = (key: string, defaultValue: string = ''): string => {
-        const field = aboutSection.fields.find((f: any) => f.id === key || f.key === key);
-        console.log(`🔍 Looking for field '${key}':`, field ? 'Found' : 'Not found');
-        if (!field) {
-          console.log(`❌ Field '${key}' not found, using default: '${defaultValue}'`);
-          return defaultValue;
-        }
-        
-        console.log(`📄 Field '${key}' details:`, { type: field.type, value: field.value });
-        
-        // Handle bilingual content - check if value is an object with en/ar properties
-        if (field.value && typeof field.value === 'object' && (field.value.en || field.value.ar)) {
-          const result = field.value[locale] || field.value.en || defaultValue;
-          console.log(`🌐 Bilingual field '${key}' for locale '${locale}':`, result);
-          return result;
-        }
-        
-        // Handle regular content
-        const result = field.value || defaultValue;
-        console.log(`📝 Regular field '${key}':`, result);
-        return result;
+        return getBilingualField(key, defaultValue);
       };
 
       // Return the transformed data structure
       return {
-        title: getFieldValue('company-name', 
+        title: getBilingualField('company-name', 
           locale === 'ar' ? 'من نحن' : 'About Us'),
         
-        subtitle: locale === 'ar' ? 'تعرف على مهمتنا وقيمنا' : 'Learn more about our mission and values',
-        
+        subtitle: getBilingualField('content', 
+          locale === 'ar' 
+            ? 'شركة محلية وخبرات عالمية تعمل على تقديم حلول تدريبية متخصصة وخدمات استشارية إدارية مبتكرة، وبأعلى معايير الجودة، وأفضل الممارسات؛ لتعزيز كفاءة المنظمات، وتحقيق أهدافها الاستراتيجية بفاعلية.'
+            : 'A local company with global expertise that provides specialized training solutions and innovative management consulting services, with the highest quality standards and best practices, to enhance the efficiency of organizations and effectively achieve their strategic goals.'
+        ),
+
         vision: {
           title: locale === 'ar' ? 'رؤيتنا' : 'Our Vision',
           description: getFieldValue('vision-statement',
             locale === 'ar' 
-              ? 'أن نكون مزود التدريب الرائد في المنطقة'
-              : 'To be the leading training provider in the region')
+              ? 'أن نصبـح الشريـك الأول للمنظمـــــات فــي تحقيــق التميـــز المستـــدام.'
+              : 'To become the first partner of organizations in achieving sustainable excellence.')
         },
         
         mission: {
           title: locale === 'ar' ? 'مهمتنا' : 'Our Mission',
           description: getFieldValue('mission-statement',
             locale === 'ar'
-              ? 'تمكين الأفراد والمنظمات من خلال برامج التدريب والتطوير عالية الجودة'
-              : 'To empower individuals and organizations through high-quality training and development programs')
+              ? 'تمكيـــن المنظمــــات وتطويــــر الكفــــاءات لتحقيـــق أقصى إمكاناتهـــا والوصــــول إلــى الأهـداف الاستراتيجيــة بفعاليـة وكفــاءة.'
+              : 'Empowering organizations and developing competencies to achieve their maximum potential and reach strategic goals effectively and efficiently.')
         },
         
         values: [
