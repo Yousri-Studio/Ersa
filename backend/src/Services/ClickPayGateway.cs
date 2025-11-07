@@ -75,6 +75,8 @@ public class ClickPayGateway : IPaymentGateway
                 callback = webhookUrl,
                 @return = finalReturnUrl,
                 hide_shipping = true,  // Hide shipping information for digital products
+                // Optional: Explicitly enable payment methods (if supported by ClickPay API)
+                //payment_methods = new[] { "card", "applepay" },  // Uncomment if ClickPay supports this parameter
                 customer_details = new
                 {
                     name = order.User.FullName,

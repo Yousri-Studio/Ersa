@@ -115,7 +115,7 @@ export default function PrivacyPolicyPage() {
                   </p>
                   <div className="bg-gray-50 p-6 rounded-lg">
                     <p className="text-gray-700 mb-2"><strong>البريد الإلكتروني:</strong> <a href='mailto:info@ersa-training.com:'>info@ersa-training.com</a></p>
-                    <p className="text-gray-700 mb-2"><strong>رقم التواصل والواتساب:</strong>+966 557 7878 49</p>
+                    <p className="text-gray-700 mb-2"><strong>رقم التواصل والواتساب:</strong> <span dir="ltr" style={{ display: 'inline-block' }}>+966 557 7878 49</span></p>
                     <p className="text-gray-700"><strong>العنوان:</strong> المملكة العربية السعودية، الرياض،العليا، طريق مكة المكرمة</p>
                   </div>
                 </>

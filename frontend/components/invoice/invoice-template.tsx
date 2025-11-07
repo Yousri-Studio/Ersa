@@ -331,7 +331,7 @@ export const InvoiceTemplate: React.FC<InvoiceTemplateProps> = ({
             <div className="space-y-1">
               <p>{locale === 'ar' ? 'الموقع الإلكتروني:' : 'Website:'} <a href='https://ersa-training.com:'>www.ersa-training.com</a></p>
               <p>{locale === 'ar' ? 'البريد الإلكتروني:' : 'Email:'} <a href='mailto:info@ersa-training.com:'>info@ersa-training.com</a></p>
-              <p>{locale === 'ar' ? 'الهاتف:' : 'Phone:'} +966 557 7878 49</p>
+              <p>{locale === 'ar' ? 'الهاتف:' : 'Phone:'} <span dir="ltr" style={{ display: 'inline-block' }}>+966 557 7878 49</span></p>
             </div>
           </div>
           <div>

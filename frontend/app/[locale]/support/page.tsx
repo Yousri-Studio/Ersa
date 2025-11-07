@@ -402,7 +402,7 @@ export default function SupportPage() {
                   </div>
                   <div className="flex items-center font-cairo">
                     <Icon name="phone" className="h-5 w-5 mr-2" />
-                    <span style={{ fontSize: '14px' }}>+966 557 7878 49</span>
+                    <span dir="ltr" style={{ fontSize: '14px', display: 'inline-block' }}>+966 557 7878 49</span>
                   </div>
                 </div>
               </div>
