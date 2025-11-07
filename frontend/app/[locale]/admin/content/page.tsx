@@ -73,7 +73,9 @@ export default function ContentManagement() {
       services: 'cogs',
       contact: 'envelope',
       faq: 'question-circle',
-      consultation: 'users'
+      consultation: 'users',
+      privacy: 'shield-alt',
+      terms: 'file-contract'
     };
     return iconMap[sectionKey] || 'file-text';
   };

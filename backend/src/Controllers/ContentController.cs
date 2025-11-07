@@ -1,4 +1,4 @@
-﻿using ErsaTraining.API.Data;
+using ErsaTraining.API.Data;
 using ErsaTraining.API.Data.Entities;
 using ErsaTraining.API.DTOs;
 using ErsaTraining.API.Services;
@@ -700,7 +700,7 @@ public class ContentController : ControllerBase
 
             // Update section blocks based on content
             await UpdateSectionBlocks(section, request.Content);
-            
+
             section.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
@@ -764,7 +764,7 @@ public class ContentController : ControllerBase
         try
         {
             var templates = new Dictionary<string, object>();
-            
+
             // Get all active pages with their sections
             var pages = await _context.ContentPages
                 .Include(p => p.Sections.Where(s => s.IsActive))
@@ -788,7 +788,7 @@ public class ContentController : ControllerBase
                         pageKey = page.PageKey,
                         fields = GetTemplateFields(section)
                     };
-                    
+
                     templates[section.SectionKey] = template;
                 }
             }
@@ -818,7 +818,7 @@ public class ContentController : ControllerBase
                 .Include(s => s.ContentPage)
                 .AsSplitQuery()
                 .FirstOrDefaultAsync(s => s.Id == sectionGuid);
-            
+
             if (section == null)
             {
                 return NotFound(new { error = "Section not found" });
@@ -826,7 +826,7 @@ public class ContentController : ControllerBase
 
             // Update section blocks based on content
             await UpdateSectionBlocks(section, request.Content);
-            
+
             section.UpdatedAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
@@ -931,13 +931,15 @@ public class ContentController : ControllerBase
             // Initialize all sections as standalone entities with bilingual content
             var allSections = new List<DefaultSectionData>
             {
-                new() { Key = "hero", Name = "Hero Section", Description = "Main banner section with title, subtitle, and call-to-action buttons", DescriptionAr = "Ù‚Ø³Ù… Ø§Ù„Ø¨Ø§Ù†Ø± Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ Ù…Ø¹ Ø§Ù„Ø¹Ù†ÙˆØ§Ù† ÙˆØ§Ù„Ø¹Ù†ÙˆØ§Ù† Ø§Ù„ÙØ±Ø¹ÙŠ ÙˆØ£Ø²Ø±Ø§Ø± Ø§Ù„Ø¯Ø¹ÙˆØ© Ù„Ù„Ø¹Ù…Ù„", SortOrder = 1, DefaultBlocks = GetDefaultBlocks("hero") },
-                new() { Key = "courses", Name = "Course Management", Description = "Course descriptions, curriculum, pricing, and enrollment details", DescriptionAr = "Ø£ÙˆØµØ§Ù Ø§Ù„Ø¯ÙˆØ±Ø§Øª ÙˆØ§Ù„Ù…Ù†Ø§Ù‡Ø¬ ÙˆØªÙØ§ØµÙŠÙ„ Ø§Ù„ØªØ³Ø¹ÙŠØ± ÙˆØ§Ù„ØªØ³Ø¬ÙŠÙ„", SortOrder = 2, DefaultBlocks = GetDefaultBlocks("courses") },
-                new() { Key = "about", Name = "About Company", Description = "Company information, mission, vision, team, and achievements", DescriptionAr = "Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ø´Ø±ÙƒØ© ÙˆØ§Ù„Ø±Ø³Ø§Ù„Ø© ÙˆØ§Ù„Ø±Ø¤ÙŠØ© ÙˆØ§Ù„ÙØ±ÙŠÙ‚ ÙˆØ§Ù„Ø¥Ù†Ø¬Ø§Ø²Ø§Øª", SortOrder = 3, DefaultBlocks = GetDefaultBlocks("about") },
-                new() { Key = "services", Name = "Services & Solutions", Description = "Consulting services, AI solutions, and service offerings", DescriptionAr = "Ø§Ù„Ø®Ø¯Ù…Ø§Øª Ø§Ù„Ø§Ø³ØªØ´Ø§Ø±ÙŠØ© ÙˆØ­Ù„ÙˆÙ„ Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ ÙˆØ§Ù„Ø¹Ø±ÙˆØ¶ Ø§Ù„Ø®Ø¯Ù…ÙŠØ©", SortOrder = 4, DefaultBlocks = GetDefaultBlocks("services") },
-                new() { Key = "contact", Name = "Contact Information", Description = "Contact details, office locations, and contact forms", DescriptionAr = "ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø§ØªØµØ§Ù„ ÙˆÙ…ÙˆØ§Ù‚Ø¹ Ø§Ù„Ù…ÙƒØ§ØªØ¨ ÙˆÙ†Ù…Ø§Ø°Ø¬ Ø§Ù„ØªÙˆØ§ØµÙ„", SortOrder = 5, DefaultBlocks = GetDefaultBlocks("contact") },
-                new() { Key = "faq", Name = "FAQ & Help", Description = "Frequently asked questions, help articles, and support content", DescriptionAr = "Ø§Ù„Ø£Ø³Ø¦Ù„Ø© Ø§Ù„Ø´Ø§Ø¦Ø¹Ø© ÙˆÙ…Ù‚Ø§Ù„Ø§Øª Ø§Ù„Ù…Ø³Ø§Ø¹Ø¯Ø© ÙˆÙ…Ø­ØªÙˆÙ‰ Ø§Ù„Ø¯Ø¹Ù…", SortOrder = 6, DefaultBlocks = GetDefaultBlocks("faq") },
-                new() { Key = "consultation", Name = "Consultation Services", Description = "Consultation offerings and service details", DescriptionAr = "Ø¹Ø±ÙˆØ¶ Ø§Ù„Ø§Ø³ØªØ´Ø§Ø±Ø© ÙˆØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø®Ø¯Ù…Ø§Øª", SortOrder = 7, DefaultBlocks = GetDefaultBlocks("consultation") }
+                new() { Key = "hero", Name = "Hero Section", Description = "Main banner section with title, subtitle, and call-to-action buttons", DescriptionAr = "قسم البانر الرئيسي مع العنوان والعنوان الفرعي وأزرار الدعوة للعمل", SortOrder = 1, DefaultBlocks = GetDefaultBlocks("hero") },
+                new() { Key = "courses", Name = "Course Management", Description = "Course descriptions, curriculum, pricing, and enrollment details", DescriptionAr = "أوصاف الدورات والمناهج وتفاصيل التسعير والتسجيل", SortOrder = 2, DefaultBlocks = GetDefaultBlocks("courses") },
+                new() { Key = "about", Name = "About Company", Description = "Company information, mission, vision, team, and achievements", DescriptionAr = "معلومات الشركة والرسالة والرؤية والفريق والإنجازات", SortOrder = 3, DefaultBlocks = GetDefaultBlocks("about") },
+                new() { Key = "privacy", Name = "Privacy Page", Description = "Registration and Cancellation Policies for Public Training Programs – Ersa Institute", DescriptionAr = "سياسات التسجيل والإلغاء للدورات العامة – معهد إرساء", SortOrder = 8, DefaultBlocks = GetDefaultBlocks("privacy") },
+                new() { Key = "terms", Name = "Terms Page", Description = "Terms of Service", DescriptionAr = "شروط الخدمة", SortOrder = 9, DefaultBlocks = GetDefaultBlocks("terms") },
+                new() { Key = "services", Name = "Services & Solutions", Description = "Consulting services, AI solutions, and service offerings", DescriptionAr = "الخدمات الاستشارية وحلول الذكاء الاصطناعي والعروض الخدمية", SortOrder = 4, DefaultBlocks = GetDefaultBlocks("services") },
+                new() { Key = "contact", Name = "Contact Information", Description = "Contact details, office locations, and contact forms", DescriptionAr = "تفاصيل الاتصال ومواقع المكاتب ونماذج التواصل", SortOrder = 5, DefaultBlocks = GetDefaultBlocks("contact") },
+                new() { Key = "faq", Name = "FAQ & Help", Description = "Frequently asked questions, help articles, and support content", DescriptionAr = "الأسئلة الشائعة ومقالات المساعدة ومحتوى الدعم", SortOrder = 6, DefaultBlocks = GetDefaultBlocks("faq") },
+                new() { Key = "consultation", Name = "Consultation Services", Description = "Consultation offerings and service details", DescriptionAr = "عروض الاستشارة وتفاصيل الخدمات", SortOrder = 7, DefaultBlocks = GetDefaultBlocks("consultation") }
             };
 
             foreach (var sectionData in allSections)
@@ -1022,7 +1024,7 @@ public class ContentController : ControllerBase
         {
             // Get all content blocks
             var blocks = await _context.ContentBlocks.ToListAsync();
-            
+
             _logger.LogInformation($"Fixing Arabic content for {blocks.Count} blocks...");
 
             foreach (var block in blocks)
@@ -1085,12 +1087,12 @@ public class ContentController : ControllerBase
                         block.ContentAr = "\u064a\u0645\u0643\u0646\u0643 \u0627\u0644\u062a\u0633\u062c\u064a\u0644 \u0645\u0646 \u062e\u0644\u0627\u0644 \u0645\u0648\u0642\u0639\u0646\u0627 \u0627\u0644\u0625\u0644\u0643\u062a\u0631\u0648\u0646\u064a \u0623\u0648 \u0627\u0644\u062a\u0648\u0627\u0635\u0644 \u0645\u0639\u0646\u0627 \u0645\u0628\u0627\u0634\u0631\u0629."; // يمكنك التسجيل من خلال موقعنا الإلكتروني أو التواصل معنا مباشرة.
                         break;
                 }
-                
+
                 block.UpdatedAt = DateTime.UtcNow;
             }
 
             await _context.SaveChangesAsync();
-            
+
             _logger.LogInformation($"Successfully fixed Arabic content for {blocks.Count} blocks");
             return Ok(new { success = true, message = $"Fixed Arabic content for {blocks.Count} blocks", count = blocks.Count });
         }
@@ -1109,7 +1111,7 @@ public class ContentController : ControllerBase
             var block = await _context.ContentBlocks.FirstOrDefaultAsync(b => b.BlockKey == "hero-badge");
             if (block == null)
                 return NotFound("Block not found");
-                
+
             return Ok(new
             {
                 blockKey = block.BlockKey,
@@ -1137,19 +1139,21 @@ public class ContentController : ControllerBase
 
             var pages = await _context.ContentPages.Select(p => new { p.PageKey, p.PageName }).ToListAsync();
             var sections = await _context.ContentSections.Select(s => new { s.SectionKey, s.SectionName, s.ContentPageId }).ToListAsync();
-            
+
             // Get sample blocks to debug Arabic content
             var sampleBlocks = await _context.ContentBlocks
                 .Where(b => b.BlockKey.StartsWith("hero"))
-                .Select(b => new { 
-                    b.BlockKey, 
-                    b.BlockName, 
+                .Select(b => new
+                {
+                    b.BlockKey,
+                    b.BlockName,
                     b.ContentEn,
                     b.ContentAr
                 })
                 .ToListAsync();
-                
-            var sampleBlocksPreview = sampleBlocks.Select(b => new {
+
+            var sampleBlocksPreview = sampleBlocks.Select(b => new
+            {
                 b.BlockKey,
                 b.BlockName,
                 ContentEnLength = b.ContentEn?.Length ?? 0,
@@ -1268,7 +1272,7 @@ public class ContentController : ControllerBase
     private object GetSectionContentObject(ContentSection section)
     {
         var blocks = section.Blocks.Where(b => b.IsActive).OrderBy(b => b.SortOrder).ToList();
-        
+
         switch (section.SectionKey.ToLower())
         {
             case "hero":
@@ -1278,7 +1282,7 @@ public class ContentController : ControllerBase
                     subtitle = blocks.FirstOrDefault(b => b.BlockKey == "subtitle")?.ContentEn ?? "Professional Training & Consultancy Services",
                     description = blocks.FirstOrDefault(b => b.BlockKey == "description")?.ContentEn ?? "Empowering individuals and organizations with world-class training solutions"
                 };
-            
+
             case "faq":
                 var faqBlocks = blocks.Where(b => b.BlockType == "faq").ToList();
                 return new
@@ -1289,7 +1293,7 @@ public class ContentController : ControllerBase
                         answer = b.ContentEn ?? ""
                     }).ToList()
                 };
-            
+
             case "services":
                 var serviceBlocks = blocks.Where(b => b.BlockType == "service").ToList();
                 return new
@@ -1300,7 +1304,7 @@ public class ContentController : ControllerBase
                         description = b.ContentEn ?? ""
                     }).ToList()
                 };
-            
+
             default:
                 return new
                 {
@@ -1350,7 +1354,7 @@ public class ContentController : ControllerBase
         }
     }
 
-    private JsonElement ConvertToJsonElement(dynamic content) 
+    private JsonElement ConvertToJsonElement(dynamic content)
     {
         // Handle content as JsonElement or JSON string
         JsonElement jsonElement;
@@ -1611,63 +1615,78 @@ public class ContentController : ControllerBase
                 await UpdateOrCreateBlockFromBilingualField(section.Id, "hero-description", "Hero Description", "textarea", contentDict, "hero-description");
                 await UpdateOrCreateBlockFromBilingualField(section.Id, "hero-cta-primary", "Primary CTA", "text", contentDict, "hero-cta-primary");
                 await UpdateOrCreateBlockFromBilingualField(section.Id, "hero-cta-secondary", "Secondary CTA", "text", contentDict, "hero-cta-secondary");
-                
+
                 // Handle separate English/Arabic features arrays
                 await HandleSeparateBilingualArrays(section.Id, contentDict, "features", "feature");
-                
+
                 // Handle separate English/Arabic testimonials arrays
                 await HandleSeparateBilingualArrays(section.Id, contentDict, "testimonials", "testimonial");
                 break;
-            
+
             case "courses":
                 // Handle bilingual page title and description
                 await UpdateOrCreateBlockFromBilingualField(section.Id, "page-title", "Page Title", "text", contentDict, "page-title");
                 await UpdateOrCreateBlockFromBilingualField(section.Id, "page-description", "Page Description", "textarea", contentDict, "page-description");
-                
+
                 // Handle separate English/Arabic categories arrays
                 await HandleSeparateBilingualArrays(section.Id, contentDict, "categories", "category");
                 break;
-            
+
             case "about":
                 // Handle bilingual fields with {en, ar} structure
                 await UpdateOrCreateBlockFromBilingualField(section.Id, "company-name", "Company Name", "text", contentDict, "company-name");
                 await UpdateOrCreateBlockFromBilingualField(section.Id, "mission", "Mission Statement", "textarea", contentDict, "mission-statement");
                 await UpdateOrCreateBlockFromBilingualField(section.Id, "vision", "Vision Statement", "textarea", contentDict, "vision-statement");
-                
+
                 // Handle team array with bilingual fields per member (nameEn, nameAr, positionEn, positionAr, etc.)
                 await HandleTeamMembersArray(section.Id, contentDict);
                 break;
-            
+
+            case "privacy":
+                // Handle bilingual fields with {en, ar} structure
+                await UpdateOrCreateBlockFromBilingualField(section.Id, "privacy-title", "Privacy Title", "text", contentDict, "privacy-title");
+                await UpdateOrCreateBlockFromBilingualField(section.Id, "privacy-content", "Privacy Content", "richtextarea", contentDict, "privacy-content");
+                await UpdateOrCreateBlockFromBilingualField(section.Id, "privacy-contact-info", "Privacy Contact Info", "richtextarea", contentDict, "privacy-contact-info");
+                break;
+
+            case "terms":
+                // Handle bilingual fields with {en, ar} structure
+                await UpdateOrCreateBlockFromBilingualField(section.Id, "terms-title", "Privacy Title", "text", contentDict, "terms-title");
+                await UpdateOrCreateBlockFromBilingualField(section.Id, "terms-content", "Privacy Content", "richtextarea", contentDict, "terms-content");
+                await UpdateOrCreateBlockFromBilingualField(section.Id, "terms-contact-info", "Privacy Contact Info", "richtextarea", contentDict, "terms-contact-info");
+                break;
+
+
             case "faq":
                 // Handle bilingual FAQ title
                 await UpdateOrCreateBlockFromBilingualField(section.Id, "faq-title", "FAQ Title", "text", contentDict, "faq-title");
-                
+
                 // Handle separate English/Arabic FAQ items arrays or bilingual FAQ items
                 await HandleFAQItemsArray(section.Id, contentDict);
                 break;
-            
+
             case "services":
                 // Handle bilingual services fields
                 await UpdateOrCreateBlockFromBilingualField(section.Id, "title", "Services Title", "text", contentDict, "services-title");
                 await UpdateOrCreateBlockFromBilingualField(section.Id, "description", "Services Description", "textarea", contentDict, "services-description");
                 break;
-                
+
             case "contact":
                 // Handle bilingual contact fields
                 await UpdateOrCreateBlockFromBilingualField(section.Id, "title", "Contact Title", "text", contentDict, "contact-title");
                 await UpdateOrCreateBlockFromBilingualField(section.Id, "address", "Address", "text", contentDict, "address");
-                
+
                 // Handle monolingual fields
                 await UpdateOrCreateBlock(section.Id, "phone", "Phone Number", "text", contentDict.ContainsKey("phone") ? contentDict["phone"]?.ToString() : null);
                 await UpdateOrCreateBlock(section.Id, "email", "Email Address", "text", contentDict.ContainsKey("email") ? contentDict["email"]?.ToString() : null);
                 break;
-                
+
             case "consultation":
                 // Handle bilingual consultation fields
                 await UpdateOrCreateBlockFromBilingualField(section.Id, "title", "Consultation Title", "text", contentDict, "consultation-title");
                 await UpdateOrCreateBlockFromBilingualField(section.Id, "description", "Consultation Description", "textarea", contentDict, "consultation-description");
                 break;
-                
+
             default:
                 // Handle generic bilingual fields
                 await UpdateOrCreateBlockFromBilingualField(section.Id, "title", "Title", "text", contentDict, "title");
@@ -1714,6 +1733,7 @@ public class ContentController : ControllerBase
         {
             existingBlock.ContentEn = contentEn;
             existingBlock.ContentAr = contentAr;
+            existingBlock.BlockType = blockType; // Update BlockType to migrate old blocks
             existingBlock.UpdatedAt = DateTime.UtcNow;
         }
         else
@@ -1747,6 +1767,8 @@ public class ContentController : ControllerBase
             "faq" => "FAQ",
             "consultation" => "Consultation",
             "about" => "About Us",
+            "privacy" => "Privacy Page",
+            "terms" => "Terms Page",
             _ => pageKey
         };
     }
@@ -1756,13 +1778,15 @@ public class ContentController : ControllerBase
         // Create standalone sections that match frontend expectations
         var allSections = new List<DefaultSectionData>
         {
-            new() { Key = "hero", Name = "Hero Section", Description = "Main banner section with title, subtitle, and call-to-action buttons", DescriptionAr = "Ù‚Ø³Ù… Ø§Ù„Ø¨Ø§Ù†Ø± Ø§Ù„Ø±Ø¦ÙŠØ³ÙŠ Ù…Ø¹ Ø§Ù„Ø¹Ù†ÙˆØ§Ù† ÙˆØ§Ù„Ø¹Ù†ÙˆØ§Ù† Ø§Ù„ÙØ±Ø¹ÙŠ ÙˆØ£Ø²Ø±Ø§Ø± Ø§Ù„Ø¯Ø¹ÙˆØ© Ù„Ù„Ø¹Ù…Ù„", SortOrder = 1, DefaultBlocks = GetDefaultBlocks("hero") },
-            new() { Key = "courses", Name = "Course Management", Description = "Course descriptions, curriculum, pricing, and enrollment details", DescriptionAr = "Ø£ÙˆØµØ§Ù Ø§Ù„Ø¯ÙˆØ±Ø§Øª ÙˆØ§Ù„Ù…Ù†Ø§Ù‡Ø¬ ÙˆØªÙØ§ØµÙŠÙ„ Ø§Ù„ØªØ³Ø¹ÙŠØ± ÙˆØ§Ù„ØªØ³Ø¬ÙŠÙ„", SortOrder = 2, DefaultBlocks = GetDefaultBlocks("courses") },
-            new() { Key = "about", Name = "About Company", Description = "Company information, mission, vision, team, and achievements", DescriptionAr = "Ù…Ø¹Ù„ÙˆÙ…Ø§Øª Ø§Ù„Ø´Ø±ÙƒØ© ÙˆØ§Ù„Ø±Ø³Ø§Ù„Ø© ÙˆØ§Ù„Ø±Ø¤ÙŠØ© ÙˆØ§Ù„ÙØ±ÙŠÙ‚ ÙˆØ§Ù„Ø¥Ù†Ø¬Ø§Ø²Ø§Øª", SortOrder = 3, DefaultBlocks = GetDefaultBlocks("about") },
-            new() { Key = "services", Name = "Services & Solutions", Description = "Consulting services, AI solutions, and service offerings", DescriptionAr = "Ø§Ù„Ø®Ø¯Ù…Ø§Øª Ø§Ù„Ø§Ø³ØªØ´Ø§Ø±ÙŠØ© ÙˆØ­Ù„ÙˆÙ„ Ø§Ù„Ø°ÙƒØ§Ø¡ Ø§Ù„Ø§ØµØ·Ù†Ø§Ø¹ÙŠ ÙˆØ§Ù„Ø¹Ø±ÙˆØ¶ Ø§Ù„Ø®Ø¯Ù…ÙŠØ©", SortOrder = 4, DefaultBlocks = GetDefaultBlocks("services") },
-            new() { Key = "contact", Name = "Contact Information", Description = "Contact details, office locations, and contact forms", DescriptionAr = "ØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø§ØªØµØ§Ù„ ÙˆÙ…ÙˆØ§Ù‚Ø¹ Ø§Ù„Ù…ÙƒØ§ØªØ¨ ÙˆÙ†Ù…Ø§Ø°Ø¬ Ø§Ù„ØªÙˆØ§ØµÙ„", SortOrder = 5, DefaultBlocks = GetDefaultBlocks("contact") },
-            new() { Key = "faq", Name = "FAQ & Help", Description = "Frequently asked questions, help articles, and support content", DescriptionAr = "Ø§Ù„Ø£Ø³Ø¦Ù„Ø© Ø§Ù„Ø´Ø§Ø¦Ø¹Ø© ÙˆÙ…Ù‚Ø§Ù„Ø§Øª Ø§Ù„Ù…Ø³Ø§Ø¹Ø¯Ø© ÙˆÙ…Ø­ØªÙˆÙ‰ Ø§Ù„Ø¯Ø¹Ù…", SortOrder = 6, DefaultBlocks = GetDefaultBlocks("faq") },
-            new() { Key = "consultation", Name = "Consultation Services", Description = "Consultation offerings and service details", DescriptionAr = "Ø¹Ø±ÙˆØ¶ Ø§Ù„Ø§Ø³ØªØ´Ø§Ø±Ø© ÙˆØªÙØ§ØµÙŠÙ„ Ø§Ù„Ø®Ø¯Ù…Ø§Øª", SortOrder = 7, DefaultBlocks = GetDefaultBlocks("consultation") }
+            new() { Key = "hero", Name = "Hero Section", Description = "Main banner section with title, subtitle, and call-to-action buttons", DescriptionAr = "قسم البانر الرئيسي مع العنوان والعنوان الفرعي وأزرار الدعوة للعمل", SortOrder = 1, DefaultBlocks = GetDefaultBlocks("hero") },
+            new() { Key = "courses", Name = "Course Management", Description = "Course descriptions, curriculum, pricing, and enrollment details", DescriptionAr = "أوصاف الدورات والمناهج وتفاصيل التسعير والتسجيل", SortOrder = 2, DefaultBlocks = GetDefaultBlocks("courses") },
+            new() { Key = "about", Name = "About Company", Description = "Company information, mission, vision, team, and achievements", DescriptionAr = "معلومات الشركة والرسالة والرؤية والفريق والإنجازات", SortOrder = 3, DefaultBlocks = GetDefaultBlocks("about") },
+            new() { Key = "privacy", Name = "Privacy Page", Description = "Registration and Cancellation Policies for Public Training Programs – Ersa Institute", DescriptionAr = "سياسات التسجيل والإلغاء للدورات العامة – معهد إرساء", SortOrder = 8, DefaultBlocks = GetDefaultBlocks("privacy") },
+            new() { Key = "terms", Name = "Terms Page", Description = "Terms of Service", DescriptionAr = "شروط الخدمة", SortOrder = 9, DefaultBlocks = GetDefaultBlocks("terms") },
+            new() { Key = "services", Name = "Services & Solutions", Description = "Consulting services, AI solutions, and service offerings", DescriptionAr = "الخدمات الاستشارية وحلول الذكاء الاصطناعي والعروض الخدمية", SortOrder = 4, DefaultBlocks = GetDefaultBlocks("services") },
+            new() { Key = "contact", Name = "Contact Information", Description = "Contact details, office locations, and contact forms", DescriptionAr = "تفاصيل الاتصال ومواقع المكاتب ونماذج التواصل", SortOrder = 5, DefaultBlocks = GetDefaultBlocks("contact") },
+            new() { Key = "faq", Name = "FAQ & Help", Description = "Frequently asked questions, help articles, and support content", DescriptionAr = "الأسئلة الشائعة ومقالات المساعدة ومحتوى الدعم", SortOrder = 6, DefaultBlocks = GetDefaultBlocks("faq") },
+            new() { Key = "consultation", Name = "Consultation Services", Description = "Consultation offerings and service details", DescriptionAr = "عروض الاستشارة وتفاصيل الخدمات", SortOrder = 7, DefaultBlocks = GetDefaultBlocks("consultation") }
         };
 
         return pageKey.ToLower() switch
@@ -1770,6 +1794,8 @@ public class ContentController : ControllerBase
             "home" => allSections.Where(s => new[] { "hero", "services" }.Contains(s.Key)).ToList(),
             "courses" => allSections.Where(s => s.Key == "courses").ToList(),
             "about" => allSections.Where(s => s.Key == "about").ToList(),
+            "privacy" => allSections.Where(s => s.Key == "privacy").ToList(),
+            "terms" => allSections.Where(s => s.Key == "terms").ToList(),
             "contact" => allSections.Where(s => s.Key == "contact").ToList(),
             "faq" => allSections.Where(s => s.Key == "faq").ToList(),
             "consultation" => allSections.Where(s => s.Key == "consultation").ToList(),
@@ -1783,52 +1809,64 @@ public class ContentController : ControllerBase
         {
             "hero" => new List<DefaultBlockData>
             {
-                new() { Key = "hero-badge", Name = "Hero Badge", Type = "text", ContentEn = "Ersa with you for skill development", ContentAr = "Ø¥Ø±Ø³Ø§Ø¡ Ù…Ø¹Ùƒ Ù„ØªØ·ÙˆÙŠØ± Ø§Ù„Ù…Ù‡Ø§Ø±Ø§Øª", SortOrder = 1 },
-                new() { Key = "hero-title", Name = "Hero Title", Type = "text", ContentEn = "Explore our training platform and elevate your abilities to achieve your maximum potential", ContentAr = "Ø§Ø³ØªÙƒØ´Ù Ù…Ù†ØµØªÙ†Ø§ Ø§Ù„ØªØ¯Ø±ÙŠØ¨ÙŠØ© ÙˆØ§Ø±ØªÙ‚ÙŠ Ø¨Ù‚Ø¯Ø±Ø§ØªÙƒ Ù„ØªØ­Ù‚ÙŠÙ‚ Ø£Ù‚ØµÙ‰ Ø¥Ù…ÙƒØ§Ù†Ø§ØªÙƒ", SortOrder = 2 },
-                new() { Key = "hero-description", Name = "Hero Description", Type = "textarea", ContentEn = "Build a promising future and lead your life with our interactive and comprehensive programs", ContentAr = "Ø§Ø¨Ù† Ù…Ø³ØªÙ‚Ø¨Ù„Ø§Ù‹ ÙˆØ§Ø¹Ø¯Ø§Ù‹ ÙˆÙ‚ÙˆØ¯ Ø­ÙŠØ§ØªÙƒ Ù…Ø¹ Ø¨Ø±Ø§Ù…Ø¬Ù†Ø§ Ø§Ù„ØªÙØ§Ø¹Ù„ÙŠØ© ÙˆØ§Ù„Ù…ÙÙ‡Ù…Ø©", SortOrder = 3 },
-                new() { Key = "hero-cta-primary", Name = "Primary CTA", Type = "text", ContentEn = "Explore Courses", ContentAr = "Ø§Ø³ØªÙƒØ´Ù Ø§Ù„Ø¯ÙˆØ±Ø§Øª", SortOrder = 4 },
-                new() { Key = "hero-cta-secondary", Name = "Secondary CTA", Type = "text", ContentEn = "Request Consultation", ContentAr = "Ø·Ù„Ø¨ Ø§Ø³ØªØ´Ø§Ø±Ø©", SortOrder = 5 }
+                new() { Key = "hero-badge", Name = "Hero Badge", Type = "text", ContentEn = "Ersa with you for skill development", ContentAr = "إرساء معك لتطوير المهارات", SortOrder = 1 },
+                new() { Key = "hero-title", Name = "Hero Title", Type = "text", ContentEn = "Explore our training platform and elevate your abilities to achieve your maximum potential", ContentAr = "استكشف منصتنا التدريبية وارتقي بقدراتك لتحقيق أقصى إمكاناتك", SortOrder = 2 },
+                new() { Key = "hero-description", Name = "Hero Description", Type = "textarea", ContentEn = "Build a promising future and lead your life with our interactive and comprehensive programs", ContentAr = "ابن مستقبلاً واعداً وقود حياتك مع برامجنا التفاعلية والشاملة", SortOrder = 3 },
+                new() { Key = "hero-cta-primary", Name = "Primary CTA", Type = "text", ContentEn = "Explore Courses", ContentAr = "استكشف الدورات", SortOrder = 4 },
+                new() { Key = "hero-cta-secondary", Name = "Secondary CTA", Type = "text", ContentEn = "Request Consultation", ContentAr = "طلب استشارة", SortOrder = 5 }
             },
             "courses" => new List<DefaultBlockData>
             {
-                new() { Key = "page-title", Name = "Page Title", Type = "text", ContentEn = "Our Courses", ContentAr = "Ø¯ÙˆØ±Ø§ØªÙ†Ø§", SortOrder = 1 },
-                new() { Key = "page-description", Name = "Page Description", Type = "textarea", ContentEn = "Discover our comprehensive collection of professional development courses", ContentAr = "Ø§ÙƒØªØ´Ù Ù…Ø¬Ù…ÙˆØ¹ØªÙ†Ø§ Ø§Ù„Ø´Ø§Ù…Ù„Ø© Ù…Ù† Ø¯ÙˆØ±Ø§Øª Ø§Ù„ØªØ·ÙˆÙŠØ± Ø§Ù„Ù…Ù‡Ù†ÙŠ", SortOrder = 2 }
+                new() { Key = "page-title", Name = "Page Title", Type = "text", ContentEn = "Our Courses", ContentAr = "دوراتنا", SortOrder = 1 },
+                new() { Key = "page-description", Name = "Page Description", Type = "textarea", ContentEn = "Discover our comprehensive collection of professional development courses", ContentAr = "اكتشف مجموعتنا الشاملة من دورات التطوير المهني", SortOrder = 2 }
             },
             "about" => new List<DefaultBlockData>
             {
-                new() { Key = "company-name", Name = "Company Name", Type = "text", ContentEn = "Ersa Training", ContentAr = "Ø¥Ø±Ø³Ø§Ø¡ Ù„Ù„ØªØ¯Ø±ÙŠØ¨", SortOrder = 1 },
-                new() { Key = "mission", Name = "Mission", Type = "textarea", ContentEn = "Empowering individuals and organizations through world-class training solutions", ContentAr = "ØªÙ…ÙƒÙŠÙ† Ø§Ù„Ø£ÙØ±Ø§Ø¯ ÙˆØ§Ù„Ù…Ù†Ø¸Ù…Ø§Øª Ù…Ù† Ø®Ù„Ø§Ù„ Ø­Ù„ÙˆÙ„ ØªØ¯Ø±ÙŠØ¨ÙŠØ© Ø¹Ø§Ù„Ù…ÙŠØ© Ø§Ù„Ù…Ø³ØªÙˆÙ‰", SortOrder = 2 },
-                new() { Key = "vision", Name = "Vision", Type = "textarea", ContentEn = "To be the preferred training partner in the region", ContentAr = "Ø£Ù† Ù†ÙƒÙˆÙ† Ø§Ù„Ø´Ø±ÙŠÙƒ Ø§Ù„ØªØ¯Ø±ÙŠØ¨ÙŠ Ø§Ù„Ù…ÙØ¶Ù„ ÙÙŠ Ø§Ù„Ù…Ù†Ø·Ù‚Ø©", SortOrder = 3 }
+                new() { Key = "company-name", Name = "Company Name", Type = "text", ContentEn = "Ersa Training", ContentAr = "إرساء للتدريب", SortOrder = 1 },
+                new() { Key = "mission", Name = "Mission", Type = "textarea", ContentEn = "Empowering individuals and organizations through world-class training solutions", ContentAr = "تمكين الأفراد والمنظمات من خلال حلول تدريبية عالمية المستوى", SortOrder = 2 },
+                new() { Key = "vision", Name = "Vision", Type = "textarea", ContentEn = "To be the preferred training partner in the region", ContentAr = "أن نكون الشريك التدريبي المفضل في المنطقة", SortOrder = 3 }
+            },
+            "privacy" => new List<DefaultBlockData>
+            {
+                new() { Key = "privacy-title", Name = "Privacy Title", Type = "text", ContentEn = "", ContentAr = "", SortOrder = 1 },
+                new() { Key = "privacy-content", Name = "Privacy Content", Type = "textarea", ContentEn = "", ContentAr = "", SortOrder = 2 },
+                new() { Key = "privacy-contact-info", Name = "Privacy Contact Info", Type = "textarea", ContentEn = "", ContentAr = "", SortOrder = 3 }
+            },
+            "terms" => new List<DefaultBlockData>
+            {
+                new() { Key = "terms-title", Name = "Terms Title", Type = "text", ContentEn = "", ContentAr = "", SortOrder = 1 },
+                new() { Key = "terms-content", Name = "Terms Content", Type = "textarea", ContentEn = "", ContentAr = "", SortOrder = 2 },
+                new() { Key = "terms-contact-info", Name = "Terms Contact Info", Type = "textarea", ContentEn = "", ContentAr = "", SortOrder = 3 }
             },
             "services" => new List<DefaultBlockData>
             {
-                new() { Key = "title", Name = "Services Title", Type = "text", ContentEn = "Our Services", ContentAr = "Ø®Ø¯Ù…Ø§ØªÙ†Ø§", SortOrder = 1 },
-                new() { Key = "description", Name = "Services Description", Type = "textarea", ContentEn = "We offer comprehensive training and consultancy services", ContentAr = "Ù†Ù‚Ø¯Ù… Ø®Ø¯Ù…Ø§Øª ØªØ¯Ø±ÙŠØ¨ÙŠØ© ÙˆØ§Ø³ØªØ´Ø§Ø±ÙŠØ© Ø´Ø§Ù…Ù„Ø©", SortOrder = 2 }
+                new() { Key = "title", Name = "Services Title", Type = "text", ContentEn = "Our Services", ContentAr = "خدماتنا", SortOrder = 1 },
+                new() { Key = "description", Name = "Services Description", Type = "textarea", ContentEn = "We offer comprehensive training and consultancy services", ContentAr = "نقدم خدمات تدريبية واستشارية شاملة", SortOrder = 2 }
             },
             "contact" => new List<DefaultBlockData>
             {
-                new() { Key = "title", Name = "Contact Title", Type = "text", ContentEn = "Get in Touch", ContentAr = "ØªÙˆØ§ØµÙ„ Ù…Ø¹Ù†Ø§", SortOrder = 1 },
-                new() { Key = "address", Name = "Address", Type = "text", ContentEn = "Riyadh, Saudi Arabia", ContentAr = "Ø§Ù„Ø±ÙŠØ§Ø¶ØŒ Ø§Ù„Ù…Ù…Ù„ÙƒØ© Ø§Ù„Ø¹Ø±Ø¨ÙŠØ© Ø§Ù„Ø³Ø¹ÙˆØ¯ÙŠØ©", SortOrder = 2 },
+                new() { Key = "title", Name = "Contact Title", Type = "text", ContentEn = "Get in Touch", ContentAr = "تواصل معنا", SortOrder = 1 },
+                new() { Key = "address", Name = "Address", Type = "text", ContentEn = "Riyadh, Saudi Arabia", ContentAr = "الرياض، المملكة العربية السعودية", SortOrder = 2 },
                 new() { Key = "phone", Name = "Phone Number", Type = "text", ContentEn = "+966 XX XXX XXXX", ContentAr = "+966 XX XXX XXXX", SortOrder = 3 },
                 new() { Key = "email", Name = "Email Address", Type = "text", ContentEn = "info@ersa-training.com", ContentAr = "info@ersa-training.com", SortOrder = 4 }
             },
             "faq" => new List<DefaultBlockData>
             {
-                new() { Key = "faq-title", Name = "FAQ Title", Type = "text", ContentEn = "Frequently Asked Questions", ContentAr = "Ø§Ù„Ø£Ø³Ø¦Ù„Ø© Ø§Ù„Ø´Ø§Ø¦Ø¹Ø©", SortOrder = 1 },
-                new() { Key = "faq-1-question", Name = "FAQ 1 Question", Type = "text", ContentEn = "How do I enroll in a course?", ContentAr = "ÙƒÙŠÙ ÙŠÙ…ÙƒÙ†Ù†ÙŠ Ø§Ù„ØªØ³Ø¬ÙŠÙ„ ÙÙŠ Ø¯ÙˆØ±Ø©ØŸ", SortOrder = 2 },
-                new() { Key = "faq-1-answer", Name = "FAQ 1 Answer", Type = "textarea", ContentEn = "You can enroll through our website or contact us directly.", ContentAr = "ÙŠÙ…ÙƒÙ†Ùƒ Ø§Ù„ØªØ³Ø¬ÙŠÙ„ Ù…Ù† Ø®Ù„Ø§Ù„ Ù…ÙˆÙ‚Ø¹Ù†Ø§ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ Ø£Ùˆ Ø§Ù„ØªÙˆØ§ØµÙ„ Ù…Ø¹Ù†Ø§ Ù…Ø¨Ø§Ø´Ø±Ø©.", SortOrder = 3 },
-                new() { Key = "faq-2-question", Name = "FAQ 2 Question", Type = "text", ContentEn = "What payment methods do you accept?", ContentAr = "Ù…Ø§ Ù‡ÙŠ Ø·Ø±Ù‚ Ø§Ù„Ø¯ÙØ¹ Ø§Ù„Ù…Ù‚Ø¨ÙˆÙ„Ø©ØŸ", SortOrder = 4 },
-                new() { Key = "faq-2-answer", Name = "FAQ 2 Answer", Type = "textarea", ContentEn = "We accept credit cards, bank transfers, and online payments.", ContentAr = "Ù†Ù‚Ø¨Ù„ Ø¨Ø·Ø§Ù‚Ø§Øª Ø§Ù„Ø§Ø¦ØªÙ…Ø§Ù† ÙˆØ§Ù„ØªØ­ÙˆÙŠÙ„Ø§Øª Ø§Ù„Ø¨Ù†ÙƒÙŠØ© ÙˆØ§Ù„Ù…Ø¯ÙÙˆØ¹Ø§Øª Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠØ©.", SortOrder = 5 }
+                new() { Key = "faq-title", Name = "FAQ Title", Type = "text", ContentEn = "Frequently Asked Questions", ContentAr = "الأسئلة الشائعة", SortOrder = 1 },
+                new() { Key = "faq-1-question", Name = "FAQ 1 Question", Type = "text", ContentEn = "How do I enroll in a course?", ContentAr = "كيف يمكنني التسجيل في دورة؟", SortOrder = 2 },
+                new() { Key = "faq-1-answer", Name = "FAQ 1 Answer", Type = "textarea", ContentEn = "You can enroll through our website or contact us directly.", ContentAr = "يمكنك التسجيل من خلال موقعنا الإلكتروني أو التواصل معنا مباشرة.", SortOrder = 3 },
+                new() { Key = "faq-2-question", Name = "FAQ 2 Question", Type = "text", ContentEn = "What payment methods do you accept?", ContentAr = "ما هي طرق الدفع المقبولة؟", SortOrder = 4 },
+                new() { Key = "faq-2-answer", Name = "FAQ 2 Answer", Type = "textarea", ContentEn = "We accept credit cards, bank transfers, and online payments.", ContentAr = "نقبل بطاقات الائتمان والتحويلات البنكية والمدفوعات الإلكترونية.", SortOrder = 5 }
             },
             "consultation" => new List<DefaultBlockData>
             {
-                new() { Key = "title", Name = "Consultation Title", Type = "text", ContentEn = "Consultation Services", ContentAr = "Ø®Ø¯Ù…Ø§Øª Ø§Ù„Ø§Ø³ØªØ´Ø§Ø±Ø©", SortOrder = 1 },
-                new() { Key = "description", Name = "Consultation Description", Type = "textarea", ContentEn = "Professional consultation services tailored to your needs", ContentAr = "Ø®Ø¯Ù…Ø§Øª Ø§Ø³ØªØ´Ø§Ø±ÙŠØ© Ù…Ù‡Ù†ÙŠØ© Ù…ØµÙ…Ù…Ø© Ø®ØµÙŠØµØ§Ù‹ Ù„Ø§Ø­ØªÙŠØ§Ø¬Ø§ØªÙƒ", SortOrder = 2 }
+                new() { Key = "title", Name = "Consultation Title", Type = "text", ContentEn = "Consultation Services", ContentAr = "خدمات الاستشارة", SortOrder = 1 },
+                new() { Key = "description", Name = "Consultation Description", Type = "textarea", ContentEn = "Professional consultation services tailored to your needs", ContentAr = "خدمات استشارية مهنية مصممة خصيصاً لاحتياجاتك", SortOrder = 2 }
             },
             _ => new List<DefaultBlockData>
             {
-                new() { Key = "title", Name = "Title", Type = "text", ContentEn = "Section Title", ContentAr = "Ø¹Ù†ÙˆØ§Ù† Ø§Ù„Ù‚Ø³Ù…", SortOrder = 1 },
-                new() { Key = "description", Name = "Description", Type = "text", ContentEn = "Section description", ContentAr = "ÙˆØµÙ Ø§Ù„Ù‚Ø³Ù…", SortOrder = 2 }
+                new() { Key = "title", Name = "Title", Type = "text", ContentEn = "Section Title", ContentAr = "عنوان القسم", SortOrder = 1 },
+                new() { Key = "description", Name = "Description", Type = "text", ContentEn = "Section description", ContentAr = "وصف القسم", SortOrder = 2 }
             }
         };
     }
@@ -1857,7 +1895,7 @@ public class ContentController : ControllerBase
                     id = "hero-badge-ar",
                     label = "Hero Badge (Arabic)",
                     type = "text",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "hero-badge")?.ContentAr ?? "Ø¥Ø±Ø³Ø§Ø¡ Ù…Ø¹Ùƒ Ù„ØªØ·ÙˆÙŠØ± Ø§Ù„Ù…Ù‡Ø§Ø±Ø§Øª",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "hero-badge")?.ContentAr ?? "إرساء معك لتطوير المهارات",
                     required = true,
                     placeholder = "Enter hero badge text in Arabic"
                 });
@@ -1875,7 +1913,7 @@ public class ContentController : ControllerBase
                     id = "hero-title-ar",
                     label = "Hero Title (Arabic)",
                     type = "text",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "hero-title")?.ContentAr ?? "Ø§Ø³ØªÙƒØ´Ù Ù…Ù†ØµØªÙ†Ø§ Ø§Ù„ØªØ¯Ø±ÙŠØ¨ÙŠØ© ÙˆØ§Ø±ØªÙ‚ÙŠ Ø¨Ù‚Ø¯Ø±Ø§ØªÙƒ Ù„ØªØ­Ù‚ÙŠÙ‚ Ø£Ù‚ØµÙ‰ Ø¥Ù…ÙƒØ§Ù†Ø§ØªÙƒ",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "hero-title")?.ContentAr ?? "استكشف منصتنا التدريبية وارتقي بقدراتك لتحقيق أقصى إمكاناتك",
                     required = true,
                     placeholder = "Enter main hero title in Arabic"
                 });
@@ -1893,7 +1931,7 @@ public class ContentController : ControllerBase
                     id = "hero-description-ar",
                     label = "Hero Description (Arabic)",
                     type = "textarea",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "hero-description")?.ContentAr ?? "Ø§Ø¨Ù† Ù…Ø³ØªÙ‚Ø¨Ù„Ø§Ù‹ ÙˆØ§Ø¹Ø¯Ø§Ù‹ ÙˆÙ‚ÙˆØ¯ Ø­ÙŠØ§ØªÙƒ Ù…Ø¹ Ø¨Ø±Ø§Ù…Ø¬Ù†Ø§ Ø§Ù„ØªÙØ§Ø¹Ù„ÙŠØ© ÙˆØ§Ù„Ù…ÙÙ‡Ù…Ø©",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "hero-description")?.ContentAr ?? "ابن مستقبلاً واعداً وقود حياتك مع برامجنا التفاعلية والشاملة",
                     required = true,
                     placeholder = "Enter hero description in Arabic"
                 });
@@ -1911,7 +1949,7 @@ public class ContentController : ControllerBase
                     id = "hero-cta-primary-ar",
                     label = "Primary CTA Text (Arabic)",
                     type = "text",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "hero-cta-primary")?.ContentAr ?? "Ø§Ø³ØªÙƒØ´Ù Ø§Ù„Ø¯ÙˆØ±Ø§Øª",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "hero-cta-primary")?.ContentAr ?? "استكشف الدورات",
                     required = true,
                     placeholder = "Enter primary button text in Arabic"
                 });
@@ -1929,11 +1967,11 @@ public class ContentController : ControllerBase
                     id = "hero-cta-secondary-ar",
                     label = "Secondary CTA Text (Arabic)",
                     type = "text",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "hero-cta-secondary")?.ContentAr ?? "Ø·Ù„Ø¨ Ø§Ø³ØªØ´Ø§Ø±Ø©",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "hero-cta-secondary")?.ContentAr ?? "طلب استشارة",
                     required = false,
                     placeholder = "Enter secondary button text in Arabic"
                 });
-                
+
                 // Features array with bilingual items
                 fields.Add(new
                 {
@@ -1943,7 +1981,7 @@ public class ContentController : ControllerBase
                     value = GetBilingualArrayFromBlocks(blocks, "feature"),
                     required = true
                 });
-                
+
                 // Testimonials array with bilingual items
                 fields.Add(new
                 {
@@ -1970,7 +2008,7 @@ public class ContentController : ControllerBase
                     id = "page-title-ar",
                     label = "Page Title (Arabic)",
                     type = "text",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "page-title")?.ContentAr ?? "Ø¯ÙˆØ±Ø§ØªÙ†Ø§",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "page-title")?.ContentAr ?? "دوراتنا",
                     required = true,
                     placeholder = "Enter page title in Arabic"
                 });
@@ -1988,11 +2026,11 @@ public class ContentController : ControllerBase
                     id = "page-description-ar",
                     label = "Page Description (Arabic)",
                     type = "textarea",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "page-description")?.ContentAr ?? "Ø§ÙƒØªØ´Ù Ù…Ø¬Ù…ÙˆØ¹ØªÙ†Ø§ Ø§Ù„Ø´Ø§Ù…Ù„Ø© Ù…Ù† Ø¯ÙˆØ±Ø§Øª Ø§Ù„ØªØ·ÙˆÙŠØ± Ø§Ù„Ù…Ù‡Ù†ÙŠ",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "page-description")?.ContentAr ?? "اكتشف مجموعتنا الشاملة من دورات التطوير المهني",
                     required = true,
                     placeholder = "Enter page description in Arabic"
                 });
-                
+
                 // Categories array with bilingual items
                 fields.Add(new
                 {
@@ -2014,7 +2052,7 @@ public class ContentController : ControllerBase
                     value = new
                     {
                         en = blocks.FirstOrDefault(b => b.BlockKey == "company-name")?.ContentEn ?? "Ersa Training",
-                        ar = blocks.FirstOrDefault(b => b.BlockKey == "company-name")?.ContentAr ?? "Ø¥Ø±Ø³Ø§Ø¡ Ù„Ù„ØªØ¯Ø±ÙŠØ¨"
+                        ar = blocks.FirstOrDefault(b => b.BlockKey == "company-name")?.ContentAr ?? "إرساء للتدريب"
                     },
                     required = true,
                     placeholder = "Enter company name"
@@ -2027,7 +2065,7 @@ public class ContentController : ControllerBase
                     value = new
                     {
                         en = blocks.FirstOrDefault(b => b.BlockKey == "mission")?.ContentEn ?? "Empowering individuals and organizations through world-class training solutions",
-                        ar = blocks.FirstOrDefault(b => b.BlockKey == "mission")?.ContentAr ?? "ØªÙ…ÙƒÙŠÙ† Ø§Ù„Ø£ÙØ±Ø§Ø¯ ÙˆØ§Ù„Ù…Ù†Ø¸Ù…Ø§Øª Ù…Ù† Ø®Ù„Ø§Ù„ Ø­Ù„ÙˆÙ„ ØªØ¯Ø±ÙŠØ¨ÙŠØ© Ø¹Ø§Ù„Ù…ÙŠØ© Ø§Ù„Ù…Ø³ØªÙˆÙ‰"
+                        ar = blocks.FirstOrDefault(b => b.BlockKey == "mission")?.ContentAr ?? "تمكين الأفراد والمنظمات من خلال حلول تدريبية عالمية المستوى"
                     },
                     required = true,
                     placeholder = "Enter company mission"
@@ -2040,12 +2078,12 @@ public class ContentController : ControllerBase
                     value = new
                     {
                         en = blocks.FirstOrDefault(b => b.BlockKey == "vision")?.ContentEn ?? "To be the preferred training partner in the region",
-                        ar = blocks.FirstOrDefault(b => b.BlockKey == "vision")?.ContentAr ?? "Ø£Ù† Ù†ÙƒÙˆÙ† Ø§Ù„Ø´Ø±ÙŠÙƒ Ø§Ù„ØªØ¯Ø±ÙŠØ¨ÙŠ Ø§Ù„Ù…ÙØ¶Ù„ ÙÙŠ Ø§Ù„Ù…Ù†Ø·Ù‚Ø©"
+                        ar = blocks.FirstOrDefault(b => b.BlockKey == "vision")?.ContentAr ?? "أن نكون الشريك التدريبي المفضل في المنطقة"
                     },
                     required = true,
                     placeholder = "Enter company vision"
                 });
-                
+
                 // Team array with bilingual fields per member
                 fields.Add(new
                 {
@@ -2055,6 +2093,97 @@ public class ContentController : ControllerBase
                     value = GetTeamMembersFromBlocks(blocks),
                     required = false
                 });
+                break;
+            case "privacy":
+                // Bilingual fields with {en, ar} structure
+                fields.Add(new
+                {
+                    id = "privacy-title",
+                    label = "Privacy Title",
+                    type = "text",
+                    value = new
+                    {
+                        en = blocks.FirstOrDefault(b => b.BlockKey == "privacy-title")?.ContentEn ?? "Registration and Cancellation Policies for Public Training Programs – Ersa Institute",
+                        ar = blocks.FirstOrDefault(b => b.BlockKey == "privacy-title")?.ContentAr ?? "سياسات التسجيل والإلغاء للدورات العامة – معهد إرساء"
+                    },
+                    required = true,
+                    placeholder = "Enter company name"
+                });
+                var privacyContentBlock = blocks.FirstOrDefault(b => b.BlockKey == "privacy-content");
+                fields.Add(new
+                {
+                    id = "privacy-content",
+                    label = "Privacy Content",
+                    type = "rich-text", // Always use rich-text for privacy-content
+                    value = new
+                    {
+                        en = privacyContentBlock?.ContentEn ?? "",
+                        ar = privacyContentBlock?.ContentAr ?? ""
+                    },
+                    required = true,
+                    placeholder = "Enter company mission"
+                });
+                var privacyContactBlock = blocks.FirstOrDefault(b => b.BlockKey == "privacy-contact-info");
+                fields.Add(new
+                {
+                    id = "privacy-contact-info",
+                    label = "Privacy Contact Info",
+                    type = "rich-text", // Always use rich-text for privacy-contact-info
+                    value = new
+                    {
+                        en = privacyContactBlock?.ContentEn ?? "",
+                        ar = privacyContactBlock?.ContentAr ?? ""
+                    },
+                    required = true,
+                    placeholder = "Enter company vision"
+                });
+
+                break;
+
+            case "terms":
+                // Bilingual fields with {en, ar} structure
+                fields.Add(new
+                {
+                    id = "terms-title",
+                    label = "Terms Title",
+                    type = "text",
+                    value = new
+                    {
+                        en = blocks.FirstOrDefault(b => b.BlockKey == "terms-title")?.ContentEn ?? "Terms of Service",
+                        ar = blocks.FirstOrDefault(b => b.BlockKey == "terms-title")?.ContentAr ?? "شروط الخدمة"
+                    },
+                    required = true,
+                    placeholder = "Enter company name"
+                });
+                var termsContentBlock = blocks.FirstOrDefault(b => b.BlockKey == "terms-content");
+                fields.Add(new
+                {
+                    id = "terms-content",
+                    label = "Terms Content",
+                    type = "rich-text", // Always use rich-text for terms-content
+                    value = new
+                    {
+                        en = termsContentBlock?.ContentEn ?? "",
+                        ar = termsContentBlock?.ContentAr ?? ""
+                    },
+                    required = true,
+                    placeholder = "Enter company mission"
+                });
+                var termsContactBlock = blocks.FirstOrDefault(b => b.BlockKey == "terms-contact-info");
+                fields.Add(new
+                {
+                    id = "terms-contact-info",
+                    label = "Terms Contact Info",
+                    type = "rich-text", // Always use rich-text for terms-contact-info
+                    value = new
+                    {
+                        en = termsContactBlock?.ContentEn ?? "",
+                        ar = termsContactBlock?.ContentAr ?? ""
+                    },
+                    required = true,
+                    placeholder = "Enter company vision"
+                });
+
                 break;
 
             case "services":
@@ -2072,7 +2201,7 @@ public class ContentController : ControllerBase
                     id = "title-ar",
                     label = "Services Title (Arabic)",
                     type = "text",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "title")?.ContentAr ?? "Ø®Ø¯Ù…Ø§ØªÙ†Ø§",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "title")?.ContentAr ?? "خدماتنا",
                     required = true,
                     placeholder = "Enter services title in Arabic"
                 });
@@ -2090,7 +2219,7 @@ public class ContentController : ControllerBase
                     id = "description",
                     label = "Services Description (Arabic)",
                     type = "textarea",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "description-ar")?.ContentAr ?? "Ù†Ù‚Ø¯Ù… Ø®Ø¯Ù…Ø§Øª ØªØ¯Ø±ÙŠØ¨ÙŠØ© ÙˆØ§Ø³ØªØ´Ø§Ø±ÙŠØ© Ø´Ø§Ù…Ù„Ø©",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "description-ar")?.ContentAr ?? "نقدم خدمات تدريبية واستشارية شاملة",
                     required = true,
                     placeholder = "Enter services description in Arabic"
                 });
@@ -2111,7 +2240,7 @@ public class ContentController : ControllerBase
                     id = "title",
                     label = "Contact Title (Arabic)",
                     type = "text",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "title")?.ContentAr ?? "ØªÙˆØ§ØµÙ„ Ù…Ø¹Ù†Ø§",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "title")?.ContentAr ?? "تواصل معنا",
                     required = true,
                     placeholder = "Enter contact title in Arabic"
                 });
@@ -2129,7 +2258,7 @@ public class ContentController : ControllerBase
                     id = "address-ar",
                     label = "Address (Arabic)",
                     type = "text",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "address-ar")?.ContentAr ?? "Ø§Ù„Ø±ÙŠØ§Ø¶ØŒ Ø§Ù„Ù…Ù…Ù„ÙƒØ© Ø§Ù„Ø¹Ø±Ø¨ÙŠØ© Ø§Ù„Ø³Ø¹ÙˆØ¯ÙŠØ©",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "address-ar")?.ContentAr ?? "الرياض، المملكة العربية السعودية",
                     required = true,
                     placeholder = "Enter address in Arabic"
                 });
@@ -2168,11 +2297,11 @@ public class ContentController : ControllerBase
                     id = "faq-title-ar",
                     label = "FAQ Title (Arabic)",
                     type = "text",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "faq-title")?.ContentAr ?? "Ø§Ù„Ø£Ø³Ø¦Ù„Ø© Ø§Ù„Ø´Ø§Ø¦Ø¹Ø©",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "faq-title")?.ContentAr ?? "الأسئلة الشائعة",
                     required = true,
                     placeholder = "Enter FAQ title in Arabic"
                 });
-                
+
                 // Separate English/Arabic arrays for FAQ items
                 fields.Add(new
                 {
@@ -2207,7 +2336,7 @@ public class ContentController : ControllerBase
                     id = "title-ar",
                     label = "Consultation Title (Arabic)",
                     type = "text",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "title")?.ContentAr ?? "Ø®Ø¯Ù…Ø§Øª Ø§Ù„Ø§Ø³ØªØ´Ø§Ø±Ø©",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "title")?.ContentAr ?? "خدمات الاستشارة",
                     required = true,
                     placeholder = "Enter consultation title in Arabic"
                 });
@@ -2225,7 +2354,7 @@ public class ContentController : ControllerBase
                     id = "description-ar",
                     label = "Consultation Description (Arabic)",
                     type = "textarea",
-                    value = blocks.FirstOrDefault(b => b.BlockKey == "description")?.ContentAr ?? "Ø®Ø¯Ù…Ø§Øª Ø§Ø³ØªØ´Ø§Ø±ÙŠØ© Ù…Ù‡Ù†ÙŠØ© Ù…ØµÙ…Ù…Ø© Ø®ØµÙŠØµØ§Ù‹ Ù„Ø§Ø­ØªÙŠØ§Ø¬Ø§ØªÙƒ",
+                    value = blocks.FirstOrDefault(b => b.BlockKey == "description")?.ContentAr ?? "خدمات استشارية مهنية مصممة خصيصاً لاحتياجاتك",
                     required = true,
                     placeholder = "Enter consultation description in Arabic"
                 });
@@ -2286,7 +2415,7 @@ public class ContentController : ControllerBase
                         var nameAndRole = parts[0].Trim();
                         var textPart = parts[1].Trim();
                         var roleParts = textPart.Split(':', 2);
-                        
+
                         result.Add(new
                         {
                             name = nameAndRole,
@@ -2325,9 +2454,9 @@ public class ContentController : ControllerBase
                 {
                     result.AddRange(new[]
                     {
-                        new { title = "Ø¯ÙˆØ±Ø§Øª Ù…ØªÙ‚Ø¯Ù…Ø©", description = "Ø£Ø­Ø¯Ø« Ø§Ù„ØªÙ‚Ù†ÙŠØ§Øª ÙˆØ§Ù„Ù…Ù†Ø§Ù‡Ø¬" },
-                        new { title = "Ù…Ø¯Ø±Ø¨ÙˆÙ† Ø®Ø¨Ø±Ø§Ø¡", description = "Ø®Ø¨Ø±Ø© ÙˆØ§Ø³Ø¹Ø© ÙÙŠ Ø§Ù„Ù…Ø¬Ø§Ù„" },
-                        new { title = "Ø¯Ø¹Ù… Ù…ØªÙˆØ§ØµÙ„", description = "Ù…Ø³Ø§Ø¹Ø¯Ø© Ø¹Ù„Ù‰ Ù…Ø¯Ø§Ø± Ø§Ù„Ø³Ø§Ø¹Ø©" }
+                        new { title = "دورات متقدمة", description = "أحدث التقنيات والمناهج" },
+                        new { title = "مدربون خبراء", description = "خبرة واسعة في المجال" },
+                        new { title = "دعم متواصل", description = "مساعدة على مدار الساعة" }
                     });
                 }
             }
@@ -2345,8 +2474,8 @@ public class ContentController : ControllerBase
                 {
                     result.AddRange(new[]
                     {
-                        new { name = "Ø£Ø­Ù…Ø¯ Ø¹Ù„ÙŠ", role = "Ø·Ø§Ù„Ø¨", text = "ØªØ¬Ø±Ø¨Ø© ØªØ¯Ø±ÙŠØ¨ÙŠØ© Ù…Ù…ØªØ§Ø²Ø©" },
-                        new { name = "Ø³Ø§Ø±Ø© Ø¬ÙˆÙ†Ø³ÙˆÙ†", role = "Ù…Ø¯ÙŠØ±", text = "Ù…Ù‡Ù†ÙŠ ÙˆÙØ¹Ø§Ù„" }
+                        new { name = "أحمد علي", role = "طالب", text = "تجربة تدريبية ممتازة" },
+                        new { name = "سارة جونسون", role = "مدير", text = "مهني وفعال" }
                     });
                 }
             }
@@ -2365,9 +2494,9 @@ public class ContentController : ControllerBase
                 {
                     result.AddRange(new[]
                     {
-                        new { name = "Ø§Ù„ØªØµÙ…ÙŠÙ… Ø§Ù„Ø¬Ø±Ø§ÙÙŠÙƒÙŠ", description = "Ø¯ÙˆØ±Ø§Øª ØªØµÙ…ÙŠÙ… Ø§Ø­ØªØ±Ø§ÙÙŠØ©" },
-                        new { name = "ØªØ·ÙˆÙŠØ± Ø§Ù„ÙˆÙŠØ¨", description = "Ù…Ù‡Ø§Ø±Ø§Øª ØªØ·ÙˆÙŠØ± Ø­Ø¯ÙŠØ«Ø©" },
-                        new { name = "Ø§Ù„ØªØ³ÙˆÙŠÙ‚ Ø§Ù„Ø±Ù‚Ù…ÙŠ", description = "Ø§Ø³ØªØ±Ø§ØªÙŠØ¬ÙŠØ§Øª ÙˆØ£Ø¯ÙˆØ§Øª Ø§Ù„ØªØ³ÙˆÙŠÙ‚" }
+                        new { name = "التصميم الجرافيكي", description = "دورات تصميم احترافية" },
+                        new { name = "تطوير الويب", description = "مهارات تطوير حديثة" },
+                        new { name = "التسويق الرقمي", description = "استراتيجيات وأدوات التسويق" }
                     });
                 }
             }
@@ -2391,7 +2520,7 @@ public class ContentController : ControllerBase
                 {
                     var enParts = block.ContentEn.Split(':', 2);
                     var arParts = block.ContentAr.Split(':', 2);
-                    
+
                     result.Add(new
                     {
                         titleEn = enParts.Length > 0 ? enParts[0].Trim() : "",
@@ -2404,7 +2533,7 @@ public class ContentController : ControllerBase
                 {
                     var enParts = block.ContentEn.Split(" - ", 2);
                     var arParts = block.ContentAr.Split(" - ", 2);
-                    
+
                     if (enParts.Length > 1 && arParts.Length > 1)
                     {
                         var nameEn = enParts[0].Trim();
@@ -2413,7 +2542,7 @@ public class ContentController : ControllerBase
                         var textPartAr = arParts[1].Trim();
                         var rolePartsEn = textPartEn.Split(':', 2);
                         var rolePartsAr = textPartAr.Split(':', 2);
-                        
+
                         result.Add(new
                         {
                             nameEn = nameEn,
@@ -2429,7 +2558,7 @@ public class ContentController : ControllerBase
                 {
                     var enParts = block.ContentEn.Split(':', 2);
                     var arParts = block.ContentAr.Split(':', 2);
-                    
+
                     result.Add(new
                     {
                         nameEn = enParts.Length > 0 ? enParts[0].Trim() : "",
@@ -2448,23 +2577,23 @@ public class ContentController : ControllerBase
             {
                 result.AddRange(new[]
                 {
-                    new { 
-                        titleEn = "Advanced Courses", 
-                        titleAr = "Ø¯ÙˆØ±Ø§Øª Ù…ØªÙ‚Ø¯Ù…Ø©",
-                        descriptionEn = "Latest technologies and methodologies", 
-                        descriptionAr = "Ø£Ø­Ø¯Ø« Ø§Ù„ØªÙ‚Ù†ÙŠØ§Øª ÙˆØ§Ù„Ù…Ù†Ø§Ù‡Ø¬"
+                    new {
+                        titleEn = "Advanced Courses",
+                        titleAr = "دورات متقدمة",
+                        descriptionEn = "Latest technologies and methodologies",
+                        descriptionAr = "أحدث التقنيات والمناهج"
                     },
-                    new { 
-                        titleEn = "Expert Trainers", 
-                        titleAr = "Ù…Ø¯Ø±Ø¨ÙˆÙ† Ø®Ø¨Ø±Ø§Ø¡",
-                        descriptionEn = "Extensive experience in the field", 
-                        descriptionAr = "Ø®Ø¨Ø±Ø© ÙˆØ§Ø³Ø¹Ø© ÙÙŠ Ø§Ù„Ù…Ø¬Ø§Ù„"
+                    new {
+                        titleEn = "Expert Trainers",
+                        titleAr = "مدربون خبراء",
+                        descriptionEn = "Extensive experience in the field",
+                        descriptionAr = "خبرة واسعة في المجال"
                     },
-                    new { 
-                        titleEn = "Continuous Support", 
-                        titleAr = "Ø¯Ø¹Ù… Ù…ØªÙˆØ§ØµÙ„",
-                        descriptionEn = "24/7 assistance available", 
-                        descriptionAr = "Ù…Ø³Ø§Ø¹Ø¯Ø© Ø¹Ù„Ù‰ Ù…Ø¯Ø§Ø± Ø§Ù„Ø³Ø§Ø¹Ø©"
+                    new {
+                        titleEn = "Continuous Support",
+                        titleAr = "دعم متواصل",
+                        descriptionEn = "24/7 assistance available",
+                        descriptionAr = "مساعدة على مدار الساعة"
                     }
                 });
             }
@@ -2472,21 +2601,21 @@ public class ContentController : ControllerBase
             {
                 result.AddRange(new[]
                 {
-                    new { 
-                        nameEn = "Ahmed Ali", 
-                        nameAr = "Ø£Ø­Ù…Ø¯ Ø¹Ù„ÙŠ",
-                        roleEn = "Student", 
-                        roleAr = "Ø·Ø§Ù„Ø¨",
-                        textEn = "Excellent training experience", 
-                        textAr = "ØªØ¬Ø±Ø¨Ø© ØªØ¯Ø±ÙŠØ¨ÙŠØ© Ù…Ù…ØªØ§Ø²Ø©"
+                    new {
+                        nameEn = "Ahmed Ali",
+                        nameAr = "أحمد علي",
+                        roleEn = "Student",
+                        roleAr = "طالب",
+                        textEn = "Excellent training experience",
+                        textAr = "تجربة تدريبية ممتازة"
                     },
-                    new { 
-                        nameEn = "Sarah Johnson", 
-                        nameAr = "Ø³Ø§Ø±Ø© Ø¬ÙˆÙ†Ø³ÙˆÙ†",
-                        roleEn = "Manager", 
-                        roleAr = "Ù…Ø¯ÙŠØ±",
-                        textEn = "Professional and effective", 
-                        textAr = "Ù…Ù‡Ù†ÙŠ ÙˆÙØ¹Ø§Ù„"
+                    new {
+                        nameEn = "Sarah Johnson",
+                        nameAr = "سارة جونسون",
+                        roleEn = "Manager",
+                        roleAr = "مدير",
+                        textEn = "Professional and effective",
+                        textAr = "مهني وفعال"
                     }
                 });
             }
@@ -2494,23 +2623,23 @@ public class ContentController : ControllerBase
             {
                 result.AddRange(new[]
                 {
-                    new { 
-                        nameEn = "Graphic Design", 
-                        nameAr = "Ø§Ù„ØªØµÙ…ÙŠÙ… Ø§Ù„Ø¬Ø±Ø§ÙÙŠÙƒÙŠ",
-                        descriptionEn = "Professional design courses", 
-                        descriptionAr = "Ø¯ÙˆØ±Ø§Øª ØªØµÙ…ÙŠÙ… Ø§Ø­ØªØ±Ø§ÙÙŠØ©"
+                    new {
+                        nameEn = "Graphic Design",
+                        nameAr = "التصميم الجرافيكي",
+                        descriptionEn = "Professional design courses",
+                        descriptionAr = "دورات تصميم احترافية"
                     },
-                    new { 
-                        nameEn = "Web Development", 
-                        nameAr = "ØªØ·ÙˆÙŠØ± Ø§Ù„ÙˆÙŠØ¨",
-                        descriptionEn = "Modern development skills", 
-                        descriptionAr = "Ù…Ù‡Ø§Ø±Ø§Øª ØªØ·ÙˆÙŠØ± Ø­Ø¯ÙŠØ«Ø©"
+                    new {
+                        nameEn = "Web Development",
+                        nameAr = "تطوير الويب",
+                        descriptionEn = "Modern development skills",
+                        descriptionAr = "مهارات تطوير حديثة"
                     },
-                    new { 
-                        nameEn = "Digital Marketing", 
-                        nameAr = "Ø§Ù„ØªØ³ÙˆÙŠÙ‚ Ø§Ù„Ø±Ù‚Ù…ÙŠ",
-                        descriptionEn = "Marketing strategies and tools", 
-                        descriptionAr = "Ø§Ø³ØªØ±Ø§ØªÙŠØ¬ÙŠØ§Øª ÙˆØ£Ø¯ÙˆØ§Øª Ø§Ù„ØªØ³ÙˆÙŠÙ‚"
+                    new {
+                        nameEn = "Digital Marketing",
+                        nameAr = "التسويق الرقمي",
+                        descriptionEn = "Marketing strategies and tools",
+                        descriptionAr = "استراتيجيات وأدوات التسويق"
                     }
                 });
             }
@@ -2565,20 +2694,20 @@ public class ContentController : ControllerBase
                 new
                 {
                     nameEn = "Ahmed Mohammed",
-                    nameAr = "Ø£Ø­Ù…Ø¯ Ù…Ø­Ù…Ø¯",
+                    nameAr = "أحمد محمد",
                     positionEn = "Chief Executive Officer",
-                    positionAr = "Ø§Ù„Ù…Ø¯ÙŠØ± Ø§Ù„ØªÙ†ÙÙŠØ°ÙŠ",
+                    positionAr = "المدير التنفيذي",
                     bioEn = "15 years of experience in training",
-                    bioAr = "Ø®Ø¨Ø±Ø© 15 Ø¹Ø§Ù… ÙÙŠ Ø§Ù„ØªØ¯Ø±ÙŠØ¨"
+                    bioAr = "خبرة 15 عام في التدريب"
                 },
                 new
                 {
                     nameEn = "Fatima Ali",
-                    nameAr = "ÙØ§Ø·Ù…Ø© Ø¹Ù„ÙŠ",
+                    nameAr = "فاطمة علي",
                     positionEn = "Training Manager",
-                    positionAr = "Ù…Ø¯ÙŠØ± Ø§Ù„ØªØ¯Ø±ÙŠØ¨",
+                    positionAr = "مدير التدريب",
                     bioEn = "10 years of experience in curriculum development",
-                    bioAr = "Ø®Ø¨Ø±Ø© 10 Ø£Ø¹ÙˆØ§Ù… ÙÙŠ ØªØ·ÙˆÙŠØ± Ø§Ù„Ù…Ù†Ø§Ù‡Ø¬"
+                    bioAr = "خبرة 10 أعوام في تطوير المناهج"
                 }
             });
         }
@@ -2623,9 +2752,9 @@ public class ContentController : ControllerBase
             {
                 result.AddRange(new[]
                 {
-                    new { question = "ÙƒÙŠÙ ÙŠÙ…ÙƒÙ†Ù†ÙŠ Ø§Ù„ØªØ³Ø¬ÙŠÙ„ ÙÙŠ Ø¯ÙˆØ±Ø©ØŸ", answer = "ÙŠÙ…ÙƒÙ†Ùƒ Ø§Ù„ØªØ³Ø¬ÙŠÙ„ Ù…Ù† Ø®Ù„Ø§Ù„ Ù…ÙˆÙ‚Ø¹Ù†Ø§ Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠ Ø£Ùˆ Ø§Ù„ØªÙˆØ§ØµÙ„ Ù…Ø¹Ù†Ø§ Ù…Ø¨Ø§Ø´Ø±Ø©." },
-                    new { question = "Ù…Ø§ Ù‡ÙŠ Ø·Ø±Ù‚ Ø§Ù„Ø¯ÙØ¹ Ø§Ù„Ù…Ù‚Ø¨ÙˆÙ„Ø©ØŸ", answer = "Ù†Ù‚Ø¨Ù„ Ø¨Ø·Ø§Ù‚Ø§Øª Ø§Ù„Ø§Ø¦ØªÙ…Ø§Ù† ÙˆØ§Ù„ØªØ­ÙˆÙŠÙ„Ø§Øª Ø§Ù„Ø¨Ù†ÙƒÙŠØ© ÙˆØ§Ù„Ù…Ø¯ÙÙˆØ¹Ø§Øª Ø§Ù„Ø¥Ù„ÙƒØªØ±ÙˆÙ†ÙŠØ©." },
-                    new { question = "Ù‡Ù„ ØªÙ‚Ø¯Ù…ÙˆÙ† Ø´Ù‡Ø§Ø¯Ø§ØªØŸ", answer = "Ù†Ø¹Ù…ØŒ Ù†Ù‚Ø¯Ù… Ø´Ù‡Ø§Ø¯Ø§Øª Ø¥ØªÙ…Ø§Ù… Ù„Ø¬Ù…ÙŠØ¹ Ø¯ÙˆØ±Ø§ØªÙ†Ø§." }
+                    new { question = "كيف يمكنني التسجيل في دورة؟", answer = "يمكنك التسجيل من خلال موقعنا الإلكتروني أو التواصل معنا مباشرة." },
+                    new { question = "ما هي طرق الدفع المقبولة؟", answer = "نقبل بطاقات الائتمان والتحويلات البنكية والمدفوعات الإلكترونية." },
+                    new { question = "هل تقدمون شهادات؟", answer = "نعم، نقدم شهادات إتمام لجميع دوراتنا." }
                 });
             }
         }

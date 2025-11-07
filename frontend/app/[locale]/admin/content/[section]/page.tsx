@@ -9,6 +9,7 @@ import toast from 'react-hot-toast';
 import { contentApi, ContentSection } from '@/lib/content-api';
 import { useAuthStore } from '@/lib/auth-store';
 import { useHydration } from '@/hooks/useHydration';
+import { RichTextEditor } from '@/components/ui/rich-text-editor';
 
 interface ContentField {
   id: string;
@@ -690,6 +691,17 @@ export default function ContentEditor() {
           />
         );
 
+      case 'rich-text':
+        return (
+          <RichTextEditor
+            value={currentValue || ''}
+            onChange={handleChange}
+            placeholder={field.placeholder}
+            dir={activeLang === 'ar' ? 'rtl' : 'ltr'}
+            disabled={!isEditing}
+          />
+        );
+
       case 'array':
         // Special handling for FAQ items to improve layout
         const isFAQItems = field.id.includes('faq-items');
@@ -970,13 +982,14 @@ export default function ContentEditor() {
                       : (locale === 'ar' ? 'حفظ' : 'Save')
                     }
                   </button>
-                  <button
+                  {/* Publish button hidden as per requirement */}
+                  {/* <button
                     onClick={handlePublish}
                     disabled={isSaving}
                     className="px-4 py-2 bg-secondary-600 text-white rounded-lg hover:bg-secondary-700 transition-colors disabled:opacity-50"
                   >
                     {locale === 'ar' ? 'نشر' : 'Publish'}
-                  </button>
+                  </button> */}
                 </div>
               )}
               
