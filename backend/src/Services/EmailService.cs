@@ -1390,7 +1390,7 @@ public class EmailService : IEmailService
     <meta charset=""UTF-8"">
     <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
     <link href=""https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap"" rel=""stylesheet"">
-    <title>{(isArabic ? "مرحباً بك" : "Welcome")}</title>
+    <title>{(isArabic ? "أهلاً بك في إرساء للتدريب والاستشارات" : "Welcome to Ersa for Training & Consultancy Services")}</title>
     <style>
         body {{
             font-family: 'Cairo', sans-serif;
@@ -1612,8 +1612,8 @@ public class EmailService : IEmailService
             <div class=""welcome-icon"">
                 🎉
             </div>
-            <h1>{(isArabic ? $"مرحباً {firstName}!" : $"Welcome {firstName}!")}</h1>
-            <p>{(isArabic ? "يسعدنا انضمامك لعائلة إرساء للتدريب" : "We're thrilled to have you join the Ersa Training family")}</p>
+            <h1>{(isArabic ? $"مرحباً {firstName}!" : $"Hello {firstName}!")}</h1>
+            <p>{(isArabic ? "أهلاً بك في إرساء للتدريب والاستشارات" : "Welcome to Ersa for Training & Consultancy Services")}</p>
         </div>
         
         <div class=""content"">
@@ -1622,9 +1622,8 @@ public class EmailService : IEmailService
             </div>
             
             <div class=""welcome-message"">
-                <p>{(isArabic ? 
-                    "تهانينا! لقد أكملت التسجيل بنجاح في منصة إرساء للتدريب. نحن متحمسون لمساعدتك في تحقيق أهدافك التعليمية والمهنية." : 
-                    "Congratulations! You've successfully completed your registration on the Ersa Training platform. We're excited to help you achieve your educational and professional goals.")}</p>
+                <p>{(isArabic ? "يسعدنا في معهد إرساء للتدريب والاستشارات انضمامك إلى منصّتنا. تم تفعيل حسابك بنجاح، ونتمنى لك رحلة تعلّم ممتعة ومليئة بالفائدة.<br/> نتطلّع لأن تكون تجربتك معنا مميزة وثرية.<br /> مع التحية،معهد إرساء للتدريب والاستشارات" : 
+                    "We are pleased to welcome you to Ersa for Training & Consultancy Services. Your account has been successfully activated, and we wish you an enjoyable and rewarding learning journey.<br/ > We look forward to providing you with a valuable and enriching experience.<br /> Best regards,")}</p>
                 
                 <p style=""margin-top: 20px;"">{(isArabic ? 
                     "إرساء ليست مجرد منصة تدريب، بل هي شريكك في رحلة النمو والتطوير المهني. نحن ملتزمون بتقديم أفضل تجربة تعليمية لك." : 
@@ -1675,21 +1674,6 @@ public class EmailService : IEmailService
                 </div>
             </div>
             
-            <div class=""stats-box"">
-                <div class=""stat-item"">
-                    <div class=""stat-number"">500+</div>
-                    <div class=""stat-label"">{(isArabic ? "دورة تدريبية" : "Training Courses")}</div>
-                </div>
-                <div class=""stat-item"">
-                    <div class=""stat-number"">10K+</div>
-                    <div class=""stat-label"">{(isArabic ? "متدرب ناجح" : "Successful Trainees")}</div>
-                </div>
-                <div class=""stat-item"">
-                    <div class=""stat-number"">95%</div>
-                    <div class=""stat-label"">{(isArabic ? "نسبة الرضا" : "Satisfaction Rate")}</div>
-                </div>
-            </div>
-            
             <div class=""recommendations"">
                 <h3>{(isArabic ? "💡 نصائح للبدء" : "💡 Tips to Get Started")}</h3>
                 <ul>
@@ -1727,31 +1711,18 @@ public class EmailService : IEmailService
                     {(isArabic ? "إكمال الملف الشخصي" : "Complete Profile")}
                 </a>
             </div>
-            
-            <div style=""margin-top: 40px; padding: 25px; background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%); border-radius: 10px; border: 2px solid #ffc107;"">
-                <p style=""margin: 0 0 15px 0; font-weight: bold; color: #856404; font-size: 18px;"">
-                    {(isArabic ? "🎁 عرض ترحيبي خاص!" : "🎁 Special Welcome Offer!")}
-                </p>
-                <p style=""margin: 0; color: #856404;"">
-                    {(isArabic ? 
-                        "احصل على خصم 10% على أول دورة تدريبية! استخدم الكود: WELCOME10" : 
-                        "Get 10% off your first training course! Use code: WELCOME10")}
-                </p>
-            </div>
         </div>
         
         <div class=""footer"">
             <h3>{(isArabic ? "إرساء للتدريب والاستشارات" : "Ersa Training & Consulting")}</h3>
             <p>{(isArabic ? "نحن هنا لدعمك في كل خطوة من رحلتك التعليمية" : "We're here to support you every step of your learning journey")}</p>
             <p style=""margin-top: 15px;"">{(isArabic ? "للدعم الفني:" : "For Support:")} support@ersa-training.com</p>
-            <p>{(isArabic ? "الهاتف:" : "Phone:")} +966 11 123 4567</p>
-            <p>{(isArabic ? "الموقع الإلكتروني:" : "Website:")} www.ersa-training.com</p>
+            <p>{(isArabic ? "الهاتف:" : "Phone:")} +966 557 7878 49</p>
+            <p><a href='' target='_blank'>{(isArabic ? "الموقع الإلكتروني:" : "Website:")} ersa-training.com</a></p>
             
             <div class=""social-links"">
-                <a href=""#"">📘</a>
-                <a href=""#"">📷</a>
-                <a href=""#"">🐦</a>
-                <a href=""#"">📺</a>
+                <a href=""https://www.linkedin.com/company/ersa-consulting-and-training-company/"" target=""_blank"">📘</a>                
+                <a href=""https://x.com/ersatraining?s=21&t=DjpWmZ-fh5LFAYzKchyxIQ"" target=""_blank"">🐦</a>
             </div>
         </div>
     </div>
