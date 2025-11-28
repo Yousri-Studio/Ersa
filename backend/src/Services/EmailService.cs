@@ -718,10 +718,11 @@ public class EmailService : IEmailService
 <head>
     <meta charset=""UTF-8"">
     <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+    <link href=""https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap"" rel=""stylesheet"">
     <title>{(isArabic ? "طلب تواصل جديد" : "New Contact Request")}</title>
     <style>
         body {{
-            font-family: 'Arial', sans-serif;
+            font-family: 'Cairo', sans-serif;
             line-height: 1.6;
             color: #333;
             margin: 0;
@@ -836,10 +837,11 @@ public class EmailService : IEmailService
 <head>
     <meta charset=""UTF-8"">
     <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+    <link href=""https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap"" rel=""stylesheet"">
     <title>{(isArabic ? "شكراً لتواصلك معنا" : "Thank you for contacting us")}</title>
     <style>
         body {{
-            font-family: 'Arial', sans-serif;
+            font-family: 'Cairo', sans-serif;
             line-height: 1.6;
             color: #333;
             margin: 0;
@@ -1100,10 +1102,11 @@ public class EmailService : IEmailService
 <head>
     <meta charset=""UTF-8"">
     <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+    <link href=""https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap"" rel=""stylesheet"">
     <title>{(isArabic ? "تأكيد الطلب" : "Order Confirmation")}</title>
     <style>
         body {{
-            font-family: 'Arial', sans-serif;
+            font-family: 'Cairo', sans-serif;
             line-height: 1.6;
             color: #333;
             margin: 0;
@@ -1386,10 +1389,11 @@ public class EmailService : IEmailService
 <head>
     <meta charset=""UTF-8"">
     <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+    <link href=""https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap"" rel=""stylesheet"">
     <title>{(isArabic ? "مرحباً بك" : "Welcome")}</title>
     <style>
         body {{
-            font-family: 'Arial', sans-serif;
+            font-family: 'Cairo', sans-serif;
             line-height: 1.6;
             color: #333;
             margin: 0;
@@ -1787,10 +1791,11 @@ public class EmailService : IEmailService
 <head>
     <meta charset=""UTF-8"">
     <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+    <link href=""https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap"" rel=""stylesheet"">
     <title>{(isArabic ? "تفعيل الحساب" : "Email Verification")}</title>
     <style>
         body {{
-            font-family: 'Arial', sans-serif;
+            font-family: 'Cairo', sans-serif;
             line-height: 1.6;
             color: #333;
             margin: 0;
@@ -2053,10 +2058,11 @@ public class EmailService : IEmailService
 <head>
     <meta charset=""UTF-8"">
     <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+    <link href=""https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap"" rel=""stylesheet"">
     <title>{(isArabic ? "إعادة تعيين كلمة المرور" : "Password Reset")}</title>
     <style>
         body {{
-            font-family: 'Arial', sans-serif;
+            font-family: 'Cairo', sans-serif;
             line-height: 1.6;
             color: #333;
             margin: 0;
@@ -2326,10 +2332,11 @@ public class EmailService : IEmailService
 <head>
     <meta charset=""UTF-8"">
     <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+    <link href=""https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap"" rel=""stylesheet"">
     <title>{tagline}</title>
     <style>
         body {{
-            font-family: 'Arial', sans-serif;
+            font-family: 'Cairo', sans-serif;
             line-height: 1.6;
             color: #333;
             margin: 0;
@@ -2602,10 +2609,11 @@ public class EmailService : IEmailService
 <head>
     <meta charset=""UTF-8"">
     <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
+    <link href=""https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap"" rel=""stylesheet"">
     <title>{tagline}</title>
     <style>
         body {{
-            font-family: 'Arial', sans-serif;
+            font-family: 'Cairo', sans-serif;
             line-height: 1.6;
             color: #333;
             margin: 0;

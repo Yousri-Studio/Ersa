@@ -93,6 +93,22 @@ public class ClickPayGateway : IPaymentGateway
             var json = JsonSerializer.Serialize(requestData);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
 
+
+            // log request data for debugging
+            _logger.LogInformation("ClickPay request data for order {OrderId}: {RequestData}", order.Id, json);
+            _logger.LogInformation("ClickPay API URL: {ApiUrl}", apiUrl);
+            _logger.LogInformation("ClickPay Profile ID: {ProfileId}", profileId);
+            _logger.LogInformation("ClickPay Server Key: {ServerKey}", serverKey);
+            _logger.LogInformation("ClickPay Webhook URL: {WebhookUrl}", webhookUrl);
+            _logger.LogInformation("ClickPay Return URL: {ReturnUrl}", finalReturnUrl);
+            _logger.LogInformation("ClickPay Customer Details: {CustomerDetails}", JsonSerializer.Serialize(requestData.customer_details));
+            _logger.LogInformation("ClickPay Cart ID: {CartId}", order.Id.ToString());
+            _logger.LogInformation("ClickPay Cart Description: {CartDescription}", $"Training Course Order {order.Id}");
+            _logger.LogInformation("ClickPay Cart Currency: {CartCurrency}", order.Currency ?? "SAR");
+            _logger.LogInformation("ClickPay Cart Amount: {CartAmount}", order.Amount.ToString("F2"));
+            _logger.LogInformation("ClickPay Callback: {Callback}", webhookUrl);                     
+            _logger.LogInformation("ClickPay Hide Shipping: {HideShipping}", true);
+           
             _httpClient.DefaultRequestHeaders.Clear();
             _httpClient.DefaultRequestHeaders.Add("Authorization", serverKey);
 
