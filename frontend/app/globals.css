@@ -2,9 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Import Font Awesome CSS from local files */
-@import '/fontawesome/css/all.min.css';
-
 /* Import local Cairo fonts */
 @font-face {
   font-family: 'Cairo';
