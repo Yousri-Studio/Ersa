@@ -1,6 +1,11 @@
+/* Import Font Awesome CSS from local files */
+@import '/fontawesome/css/all.min.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+
 
 /* Import local Cairo fonts */
 @font-face {
