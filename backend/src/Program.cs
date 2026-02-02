@@ -125,6 +125,7 @@ builder.Services.AddHttpClient();
 // Payment Gateway Services
 builder.Services.AddScoped<IPaymentGateway, HyperPayGateway>();
 builder.Services.AddScoped<IPaymentGateway, ClickPayGateway>();
+builder.Services.AddScoped<IPaymentGateway, TamaraGateway>();
 
 // Application Services
 builder.Services.AddScoped<IJwtService, JwtService>();

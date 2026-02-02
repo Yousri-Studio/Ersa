@@ -134,6 +134,36 @@ public class PaymentService : IPaymentService
                         orderId = parsedCartId;
                     }
                 }
+                else if (provider.Equals("Tamara", StringComparison.OrdinalIgnoreCase))
+                {
+                    // Preferred: order_reference_id contains our local OrderId
+                    if (root.TryGetProperty("order_reference_id", out var orderRefProp) &&
+                        Guid.TryParse(orderRefProp.GetString(), out var parsedOrderRef))
+                    {
+                        orderId = parsedOrderRef;
+                    }
+                    else if (root.TryGetProperty("orderReferenceId", out var orderRefProp2) &&
+                             Guid.TryParse(orderRefProp2.GetString(), out var parsedOrderRef2))
+                    {
+                        orderId = parsedOrderRef2;
+                    }
+                    else if (root.TryGetProperty("order_id", out var tamaraOrderIdProp))
+                    {
+                        // Fallback: resolve local order via ProviderRef (we store Tamara order_id as ProviderRef)
+                        var tamaraOrderId = tamaraOrderIdProp.GetString();
+                        if (!string.IsNullOrWhiteSpace(tamaraOrderId))
+                        {
+                            var paymentByRef = await _context.Payments
+                                .AsNoTracking()
+                                .FirstOrDefaultAsync(p => p.Provider == "Tamara" && p.ProviderRef == tamaraOrderId);
+
+                            if (paymentByRef != null)
+                            {
+                                orderId = paymentByRef.OrderId;
+                            }
+                        }
+                    }
+                }
 
                 if (orderId.HasValue)
                 {
@@ -222,15 +252,38 @@ public class PaymentService : IPaymentService
     /// <returns>List of available gateway names.</returns>
     public List<string> GetAvailableGateways()
     {
-        var gatewayMethod = _configuration.GetValue<int>("PaymentGateway:GatewayMethod");
-        
-        return gatewayMethod switch
+        // Preferred: explicit allow-list of enabled gateways (order preserved)
+        var enabledGateways = _configuration
+            .GetSection("PaymentGateway:EnabledGateways")
+            .Get<string[]>();
+
+        if (enabledGateways != null && enabledGateways.Length > 0)
         {
-            0 => _gateways.Keys.ToList(), // Both gateways
-            1 => new List<string> { "HyperPay" }, // Only HyperPay
-            2 => new List<string> { "ClickPay" }, // Only ClickPay
-            _ => new List<string> { GetDefaultGateway() } // Fallback to default
+            return enabledGateways
+                .Where(g => !string.IsNullOrWhiteSpace(g))
+                .Select(g => g.Trim())
+                // Must exist in DI-registered gateways
+                .Where(g => _gateways.ContainsKey(g))
+                // Must be configured (credential gating)
+                .Where(IsGatewayConfigured)
+                .Distinct(StringComparer.OrdinalIgnoreCase)
+                .ToList();
+        }
+
+        // Backward-compatible fallback: legacy int switch
+        var gatewayMethod = _configuration.GetValue<int>("PaymentGateway:GatewayMethod");
+        var legacy = gatewayMethod switch
+        {
+            0 => _gateways.Keys.ToList(), // All registered gateways
+            1 => new List<string> { "HyperPay" },
+            2 => new List<string> { "ClickPay" },
+            _ => new List<string>()
         };
+
+        return legacy
+            .Where(IsGatewayConfigured)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
     }
 
     /// <summary>
@@ -239,14 +292,61 @@ public class PaymentService : IPaymentService
     /// <returns>Default gateway name.</returns>
     public string GetDefaultGateway()
     {
-        var gatewayMethod = _configuration.GetValue<int>("PaymentGateway:GatewayMethod");
-        var defaultGateway = _configuration["PaymentGateway:DefaultGateway"] ?? "ClickPay";
-        
-        return gatewayMethod switch
+        var available = GetAvailableGateways();
+        if (available.Count == 0)
         {
-            1 => "HyperPay",
-            2 => "ClickPay",
-            _ => defaultGateway
-        };
+            throw new InvalidOperationException("No active payment gateways are available (check PaymentGateway:EnabledGateways and provider credentials).");
+        }
+
+        var configuredDefault = _configuration["PaymentGateway:DefaultGateway"];
+        if (!string.IsNullOrWhiteSpace(configuredDefault))
+        {
+            var trimmed = configuredDefault.Trim();
+            if (available.Contains(trimmed, StringComparer.OrdinalIgnoreCase))
+            {
+                return trimmed;
+            }
+        }
+
+        // Fallback: first available gateway (preserves EnabledGateways order)
+        return available[0];
+    }
+
+    private bool IsGatewayConfigured(string providerName)
+    {
+        // Hide gateways that are enabled but missing required credentials.
+        // This keeps the UI showing only truly "active" methods.
+
+        if (providerName.Equals("ClickPay", StringComparison.OrdinalIgnoreCase))
+        {
+            var profileId = _configuration["ClickPay:ProfileId"];
+            var serverKey = _configuration["ClickPay:ServerKey"];
+            return HasRealValue(profileId) && HasRealValue(serverKey);
+        }
+
+        if (providerName.Equals("HyperPay", StringComparison.OrdinalIgnoreCase))
+        {
+            var entityId = _configuration["HyperPay:EntityId"];
+            var accessToken = _configuration["HyperPay:AccessToken"];
+            return HasRealValue(entityId) && HasRealValue(accessToken);
+        }
+
+        if (providerName.Equals("Tamara", StringComparison.OrdinalIgnoreCase))
+        {
+            var apiBaseUrl = _configuration["Tamara:ApiBaseUrl"];
+            var apiToken = _configuration["Tamara:ApiToken"];
+            var notificationToken = _configuration["Tamara:NotificationToken"];
+            return HasRealValue(apiBaseUrl) && HasRealValue(apiToken) && HasRealValue(notificationToken);
+        }
+
+        // Unknown provider: assume configured (so we don't unintentionally hide new providers)
+        return true;
+    }
+
+    private static bool HasRealValue(string? value)
+    {
+        if (string.IsNullOrWhiteSpace(value)) return false;
+        var v = value.Trim();
+        return !(v.StartsWith("your-", StringComparison.OrdinalIgnoreCase) || v.Contains("your-", StringComparison.OrdinalIgnoreCase));
     }
 }

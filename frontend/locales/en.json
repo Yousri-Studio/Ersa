@@ -864,11 +864,12 @@
     "title": "Checkout",
     "order-summary": "Order Summary",
     "billing-info": "Billing Information",
+    "payment-method": "Payment method",
     "total": "Total",
     "empty-cart": "Your cart is empty.",
     "proceed-to-payment": "Proceed to Payment",
     "processing": "Processing...",
-    "secure-payment": "🔒 Secure payment powered by ClickPay",
+    "secure-payment": "🔒 Secure payment",
     "redirecting-to-login": "Redirecting to login...",
     "errors": {
       "empty-cart": "Your cart is empty.",

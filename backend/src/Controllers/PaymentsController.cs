@@ -36,7 +36,15 @@ public class PaymentsController : ControllerBase
         {
             var availableGateways = _paymentService.GetAvailableGateways();
             var defaultGateway = _paymentService.GetDefaultGateway();
-            var gatewayMethod = availableGateways.Count > 1 ? 0 : (defaultGateway == "HyperPay" ? 1 : 2);
+            // Legacy field: keep for backward compatibility. Do NOT rely on it for UI decisions.
+            // 0 = multi/unknown, 1 = HyperPay only, 2 = ClickPay only
+            var gatewayMethod = availableGateways.Count > 1
+                ? 0
+                : defaultGateway.Equals("HyperPay", StringComparison.OrdinalIgnoreCase)
+                    ? 1
+                    : defaultGateway.Equals("ClickPay", StringComparison.OrdinalIgnoreCase)
+                        ? 2
+                        : 0;
 
             return Ok(new PaymentConfigResponse
             {
@@ -150,6 +158,29 @@ public class PaymentsController : ControllerBase
         catch (Exception ex)
         {
             _logger.LogError(ex, "❌ Error processing ClickPay webhook");
+            return StatusCode(500);
+        }
+    }
+
+    [HttpPost("tamara/webhook")]
+    public async Task<IActionResult> TamaraWebhook()
+    {
+        try
+        {
+            var payload = await new StreamReader(Request.Body).ReadToEndAsync();
+
+            // Tamara sends tamaraToken as query param and also as Authorization bearer token.
+            // Forward whichever is present to the gateway for verification.
+            var tokenFromQuery = Request.Query["tamaraToken"].FirstOrDefault();
+            var tokenFromAuth = Request.Headers["Authorization"].FirstOrDefault();
+            var token = !string.IsNullOrWhiteSpace(tokenFromAuth) ? tokenFromAuth! : (tokenFromQuery ?? "");
+
+            var success = await _paymentService.ProcessWebhookAsync(payload, token, "Tamara");
+            return success ? Ok() : BadRequest();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error processing Tamara webhook");
             return StatusCode(500);
         }
     }

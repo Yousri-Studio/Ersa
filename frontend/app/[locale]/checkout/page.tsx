@@ -8,6 +8,8 @@ import { useAuthStore } from '@/lib/auth-store';
 import { useHydration } from '@/hooks/useHydration';
 import { ordersApi, paymentsApi, type Order } from '@/lib/api';
 import { Icon } from '@/components/ui/icon';
+import PaymentMethodSelector from '@/components/checkout/PaymentMethodSelector';
+import { usePaymentConfig } from '@/hooks/usePaymentConfig';
 
 function CheckoutContent() {
   const locale = useLocale();
@@ -17,10 +19,12 @@ function CheckoutContent() {
   const [error, setError] = useState<string | null>(null);
   const [existingOrder, setExistingOrder] = useState<Order | null>(null);
   const [isAuthChecked, setIsAuthChecked] = useState(false);
+  const [selectedPaymentProvider, setSelectedPaymentProvider] = useState<string | null>(null);
   const { items, total, currency, cartId, clearCart } = useCartStore();
   const { user, isAuthenticated, initFromCookie } = useAuthStore();
   const isHydrated = useHydration();
   const router = useRouter();
+  const { config: paymentConfig } = usePaymentConfig(isHydrated);
 
   // Get orderId from URL - try both searchParams and window.location as fallback
   const existingOrderId = searchParams?.get('orderId') || 
@@ -82,6 +86,17 @@ function CheckoutContent() {
     loadExistingOrder();
   }, [isHydrated, isAuthChecked, isAuthenticated, existingOrderId, t]);
 
+  // Initialize payment provider selection from backend config (active-only gateways)
+  useEffect(() => {
+    if (!paymentConfig) return;
+    setSelectedPaymentProvider((prev) => {
+      if (prev && paymentConfig.availableGateways.some((g) => g.toLowerCase() === prev.toLowerCase())) {
+        return prev;
+      }
+      return paymentConfig.defaultGateway || paymentConfig.availableGateways[0] || null;
+    });
+  }, [paymentConfig]);
+
   const handleCheckout = async () => {
     setIsLoading(true);
     setError(null);
@@ -126,7 +141,11 @@ function CheckoutContent() {
       const returnUrl = `${window.location.origin}/${locale}/checkout/success`;
       console.log('🔗 Payment return URL:', returnUrl);
       
-      const checkoutResponse = await paymentsApi.createCheckout({ orderId, returnUrl });
+      const checkoutResponse = await paymentsApi.createCheckout({
+        orderId,
+        returnUrl,
+        paymentProvider: selectedPaymentProvider ?? undefined,
+      });
       const { redirectUrl } = checkoutResponse.data;
       console.log('✅ Payment session created, redirecting to:', redirectUrl);
 
@@ -293,6 +312,15 @@ function CheckoutContent() {
               )}
             </div>
           </div>
+
+          {paymentConfig?.showSelector && (
+            <PaymentMethodSelector
+              title={t('checkout.payment-method')}
+              availableGateways={paymentConfig.availableGateways}
+              selectedGateway={selectedPaymentProvider}
+              onChange={setSelectedPaymentProvider}
+            />
+          )}
 
           {error && (
             <div className="mt-4 p-4 bg-red-50 text-red-700 border border-red-200 rounded-lg flex items-start">

@@ -8,6 +8,7 @@ import type { AdminOrderDetail } from '@/lib/admin-api';
 import { useHydration } from '@/hooks/useHydration';
 import toast from 'react-hot-toast';
 import EnrollmentFulfillment from '@/components/admin/enrollment-fulfillment';
+import { getPaymentProviderIconName } from '@/lib/payment-provider';
 
 export default function AdminOrderDetail() {
   const params = useParams();
@@ -188,26 +189,6 @@ export default function AdminOrderDetail() {
       case 'cancelled': return 'Cancelled';
       case 'refunded': return 'Refunded';
       default: return 'Unknown';
-    }
-  };
-
-  const getPaymentProviderIcon = (provider: string) => {
-    const providerLower = provider.toLowerCase();
-    switch (providerLower) {
-      case 'clickpay':
-        return 'credit-card'; // or 'wallet' for payment gateway
-      case 'hyperpay':
-        return 'building-columns'; // or 'credit-card' for bank payment
-      case 'stripe':
-        return 'cc-stripe';
-      case 'paypal':
-        return 'cc-paypal';
-      case 'cash':
-        return 'money-bill';
-      case 'bank':
-        return 'building-columns';
-      default:
-        return 'credit-card'; // default payment icon
     }
   };
 
@@ -409,7 +390,7 @@ export default function AdminOrderDetail() {
                   <div className="flex items-center space-x-3 rtl:space-x-reverse">
                     <div className="flex-shrink-0">
                       <div className="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center">
-                        <Icon name={getPaymentProviderIcon(payment.provider)} className={`h-4 w-4 ${getPaymentProviderColor(payment.provider)}`} />
+                        <Icon name={getPaymentProviderIconName(payment.provider)} className={`h-4 w-4 ${getPaymentProviderColor(payment.provider)}`} />
                       </div>
                     </div>
                     <div>
